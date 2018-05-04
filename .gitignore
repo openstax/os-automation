@@ -109,3 +109,5 @@ venv.bak/
 # test report
 report.html
 assets/
+coverage.xml
+testrail.cfg
