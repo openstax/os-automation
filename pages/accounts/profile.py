@@ -15,7 +15,7 @@ class Profile(Home):
     _edit_submit_locator = (By.CLASS_NAME, 'editable-submit')
     _edit_cancel_locator = (By.CLASS_NAME, 'editable-cancel')
     _username_exists_locator = (By.CSS_SELECTOR, '#profile .row')
-    _console_locator = (By.ID, 'upper-corner-console')
+    _console_locator = (By.CSS_SELECTOR, '#upper-corner-console a')
 
     @property
     def name(self):
@@ -40,14 +40,14 @@ class Profile(Home):
     def log_out(self):
         """Log the user out."""
         self.find_element(*self._log_out_locator).click()
-        return Home(self)
+        return Home(self.driver)
 
     def open_popup_console(self):
         """Open the small admin console."""
-        if self.is_admin:
-            self.find_element(*self._console_locator).click()
-            return self.PopupConcole(self)
-        return self
+        if not self.is_admin:
+            raise AccountException('User is not an administrator')
+        self.find_element(*self._console_locator).click()
+        return self.PopupConcole(self)
 
     @property
     def is_admin(self):
@@ -58,8 +58,7 @@ class Profile(Home):
     def has_username(self):
         """Return True if a user has a username field.
 
-        Length is 4 fields if the username is not set
-        and 5 if it is.
+        Length is 4 fields if the username is not set and 5 if it is.
         """
         return len(self.find_elements(*self._username_exists_locator)) >= 5
 
@@ -83,7 +82,8 @@ class Profile(Home):
             """User title or prefix."""
             return self.find_element(*self._title_locator).text
 
-        def new_title(self, title):
+        @title.setter
+        def title(self, title):
             """Set a new title."""
             return self._replace_value(self._title_locator, title)
 
@@ -92,7 +92,8 @@ class Profile(Home):
             """User first name."""
             return self.find_element(*self._first_name_locator).text
 
-        def new_first_name(self, name):
+        @first_name.setter
+        def first_name(self, name):
             """Set a new first name."""
             return self._replace_value(self._first_name_locator, name)
 
@@ -101,7 +102,8 @@ class Profile(Home):
             """User surname."""
             return self.find_element(*self._last_name_locator).text
 
-        def new_last_name(self, name):
+        @last_name.setter
+        def last_name(self, name):
             """Set a new last name."""
             return self._replace_value(self._last_name_locator, name)
 
@@ -110,7 +112,8 @@ class Profile(Home):
             """User suffix."""
             return self.find_element(*self._suffix_locator).text
 
-        def new_suffix(self, suffix):
+        @suffix.setter
+        def suffix(self, suffix):
             """Set a new suffix."""
             return self._replace_value(self._suffix_locator, suffix)
 
@@ -125,7 +128,8 @@ class Profile(Home):
             """Username."""
             return self.find_element(*self._username_locator).text
 
-        def new_username(self, username):
+        @username.setter
+        def username(self, username):
             """Set a new username."""
             self.find_element(*Profile._edit_clear_locator).click()
             self.find_element(*self._username_locator).send_keys(username)
@@ -164,3 +168,9 @@ class Profile(Home):
         """Popup console interaction."""
 
         _root_locator = (By.CSS_SELECTOR, '.modal-content')
+
+
+class AccountException(Exception):
+    """Account exception."""
+
+    pass
