@@ -1,8 +1,11 @@
 """Home page objects."""
+from time import sleep
+
 from pypom import Region
 from selenium.webdriver.common.by import By
 
 from pages.accounts.base import AccountsBase
+from pages.accounts.signup import Signup
 from pages.salesforce.home import Salesforce
 
 
@@ -46,6 +49,7 @@ class Home(AccountsBase):
             """Log into the site with a specific user."""
             self.find_element(*self._user_field_locator).send_keys(user)
             self.find_element(*self._login_submit_button_locator).click()
+            sleep(1)
             self.find_element(*self._password_field_locator) \
                 .send_keys(password)
             self.find_element(*self._login_submit_button_locator).click()
@@ -53,7 +57,6 @@ class Home(AccountsBase):
 
         def reset_password(self, user, new_password):
             """Reset a current user's password."""
-            self.find_element(*self._password_reset_locator).click()
             assert(False), 'work to be done'
 
         @property
@@ -69,12 +72,14 @@ class Home(AccountsBase):
             sleep(0.25)
             return self
 
+        @property
         def go_to_help(self):
             """Click the Salesforce help link."""
             if not self.is_help_shown:
                 self.toggle_help
             current = self.driver.current_window_handle
             self.find_element(*self._salesforce_link_locator).click()
+            sleep(1)
             if current == self.driver.window_handles[0] and \
                     len(self.driver.window_handles) > 1:
                 self.driver.switch_to.window(self.driver.window_handles[1])
@@ -84,11 +89,9 @@ class Home(AccountsBase):
             """Return Account log in error message."""
             return self.find_element(*self._error_locator).text
 
-        def signup_user(self, email, password, user_type):
-            """Sign up as a new user."""
-            try:
-                from pages.accounts.signup import Signup
-            except ImportError:
-                # already loaded
-                pass
-            return Signup(self.driver, email, password, user_type)
+        @property
+        def go_to_signup(self):
+            """Go to user signup."""
+            self.find_element(*self._signup_locator).click()
+            sleep(1)
+            return Signup(self.driver)

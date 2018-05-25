@@ -2,12 +2,12 @@
 import os
 
 import pytest
-from pytest_testrail.plugin import testrail
+from pytest_testrail.plugin import pytestrail
 
 from pages.accounts.admin import AccountsAdmin
 
 
-@testrail('')
+@pytestrail.case('C195544')
 @pytest.mark.nondestructive
 def test_admin_login(base_url, selenium):
     """Login as an administrator."""

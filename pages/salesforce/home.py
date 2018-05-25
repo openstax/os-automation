@@ -8,17 +8,11 @@ class Salesforce(Page):
 
     URL_TEMPLATE = 'http://openstax.force.com/help/'
 
-    _loader_locator = (By.ID, 'base')
-
-    @property
-    def loaded(self):
-        """Override the load check."""
-        print(self.find_element(*self._loader_locator))
-        return self.find_element(*self._loader_locator)
+    _loader_locator = (By.CSS_SELECTOR, 'body')
 
     def wait_for_page_to_load(self):
         """Override page load."""
-        self.wait.until(lambda _: self.loaded)
+        self.wait.until(lambda _: self.find_element(*self._loader_locator))
 
     @property
     def at_salesforce(self):
