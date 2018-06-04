@@ -1,4 +1,6 @@
 """Salesforce placeholder."""
+from time import sleep
+
 from pypom import Page
 from selenium.webdriver.common.by import By
 
@@ -12,6 +14,7 @@ class Salesforce(Page):
 
     def wait_for_page_to_load(self):
         """Override page load."""
+        sleep(1.0)
         self.wait.until(lambda _: self.find_element(*self._loader_locator))
 
     @property

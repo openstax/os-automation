@@ -12,6 +12,8 @@ from pages.salesforce.home import Salesforce
 class Home(AccountsBase):
     """Home page base."""
 
+    URL_TEMPLATE = AccountsBase.URL_TEMPLATE
+
     @property
     def login(self):
         """Return the login pane."""
@@ -80,9 +82,10 @@ class Home(AccountsBase):
             current = self.driver.current_window_handle
             self.find_element(*self._salesforce_link_locator).click()
             sleep(1)
-            if current == self.driver.window_handles[0] and \
-                    len(self.driver.window_handles) > 1:
-                self.driver.switch_to.window(self.driver.window_handles[1])
+            new_handle = 1 if current == self.driver.window_handles[0] else 0
+            if len(self.driver.window_handles) > 1:
+                self.driver.switch_to.window(
+                    self.driver.window_handles[new_handle])
             return Salesforce(self.driver)
 
         def get_login_error(self):

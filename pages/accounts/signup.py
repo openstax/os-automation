@@ -14,7 +14,7 @@ from pages.utils.utilities import Utility
 class Signup(AccountsBase):
     """Signup process."""
 
-    URL_TEMPLATE = '/signup'
+    URL_TEMPLATE = AccountsBase.URL_TEMPLATE + '/signup'
 
     STUDENT = 'Student'
     INSTRUCTOR = 'Instructor'

@@ -19,7 +19,7 @@ def test_open_home_page(base_url, selenium):
     assert(page.header.is_header_displayed), 'Accounts header is not shown'
     assert(page.footer.is_footer_displayed), 'Accounts footer is not shown'
     page.header.go_to_accounts_home()
-    assert(selenium.current_url == base_url + '/login')
+    assert(page.driver.current_url == Home.URL_TEMPLATE + '/login')
 
 
 @pytestrail.case('C195136')
@@ -128,7 +128,7 @@ def test_salesforce_link(base_url, selenium):
     page = Home(selenium, base_url).open()
     salesforce = page.login.go_to_help
     salesforce.wait_for_page_to_load()
-    assert(selenium.title == 'Salesforce Support page'), \
+    assert(salesforce.driver.title == 'Salesforce Support page'), \
         'Not at the Salesforce help page'
     assert(salesforce.at_salesforce)
 
@@ -149,7 +149,7 @@ def test_terms_of_use(base_url, selenium):
     """View Accounts terms of use."""
     page = Home(selenium, base_url).open()
     page.footer.show_terms_of_use
-    assert('Site Terms' in selenium.page_source), \
+    assert('Site Terms' in page.driver.page_source), \
         'Terms of use not shown'
 
 
@@ -159,7 +159,7 @@ def test_go_to_rice(base_url, selenium):
     """Follow the Rice link."""
     page = Home(selenium, base_url).open()
     rice = page.footer.go_to_rice()
-    assert(selenium.title == 'Rice University'), \
+    assert(rice.driver.title == 'Rice University'), \
         'Not at the Rice University webpage'
     assert(rice.at_rice)
 
@@ -172,5 +172,5 @@ def test_go_to_account_signup(base_url, selenium):
     verify = page.login.go_to_signup
     assert(isinstance(verify, Signup)), \
         'Signup object not returned'
-    assert('signup' in selenium.current_url), \
+    assert('signup' in verify.driver.current_url), \
         'Not at sign up page'

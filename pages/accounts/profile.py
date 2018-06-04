@@ -10,7 +10,7 @@ from pages.accounts import admin, home
 class Profile(home.Home):
     """Profile page."""
 
-    URL_TEMPLATE = '/profile'
+    URL_TEMPLATE = home.Home.URL_TEMPLATE + '/profile'
 
     _log_out_locator = (By.CLASS_NAME, 'sign-out')
     _edit_clear_locator = (By.CLASS_NAME, 'editable-clear-x')

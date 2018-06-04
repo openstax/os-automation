@@ -1,6 +1,7 @@
 """Test the e-mail hosts."""
 import os
 import re
+from time import sleep
 
 import pytest
 from pytest_testrail.plugin import pytestrail
@@ -89,6 +90,8 @@ def test_guerrilla_mail(base_url, selenium):
         'Incorrect default host name'
     page.header.host = 'guerrillamail.com'
     assert(page.header.host == 'guerrillamail.com'), 'Host name unchanged'
+    # wait for the flash headers to disappear
+    sleep(5.0)
     page.header.forget_address()
     assert(selenium.find_element('css selector', '#inbox-id input')
            .text == ''), 'Username not blank'

@@ -202,7 +202,7 @@ class GuerrillaMail(Page):
         def forget_address(self):
             """Purge the current e-mail."""
             self.find_element(*self._forget_address_locator).click()
-            sleep(0.2)
+            sleep(1.0)
             return self
 
     class Emails(Region):
