@@ -4,7 +4,10 @@ import os
 import pytest
 from pytest_testrail.plugin import pytestrail
 
-from pages.accounts.admin import AccountsAdmin
+try:
+    from pages.accounts.admin import AccountsAdmin
+except ImportError:
+    pass
 
 
 @pytestrail.case('C195544')

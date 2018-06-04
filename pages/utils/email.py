@@ -229,7 +229,6 @@ class GuerrillaMail(Page):
         @property
         def get_pin(self):
             """Return the numeric pin."""
-            print('PIN: ' + str(bool(self.has_pin)))
             if self.has_pin:
                 return (MATCHER.search(self.excerpt).group())[-6:]
             raise EmailVerificationError('No pin found')

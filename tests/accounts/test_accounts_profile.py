@@ -4,8 +4,13 @@ import os
 import pytest
 from pytest_testrail.plugin import pytestrail
 
-from pages.accounts.profile import AccountException, Profile
+from pages.accounts.profile import AccountException
 from pages.utils.utilities import Utility
+
+try:
+    from pages.accounts.profile import Profile
+except ImportError:
+    pass
 
 
 @pytestrail.case('C195545')

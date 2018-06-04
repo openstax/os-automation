@@ -39,7 +39,6 @@ def test_google_mail(base_url, selenium):
 
 @pytestrail.case('C195538')
 @pytest.mark.nondestructive
-@pytest.mark.xfail
 def test_guerrilla_mail(base_url, selenium):
     """Test a Guerrilla Mail user."""
     page = GuerrillaMail(selenium, base_url).open()

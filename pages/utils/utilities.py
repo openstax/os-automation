@@ -38,6 +38,12 @@ class Utility(object):
             .text
 
     @classmethod
+    def scroll_to(cls, driver, element_locator):
+        """Scroll the screen to the element found at the locator."""
+        driver.execute_script('arguments[0].scrollIntoView();',
+                              driver.find_element(*element_locator))
+
+    @classmethod
     def random_hex(cls, length=20):
         """Return a random hex number of size length."""
         return ''.join([Utility.HEX_DIGITS[randint(0, 0xF)]
@@ -72,6 +78,13 @@ class Utility(object):
             name[3] = fake.suffix_male() if use_male_functions else \
                 fake.suffix_female()
         return name
+
+    @classmethod
+    def random_phone(cls, area_code=713, number_only=True):
+        """Return a random phone number."""
+        template = ('{area}5550{local}' if number_only else
+                    '({area}) 555-0{local}')
+        return template.format(area=area_code, local=randint(100, 199))
 
     @classmethod
     def new_tab(cls, driver):
