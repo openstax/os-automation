@@ -12,7 +12,7 @@ class AccountsBase(Page):
     """Base class."""
 
     URL_TEMPLATE = 'https://accounts{0}.openstax.org'.format(
-        os.getenv('instance', ''))
+        os.getenv('INSTANCE', '-qa'))
 
     _root_locator = (By.CSS_SELECTOR, '.start')
 

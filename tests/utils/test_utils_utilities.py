@@ -4,7 +4,7 @@ import pytest
 from pytest_testrail.plugin import pytestrail
 from selenium.webdriver.common.by import By
 
-from pages.accounts.home import Home
+from pages.accounts.home import AccountsHome as Home
 from pages.utils.utilities import Utility
 
 
@@ -24,13 +24,10 @@ def test_menu_select(base_url, selenium):
 @pytestrail.case('C195540')
 @pytest.mark.nondestructive
 def test_random(base_url, selenium):
-    """Get a random number between 0 and 50, inclusive, 3 times."""
-    value = Utility.random(0, 50)
-    assert(value >= 0 and value <= 50)
-    value = Utility.random(0, 50)
-    assert(value >= 0 and value <= 50)
-    value = Utility.random(0, 50)
-    assert(value >= 0 and value <= 50)
+    """Get a random number between 0 and 50, inclusive, 10 times."""
+    for _ in range(10):
+        value = Utility.random(0, 50)
+        assert(value >= 0 and value <= 50)
 
 
 @pytestrail.case('C195541')

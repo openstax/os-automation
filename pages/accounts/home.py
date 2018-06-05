@@ -9,7 +9,7 @@ from pages.accounts.signup import Signup
 from pages.salesforce.home import Salesforce
 
 
-class Home(AccountsBase):
+class AccountsHome(AccountsBase):
     """Home page base."""
 
     URL_TEMPLATE = AccountsBase.URL_TEMPLATE

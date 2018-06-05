@@ -5,7 +5,7 @@ import pytest
 from pytest_testrail.plugin import pytestrail
 from selenium.common.exceptions import NoSuchElementException, TimeoutException
 
-from pages.accounts.home import Home
+from pages.accounts.home import AccountsHome as Home
 from pages.utils.email import GuerrillaMail
 from pages.utils.utilities import Utility
 
