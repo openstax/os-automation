@@ -11,13 +11,15 @@ DOTENV_PATH = os.path.join(
 load_dotenv(dotenv_path=DOTENV_PATH)
 
 # Import fixtures from our package so pytest can detect them
-from fixtures.base import chrome_options, selenium  # Flake8: noqa
-from fixtures.accounts import accounts_base_url
-from fixtures.exercises import exercises_base_url
-from fixtures.payments import payments_base_url
-from fixtures.snapshot import snapshot
-from fixtures.tutor import tutor_base_url
-from fixtures.web import web_base_url
+pytest_plugins = (
+    'fixtures.accounts',
+    'fixtures.base',
+    'fixtures.exercises',
+    'fixtures.payments',
+    'fixtures.snapshot',
+    'fixtures.tutor',
+    'fixtures.web'
+)
 
 
 def pytest_addoption(parser):
