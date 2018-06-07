@@ -21,7 +21,7 @@ def test_open_home_page(accounts_base_url, selenium):
     assert(page.header.is_header_displayed), 'Accounts header is not shown'
     assert(page.footer.is_footer_displayed), 'Accounts footer is not shown'
     page.header.go_to_accounts_home()
-    assert(page.driver.current_url == accounts_base_url + '/login')
+    assert(page.current_url == accounts_base_url + '/login')
 
 
 @test_case('C195136')

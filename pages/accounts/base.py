@@ -28,6 +28,11 @@ class AccountsBase(Page):
         """Return Accounts' footer."""
         return self.Footer(self)
 
+    @property
+    def current_url(self):
+        """Return the current page URL."""
+        return self.driver.current_url
+
     class Header(Region):
         """Accounts header."""
 

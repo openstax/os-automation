@@ -1,6 +1,7 @@
 """Check for collection issue prior to testing."""
 
 import os
+import sys
 
 import pytest
 from dotenv import load_dotenv
