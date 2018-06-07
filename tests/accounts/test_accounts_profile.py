@@ -127,15 +127,25 @@ def test_add_a_verified_email(base_url, selenium):
 
 
 @pytestrail.case('C195555')
-@pytest.mark.xfail
 def test_profile_login_using_google(base_url, selenium):
     """Test the Gmail login method."""
+    page = Profile(selenium, base_url).open()
+    assert(not page.logged_in), 'Already logged in'
+    username = os.getenv('FACEBOOK_USER')
+    password = os.getenv('FACEBOOK_PASSWORD')
+    page.login.google_login(username, password)
+    assert (page.logged_in), 'Failed to login with google'
 
 
 @pytestrail.case('C195556')
-@pytest.mark.xfail
 def test_profile_login_using_facebook(base_url, selenium):
     """Test the Facebook login method."""
+    page = Profile(selenium, base_url).open()
+    assert(not page.logged_in), 'Already logged in'
+    username = os.getenv('GOOGLE_USER')
+    password = os.getenv('GOOGLE_PASSWORD')
+    page.login.facebook_login(username, password)
+    assert (page.logged_in), 'Failed to login with facebook'
 
 
 @pytestrail.case('C195557')
@@ -150,3 +160,12 @@ def test_admin_pop_up_console(base_url, selenium):
 @pytest.mark.xfail
 def test_go_to_full_console(base_url, selenium):
     """Go to the full console."""
+    page = Profile(selenium, base_url).open()
+    username = os.getenv('ADMIN_USER')
+    password = os.getenv('ADMIN_PASSWORD')
+    page.log_in(username, password)
+    assert(page.logged_in), 'User is not logged in'
+    assert(page.is_admin), 'User is not an administrator'
+    page.open_full_console()
+    assert('/admin/console' in selenium.current_url), \
+        'Not at the Full Admin Console page'
