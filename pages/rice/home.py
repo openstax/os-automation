@@ -1,4 +1,5 @@
 """Rice placeholder."""
+
 from pypom import Page
 
 

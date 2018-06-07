@@ -1,23 +1,24 @@
 """Test the e-mail hosts."""
+
 import os
 import re
 from time import sleep
 
 import pytest
-from pytest_testrail.plugin import pytestrail
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as expect
 from selenium.webdriver.support.ui import WebDriverWait
 
 from pages.utils.email import EmailVerificationError, GoogleBase, GuerrillaMail
 from pages.utils.utilities import Utility
+from tests.markers import nondestructive, test_case
 
 
-@pytestrail.case('C195537')
-@pytest.mark.nondestructive
+@test_case('C195537')
+@nondestructive
 def test_google_mail(base_url, selenium):
     """Test a Google Gmail user."""
-    page = GoogleBase(selenium, base_url).open()
+    page = GoogleBase(selenium).open()
     assert('/signin' in selenium.current_url), 'Not at Google sign in'
     username = os.getenv('TEST_EMAIL_ACCOUNT')
     password = os.getenv('TEST_EMAIL_PASSWORD')
@@ -38,11 +39,11 @@ def test_google_mail(base_url, selenium):
                 mail.get_pin
 
 
-@pytestrail.case('C195538')
-@pytest.mark.nondestructive
+@test_case('C195538')
+@nondestructive
 def test_guerrilla_mail(base_url, selenium):
     """Test a Guerrilla Mail user."""
-    page = GuerrillaMail(selenium, base_url).open()
+    page = GuerrillaMail(selenium).open()
     assert('guerrilla' in selenium.current_url)
     assert(page.header.is_header_displayed), 'Header not available'
     assert(page.emails), 'No e-mails found'

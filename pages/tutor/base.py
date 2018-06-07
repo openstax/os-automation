@@ -1,5 +1,5 @@
 """Basic page parent for all Accounts pages."""
-import os
+
 from time import sleep
 
 from pypom import Page, Region
@@ -15,9 +15,6 @@ from pages.web.tutor_marketing import TutorMarketing
 
 class TutorBase(Page):
     """Base class."""
-
-    URL_TEMPLATE = 'https://tutor{0}.openstax.org'.format(
-        (os.getenv('INSTANCE', '-qa')))
 
     _root_locator = (By.ID, 'home')
 

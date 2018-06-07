@@ -1,4 +1,5 @@
 """Web's Tutor marketing page."""
+
 from pages.web.home import WebHome
 
 

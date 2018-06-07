@@ -1,5 +1,5 @@
 """Basic page parent for all Accounts pages."""
-import os
+
 from time import sleep
 
 from pypom import Page, Region
@@ -10,9 +10,6 @@ from pages.rice.home import Rice
 
 class AccountsBase(Page):
     """Base class."""
-
-    URL_TEMPLATE = 'https://accounts{0}.openstax.org'.format(
-        os.getenv('INSTANCE', '-qa'))
 
     _root_locator = (By.CSS_SELECTOR, '.start')
 

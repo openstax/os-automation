@@ -1,4 +1,5 @@
 """Web's home page."""
+
 from pages.web.base import WebBase
 
 

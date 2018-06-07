@@ -1,4 +1,5 @@
 """Home page objects."""
+
 from time import sleep
 
 from pypom import Region
@@ -11,8 +12,6 @@ from pages.salesforce.home import Salesforce
 
 class AccountsHome(AccountsBase):
     """Home page base."""
-
-    URL_TEMPLATE = AccountsBase.URL_TEMPLATE
 
     @property
     def login(self):

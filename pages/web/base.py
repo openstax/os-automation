@@ -1,5 +1,4 @@
 """Basic page parent for all OpenStax Web pages."""
-import os
 
 from pypom import Page, Region
 from selenium.webdriver.common.by import By
@@ -7,10 +6,6 @@ from selenium.webdriver.common.by import By
 
 class WebBase(Page):
     """Base class."""
-
-    URL_TEMPLATE = 'https://{0}openstax.org'.format(
-        ('oscms' + os.getenv('INSTANCE', '-qa') + '.')
-        if os.getenv('INSTANCE', '') != '' else '')
 
     _root_locator = (By.ID, 'home')
 

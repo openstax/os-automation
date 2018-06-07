@@ -1,4 +1,5 @@
 """Profile page for logged in users."""
+
 from time import sleep
 
 from pypom import Region
@@ -10,7 +11,7 @@ from pages.accounts import admin, home
 class Profile(home.AccountsHome):
     """Profile page."""
 
-    URL_TEMPLATE = home.AccountsHome.URL_TEMPLATE + '/profile'
+    URL_TEMPLATE = '/profile'
 
     _log_out_locator = (By.CLASS_NAME, 'sign-out')
     _edit_clear_locator = (By.CLASS_NAME, 'editable-clear-x')
@@ -64,6 +65,7 @@ class Profile(home.AccountsHome):
     @property
     def is_admin(self):
         """Return True if a user is an Accounts administrator."""
+        sleep(0.25)
         return self.is_element_displayed(*self._popup_console_locator)
 
     @property

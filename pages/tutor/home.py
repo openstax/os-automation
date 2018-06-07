@@ -8,8 +8,6 @@ from pages.tutor.base import TutorBase
 class TutorHome(TutorBase):
     """Home page base."""
 
-    URL_TEMPLATE = TutorBase.URL_TEMPLATE
-
     def log_in(self, user, password):
         """Log into the site with a specific user."""
 

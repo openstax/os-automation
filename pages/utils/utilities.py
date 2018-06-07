@@ -1,4 +1,5 @@
 """Helper functions for OpenStax Pages."""
+
 from random import randint
 from time import sleep
 

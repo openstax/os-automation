@@ -1,4 +1,5 @@
 """Rice GDPR."""
+
 from pypom import Page
 
 
