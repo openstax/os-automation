@@ -4,8 +4,9 @@ import os
 import pytest
 from pytest_testrail.plugin import pytestrail
 
-from pages.accounts.profile import AccountException
+from pages.utils.email import GuerrillaMail
 from pages.utils.utilities import Utility
+from pages.accounts.profile import AccountException
 
 try:
     from pages.accounts.profile import Profile
@@ -115,15 +116,56 @@ def test_profile_email_fields(base_url, selenium):
 
 
 @pytestrail.case('C195554')
-@pytest.mark.xfail
 def test_verify_an_existing_unverified_email(base_url, selenium):
     """Test the user email verification process."""
+    page = GuerrillaMail(selenium).open()
+    email = page.header.email
+    assert email is not None, "Didn't get guerrilla email"
 
+    page = Profile(page.driver).open()
+    username = os.getenv('STUDENT_USER')
+    password = os.getenv('STUDENT_PASSWORD')
+    page.log_in(username, password)
+    page.emails.add_email(email)
+    new_email = page.emails.emails.pop()
+    new_email.resend_confirmation()
+
+    page = GuerrillaMail(page.driver, timeout=60).open()
+    page.wait_for_email()
+    assert len(page.emails) > 2, "Didn't receive email"
+    new_email = page.emails[0]
+    new_email.open_email()
+    page.openedmail.confirm_email()
+    assert 'openstax.org/confirm?' in selenium.current_url
+
+    page = Profile(page.driver).open()
+    new_email = page.emails.emails.pop()
+    assert new_email.is_confirmed, "The email isn't verified"
 
 @pytestrail.case('C195553')
-@pytest.mark.xfail
 def test_add_a_verified_email(base_url, selenium):
     """Test the ability to add an e-mail address to an existing user."""
+    page = GuerrillaMail(selenium).open()
+    email = page.header.email
+    assert email is not None, "Didn't get guerrilla email"
+
+    page = Profile(page.driver).open()
+    username = os.getenv('STUDENT_USER')
+    password = os.getenv('STUDENT_PASSWORD')
+    page.log_in(username, password)
+    page.emails.add_email(email)
+
+    page = GuerrillaMail(page.driver, timeout=60).open()
+    page.wait_for_email()
+    assert len(page.emails) > 1, "Didn't receive email"
+    new_email = page.emails[0]
+    new_email.open_email()
+    page.openedmail.confirm_email()
+    assert 'openstax.org/confirm?' in selenium.current_url
+
+    page = Profile(page.driver).open()
+    new_email = page.emails.emails.pop()
+    assert new_email.is_confirmed, "The email isn't verified"
 
 
 @pytestrail.case('C195555')

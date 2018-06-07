@@ -92,3 +92,14 @@ class Utility(object):
         driver.execute_script('window.open();')
         sleep(1)
         return driver.window_handles
+
+    @classmethod
+    def switch_to(cls, driver, link_locator):
+        """Switch to the other window handle."""
+        current = driver.current_window_handle
+        driver.find_element(*link_locator).click()
+        sleep(1)
+        new_handle = 1 if current == driver.window_handles[0] else 0
+        if len(driver.window_handles) > 1:
+            driver.switch_to.window(
+                driver.window_handles[new_handle])

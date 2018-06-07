@@ -1,4 +1,5 @@
 """Profile page for logged in users."""
+
 from time import sleep
 
 from pypom import Region
@@ -34,7 +35,7 @@ class Profile(home.Home):
     @property
     def emails(self):
         """Email fields."""
-        return self.Email(self)
+        return self.Emails(self)
 
     @property
     def login_method(self):
@@ -191,6 +192,10 @@ class Profile(home.Home):
 
         _root_locator = (By.XPATH, '//div[div[contains(text(),"Emails")]]')
         _email_locator = (By.CSS_SELECTOR, '.info > .email-entry')
+        _unverified_locator = (By.CLASS_NAME, 'unconfirmed-warning')
+        _add_email_locator = (By.ID, 'add-an-email')
+        _email_form_locator = (By.CSS_SELECTOR, '.editable-input input')
+        _email_submit_locator = (By.XPATH, '//button[@type="submit"]')
 
         @property
         def emails(self):
@@ -203,6 +208,31 @@ class Profile(home.Home):
 
             _email_locator = (By.CLASS_NAME, 'value')
             _unverified_locator = (By.CLASS_NAME, 'unconfirmed-warning')
+            _unverified_btn_locator = \
+                (By.CSS_SELECTOR, '.unconfirmed-warning > *')
+            _confirmation_btn_locator = \
+                (By.CSS_SELECTOR, '.button_to>[type="submit"]')
+
+            def resend_confirmation(self):
+                """Resend confirmation email for a certain email."""
+                self.find_element(*self._unverified_btn_locator).click()
+                sleep(0.1)
+                self.find_element(*self._confirmation_btn_locator).click()
+
+            @property
+            def is_confirmed(self):
+                """Check if the email is already verified."""
+                return 'verified' in self._root.get_attribute('class')
+
+        def add_email(self, email):
+            """Add a email to the account's email list."""
+            sleep(0.1)
+            self.find_element(*self._add_email_locator).click()
+            sleep(0.1)
+            self.find_element(*self._email_form_locator).send_keys(email)
+            self.find_element(*self._email_submit_locator).click()
+            sleep(0.1)
+            self.driver.refresh()
 
     class LoginOptions(Region):
         """Login options."""
