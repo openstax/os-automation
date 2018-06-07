@@ -6,6 +6,7 @@ from pytest_testrail.plugin import pytestrail
 
 from pages.accounts.profile import AccountException
 from pages.utils.utilities import Utility
+from selenium.webdriver.common.by import By
 
 try:
     from pages.accounts.profile import Profile
@@ -140,9 +141,103 @@ def test_profile_login_using_facebook(base_url, selenium):
 
 @pytestrail.case('C195557')
 @pytest.mark.nondestructive
-@pytest.mark.xfail
 def test_admin_pop_up_console(base_url, selenium):
-    """Test the pop up console."""
+    page = Profile(selenium, base_url).open()
+    assert(not page.logged_in), 'Active user session unexpected'
+    username = os.getenv('ADMIN_USER')
+    password = os.getenv('ADMIN_PASSWORD')
+    page.log_in(username, password)
+    assert(page.logged_in), 'User "{0}" not logged in'.format(username)
+    assert(page.is_admin), 'User is not an administrator'
+    assert(page.has_username), 'No username found'
+    popup = page.open_popup_console()
+    from time import sleep
+    sleep(.25)
+    misc = popup.misc
+    assert(misc.task_locate())
+    assert(misc.security_locate())
+    assert(misc.routing_locate())
+    assert(misc.controller_locate())
+    assert(misc.action_locate())
+    assert(misc.template_locate())
+    assert(misc.not_yet_locate())
+    #link of misc tests
+    misc.task_locate().click()
+    assert("cron" in selenium.current_url)
+
+    popup = page.open_popup_console()
+    sleep(.25)
+    popup.misc.security_locate().click()
+    assert("security_transgression" in selenium.current_url)
+    # popup = page.open_popup_console()
+
+    popup = page.open_popup_console()
+    sleep(.25)
+    popup.misc.routing_locate().click()
+    assert("routing_error" in selenium.current_url)
+
+    popup = page.open_popup_console()
+    sleep(.25)
+    popup.misc.controller_locate().click()
+    assert("unknown_controller" in selenium.current_url)
+
+    popup = page.open_popup_console()
+    sleep(.25)
+    popup.misc.action_locate().click()
+    assert("unknown_action" in selenium.current_url)
+
+    popup = page.open_popup_console()
+    sleep(.25)
+    popup.misc.template_locate().click()
+    assert("missing_template" in selenium.current_url)
+
+    popup = page.open_popup_console()
+    sleep(.25)
+    popup.misc.not_yet_locate().click()
+    assert("not_yet_implemented" in selenium.current_url)
+
+    #User
+    popup = page.open_popup_console()
+    sleep(.25)
+    assert(popup.users.search_bar())
+    assert(popup.users.search_button())
+
+    #Links
+    popup.links.search_security().click()
+    assert("security_log" in selenium.current_url)
+
+    selenium.back()
+    popup = page.open_popup_console()
+    sleep(.25)
+    popup.links.search_application().click()
+    assert("applications" in selenium.current_url)
+
+    selenium.back()
+    popup = page.open_popup_console()
+    sleep(.25)
+    popup.links.search_print().click()
+    assert("print" in selenium.current_url)
+
+
+    selenium.back()
+    popup = page.open_popup_console()
+    sleep(.25)
+    popup.links.search_api().click()
+    assert("api/docs/v1" in selenium.current_url)
+
+
+    
+
+
+
+    # assert(popup.find_element(By.CLASS_NAME, 'modal-open'))
+    # page.find_element(By.CLASS_NAME, 'active').click()
+    # assert(page.find_element(By.ID, "search_terms").is_displayed()), "Search bar not displayed"
+
+
+
+
+
 
 
 @pytestrail.case('C195558')

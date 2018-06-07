@@ -106,6 +106,8 @@ venv.bak/
 # JetBrains
 .idea/
 
+.DS_Store
+
 # test report
 report.html
 assets/

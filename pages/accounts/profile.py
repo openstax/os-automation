@@ -52,7 +52,7 @@ class Profile(home.Home):
         if not self.is_admin:
             raise AccountException('User is not an administrator')
         self.find_element(*self._popup_console_locator).click()
-        return self.PopupConcole(self)
+        return self.PopupConsole(self)
 
     def open_full_console(self):
         """Open the full admin console."""
@@ -220,7 +220,104 @@ class Profile(home.Home):
     class PopupConsole(Region):
         """Popup console interaction."""
 
-        _root_locator = (By.CSS_SELECTOR, '.modal-content')
+        # _root_locator = (By.CLASS_NAME, 'modal-content')
+        _users_locator = (By.LINK_TEXT, 'Users')
+        _misc_locator = (By.LINK_TEXT, 'Misc')
+        _links_locator = (By.LINK_TEXT, 'Links')
+        _full_console_locator = (By.PARTIAL_LINK_TEXT, 'Console')
+
+        @property
+        def misc(self):
+            self.find_element(*self._misc_locator).click()
+            return self.Misc(self)
+
+        @property
+        def users(self):
+            self.find_element(*self._users_locator).click()
+            return self.Users(self)
+
+        @property
+        def links(self):
+            self.find_element(*self._links_locator).click()
+            return self.Links(self)
+
+        @property
+        def full_console(self):
+            self.find_element(*self._full_console_locator).click()
+
+        class Misc(Region):
+            _task_locator = (By.PARTIAL_LINK_TEXT, 'Run')
+            _security_locator = (By.PARTIAL_LINK_TEXT, 'SecurityTransgression')
+            _routing_locator = (By.PARTIAL_LINK_TEXT, 'RoutingError')
+            _controller_locator = (By.PARTIAL_LINK_TEXT, 'UnknownController')
+            _action_locator = (By.PARTIAL_LINK_TEXT, 'UnknownAction')
+            _template_locator = (By.PARTIAL_LINK_TEXT, 'Template')
+            _not_yet_implemented_locator = (By.PARTIAL_LINK_TEXT, 'NotYetImplemented')
+    
+
+            def task_locate(self):
+                try: return self.find_element(*self._task_locator)
+                except: return False
+
+            def security_locate(self):
+                try: return self.find_element(*self._security_locator)
+                except: return False
+
+            def routing_locate(self):
+                try: return self.find_element(*self._routing_locator)
+                except: return False
+
+            def controller_locate(self):
+                try: return self.find_element(*self._controller_locator)
+                except: return False
+                
+            def action_locate(self):
+                try: return self.find_element(*self._action_locator)
+                except: return False            
+
+            def template_locate(self):
+                try: return self.find_element(*self._template_locator)
+                except: return False
+
+            def not_yet_locate(self):
+                try: return self.find_element(*self._not_yet_implemented_locator)
+                except: return False
+
+        class Users(Region):
+            _search_bar_locator = (By.ID, 'search_terms')
+            _search_button_locator = (By.NAME, 'commit')
+
+            def search_bar(self):
+                try: return self.find_element(*self._search_bar_locator)
+                except: return False
+
+            def search_button(self):
+                try: return self.find_element(*self._search_bar_locator)
+                except: return False
+
+        class Links(Region):
+            _security_log_locator = (By.PARTIAL_LINK_TEXT, 'Security')
+            _application_locator = (By.PARTIAL_LINK_TEXT, 'OAuth')
+            _print_locator = (By.PARTIAL_LINK_TEXT, 'FinePrint')
+            _api_locator = (By.PARTIAL_LINK_TEXT, 'API')
+
+            def search_security(self):
+                try: return self.find_element(*self._security_log_locator)
+                except: return False
+
+            def search_application(self):
+                try: return self.find_element(*self._application_locator)
+                except: return False
+
+            def search_print(self):
+                try: return self.find_element(*self._print_locator)
+                except: return False
+
+            def search_api(self):
+                try: return self.find_element(*self._api_locator)
+                except: return False
+
+
 
 
 class AccountException(Exception):
