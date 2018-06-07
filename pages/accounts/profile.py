@@ -8,10 +8,10 @@ from selenium.webdriver.common.by import By
 from pages.accounts import admin, home
 
 
-class Profile(home.Home):
+class Profile(home.AccountsHome):
     """Profile page."""
 
-    URL_TEMPLATE = home.Home.URL_TEMPLATE + '/profile'
+    URL_TEMPLATE = '/profile'
 
     _log_out_locator = (By.CLASS_NAME, 'sign-out')
     _edit_clear_locator = (By.CLASS_NAME, 'editable-clear-x')
@@ -46,7 +46,7 @@ class Profile(home.Home):
         """Log the user out."""
         self.find_element(*self._log_out_locator).click()
         sleep(1)
-        return home.Home(self.driver)
+        return home.AccountsHome(self.driver)
 
     def open_popup_console(self):
         """Open the small admin console."""
@@ -65,6 +65,7 @@ class Profile(home.Home):
     @property
     def is_admin(self):
         """Return True if a user is an Accounts administrator."""
+        sleep(0.25)
         return self.is_element_displayed(*self._popup_console_locator)
 
     @property
