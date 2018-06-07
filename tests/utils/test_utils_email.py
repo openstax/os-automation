@@ -20,8 +20,8 @@ def test_google_mail(base_url, selenium):
     """Test a Google Gmail user."""
     page = GoogleBase(selenium).open()
     assert('/signin' in selenium.current_url), 'Not at Google sign in'
-    username = os.getenv('TEST_EMAIL_ACCOUNT')
-    password = os.getenv('TEST_EMAIL_PASSWORD')
+    username = os.getenv('GMAIL_USERNAME')
+    password = os.getenv('GMAIL_PASSWORD')
     email = page.login.go(username, password)
     emails = email.emails
     assert(emails), 'No e-mails found'
