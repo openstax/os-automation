@@ -47,8 +47,6 @@ class AccountsHome(AccountsBase):
         _fb_password_field_locator = (By.ID, 'pass')
         _fb_submit_locator = (By.ID, 'loginbutton') 
         _fb_safari_specific_locator = (By.NAME, '__CONFIRM__')
-        # _fb_safari_specific_locator = (By.CSS_SELECTOR, '[tabindex="0"]]')
-        # fb_safari_specific_locator = (By.XPATH, '//button[text() = "OK"]')
 
         _google_locator = (By.ID, 'google-login-button')
         _google_user_locator = (By.CSS_SELECTOR, '[type=email]')
@@ -77,16 +75,18 @@ class AccountsHome(AccountsBase):
             self.find_element(*self._login_submit_button_locator).click()
             sleep(1)
             self.find_element(*self._fb_locator).click()
-            sleep(2)
+            self.wait.until(
+                expect.visibility_of_element_located(
+                    self._fb_email_field_locator))
             self.find_element(*self._fb_email_field_locator) \
                 .send_keys(facebook_user)
-            sleep(2)
             self.find_element(*self._fb_password_field_locator) \
                 .send_keys(password)
-            sleep(2)
             self.find_element(*self._fb_submit_locator).click()
-            sleep(2)
             if self.driver.capabilities['browserName'] == 'safari':
+                self.wait.until(
+                    expect.visibility_of_element_located(
+                        self._fb_safari_specific_locator))
                 self.find_element(*self._fb_safari_specific_locator).click()
             sleep(2)
 
@@ -107,7 +107,7 @@ class AccountsHome(AccountsBase):
             self.find_element(*self._google_password_locator) \
                 .send_keys(password)
             self.find_element(*self._google_pass_next_locator).click()
-            sleep(3)
+            sleep(2)
 
         def reset_password(self, user, new_password):
             """Reset a current user's password."""
