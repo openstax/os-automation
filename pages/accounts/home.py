@@ -47,8 +47,6 @@ class AccountsHome(AccountsBase):
         _fb_password_field_locator = (By.ID, 'pass')
         _fb_submit_locator = (By.ID, 'loginbutton') 
         _fb_safari_specific_locator = (By.NAME, '__CONFIRM__')
-        # _fb_safari_specific_locator = (By.CSS_SELECTOR, '[tabindex="0"]]')
-        # fb_safari_specific_locator = (By.XPATH, '//button[text() = "OK"]')
 
         _google_locator = (By.ID, 'google-login-button')
         _google_user_locator = (By.CSS_SELECTOR, '[type=email]')
