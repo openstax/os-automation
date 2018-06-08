@@ -13,6 +13,14 @@ If you have cloned this project already then you can skip this, otherwise you'll
     venv: https://docs.python.org/3/library/venv.html
     virtualenvwrapper: https://gist.github.com/apavamontri/4516816
 
+### Copy and complete the environment variable file
+
+```bash
+$ cp .env.template .env
+```
+
+Enter valid account and server data for use on your system.
+
 ### Run the tests
 
 Tests are run using the command line using the `tox` command. By default this will run all of the environments configured, including checking your tests against recommended style conventions using [flake8][flake8].
