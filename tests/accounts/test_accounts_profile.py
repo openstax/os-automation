@@ -132,30 +132,30 @@ def test_add_a_verified_email(accounts_base_url, selenium):
 
 
 @test_case('C195555')
-@expected_failure
 @accounts
 @social
 def test_profile_login_using_google(accounts_base_url, selenium):
     """Test the Gmail login method."""
     page = Profile(selenium, accounts_base_url).open()
     assert(not page.logged_in), 'Already logged in'
-    username = os.getenv('FACEBOOK_USER')
-    password = os.getenv('FACEBOOK_PASSWORD')
-    page.login.google_login(username, password)
+    user = os.getenv('STUDENT_USER')
+    google_user = os.getenv('GOOGLE_USERNAME')
+    password = os.getenv('GOOGLE_PASSWORD')
+    page.login.google_login(user, google_user, password)
     assert (page.logged_in), 'Failed to login with google'
 
 
 @test_case('C195556')
-@expected_failure
 @accounts
 @social
 def test_profile_login_using_facebook(accounts_base_url, selenium):
     """Test the Facebook login method."""
     page = Profile(selenium, accounts_base_url).open()
     assert(not page.logged_in), 'Already logged in'
-    username = os.getenv('GOOGLE_USER')
-    password = os.getenv('GOOGLE_PASSWORD')
-    page.login.facebook_login(username, password)
+    user = os.getenv('STUDENT_USER')
+    facebook_user = os.getenv('FACEBOOK_USERNAME')
+    password = os.getenv('FACEBOOK_PASSWORD')
+    page.login.facebook_login(user, facebook_user, password)
     assert (page.logged_in), 'Failed to login with facebook'
 
 
@@ -173,7 +173,7 @@ def test_admin_pop_up_console(accounts_base_url, selenium):
 @accounts
 def test_go_to_full_console(accounts_base_url, selenium):
     """Go to the full console."""
-    page = Profile(selenium, base_url).open()
+    page = Profile(selenium, accounts_base_url).open()
     username = os.getenv('ADMIN_USER')
     password = os.getenv('ADMIN_PASSWORD')
     page.log_in(username, password)

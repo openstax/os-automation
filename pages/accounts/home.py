@@ -68,21 +68,23 @@ class AccountsHome(AccountsBase):
             self.find_element(*self._login_submit_button_locator).click()
             self.wait.until(lambda _: self.logged_in)
 
-        def facebook_login(self, user, password):
+        def facebook_login(self, user, facebook_user, password):
             """Log into the site with facebook."""
             self.find_element(*self._user_field_locator).send_keys(user)
             self.find_element(*self._login_submit_button_locator).click()
             sleep(1)
             self.find_element(*self._fb_locator).click()
-            self.find_element(*self._fb_email_field_locator).send_keys(user)
+            sleep(1)
+            self.find_element(*self._fb_email_field_locator) \
+                .send_keys(facebook_user)
             self.find_element(*self._fb_password_field_locator) \
                 .send_keys(password)
             self.find_element(*self._fb_sumbit_locator).click()
-            sleep(3)
+            sleep(10)
 
-        def google_login(self, username, password):
+        def google_login(self, user, google_user, password):
             """Log into the site with google."""
-            self.find_element(*self._user_field_locator).send_keys(username)
+            self.find_element(*self._user_field_locator).send_keys(user)
             self.find_element(*self._login_submit_button_locator).click()
             sleep(1)
             self.find_element(*self._google_locator).click()
