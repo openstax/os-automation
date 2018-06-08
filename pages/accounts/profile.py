@@ -1,5 +1,4 @@
 """Profile page for logged in users."""
-
 from time import sleep
 
 from pypom import Region
@@ -8,10 +7,10 @@ from selenium.webdriver.common.by import By
 from pages.accounts import admin, home
 
 
-class Profile(home.AccountsHome):
+class Profile(home.Home):
     """Profile page."""
 
-    URL_TEMPLATE = '/profile'
+    URL_TEMPLATE = home.Home.URL_TEMPLATE + '/profile'
 
     _log_out_locator = (By.CLASS_NAME, 'sign-out')
     _edit_clear_locator = (By.CLASS_NAME, 'editable-clear-x')
@@ -30,30 +29,30 @@ class Profile(home.AccountsHome):
     @property
     def username(self):
         """Username field."""
-        return self.User(self)
+        return self.Username(self)
 
     @property
     def emails(self):
         """Email fields."""
-        return self.Email(self)
+        return self.Emails(self)
 
     @property
     def login_method(self):
         """Options for logging in."""
-        return self.LoginOption(self)
+        return self.LoginOptions(self)
 
     def log_out(self):
         """Log the user out."""
         self.find_element(*self._log_out_locator).click()
         sleep(1)
-        return home.AccountsHome(self.driver)
+        return home.Home(self.driver)
 
     def open_popup_console(self):
         """Open the small admin console."""
         if not self.is_admin:
             raise AccountException('User is not an administrator')
         self.find_element(*self._popup_console_locator).click()
-        return self.PopupConcole(self)
+        return self.PopupConsole(self)
 
     def open_full_console(self):
         """Open the full admin console."""
@@ -65,7 +64,6 @@ class Profile(home.AccountsHome):
     @property
     def is_admin(self):
         """Return True if a user is an Accounts administrator."""
-        sleep(0.25)
         return self.is_element_displayed(*self._popup_console_locator)
 
     @property
@@ -173,7 +171,9 @@ class Profile(home.AccountsHome):
         """Username assignment."""
 
         _root_locator = (By.XPATH, '//div[div[contains(text(),"Username")]]')
-        _username_locator = (By.CSS_SELECTOR, '#username + span input')
+        _username_locator = (By.CSS_SELECTOR, '#username')
+        _input_locator = (By.XPATH, '//*[@id="profile"]/div/div[3]/div[2]/'
+                                    'span/div/form/div/div[1]/div[1]/input')
 
         @property
         def username(self):
@@ -183,10 +183,11 @@ class Profile(home.AccountsHome):
         @username.setter
         def username(self, username):
             """Set a new username."""
+            self.find_element(*self._username_locator).click()
             self.find_element(*Profile._edit_clear_locator).click()
-            self.find_element(*self._username_locator).send_keys(username)
-            self.find_element(*Profile._edit_submit_locator)
-            return Profile(self)
+            self.find_element(*self._input_locator).send_keys(username)
+            self.find_element(*Profile._edit_submit_locator).click()
+            return Profile(self.driver)
 
     class Emails(Region):
         """Email sections."""
