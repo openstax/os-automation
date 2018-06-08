@@ -6,6 +6,8 @@ import pytest
 
 from pages.accounts.profile import AccountException, Profile
 from pages.utils.utilities import Utility
+
+from time import sleep
 from tests.markers import accounts, expected_failure, nondestructive  # noqa
 from tests.markers import social, test_case  # noqa
 
@@ -102,11 +104,27 @@ def test_profile_name_field(accounts_base_url, selenium):
         'Names do not match'
 
 
-@test_case('C195551')
-@expected_failure
-@accounts
-def test_profile_username_field(accounts_base_url, selenium):
+@pytestrail.case('C195551')
+def test_profile_username_field(base_url, selenium):
     """Test the user's username field."""
+    # setup
+    page = Profile(selenium, base_url).open()
+    username = os.getenv('STUDENT_USER')
+    password = os.getenv('STUDENT_PASSWORD')
+    page.log_in(username, password)
+    assert (page.logged_in), 'User is not logged in'
+    # at profile, store original values
+    old_username = page.username.username
+    new_username = 'newusername'
+    # set new values
+    page.username.username = new_username
+    assert (page.username.username != old_username), 'Username change failed'
+    # reset the fields to the original values
+    # from time import sleep
+    sleep(0.25)
+    page.username.username = old_username
+    sleep(0.25)
+    assert (page.username.username == old_username), 'Username reset failed'
 
 
 @test_case('C195552')
