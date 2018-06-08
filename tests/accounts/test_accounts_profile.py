@@ -1,25 +1,23 @@
 """Test the Accounts logged in profile page."""
+
 import os
 
 import pytest
-from pytest_testrail.plugin import pytestrail
 
-from pages.accounts.profile import AccountException
+from pages.accounts.profile import AccountException, Profile
 from pages.utils.utilities import Utility
 
 from time import sleep
-
-try:
-    from pages.accounts.profile import Profile
-except ImportError:
-    pass
+from tests.markers import accounts, expected_failure, nondestructive  # noqa
+from tests.markers import social, test_case  # noqa
 
 
-@pytestrail.case('C195545')
-@pytest.mark.nondestructive
-def test_user_profile(base_url, selenium):
+@test_case('C195545')
+@nondestructive
+@accounts
+def test_user_profile(accounts_base_url, selenium):
     """Login as a student user with a username."""
-    page = Profile(selenium, base_url).open()
+    page = Profile(selenium, accounts_base_url).open()
     assert(not page.logged_in), 'Active user session unexpected'
     username = os.getenv('STUDENT_USER')
     password = os.getenv('STUDENT_PASSWORD')
@@ -33,11 +31,12 @@ def test_user_profile(base_url, selenium):
     assert('/login' in selenium.current_url), 'Not at the Accounts login page'
 
 
-@pytestrail.case('C195546')
-@pytest.mark.nondestructive
-def test_admin_profile(base_url, selenium):
+@test_case('C195546')
+@nondestructive
+@accounts
+def test_admin_profile(accounts_base_url, selenium):
     """Login as an administrative user with a username."""
-    page = Profile(selenium, base_url).open()
+    page = Profile(selenium, accounts_base_url).open()
     assert(not page.logged_in), 'Active user session unexpected'
     username = os.getenv('ADMIN_USER')
     password = os.getenv('ADMIN_PASSWORD')
@@ -49,11 +48,12 @@ def test_admin_profile(base_url, selenium):
     assert('/login' in selenium.current_url), 'Not at the Accounts login page'
 
 
-@pytestrail.case('C195547')
-@pytest.mark.nondestructive
-def test_name_get_properties(base_url, selenium):
+@test_case('C195547')
+@nondestructive
+@accounts
+def test_name_get_properties(accounts_base_url, selenium):
     """Test the getter methods for the name segments."""
-    page = Profile(selenium, base_url).open()
+    page = Profile(selenium, accounts_base_url).open()
     username = os.getenv('STUDENT_USER')
     password = os.getenv('STUDENT_PASSWORD')
     page.log_in(username, password)
@@ -69,11 +69,12 @@ def test_name_get_properties(base_url, selenium):
         'Names do not match'
 
 
-@pytestrail.case('C195548')
-def test_profile_name_field(base_url, selenium):
+@test_case('C195548')
+@accounts
+def test_profile_name_field(accounts_base_url, selenium):
     """Test the user's name field."""
     # setup
-    page = Profile(selenium, base_url).open()
+    page = Profile(selenium, accounts_base_url).open()
     username = os.getenv('STUDENT_USER')
     password = os.getenv('STUDENT_PASSWORD')
     page.log_in(username, password)
@@ -126,46 +127,55 @@ def test_profile_username_field(base_url, selenium):
     assert (page.username.username == old_username), 'Username reset failed'
 
 
-@pytestrail.case('C195552')
-@pytest.mark.nondestructive
-@pytest.mark.xfail
-def test_profile_email_fields(base_url, selenium):
+@test_case('C195552')
+@nondestructive
+@expected_failure
+@accounts
+def test_profile_email_fields(accounts_base_url, selenium):
     """Test the user's email fields."""
 
 
-@pytestrail.case('C195554')
-@pytest.mark.xfail
-def test_verify_an_existing_unverified_email(base_url, selenium):
+@test_case('C195554')
+@expected_failure
+@accounts
+def test_verify_an_existing_unverified_email(accounts_base_url, selenium):
     """Test the user email verification process."""
 
 
-@pytestrail.case('C195553')
-@pytest.mark.xfail
-def test_add_a_verified_email(base_url, selenium):
+@test_case('C195553')
+@expected_failure
+@accounts
+def test_add_a_verified_email(accounts_base_url, selenium):
     """Test the ability to add an e-mail address to an existing user."""
 
 
-@pytestrail.case('C195555')
-@pytest.mark.xfail
-def test_profile_login_using_google(base_url, selenium):
+@test_case('C195555')
+@expected_failure
+@accounts
+@social
+def test_profile_login_using_google(accounts_base_url, selenium):
     """Test the Gmail login method."""
 
 
-@pytestrail.case('C195556')
-@pytest.mark.xfail
-def test_profile_login_using_facebook(base_url, selenium):
+@test_case('C195556')
+@expected_failure
+@accounts
+@social
+def test_profile_login_using_facebook(accounts_base_url, selenium):
     """Test the Facebook login method."""
 
 
-@pytestrail.case('C195557')
-@pytest.mark.nondestructive
-@pytest.mark.xfail
-def test_admin_pop_up_console(base_url, selenium):
+@test_case('C195557')
+@nondestructive
+@expected_failure
+@accounts
+def test_admin_pop_up_console(accounts_base_url, selenium):
     """Test the pop up console."""
 
 
-@pytestrail.case('C195558')
-@pytest.mark.nondestructive
-@pytest.mark.xfail
-def test_go_to_full_console(base_url, selenium):
+@test_case('C195558')
+@nondestructive
+@expected_failure
+@accounts
+def test_go_to_full_console(accounts_base_url, selenium):
     """Go to the full console."""
