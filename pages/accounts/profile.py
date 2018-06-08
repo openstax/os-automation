@@ -30,17 +30,17 @@ class Profile(home.AccountsHome):
     @property
     def username(self):
         """Username field."""
-        return self.Username(self)
+        return self.User(self)
 
     @property
     def emails(self):
         """Email fields."""
-        return self.Emails(self)
+        return self.Email(self)
 
     @property
     def login_method(self):
         """Options for logging in."""
-        return self.LoginOptions(self)
+        return self.LoginOption(self)
 
     def log_out(self):
         """Log the user out."""
@@ -53,7 +53,7 @@ class Profile(home.AccountsHome):
         if not self.is_admin:
             raise AccountException('User is not an administrator')
         self.find_element(*self._popup_console_locator).click()
-        return self.PopupConsole(self)
+        return self.PopupConcole(self)
 
     def open_full_console(self):
         """Open the full admin console."""
@@ -173,9 +173,7 @@ class Profile(home.AccountsHome):
         """Username assignment."""
 
         _root_locator = (By.XPATH, '//div[div[contains(text(),"Username")]]')
-        _username_locator = (By.CSS_SELECTOR, '#username')
-        _input_locator = (By.XPATH, '//*[@id="profile"]/div/div[3]/div[2]/'
-                                    'span/div/form/div/div[1]/div[1]/input')
+        _username_locator = (By.CSS_SELECTOR, '#username + span input')
 
         @property
         def username(self):
@@ -185,11 +183,10 @@ class Profile(home.AccountsHome):
         @username.setter
         def username(self, username):
             """Set a new username."""
-            self.find_element(*self._username_locator).click()
             self.find_element(*Profile._edit_clear_locator).click()
-            self.find_element(*self._input_locator).send_keys(username)
-            self.find_element(*Profile._edit_submit_locator).click()
-            return Profile(self.driver)
+            self.find_element(*self._username_locator).send_keys(username)
+            self.find_element(*Profile._edit_submit_locator)
+            return Profile(self)
 
     class Emails(Region):
         """Email sections."""
