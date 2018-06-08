@@ -45,7 +45,10 @@ class AccountsHome(AccountsBase):
         _fb_locator = (By.ID, 'facebook-login-button')
         _fb_email_field_locator = (By.ID, 'email')
         _fb_password_field_locator = (By.ID, 'pass')
-        _fb_sumbit_locator = (By.ID, 'loginbutton')
+        _fb_submit_locator = (By.ID, 'loginbutton') 
+        _fb_safari_specific_locator = (By.NAME, '__CONFIRM__')
+        # _fb_safari_specific_locator = (By.CSS_SELECTOR, '[tabindex="0"]]')
+        # fb_safari_specific_locator = (By.XPATH, '//button[text() = "OK"]')
 
         _google_locator = (By.ID, 'google-login-button')
         _google_user_locator = (By.CSS_SELECTOR, '[type=email]')
@@ -74,13 +77,19 @@ class AccountsHome(AccountsBase):
             self.find_element(*self._login_submit_button_locator).click()
             sleep(1)
             self.find_element(*self._fb_locator).click()
-            sleep(1)
+            sleep(2)
             self.find_element(*self._fb_email_field_locator) \
                 .send_keys(facebook_user)
+            sleep(2)
             self.find_element(*self._fb_password_field_locator) \
                 .send_keys(password)
-            self.find_element(*self._fb_sumbit_locator).click()
-            sleep(10)
+            sleep(2)
+            self.find_element(*self._fb_submit_locator).click()
+            sleep(2)
+            if self.driver.capabilities['browserName'] == 'safari':
+                self.find_element(*self._fb_safari_specific_locator).click()
+            sleep(2)
+
 
         def google_login(self, user, google_user, password):
             """Log into the site with google."""
