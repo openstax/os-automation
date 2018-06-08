@@ -7,6 +7,8 @@ from pytest_testrail.plugin import pytestrail
 from pages.accounts.profile import AccountException
 from pages.utils.utilities import Utility
 
+from time import sleep
+
 try:
     from pages.accounts.profile import Profile
 except ImportError:
@@ -102,9 +104,26 @@ def test_profile_name_field(base_url, selenium):
 
 
 @pytestrail.case('C195551')
-@pytest.mark.xfail
 def test_profile_username_field(base_url, selenium):
     """Test the user's username field."""
+    # setup
+    page = Profile(selenium, base_url).open()
+    username = os.getenv('STUDENT_USER')
+    password = os.getenv('STUDENT_PASSWORD')
+    page.log_in(username, password)
+    assert (page.logged_in), 'User is not logged in'
+    # at profile, store original values
+    old_username = page.username.username
+    new_username = 'newusername'
+    # set new values
+    page.username.username = new_username
+    assert (page.username.username != old_username), 'Username change failed'
+    # reset the fields to the original values
+    # from time import sleep
+    sleep(0.25)
+    page.username.username = old_username
+    sleep(0.25)
+    assert (page.username.username == old_username), 'Username reset failed'
 
 
 @pytestrail.case('C195552')

@@ -29,17 +29,17 @@ class Profile(home.Home):
     @property
     def username(self):
         """Username field."""
-        return self.User(self)
+        return self.Username(self)
 
     @property
     def emails(self):
         """Email fields."""
-        return self.Email(self)
+        return self.Emails(self)
 
     @property
     def login_method(self):
         """Options for logging in."""
-        return self.LoginOption(self)
+        return self.LoginOptions(self)
 
     def log_out(self):
         """Log the user out."""
@@ -52,7 +52,7 @@ class Profile(home.Home):
         if not self.is_admin:
             raise AccountException('User is not an administrator')
         self.find_element(*self._popup_console_locator).click()
-        return self.PopupConcole(self)
+        return self.PopupConsole(self)
 
     def open_full_console(self):
         """Open the full admin console."""
@@ -171,7 +171,9 @@ class Profile(home.Home):
         """Username assignment."""
 
         _root_locator = (By.XPATH, '//div[div[contains(text(),"Username")]]')
-        _username_locator = (By.CSS_SELECTOR, '#username + span input')
+        _username_locator = (By.CSS_SELECTOR, '#username')
+        _input_locator = (By.XPATH, '//*[@id="profile"]/div/div[3]/div[2]/'
+                                    'span/div/form/div/div[1]/div[1]/input')
 
         @property
         def username(self):
@@ -181,10 +183,11 @@ class Profile(home.Home):
         @username.setter
         def username(self, username):
             """Set a new username."""
+            self.find_element(*self._username_locator).click()
             self.find_element(*Profile._edit_clear_locator).click()
-            self.find_element(*self._username_locator).send_keys(username)
-            self.find_element(*Profile._edit_submit_locator)
-            return Profile(self)
+            self.find_element(*self._input_locator).send_keys(username)
+            self.find_element(*Profile._edit_submit_locator).click()
+            return Profile(self.driver)
 
     class Emails(Region):
         """Email sections."""
