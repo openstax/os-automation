@@ -1,6 +1,5 @@
 """Test the e-mail hosts."""
 
-import os
 import re
 
 import pytest
@@ -15,13 +14,11 @@ from tests.markers import nondestructive, social, test_case
 @test_case('C195537')
 @nondestructive
 @social
-def test_google_mail_user_has_pin_emails(selenium):
+def test_google_mail_user_has_pin_emails(gmail, selenium):
     """Test a Google Gmail user."""
     # GIVEN: A valid logged in Gmail user with previous validation emails
     page = GoogleBase(selenium).open()
-    username = os.getenv('GMAIL_USERNAME')
-    password = os.getenv('GMAIL_PASSWORD')
-    email = page.login.go(username, password)
+    email = page.login.go(*gmail)
     emails = email.emails
 
     # WHEN:
