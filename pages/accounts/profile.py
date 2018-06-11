@@ -7,7 +7,6 @@ from selenium.webdriver.common.by import By
 
 from pages.accounts import admin, home
 
-
 class Profile(home.AccountsHome):
     """Profile page."""
 
@@ -53,6 +52,7 @@ class Profile(home.AccountsHome):
         if not self.is_admin:
             raise AccountException('User is not an administrator')
         self.find_element(*self._popup_console_locator).click()
+        sleep(.25)
         return self.PopupConsole(self)
 
     def open_full_console(self):
@@ -318,7 +318,6 @@ class Profile(home.AccountsHome):
             def search_api(self):
                 try: return self.find_element(*self._api_locator)
                 except: return False
-
 
 
 

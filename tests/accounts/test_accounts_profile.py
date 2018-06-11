@@ -161,8 +161,7 @@ def test_admin_pop_up_console(accounts_base_url, selenium):
     assert(page.is_admin), 'User is not an administrator'
     assert(page.has_username), 'No username found'
     popup = page.open_popup_console()
-    from time import sleep
-    sleep(.25)
+
     misc = popup.misc
     assert(misc.task_locate())
     assert(misc.security_locate())
@@ -176,38 +175,31 @@ def test_admin_pop_up_console(accounts_base_url, selenium):
     assert("cron" in selenium.current_url)
 
     popup = page.open_popup_console()
-    sleep(.25)
     popup.misc.security_locate().click()
     assert("security_transgression" in selenium.current_url)
 
     popup = page.open_popup_console()
-    sleep(.25)
     popup.misc.routing_locate().click()
     assert("routing_error" in selenium.current_url)
 
     popup = page.open_popup_console()
-    sleep(.25)
     popup.misc.controller_locate().click()
     assert("unknown_controller" in selenium.current_url)
 
     popup = page.open_popup_console()
-    sleep(.25)
     popup.misc.action_locate().click()
     assert("unknown_action" in selenium.current_url)
 
     popup = page.open_popup_console()
-    sleep(.25)
     popup.misc.template_locate().click()
     assert("missing_template" in selenium.current_url)
 
     popup = page.open_popup_console()
-    sleep(.25)
     popup.misc.not_yet_locate().click()
     assert("not_yet_implemented" in selenium.current_url)
 
     #User
     popup = page.open_popup_console()
-    sleep(.25)
     assert(popup.users.search_bar())
     assert(popup.users.search_button())
 
@@ -217,19 +209,16 @@ def test_admin_pop_up_console(accounts_base_url, selenium):
 
     selenium.back()
     popup = page.open_popup_console()
-    sleep(.25)
     popup.links.search_application().click()
     assert("applications" in selenium.current_url)
 
     selenium.back()
     popup = page.open_popup_console()
-    sleep(.25)
     popup.links.search_print().click()
     assert("print" in selenium.current_url)
 
     selenium.back()
     popup = page.open_popup_console()
-    sleep(.25)
     popup.links.search_api().click()
     assert("api/docs/v1" in selenium.current_url)
 
