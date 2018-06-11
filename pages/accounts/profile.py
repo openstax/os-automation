@@ -84,7 +84,6 @@ class Profile(home.AccountsHome):
         LAST = 2
         SUFFIX = 3
 
-        _root_locator = (By.CSS_SELECTOR, '.row.name')
         _full_name_locator = (By.ID, 'name')
         _input_locator = (By.CLASS_NAME, 'form-control')
         _edit_clear_locator = (By.CLASS_NAME, 'editable-clear-x')
@@ -258,44 +257,46 @@ class Profile(home.AccountsHome):
     
 
             def task_locate(self):
-                try: return self.find_element(*self._task_locator)
-                except: return False
+                try: return self.find_element(*self._task_locator) 
+                except NoSuchElementException: return None
 
             def security_locate(self):
-                try: return self.find_element(*self._security_locator)
-                except: return False
+                try: return self.find_element(*self._security_locator) 
+                except NoSuchElementException: return None
+                
 
             def routing_locate(self):
-                try: return self.find_element(*self._routing_locator)
-                except: return False
+                try: return self.find_element(*self._routing_locator) 
+                except NoSuchElementException: return None
+                
 
             def controller_locate(self):
-                try: return self.find_element(*self._controller_locator)
-                except: return False
+                try: return self.find_element(*self._controller_locator) 
+                except NoSuchElementException: return None
                 
             def action_locate(self):
-                try: return self.find_element(*self._action_locator)
-                except: return False            
+                try: return self.find_element(*self._action_locator) 
+                except NoSuchElementException: return None
 
             def template_locate(self):
-                try: return self.find_element(*self._template_locator)
-                except: return False
+                try: return self.find_element(*self._template_locator) 
+                except NoSuchElementException: return None
 
             def not_yet_locate(self):
-                try: return self.find_element(*self._not_yet_implemented_locator)
-                except: return False
+                try: return self.find_element(*self._not_yet_implemented_locator) 
+                except NoSuchElementException: return None
 
         class Users(Region):
             _search_bar_locator = (By.ID, 'search_terms')
             _search_button_locator = (By.NAME, 'commit')
 
             def search_bar(self):
-                try: return self.find_element(*self._search_bar_locator)
-                except: return False
+                try: return self.find_element(*self._search_bar_locator) 
+                except NoSuchElementException: return None
 
             def search_button(self):
-                try: return self.find_element(*self._search_bar_locator)
-                except: return False
+                try: return self.find_element(*self._search_bar_locator) 
+                except NoSuchElementException: return None
 
         class Links(Region):
             _security_log_locator = (By.PARTIAL_LINK_TEXT, 'Security')
@@ -304,24 +305,23 @@ class Profile(home.AccountsHome):
             _api_locator = (By.PARTIAL_LINK_TEXT, 'API')
 
             def search_security(self):
-                try: return self.find_element(*self._security_log_locator)
-                except: return False
+                try: return self.find_element(*self._security_log_locator) 
+                except NoSuchElementException: return None
 
             def search_application(self):
-                try: return self.find_element(*self._application_locator)
-                except: return False
+                try: return self.find_element(*self._application_locator) 
+                except NoSuchElementException: return None
 
             def search_print(self):
-                try: return self.find_element(*self._print_locator)
-                except: return False
+                try: return self.find_element(*self._print_locator) 
+                except NoSuchElementException: return None
 
             def search_api(self):
-                try: return self.find_element(*self._api_locator)
-                except: return False
+                try: return self.find_element(*self._api_locator) 
+                except NoSuchElementException: return None
 
 
 
 class AccountException(Exception):
     """Account exception."""
-
     pass

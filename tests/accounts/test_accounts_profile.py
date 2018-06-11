@@ -170,7 +170,7 @@ def test_admin_pop_up_console(accounts_base_url, selenium):
     assert(misc.action_locate())
     assert(misc.template_locate())
     assert(misc.not_yet_locate())
-    #link of misc tests
+    # link of misc tests
     misc.task_locate().click()
     assert("cron" in selenium.current_url)
 
@@ -198,12 +198,12 @@ def test_admin_pop_up_console(accounts_base_url, selenium):
     popup.misc.not_yet_locate().click()
     assert("not_yet_implemented" in selenium.current_url)
 
-    #User
+    # User
     popup = page.open_popup_console()
     assert(popup.users.search_bar())
     assert(popup.users.search_button())
 
-    #Links
+    # Links
     popup.links.search_security().click()
     assert("security_log" in selenium.current_url)
 
