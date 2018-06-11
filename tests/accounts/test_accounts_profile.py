@@ -1,5 +1,6 @@
 """Test the Accounts logged in profile page."""
 import os
+from time import sleep
 
 import pytest
 from pytest_testrail.plugin import pytestrail
@@ -109,9 +110,27 @@ def test_profile_username_field(base_url, selenium):
 
 @pytestrail.case('C195552')
 @pytest.mark.nondestructive
-@pytest.mark.xfail
 def test_profile_email_fields(base_url, selenium):
     """Test the user's email fields."""
+    """Test the user's name field."""
+    # setup
+    page = Profile(selenium, base_url).open()
+    username = os.getenv('STUDENT_USER')
+    password = os.getenv('STUDENT_PASSWORD')
+    page.log_in(username, password)
+    assert(page.logged_in), 'User is not logged in'
+    # add a new email
+    prelen = len(page.emails.emails)
+    page.emails.add_email()
+    pastlen = len(page.emails.emails)
+    assert (pastlen == prelen + 1), "Email is not added properly"
+    sleep(0.5)
+    # delete the new email added
+    email = page.emails.emails[-1]
+    email.delete()
+    sleep(0.5)
+    finallen = len(page.emails.emails)
+    assert (pastlen == finallen + 1), "Email is not deleted properly"
 
 
 @pytestrail.case('C195554')
