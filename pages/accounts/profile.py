@@ -1,4 +1,5 @@
 """Profile page for logged in users."""
+
 from time import sleep
 
 from pypom import Region
@@ -7,10 +8,10 @@ from selenium.webdriver.common.by import By
 from pages.accounts import admin, home
 
 
-class Profile(home.Home):
+class Profile(home.AccountsHome):
     """Profile page."""
 
-    URL_TEMPLATE = home.Home.URL_TEMPLATE + '/profile'
+    URL_TEMPLATE = '/profile'
 
     _log_out_locator = (By.CLASS_NAME, 'sign-out')
     _edit_clear_locator = (By.CLASS_NAME, 'editable-clear-x')
