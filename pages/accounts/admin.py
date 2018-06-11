@@ -1,8 +1,8 @@
 """Accounts admin controls and console."""
 # from selenium.webdriver.common.by import By
 
-from pages.accounts import profile
+from pages.accounts.profile import Profile
 
 
-class AccountsAdmin(profile.Profile):
+class AccountsAdmin(Profile):
     """Accounts admin controls."""

@@ -115,7 +115,6 @@ def test_profile_username_field(accounts_base_url, selenium):
     # at profile, store original values
     old_username = page.username.username
     new_username = Utility.random_hex()
-    # new_username = 'newuser'
     # set new values
     page.username.username = new_username
     assert (page.username.username != old_username), 'Username change failed'
