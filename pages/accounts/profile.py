@@ -3,6 +3,7 @@ from time import sleep
 
 from pypom import Region
 from selenium.webdriver.common.by import By
+from selenium.webdriver.common.keys import Keys
 
 from pages.accounts import admin, home
 
@@ -34,7 +35,7 @@ class Profile(home.Home):
     @property
     def emails(self):
         """Email fields."""
-        return self.Email(self)
+        return self.Emails(self)
 
     @property
     def login_method(self):
@@ -191,6 +192,8 @@ class Profile(home.Home):
 
         _root_locator = (By.XPATH, '//div[div[contains(text(),"Emails")]]')
         _email_locator = (By.CSS_SELECTOR, '.info > .email-entry')
+        _add_locator = (By.ID, 'add-an-email')
+        _text_locator = (By.CLASS_NAME, 'input-sm')
 
         @property
         def emails(self):
@@ -198,11 +201,28 @@ class Profile(home.Home):
             return [self.Email(self, element)
                     for element in self.find_elements(*self._email_locator)]
 
+        def add_email(self):
+            """Add an email."""
+            self.find_element(*self._add_locator).click()
+            self.find_element(*self._text_locator).send_keys("ts40@rice.edu")
+            self.find_element(*self._text_locator).send_keys(Keys.RETURN)
+
         class Email(Region):
             """Individual email section."""
 
             _email_locator = (By.CLASS_NAME, 'value')
             _unverified_locator = (By.CLASS_NAME, 'unconfirmed-warning')
+            _delete_locator = (By.CSS_SELECTOR, '.glyphicon-trash + a')
+            _ok_locator = (By.CSS_SELECTOR, '.btn-danger')
+            _specific_locator = (By.CSS_SELECTOR, '.editable-click  .value')
+
+            def delete(self):
+                """Delete an individual email section."""
+                self.find_element(*self._specific_locator).click()
+                sleep(0.25)
+                self.find_element(*self._delete_locator).click()
+                sleep(0.25)
+                self.find_element(*self._ok_locator).click()
 
     class LoginOptions(Region):
         """Login options."""
