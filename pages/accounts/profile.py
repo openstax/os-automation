@@ -196,7 +196,7 @@ class Profile(home.AccountsHome):
         _unverified_locator = (By.CLASS_NAME, 'unconfirmed-warning')
         _add_email_locator = (By.ID, 'add-an-email')
         _email_form_locator = (By.CSS_SELECTOR, '.editable-input input')
-        _email_submit_locator = (By.XPATH, '//button[@type="submit"]')
+        _email_submit_locator = (By.CSS_SELECTOR, '[type=submit]')
 
         @property
         def emails(self):

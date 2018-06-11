@@ -221,7 +221,7 @@ class GuerrillaMail(Page):
 
         _subject_locator = (By.CLASS_NAME, 'td3')
         _excerpt_locator = (By.CLASS_NAME, 'email-excerpt')
-        _emails_locator = (By.XPATH, '//tbody/tr')
+        _emails_locator = (By.CSS_SELECTOR, 'tbody > tr')
 
         @property
         def subject(self):
@@ -253,7 +253,7 @@ class GuerrillaMail(Page):
             sleep(0.5)
             self.driver.refresh()
 
-    class Openedmail(Region):
+    class OpenedMail(Region):
         """The email page after it's opened."""
 
         _confirmation_link_locator = (By.CSS_SELECTOR, '.email_body a')

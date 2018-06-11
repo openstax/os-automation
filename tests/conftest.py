@@ -9,7 +9,6 @@ from dotenv import load_dotenv
 DOTENV_PATH = os.path.join(
     os.path.realpath(os.path.dirname(__file__)), '../.env')
 load_dotenv(dotenv_path=DOTENV_PATH)
-
 # Import fixtures from our package so pytest can detect them
 from fixtures.base import chrome_options, selenium  # Flake8: noqa
 from fixtures.accounts import accounts_base_url
