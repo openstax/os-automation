@@ -173,8 +173,8 @@ class Profile(home.AccountsHome):
 
         _root_locator = (By.XPATH, '//div[div[contains(text(),"Username")]]')
         _username_locator = (By.CSS_SELECTOR, '#username')
-        _input_locator = (By.XPATH, '//*[@id="profile"]/div/div[3]/div[2]/'
-                                    'span/div/form/div/div[1]/div[1]/input')
+        _input_locator = (By.CSS_SELECTOR, "#profile > div > div:nth-child(3) > div.col-sm-10.info > span > div \
+         > form > div > div:nth-child(1) > div.editable-input > input")
 
         @property
         def username(self):
