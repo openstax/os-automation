@@ -2,7 +2,6 @@
 
 import os
 import re
-from time import sleep
 
 import pytest
 from selenium.webdriver.common.by import By
@@ -10,20 +9,24 @@ from selenium.webdriver.support import expected_conditions as expect
 from selenium.webdriver.support.ui import WebDriverWait
 
 from pages.utils.email import EmailVerificationError, GoogleBase, GuerrillaMail
-from pages.utils.utilities import Utility
-from tests.markers import nondestructive, test_case
+from tests.markers import nondestructive, social, test_case
 
 
 @test_case('C195537')
 @nondestructive
-def test_google_mail(base_url, selenium):
+@social
+def test_google_mail_user_has_pin_emails(selenium):
     """Test a Google Gmail user."""
+    # GIVEN: A valid logged in Gmail user with previous validation emails
     page = GoogleBase(selenium).open()
-    assert('/signin' in selenium.current_url), 'Not at Google sign in'
     username = os.getenv('GMAIL_USERNAME')
     password = os.getenv('GMAIL_PASSWORD')
     email = page.login.go(username, password)
     emails = email.emails
+
+    # WHEN:
+
+    # THEN: There is a mixture of emails with and without pins
     assert(emails), 'No e-mails found'
     for mail in emails:
         if mail.has_pin:
@@ -41,21 +44,12 @@ def test_google_mail(base_url, selenium):
 
 @test_case('C195538')
 @nondestructive
-def test_guerrilla_mail(base_url, selenium):
+def test_guerrilla_mail_received_pin_email(selenium):
     """Test a Guerrilla Mail user."""
+    # GIVEN: A new Guerrilla Mail session
     page = GuerrillaMail(selenium).open()
-    assert('guerrilla' in selenium.current_url)
-    assert(page.header.is_header_displayed), 'Header not available'
-    assert(page.emails), 'No e-mails found'
-    assert(page.header.email), 'No e-mail address returned'
-    assert(page.header.is_scrambled), 'E-mail is in plain text'
-    email_layout = re.compile(r'[^@]+@[^@]+\.[^@]+')
-    assert(email_layout.match(page.header.email)), \
-        'E-mail is not a valid format'
-    assert(not page.header.scramble().is_scrambled), 'E-mail is scrambled'
-    assert(email_layout.match(page.header.email)), \
-        'E-mail is not a valid format'
-    # send a test message to verify pin code
+
+    # WHEN: A template email with a pin is sent to the current email
     page = page.compose.send_message(
         to=page.header.email,
         subject='[OpenStax] Use PIN 999999 to confirm your email address',
@@ -67,11 +61,18 @@ def test_guerrilla_mail(base_url, selenium):
               'is trying to use ... to create an\nOpenStax account. If this '
               'wasn\'t you, please disregard this message.\n\nRegards,\nThe '
               'OpenStax Team'))
-    # wait for the message to show in the inbox
+    # AND: The user waits for the message to show in the inbox
     WebDriverWait(page.selenium, 30).until(
         expect.presence_of_element_located(
             (By.XPATH, '//*[contains(text(),"999999")]')))
     emails = page.emails
+
+    # THEN: There is an email with a pin and an email without a pin
+    assert(page.header.is_header_displayed), 'Header not available'
+    assert(page.emails), 'No e-mails found'
+    assert(page.header.email), 'No e-mail address returned'
+    assert(re.compile(r'[^@]+@[^@]+\.[^@]+').match(page.header.email)), \
+        'E-mail is not a valid format'
     assert(emails), 'No e-mails found'
     for mail in emails:
         if mail.has_pin:
@@ -83,7 +84,12 @@ def test_guerrilla_mail(base_url, selenium):
             assert(mail.excerpt), 'Excerpt not shown'
             with pytest.raises(EmailVerificationError):
                 mail.get_pin
-    new_user = Utility.random_hex(12).lower()
+    '''assert(page.header.is_scrambled), 'E-mail is in plain text'
+    assert(email_layout.match(page.header.email)), \
+        'E-mail is not a valid format'
+    assert(not page.header.scramble().is_scrambled), 'E-mail is scrambled'
+    '''
+    '''new_user = Utility.random_hex(12).lower()
     page.header.email = new_user
     assert(new_user in page.header.email), \
         'E-mail user ID did not change'
@@ -95,4 +101,4 @@ def test_guerrilla_mail(base_url, selenium):
     sleep(5.0)
     page.header.forget_address()
     assert(selenium.find_element('css selector', '#inbox-id input')
-           .text == ''), 'Username not blank'
+           .text == ''), 'Username not blank' '''
