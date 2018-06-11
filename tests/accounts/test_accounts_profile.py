@@ -126,7 +126,6 @@ def test_verify_an_existing_unverified_email(accounts_base_url, selenium):
     page = GuerrillaMail(selenium).open()
     email = page.header.email
     assert email is not None, "Didn't get guerrilla email"
-
     page = Profile(page.driver).open()
     username = os.getenv('STUDENT_USER')
     password = os.getenv('STUDENT_PASSWORD')
@@ -147,7 +146,7 @@ def test_verify_an_existing_unverified_email(accounts_base_url, selenium):
     new_email = page.emails.emails.pop()
     assert new_email.is_confirmed, "The email isn't verified"
 
-
+    
 @test_case('C195553')
 @expected_failure
 @accounts
@@ -156,7 +155,6 @@ def test_add_a_verified_email(accounts_base_url, selenium):
     page = GuerrillaMail(selenium).open()
     email = page.header.email
     assert email is not None, "Didn't get guerrilla email"
-
     page = Profile(page.driver).open()
     username = os.getenv('STUDENT_USER')
     password = os.getenv('STUDENT_PASSWORD')
@@ -175,7 +173,7 @@ def test_add_a_verified_email(accounts_base_url, selenium):
     new_email = page.emails.emails.pop()
     assert new_email.is_confirmed, "The email isn't verified"
 
-
+    
 @test_case('C195555')
 @expected_failure
 @accounts
