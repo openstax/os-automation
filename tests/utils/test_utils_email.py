@@ -81,6 +81,8 @@ def test_guerrilla_mail_received_pin_email(selenium):
             assert(mail.excerpt), 'Excerpt not shown'
             with pytest.raises(EmailVerificationError):
                 mail.get_pin
+
+    # TODO: move Guerrilla Mail email manipulation tests to a separate test
     '''assert(page.header.is_scrambled), 'E-mail is in plain text'
     assert(email_layout.match(page.header.email)), \
         'E-mail is not a valid format'
