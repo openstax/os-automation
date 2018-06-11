@@ -123,7 +123,7 @@ def test_profile_email_fields(accounts_base_url, selenium):
 @accounts
 def test_verify_an_existing_unverified_email(accounts_base_url, selenium):
     """Test the user email verification process."""
-    # GIVEN the user has a existing unverified email
+    # GIVEN the user is valid and has a existing unverified email
     page = GuerrillaMail(selenium).open()
     email = page.header.email
     assert email is not None, "Didn't get guerrilla email"
