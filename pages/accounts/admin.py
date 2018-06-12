@@ -6,3 +6,5 @@ from pages.accounts import profile
 
 class AccountsAdmin(profile.Profile):
     """Accounts admin controls."""
+
+    pass

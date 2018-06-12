@@ -4,6 +4,7 @@ from time import sleep
 
 from pypom import Region
 from selenium.webdriver.common.by import By
+from selenium.webdriver.support import expected_conditions as expect
 
 from pages.accounts.base import AccountsBase
 from pages.accounts.signup import Signup
@@ -41,6 +42,18 @@ class AccountsHome(AccountsBase):
         _error_locator = (By.CSS_SELECTOR, '.alert')
         _signup_locator = (By.CSS_SELECTOR, '.extra-info a')
 
+        _fb_locator = (By.ID, 'facebook-login-button')
+        _fb_email_field_locator = (By.ID, 'email')
+        _fb_password_field_locator = (By.ID, 'pass')
+        _fb_submit_locator = (By.ID, 'loginbutton') 
+        _fb_safari_specific_locator = (By.NAME, '__CONFIRM__')
+
+        _google_locator = (By.ID, 'google-login-button')
+        _google_user_locator = (By.CSS_SELECTOR, '[type=email]')
+        _google_user_next_locator = (By.ID, 'identifierNext')
+        _google_password_locator = (By.CSS_SELECTOR, '[type=password]')
+        _google_pass_next_locator = (By.ID, 'passwordNext')
+
         @property
         def logged_in(self):
             """Return True if a user is logged in."""
@@ -55,6 +68,46 @@ class AccountsHome(AccountsBase):
                 .send_keys(password)
             self.find_element(*self._login_submit_button_locator).click()
             self.wait.until(lambda _: self.logged_in)
+
+        def facebook_login(self, user, facebook_user, password):
+            """Log into the site with facebook."""
+            self.find_element(*self._user_field_locator).send_keys(user)
+            self.find_element(*self._login_submit_button_locator).click()
+            sleep(1)
+            self.find_element(*self._fb_locator).click()
+            self.wait.until(
+                expect.visibility_of_element_located(
+                    self._fb_email_field_locator))
+            self.find_element(*self._fb_email_field_locator) \
+                .send_keys(facebook_user)
+            self.find_element(*self._fb_password_field_locator) \
+                .send_keys(password)
+            self.find_element(*self._fb_submit_locator).click()
+            if self.driver.capabilities['browserName'] == 'safari':
+                self.wait.until(
+                    expect.visibility_of_element_located(
+                        self._fb_safari_specific_locator))
+                self.find_element(*self._fb_safari_specific_locator).click()
+            sleep(2)
+
+
+        def google_login(self, user, google_user, password):
+            """Log into the site with google."""
+            self.find_element(*self._user_field_locator).send_keys(user)
+            self.find_element(*self._login_submit_button_locator).click()
+            sleep(1)
+            self.find_element(*self._google_locator).click()
+            self.wait.until(
+                expect.visibility_of_element_located(
+                    self._google_user_locator))
+            self.find_element(*self._google_user_next_locator).click()
+            self.wait.until(
+                expect.visibility_of_element_located(
+                    self._google_password_locator))
+            self.find_element(*self._google_password_locator) \
+                .send_keys(password)
+            self.find_element(*self._google_pass_next_locator).click()
+            sleep(2)
 
         def reset_password(self, user, new_password):
             """Reset a current user's password."""

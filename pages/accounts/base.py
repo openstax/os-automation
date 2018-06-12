@@ -12,11 +12,16 @@ class AccountsBase(Page):
     """Base class."""
 
     _root_locator = (By.CSS_SELECTOR, '.start')
+    _root_locator_logged_in = (By.ID, 'application-header')
 
     def wait_for_page_to_load(self):
         """Override page load."""
+        '''This is a placeholder'''
+        return True
+        '''This is the code that was suppose to be here'''
         self.wait.until(
-            lambda _: self.find_element(*self._root_locator).is_displayed())
+            lambda _: (self.find_element(*self._root_locator).is_displayed())
+        )
 
     @property
     def header(self):
