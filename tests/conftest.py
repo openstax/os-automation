@@ -8,8 +8,9 @@ from dotenv import load_dotenv
 DOTENV_PATH = os.path.join(
     os.path.realpath(os.path.dirname(__file__)), '../.env')
 load_dotenv(dotenv_path=DOTENV_PATH)
-
 # Import fixtures from our package so pytest can detect them
+
+
 pytest_plugins = (
     'fixtures.accounts',
     'fixtures.base',

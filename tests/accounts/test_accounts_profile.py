@@ -5,6 +5,7 @@ import os
 import pytest
 
 from pages.accounts.profile import AccountException, Profile
+from pages.utils.email import GuerrillaMail
 from pages.utils.utilities import Utility
 from tests.markers import accounts, expected_failure, nondestructive  # noqa
 from tests.markers import social, test_case  # noqa
@@ -122,15 +123,71 @@ def test_profile_email_fields(accounts_base_url, selenium):
 @accounts
 def test_verify_an_existing_unverified_email(accounts_base_url, selenium):
     """Test the user email verification process."""
+    # GIVEN the user is valid and has a existing unverified email
+    page = GuerrillaMail(selenium).open()
+    email = page.header.email
+    assert email is not None, "Didn't get guerrilla email"
+    page = Profile(page.driver).open()
+    username = os.getenv('STUDENT_USER')
+    password = os.getenv('STUDENT_PASSWORD')
+    page.log_in(username, password)
+    page.emails.add_email(email)
+    new_email = page.emails.emails.pop()
 
+    # WHEN the user click resend confirmation
+    new_email.resend_confirmation()
 
+    # THEN the user should receive new confirmation email
+    page = GuerrillaMail(page.driver, timeout=60).open()
+    page.wait_for_email()
+    assert len(page.emails) > 2, "Didn't receive email"
+    new_email = page.emails[0]
+    new_email.open_email()
+
+    # WHEN the user click the confirmation link
+    page.openedmail.confirm_email()
+    assert 'openstax.org/confirm?' in selenium.current_url
+
+    # THEN the email should appear as confirmed
+    page = Profile(page.driver).open()
+    new_email = page.emails.emails.pop()
+    assert new_email.is_confirmed, "The email isn't verified"
+
+    
 @test_case('C195553')
 @expected_failure
 @accounts
 def test_add_a_verified_email(accounts_base_url, selenium):
     """Test the ability to add an e-mail address to an existing user."""
+    # GIVEN the user is valid
 
+    # WHEN the user add a new email
+    page = GuerrillaMail(selenium).open()
+    email = page.header.email
+    assert email is not None, "Didn't get guerrilla email"
+    page = Profile(page.driver).open()
+    username = os.getenv('STUDENT_USER')
+    password = os.getenv('STUDENT_PASSWORD')
+    page.log_in(username, password)
+    page.emails.add_email(email)
 
+    # THEN the user should receive a confirmation email automatically
+    page = GuerrillaMail(page.driver, timeout=60).open()
+    page.wait_for_email()
+    assert len(page.emails) > 1, "Didn't receive email"
+    new_email = page.emails[0]
+    new_email.open_email()
+
+    # WHEN the user click the confirmation link
+    page.openedmail.confirm_email()
+    assert 'openstax.org/confirm?' in selenium.current_url
+
+    # THEN the email should appear as confirmed
+    page = Profile(page.driver).open()
+    new_email = page.emails.emails.pop()
+    assert new_email.is_confirmed, "The email isn't verified"
+
+    
 @test_case('C195555')
 @expected_failure
 @accounts
