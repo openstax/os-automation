@@ -46,7 +46,7 @@ class Profile(home.AccountsHome):
         """Log the user out."""
         self.find_element(*self._log_out_locator).click()
         sleep(1)
-        return home.Home(self.driver)
+        return home.AccountsHome(self.driver)
 
     def open_popup_console(self):
         """Open the small admin console."""
@@ -188,6 +188,7 @@ class Profile(home.AccountsHome):
             self.find_element(*Profile._edit_clear_locator).click()
             self.find_element(*self._input_locator).send_keys(username)
             self.find_element(*Profile._edit_submit_locator).click()
+            sleep(0.25)
             return Profile(self.driver)
 
     class Emails(Region):

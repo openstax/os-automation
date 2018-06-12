@@ -119,10 +119,7 @@ def test_profile_username_field(accounts_base_url, selenium):
     page.username.username = new_username
     assert (page.username.username != old_username), 'Username change failed'
     # reset the fields to the original values
-    from time import sleep
-    sleep(0.25)
     page.username.username = old_username
-    sleep(0.25)
     assert (page.username.username == old_username), 'Username reset failed'
 
 
