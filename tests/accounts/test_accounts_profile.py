@@ -1,8 +1,5 @@
 """Test the Accounts logged in profile page."""
 
-import os
-from time import sleep
-
 import pytest
 
 from pages.accounts.profile import AccountException, Profile
@@ -15,14 +12,12 @@ from tests.markers import social, test_case  # noqa
 @test_case('C195545')
 @nondestructive
 @accounts
-def test_user_profile(accounts_base_url, selenium):
+def test_user_profile(accounts_base_url, selenium, student):
     """Login as a student user with a username."""
     page = Profile(selenium, accounts_base_url).open()
     assert(not page.logged_in), 'Active user session unexpected'
-    username = os.getenv('STUDENT_USER')
-    password = os.getenv('STUDENT_PASSWORD')
-    page.log_in(username, password)
-    assert(page.logged_in), 'User "{0}" not logged in'.format(username)
+    page.log_in(*student)
+    assert(page.logged_in), 'User "{0}" not logged in'.format(student[0])
     assert(not page.is_admin), 'User is an administrator'
     assert(page.has_username), 'No username found'
     with pytest.raises(AccountException):
@@ -34,14 +29,12 @@ def test_user_profile(accounts_base_url, selenium):
 @test_case('C195546')
 @nondestructive
 @accounts
-def test_admin_profile(accounts_base_url, selenium):
+def test_admin_profile(accounts_base_url, admin, selenium):
     """Login as an administrative user with a username."""
     page = Profile(selenium, accounts_base_url).open()
     assert(not page.logged_in), 'Active user session unexpected'
-    username = os.getenv('ADMIN_USER')
-    password = os.getenv('ADMIN_PASSWORD')
-    page.log_in(username, password)
-    assert(page.logged_in), 'User "{0}" not logged in'.format(username)
+    page.log_in(*admin)
+    assert(page.logged_in), 'User "{0}" not logged in'.format(admin[0])
     assert(page.is_admin), 'User is not an administrator'
     assert(page.has_username), 'No username found'
     page.log_out()
@@ -51,12 +44,10 @@ def test_admin_profile(accounts_base_url, selenium):
 @test_case('C195547')
 @nondestructive
 @accounts
-def test_name_get_properties(accounts_base_url, selenium):
+def test_name_get_properties(accounts_base_url, selenium, student):
     """Test the getter methods for the name segments."""
     page = Profile(selenium, accounts_base_url).open()
-    username = os.getenv('STUDENT_USER')
-    password = os.getenv('STUDENT_PASSWORD')
-    page.log_in(username, password)
+    page.log_in(*student)
     assert(page.logged_in), 'User is not logged in'
     name = page.name.full_name()
     page.name.open()
@@ -71,13 +62,11 @@ def test_name_get_properties(accounts_base_url, selenium):
 
 @test_case('C195548')
 @accounts
-def test_profile_name_field(accounts_base_url, selenium):
+def test_profile_name_field(accounts_base_url, selenium, student):
     """Test the user's name field."""
     # setup
     page = Profile(selenium, accounts_base_url).open()
-    username = os.getenv('STUDENT_USER')
-    password = os.getenv('STUDENT_PASSWORD')
-    page.log_in(username, password)
+    page.log_in(*student)
     assert(page.logged_in), 'User is not logged in'
     # at profile, store original values
     page.name.open()
@@ -114,25 +103,20 @@ def test_profile_username_field(accounts_base_url, selenium):
 @test_case('C195552')
 @nondestructive
 @accounts
-def test_profile_email_fields(accounts_base_url, selenium):
+def test_profile_email_fields(accounts_base_url, selenium, student):
     """Test the user's email fields."""
-    """Test the user's name field."""
     # setup
     page = Profile(selenium, base_url).open()
-    username = os.getenv('STUDENT_USER')
-    password = os.getenv('STUDENT_PASSWORD')
-    page.log_in(username, password)
+    page.log_in(*student)
     assert(page.logged_in), 'User is not logged in'
     # add a new email
     prelen = len(page.emails.emails)
     page.emails.add_email()
     pastlen = len(page.emails.emails)
     assert (pastlen == prelen + 1), "Email is not added properly"
-    sleep(0.5)
     # delete the new email added
     email = page.emails.emails[-1]
     email.delete()
-    sleep(0.5)
     finallen = len(page.emails.emails)
     assert (pastlen == finallen + 1), "Email is not deleted properly"
 
@@ -140,16 +124,14 @@ def test_profile_email_fields(accounts_base_url, selenium):
 @test_case('C195554')
 @expected_failure
 @accounts
-def test_verify_an_existing_unverified_email(accounts_base_url, selenium):
+def test_verify_an_existing_unverified_email(accounts_base_url, selenium, student):
     """Test the user email verification process."""
     # GIVEN the user is valid and has a existing unverified email
     page = GuerrillaMail(selenium).open()
     email = page.header.email
     assert email is not None, "Didn't get guerrilla email"
     page = Profile(page.driver).open()
-    username = os.getenv('STUDENT_USER')
-    password = os.getenv('STUDENT_PASSWORD')
-    page.log_in(username, password)
+    page.log_in(*student)
     page.emails.add_email(email)
     new_email = page.emails.emails.pop()
 
@@ -174,9 +156,8 @@ def test_verify_an_existing_unverified_email(accounts_base_url, selenium):
 
     
 @test_case('C195553')
-@expected_failure
 @accounts
-def test_add_a_verified_email(accounts_base_url, selenium):
+def test_add_a_verified_email(accounts_base_url, selenium, student):
     """Test the ability to add an e-mail address to an existing user."""
     # GIVEN the user is valid
 
@@ -185,9 +166,7 @@ def test_add_a_verified_email(accounts_base_url, selenium):
     email = page.header.email
     assert email is not None, "Didn't get guerrilla email"
     page = Profile(page.driver).open()
-    username = os.getenv('STUDENT_USER')
-    password = os.getenv('STUDENT_PASSWORD')
-    page.log_in(username, password)
+    page.log_in(*student)
     page.emails.add_email(email)
 
     # THEN the user should receive a confirmation email automatically
@@ -210,17 +189,14 @@ def test_add_a_verified_email(accounts_base_url, selenium):
 @test_case('C195555')
 @accounts
 @social
-def test_profile_login_using_google(accounts_base_url, selenium):
+def test_profile_login_using_google(accounts_base_url, google, selenium, student):
     """Test the Gmail login method."""
     # GIVEN the user had added Google as an alternative login method and is not logged in
     page = Profile(selenium, accounts_base_url).open()
     assert(not page.logged_in), 'Already logged in'
     
     # WHEN the user logs into OpenStax through a Google account
-    user = os.getenv('STUDENT_USER')
-    google_user = os.getenv('GOOGLE_USERNAME')
-    password = os.getenv('GOOGLE_PASSWORD')
-    page.login.google_login(user, google_user, password)
+    page.login.google_login(student[0], *google)
     
     # THEN the user is logged in
     assert (page.logged_in), 'Failed to login with google'
@@ -229,17 +205,14 @@ def test_profile_login_using_google(accounts_base_url, selenium):
 @test_case('C195556')
 @accounts
 @social
-def test_profile_login_using_facebook(accounts_base_url, selenium):
+def test_profile_login_using_facebook(accounts_base_url, facebook, selenium, student):
     """Test the Facebook login method."""
     # GIVEN the user had added Facebook as an alternative login method and is not logged in
     page = Profile(selenium, accounts_base_url).open()
     assert(not page.logged_in), 'Already logged in'
     
     # WHEN the user logs into OpenStax through a Facebook account
-    user = os.getenv('STUDENT_USER')
-    facebook_user = os.getenv('FACEBOOK_USERNAME')
-    password = os.getenv('FACEBOOK_PASSWORD')
-    page.login.facebook_login(user, facebook_user, password)
+    page.login.facebook_login(student[0], *facebook)
     
     # THEN the user is logged in 
     assert (page.logged_in), 'Failed to login with facebook'
@@ -255,16 +228,13 @@ def test_admin_pop_up_console(accounts_base_url, selenium):
 
 @test_case('C195558')
 @nondestructive
-@expected_failure
 @accounts
-def test_go_to_full_console(accounts_base_url, selenium):
+def test_go_to_full_console(accounts_base_url, admin, selenium):
     """Go to the full console."""
     # GIVEN the user is logged in as an administrator
     page = Profile(selenium, accounts_base_url).open()
     assert(not page.logged_in), 'User is not logged in'
-    username = os.getenv('ADMIN_USER')
-    password = os.getenv('ADMIN_PASSWORD')
-    page.log_in(username, password)
+    page.log_in(*admin)
     assert(page.logged_in), 'User is not logged in'
     assert(page.is_admin), 'User is not an administrator'
     
