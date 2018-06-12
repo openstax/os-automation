@@ -208,19 +208,41 @@ def test_add_a_verified_email(accounts_base_url, selenium):
 
     
 @test_case('C195555')
-@expected_failure
 @accounts
 @social
 def test_profile_login_using_google(accounts_base_url, selenium):
     """Test the Gmail login method."""
+    # GIVEN the user had added Google as an alternative login method and is not logged in
+    page = Profile(selenium, accounts_base_url).open()
+    assert(not page.logged_in), 'Already logged in'
+    
+    # WHEN the user logs into OpenStax through a Google account
+    user = os.getenv('STUDENT_USER')
+    google_user = os.getenv('GOOGLE_USERNAME')
+    password = os.getenv('GOOGLE_PASSWORD')
+    page.login.google_login(user, google_user, password)
+    
+    # THEN the user is logged in
+    assert (page.logged_in), 'Failed to login with google'
 
 
 @test_case('C195556')
-@expected_failure
 @accounts
 @social
 def test_profile_login_using_facebook(accounts_base_url, selenium):
     """Test the Facebook login method."""
+    # GIVEN the user had added Facebook as an alternative login method and is not logged in
+    page = Profile(selenium, accounts_base_url).open()
+    assert(not page.logged_in), 'Already logged in'
+    
+    # WHEN the user logs into OpenStax through a Facebook account
+    user = os.getenv('STUDENT_USER')
+    facebook_user = os.getenv('FACEBOOK_USERNAME')
+    password = os.getenv('FACEBOOK_PASSWORD')
+    page.login.facebook_login(user, facebook_user, password)
+    
+    # THEN the user is logged in 
+    assert (page.logged_in), 'Failed to login with facebook'
 
 
 @test_case('C195557')
@@ -237,3 +259,18 @@ def test_admin_pop_up_console(accounts_base_url, selenium):
 @accounts
 def test_go_to_full_console(accounts_base_url, selenium):
     """Go to the full console."""
+    # GIVEN the user is logged in as an administrator
+    page = Profile(selenium, accounts_base_url).open()
+    assert(not page.logged_in), 'User is not logged in'
+    username = os.getenv('ADMIN_USER')
+    password = os.getenv('ADMIN_PASSWORD')
+    page.log_in(username, password)
+    assert(page.logged_in), 'User is not logged in'
+    assert(page.is_admin), 'User is not an administrator'
+    
+    # WHEN the user clicks the full console
+    page.open_full_console()
+    
+    # THEN the user is routed to the full console page
+    assert('/admin/console' in selenium.current_url), \
+        'Not at the Full Admin Console page'
