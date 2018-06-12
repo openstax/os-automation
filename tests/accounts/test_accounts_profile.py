@@ -183,16 +183,12 @@ def test_admin_pop_up_console(accounts_base_url, selenium):
 @accounts
 def test_go_to_full_console(accounts_base_url, selenium):
     """Go to the full console."""
-    # GIVEN the user is not logged in
+    # GIVEN the user is logged in as an administrator
     page = Profile(selenium, accounts_base_url).open()
     assert(not page.logged_in), 'User is not logged in'
-    
-    # WHEN the user logs in as an admin 
     username = os.getenv('ADMIN_USER')
     password = os.getenv('ADMIN_PASSWORD')
     page.log_in(username, password)
-    
-    # THEN the user is logged in as an admin
     assert(page.logged_in), 'User is not logged in'
     assert(page.is_admin), 'User is not an administrator'
     
