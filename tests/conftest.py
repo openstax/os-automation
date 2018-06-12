@@ -133,7 +133,7 @@ def pytest_addoption(parser):
 
 def pytest_collection_modifyitems(config, items):
     """Runtime test options."""
-    if config.getoption('--skip-social'):
+    if config.getoption('--skip-social') or config.getoption('--headless'):
         skip_social = pytest.mark.skip(reason='Skipping social login tests.')
         for item in items:
             if 'social' in items:
