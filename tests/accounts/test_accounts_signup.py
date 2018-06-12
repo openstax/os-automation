@@ -1,19 +1,20 @@
 """Test the Accounts signup process."""
-import os
 
-from pytest_testrail.plugin import pytestrail
+import os
 
 from pages.accounts.signup import Signup
 from pages.utils.email import GuerrillaMail
 from pages.utils.utilities import Utility
+from tests.markers import accounts, test_case
 
 
-@pytestrail.case('C195549')
-def test_student_account_signup(base_url, selenium):
+@test_case('C195549')
+@accounts
+def test_student_account_signup(accounts_base_url, selenium):
     """Test student user signup."""
-    page = GuerrillaMail(selenium, base_url).open()
+    page = GuerrillaMail(selenium).open()
     email = page.header.email
-    page = Signup(selenium, base_url).open()
+    page = Signup(selenium, accounts_base_url).open()
     page.account_signup(
         email=email,
         password=os.getenv('STUDENT_PASSWORD'),
@@ -29,12 +30,13 @@ def test_student_account_signup(base_url, selenium):
         'Not logged in as a new student'
 
 
-@pytestrail.case('C205362')
-def test_instructor_account_signup(base_url, selenium):
+@test_case('C205362')
+@accounts
+def test_instructor_account_signup(accounts_base_url, selenium):
     """Test non-student user signup."""
-    page = GuerrillaMail(selenium, base_url).open()
+    page = GuerrillaMail(selenium).open()
     email = page.header.email
-    page = Signup(selenium, base_url).open()
+    page = Signup(selenium, accounts_base_url).open()
     subjects = subject_list(Utility.random(1, 5))
     page.account_signup(
         email=email,
@@ -56,12 +58,13 @@ def test_instructor_account_signup(base_url, selenium):
         'Not logged in as a new instructor'
 
 
-@pytestrail.case('C195550')
-def test_non_student_account_signup(base_url, selenium):
+@test_case('C195550')
+@accounts
+def test_non_student_account_signup(accounts_base_url, selenium):
     """Test non-student user signup."""
-    page = GuerrillaMail(selenium, base_url).open()
+    page = GuerrillaMail(selenium).open()
     email = page.header.email
-    page = Signup(selenium, base_url).open()
+    page = Signup(selenium, accounts_base_url).open()
     # collect the options besides the initial value, student and teacher
     options = [
         ('administrator', Signup.ADMINISTRATOR),

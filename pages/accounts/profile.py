@@ -1,4 +1,5 @@
 """Profile page for logged in users."""
+
 from time import sleep
 
 from pypom import Region
@@ -8,10 +9,10 @@ from selenium.webdriver.common.keys import Keys
 from pages.accounts import admin, home
 
 
-class Profile(home.Home):
+class Profile(home.AccountsHome):
     """Profile page."""
 
-    URL_TEMPLATE = home.Home.URL_TEMPLATE + '/profile'
+    URL_TEMPLATE = '/profile'
 
     _log_out_locator = (By.CLASS_NAME, 'sign-out')
     _edit_clear_locator = (By.CLASS_NAME, 'editable-clear-x')
@@ -46,7 +47,7 @@ class Profile(home.Home):
         """Log the user out."""
         self.find_element(*self._log_out_locator).click()
         sleep(1)
-        return home.Home(self.driver)
+        return home.AccountsHome(self.driver)
 
     def open_popup_console(self):
         """Open the small admin console."""
@@ -65,6 +66,7 @@ class Profile(home.Home):
     @property
     def is_admin(self):
         """Return True if a user is an Accounts administrator."""
+        sleep(0.25)
         return self.is_element_displayed(*self._popup_console_locator)
 
     @property
@@ -194,6 +196,10 @@ class Profile(home.Home):
         _email_locator = (By.CSS_SELECTOR, '.info > .email-entry')
         _add_locator = (By.ID, 'add-an-email')
         _text_locator = (By.CLASS_NAME, 'input-sm')
+        _unverified_locator = (By.CLASS_NAME, 'unconfirmed-warning')
+        _add_email_locator = (By.ID, 'add-an-email')
+        _email_form_locator = (By.CSS_SELECTOR, '.editable-input input')
+        _email_submit_locator = (By.CSS_SELECTOR, '[type=submit]')
 
         @property
         def emails(self):
@@ -201,20 +207,29 @@ class Profile(home.Home):
             return [self.Email(self, element)
                     for element in self.find_elements(*self._email_locator)]
 
-        def add_email(self):
-            """Add an email."""
-            self.find_element(*self._add_locator).click()
-            self.find_element(*self._text_locator).send_keys("ts40@rice.edu")
-            self.find_element(*self._text_locator).send_keys(Keys.RETURN)
-
+        def add_email(self, email):
+            """Add a email to the account's email list."""
+            sleep(0.1)
+            self.find_element(*self._add_email_locator).click()
+            sleep(0.1)
+            self.find_element(*self._email_form_locator).send_keys(email)
+            self.find_element(*self._email_submit_locator).click()
+            sleep(0.1)
+            self.driver.refresh()
+            
         class Email(Region):
             """Individual email section."""
 
             _email_locator = (By.CLASS_NAME, 'value')
             _unverified_locator = (By.CLASS_NAME, 'unconfirmed-warning')
+
             _delete_locator = (By.CSS_SELECTOR, '.glyphicon-trash + a')
             _ok_locator = (By.CSS_SELECTOR, '.btn-danger')
             _specific_locator = (By.CSS_SELECTOR, '.editable-click  .value')
+            _unverified_btn_locator = \
+                (By.CSS_SELECTOR, '.unconfirmed-warning > *')
+            _confirmation_btn_locator = \
+                (By.CSS_SELECTOR, '.button_to>[type="submit"]')
 
             def delete(self):
                 """Delete an individual email section."""
@@ -223,6 +238,21 @@ class Profile(home.Home):
                 self.find_element(*self._delete_locator).click()
                 sleep(0.25)
                 self.find_element(*self._ok_locator).click()
+            
+
+            def resend_confirmation(self):
+                """Resend confirmation email for a certain email."""
+                self.find_element(*self._unverified_btn_locator).click()
+                sleep(0.1)
+                self.find_element(*self._confirmation_btn_locator).click()
+
+            @property
+            def is_confirmed(self):
+                """Check if the email is already verified."""
+                return 'verified' in self._root.get_attribute('class')
+
+       
+
 
     class LoginOptions(Region):
         """Login options."""

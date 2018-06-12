@@ -1,4 +1,5 @@
 """Break the signup process out of the base."""
+
 from time import sleep
 
 from pypom import Region
@@ -14,7 +15,7 @@ from pages.utils.utilities import Utility
 class Signup(AccountsBase):
     """Signup process."""
 
-    URL_TEMPLATE = AccountsBase.URL_TEMPLATE + '/signup'
+    URL_TEMPLATE = '/signup'
 
     STUDENT = 'Student'
     INSTRUCTOR = 'Instructor'
