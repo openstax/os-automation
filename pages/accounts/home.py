@@ -45,7 +45,7 @@ class AccountsHome(AccountsBase):
         _fb_locator = (By.ID, 'facebook-login-button')
         _fb_email_field_locator = (By.ID, 'email')
         _fb_password_field_locator = (By.ID, 'pass')
-        _fb_submit_locator = (By.ID, 'loginbutton') 
+        _fb_submit_locator = (By.ID, 'loginbutton')
         _fb_safari_specific_locator = (By.NAME, '__CONFIRM__')
 
         _google_locator = (By.ID, 'google-login-button')
@@ -89,7 +89,6 @@ class AccountsHome(AccountsBase):
                         self._fb_safari_specific_locator))
                 self.find_element(*self._fb_safari_specific_locator).click()
             sleep(2)
-
 
         def google_login(self, user, google_user, password):
             """Log into the site with google."""

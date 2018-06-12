@@ -149,7 +149,7 @@ class GuerrillaMail(Page):
     @property
     def openedmail(self):
         """Return a opened email region."""
-        return self.Openedmail(self)
+        return self.OpenedMail(self)
 
     class Header(Region):
         """E-mail address controls."""

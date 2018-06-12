@@ -4,7 +4,6 @@ from time import sleep
 
 from pypom import Region
 from selenium.webdriver.common.by import By
-from selenium.webdriver.common.keys import Keys
 
 from pages.accounts import admin, home
 
@@ -61,7 +60,7 @@ class Profile(home.AccountsHome):
         if not self.is_admin:
             raise AccountException('User is not an administrator')
         self.find_element(*self._full_console_locator).click()
-        return admin.AccountsAdmin(self)
+        return admin.AccountsAdmin(self.driver)
 
     @property
     def is_admin(self):
@@ -199,7 +198,8 @@ class Profile(home.AccountsHome):
         _unverified_locator = (By.CLASS_NAME, 'unconfirmed-warning')
         _add_email_locator = (By.ID, 'add-an-email')
         _email_form_locator = (By.CSS_SELECTOR, '.editable-input input')
-        _email_submit_locator = (By.CSS_SELECTOR, '[type=submit]')
+        _email_submit_locator = (By.CSS_SELECTOR,
+                                 '.editable-input + div > button')
 
         @property
         def emails(self):
@@ -216,7 +216,7 @@ class Profile(home.AccountsHome):
             self.find_element(*self._email_submit_locator).click()
             sleep(0.1)
             self.driver.refresh()
-            
+
         class Email(Region):
             """Individual email section."""
 
@@ -226,10 +226,10 @@ class Profile(home.AccountsHome):
             _delete_locator = (By.CSS_SELECTOR, '.glyphicon-trash + a')
             _ok_locator = (By.CSS_SELECTOR, '.btn-danger')
             _specific_locator = (By.CSS_SELECTOR, '.editable-click  .value')
-            _unverified_btn_locator = \
-                (By.CSS_SELECTOR, '.unconfirmed-warning > *')
-            _confirmation_btn_locator = \
-                (By.CSS_SELECTOR, '.button_to>[type="submit"]')
+            _unverified_btn_locator = (By.CSS_SELECTOR,
+                                       '.unconfirmed-warning > *')
+            _confirmation_btn_locator = (By.CSS_SELECTOR,
+                                         '.button_to>[type="submit"]')
 
             def delete(self):
                 """Delete an individual email section."""
@@ -238,7 +238,6 @@ class Profile(home.AccountsHome):
                 self.find_element(*self._delete_locator).click()
                 sleep(0.25)
                 self.find_element(*self._ok_locator).click()
-            
 
             def resend_confirmation(self):
                 """Resend confirmation email for a certain email."""
@@ -250,9 +249,6 @@ class Profile(home.AccountsHome):
             def is_confirmed(self):
                 """Check if the email is already verified."""
                 return 'verified' in self._root.get_attribute('class')
-
-       
-
 
     class LoginOptions(Region):
         """Login options."""
