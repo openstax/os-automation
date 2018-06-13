@@ -94,10 +94,22 @@ def test_profile_name_field(accounts_base_url, selenium, student):
 
 
 @test_case('C195551')
-@expected_failure
 @accounts
-def test_profile_username_field(accounts_base_url, selenium):
+def test_profile_username_field(accounts_base_url, selenium, student):
     """Test the user's username field."""
+    # setup
+    page = Profile(selenium, accounts_base_url).open()
+    page.log_in(*student)
+    assert (page.logged_in), 'User is not logged in'
+    # at profile, store original values
+    old_username = page.username.username
+    new_username = Utility.random_hex()
+    # set new values
+    page.username.username = new_username
+    assert (page.username.username != old_username), 'Username change failed'
+    # reset the fields to the original values
+    page.username.username = old_username
+    assert (page.username.username == old_username), 'Username reset failed'
 
 
 @test_case('C195552')

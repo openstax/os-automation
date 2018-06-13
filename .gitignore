@@ -113,3 +113,5 @@ report.html
 assets/
 coverage.xml
 testrail.cfg
+
+.DS_Store
