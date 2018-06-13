@@ -1,7 +1,5 @@
 """Test the Accounts logged in profile page."""
 
-import os
-
 import pytest
 
 from pages.accounts.profile import AccountException, Profile
@@ -13,14 +11,12 @@ from tests.markers import social, test_case  # noqa
 @test_case('C195545')
 @nondestructive
 @accounts
-def test_user_profile(accounts_base_url, selenium):
+def test_user_profile(accounts_base_url, selenium, student):
     """Login as a student user with a username."""
     page = Profile(selenium, accounts_base_url).open()
     assert(not page.logged_in), 'Active user session unexpected'
-    username = os.getenv('STUDENT_USER')
-    password = os.getenv('STUDENT_PASSWORD')
-    page.log_in(username, password)
-    assert(page.logged_in), 'User "{0}" not logged in'.format(username)
+    page.log_in(*student)
+    assert(page.logged_in), 'User "{0}" not logged in'.format(student[0])
     assert(not page.is_admin), 'User is an administrator'
     assert(page.has_username), 'No username found'
     with pytest.raises(AccountException):
@@ -32,14 +28,12 @@ def test_user_profile(accounts_base_url, selenium):
 @test_case('C195546')
 @nondestructive
 @accounts
-def test_admin_profile(accounts_base_url, selenium):
+def test_admin_profile(accounts_base_url, admin, selenium):
     """Login as an administrative user with a username."""
     page = Profile(selenium, accounts_base_url).open()
     assert(not page.logged_in), 'Active user session unexpected'
-    username = os.getenv('ADMIN_USER')
-    password = os.getenv('ADMIN_PASSWORD')
-    page.log_in(username, password)
-    assert(page.logged_in), 'User "{0}" not logged in'.format(username)
+    page.log_in(*admin)
+    assert(page.logged_in), 'User "{0}" not logged in'.format(admin[0])
     assert(page.is_admin), 'User is not an administrator'
     assert(page.has_username), 'No username found'
     page.log_out()
@@ -49,12 +43,10 @@ def test_admin_profile(accounts_base_url, selenium):
 @test_case('C195547')
 @nondestructive
 @accounts
-def test_name_get_properties(accounts_base_url, selenium):
+def test_name_get_properties(accounts_base_url, selenium, student):
     """Test the getter methods for the name segments."""
     page = Profile(selenium, accounts_base_url).open()
-    username = os.getenv('STUDENT_USER')
-    password = os.getenv('STUDENT_PASSWORD')
-    page.log_in(username, password)
+    page.log_in(*student)
     assert(page.logged_in), 'User is not logged in'
     name = page.name.full_name()
     page.name.open()
@@ -69,13 +61,11 @@ def test_name_get_properties(accounts_base_url, selenium):
 
 @test_case('C195548')
 @accounts
-def test_profile_name_field(accounts_base_url, selenium):
+def test_profile_name_field(accounts_base_url, selenium, student):
     """Test the user's name field."""
     # setup
     page = Profile(selenium, accounts_base_url).open()
-    username = os.getenv('STUDENT_USER')
-    password = os.getenv('STUDENT_PASSWORD')
-    page.log_in(username, password)
+    page.log_in(*student)
     assert(page.logged_in), 'User is not logged in'
     # at profile, store original values
     page.name.open()
@@ -104,13 +94,11 @@ def test_profile_name_field(accounts_base_url, selenium):
 
 @test_case('C195551')
 @accounts
-def test_profile_username_field(accounts_base_url, selenium):
+def test_profile_username_field(accounts_base_url, selenium, student):
     """Test the user's username field."""
     # setup
     page = Profile(selenium, accounts_base_url).open()
-    username = os.getenv('STUDENT_USER')
-    password = os.getenv('STUDENT_PASSWORD')
-    page.log_in(username, password)
+    page.log_in(*student)
     assert (page.logged_in), 'User is not logged in'
     # at profile, store original values
     old_username = page.username.username
