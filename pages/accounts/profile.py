@@ -268,7 +268,6 @@ class Profile(home.AccountsHome):
     class PopupConsole(Region):
         """Popup console interaction."""
 
-        # _root_locator = (By.CLASS_NAME, 'modal-content')
         _users_locator = (By.LINK_TEXT, 'Users')
         _misc_locator = (By.LINK_TEXT, 'Misc')
         _links_locator = (By.LINK_TEXT, 'Links')
