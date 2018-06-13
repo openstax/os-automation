@@ -60,6 +60,7 @@ class Profile(home.AccountsHome):
         if not self.is_admin:
             raise AccountException('User is not an administrator')
         self.find_element(*self._full_console_locator).click()
+        sleep(1)
         return admin.AccountsAdmin(self.driver)
 
     @property
@@ -91,23 +92,35 @@ class Profile(home.AccountsHome):
         _edit_submit_locator = (By.CLASS_NAME, 'editable-submit')
         _edit_cancel_locator = (By.CLASS_NAME, 'editable-cancel')
 
+        def __init__(self, x):
+            """Add a username field."""
+            self._name = []
+            super().__init__(x)
+
+        @property
         def full_name(self):
             """Return the complete name."""
             return self.find_element(*self._full_name_locator).text
 
         def get_name_parts(self):
             """Return a list of the name fields."""
+            if self._name:
+                return self._name
+            self.open()
             full_name = self.selenium.execute_script(
                 "return $('.row.name input').serializeArray()")
-            parts = ['', '', '', '']
+            self._name = ['', '', '', '']
             for position, row in enumerate(full_name):
-                parts[position] = row['value']
-            return parts
+                self._name[position] = row['value']
+            self.cancel()
+            return self._name
 
         def open(self):
             """Open the name inputs."""
-            self.find_element(*self._full_name_locator).click()
-            self._parts = self.get_name_parts()
+            full_name = self.find_element(*self._full_name_locator)
+            if 'editable-open' not in full_name.get_attribute('class'):
+                full_name.click()
+                sleep(0.25)
             return self
 
         def confirm(self):
@@ -132,6 +145,8 @@ class Profile(home.AccountsHome):
         @property
         def title(self):
             """User title or prefix."""
+            if self._name:
+                return self._name[self.TITLE]
             return self.get_name_parts()[self.TITLE]
 
         @title.setter
@@ -142,6 +157,8 @@ class Profile(home.AccountsHome):
         @property
         def first_name(self):
             """User first name."""
+            if self._name:
+                return self._name[self.FIRST]
             return self.get_name_parts()[self.FIRST]
 
         @first_name.setter
@@ -152,6 +169,8 @@ class Profile(home.AccountsHome):
         @property
         def last_name(self):
             """User surname."""
+            if self._name:
+                return self._name[self.LAST]
             return self.get_name_parts()[self.LAST]
 
         @last_name.setter
@@ -162,6 +181,8 @@ class Profile(home.AccountsHome):
         @property
         def suffix(self):
             """User suffix."""
+            if self._name:
+                return self._name[self.SUFFIX]
             return self.get_name_parts()[self.SUFFIX]
 
         @suffix.setter
@@ -198,8 +219,8 @@ class Profile(home.AccountsHome):
         _unverified_locator = (By.CLASS_NAME, 'unconfirmed-warning')
         _add_email_locator = (By.ID, 'add-an-email')
         _email_form_locator = (By.CSS_SELECTOR, '.editable-input input')
-        _email_submit_locator = (By.CSS_SELECTOR,
-                                 '.editable-input + div > button')
+        _email_submit_locator = (
+            By.CSS_SELECTOR, '.editable-input + div > button')
 
         @property
         def emails(self):
@@ -216,34 +237,37 @@ class Profile(home.AccountsHome):
             self.find_element(*self._email_submit_locator).click()
             sleep(0.1)
             self.driver.refresh()
+            return Profile(self.driver)
 
         class Email(Region):
             """Individual email section."""
 
             _email_locator = (By.CLASS_NAME, 'value')
             _unverified_locator = (By.CLASS_NAME, 'unconfirmed-warning')
-
             _delete_locator = (By.CSS_SELECTOR, '.glyphicon-trash + a')
             _ok_locator = (By.CSS_SELECTOR, '.btn-danger')
             _specific_locator = (By.CSS_SELECTOR, '.editable-click  .value')
-            _unverified_btn_locator = (By.CSS_SELECTOR,
-                                       '.unconfirmed-warning > *')
-            _confirmation_btn_locator = (By.CSS_SELECTOR,
-                                         '.button_to>[type="submit"]')
+            _unverified_btn_locator = (
+                By.CSS_SELECTOR, '.unconfirmed-warning > *')
+            _confirmation_btn_locator = (
+                By.CSS_SELECTOR, '.button_to>[type="submit"]')
 
             def delete(self):
                 """Delete an individual email section."""
                 self.find_element(*self._specific_locator).click()
                 sleep(0.25)
                 self.find_element(*self._delete_locator).click()
-                sleep(0.25)
+                sleep(0.5)
                 self.find_element(*self._ok_locator).click()
+                sleep(0.25)
+                return Profile(self.driver)
 
             def resend_confirmation(self):
                 """Resend confirmation email for a certain email."""
                 self.find_element(*self._unverified_btn_locator).click()
                 sleep(0.1)
                 self.find_element(*self._confirmation_btn_locator).click()
+                return Profile(self.driver)
 
             @property
             def is_confirmed(self):

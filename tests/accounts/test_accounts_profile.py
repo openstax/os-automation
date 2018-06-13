@@ -46,16 +46,21 @@ def test_admin_profile(accounts_base_url, admin, selenium):
 @accounts
 def test_name_get_properties(accounts_base_url, selenium, student):
     """Test the getter methods for the name segments."""
+    # GIVEN: A logged in student user
     page = Profile(selenium, accounts_base_url).open()
     page.log_in(*student)
-    assert(page.logged_in), 'User is not logged in'
-    name = page.name.full_name()
+
+    # WHEN: We request the user's full name
+    # AND: We request the user's title, first name, surname and suffix
+    name = page.name.full_name
     page.name.open()
     getters = [
         page.name.title,
         page.name.first_name,
         page.name.last_name,
         page.name.suffix]
+
+    # THEN: The user's full name should match the various name parts
     assert(name == ' '.join(getters).strip()), \
         'Names do not match'
 
@@ -64,32 +69,34 @@ def test_name_get_properties(accounts_base_url, selenium, student):
 @accounts
 def test_profile_name_field(accounts_base_url, selenium, student):
     """Test the user's name field."""
-    # setup
+    # GIVEN: A logged in student user
     page = Profile(selenium, accounts_base_url).open()
     page.log_in(*student)
-    assert(page.logged_in), 'User is not logged in'
-    # at profile, store original values
-    page.name.open()
     name = page.name.get_name_parts()
-    page.name.cancel()
+
+    # WHEN: The user changes their name
     new_name = Utility.random_name()
-    # set new values
     page.name.open()
-    page.name.title = new_name[0]
-    page.name.first_name = new_name[1]
-    page.name.last_name = new_name[2]
-    page.name.suffix = new_name[3]
+    page.name.title = new_name[page.name.TITLE]
+    page.name.first_name = new_name[page.name.FIRST]
+    page.name.last_name = new_name[page.name.LAST]
+    page.name.suffix = new_name[page.name.SUFFIX]
     page.name.confirm()
-    assert(page.name.full_name() == ' '.join(new_name).strip()), \
+
+    # THEN: The user's name is changed
+    assert(page.name.full_name == ' '.join(new_name).strip()), \
         'Names do not match'
-    # reset the fields to the original values
+
+    # WHEN: The user resets their name
     page.name.open()
-    page.name.title = name[0]
-    page.name.first_name = name[1]
-    page.name.last_name = name[2]
-    page.name.suffix = name[3]
+    page.name.title = name[page.name.TITLE]
+    page.name.first_name = name[page.name.FIRST]
+    page.name.last_name = name[page.name.LAST]
+    page.name.suffix = name[page.name.SUFFIX]
     page.name.confirm()
-    assert(page.name.full_name() == ' '.join(name).strip()), \
+
+    # THEN: The user's name is reset
+    assert(page.name.full_name == ' '.join(name).strip()), \
         'Names do not match'
 
 
@@ -105,22 +112,30 @@ def test_profile_username_field(accounts_base_url, selenium):
 @accounts
 def test_profile_email_fields(accounts_base_url, selenium, student):
     """Test the user's email fields."""
-    # setup
+    # GIVEN: A logged in student
     page = Profile(selenium, accounts_base_url).open()
     page.log_in(*student)
-    assert(page.logged_in), 'User is not logged in'
-    # add a new email
-    prelen = len(page.emails.emails)
-    name = page.user.get_name_parts()
-    fake_email = Utility.fake_email(name[1], name[2])
+
+    # WHEN: The student adds a new email to the account
+    initial_email_count = len(page.emails.emails)
+    name = page.name.get_name_parts()
+    fake_email = Utility.fake_email(name[page.name.FIRST],
+                                    name[page.name.LAST])
     page.emails.add_email(fake_email)
-    pastlen = len(page.emails.emails)
-    assert (pastlen == prelen + 1), "Email is not added properly"
-    # delete the new email added
+    emails_after_add = len(page.emails.emails)
+
+    # THEN: The new email is attached to the account
+    assert(emails_after_add == initial_email_count + 1), \
+        "Email was not added"
+
+    # WHEN: The new email is deleted
     email = page.emails.emails[-1]
     email.delete()
-    finallen = len(page.emails.emails)
-    assert (pastlen == finallen + 1), "Email is not deleted properly"
+    final_email_count = len(page.emails.emails)
+
+    # THEN: The email is removed from the account
+    assert(final_email_count == initial_email_count), \
+        "Email did not deleted properly"
 
 
 @test_case('C195554')

@@ -8,12 +8,11 @@ from selenium.webdriver.support import expected_conditions as expect
 from selenium.webdriver.support.ui import WebDriverWait
 
 from pages.utils.email import EmailVerificationError, GoogleBase, GuerrillaMail
-from tests.markers import nondestructive, social, test_case
+from tests.markers import nondestructive, test_case
 
 
 @test_case('C195537')
 @nondestructive
-@social
 def test_google_mail_user_has_pin_emails(gmail, selenium):
     """Test a Google Gmail user."""
     # GIVEN: A valid logged in Gmail user with previous validation emails
