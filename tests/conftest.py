@@ -48,6 +48,10 @@ def pytest_addoption(parser):
                                     'PRINT_PAGE_SOURCE_ON_FAILURE', False),
                                help=('Print page source to stdout '
                                      'when a test fails.'))
+    selenium_options.addoption('--run-social',
+                               action='store_true',
+                               default=False,
+                               help='Run only social login tests.')
     selenium_options.addoption('--skip-social',
                                action='store_true',
                                default=False,
@@ -133,11 +137,18 @@ def pytest_addoption(parser):
 
 def pytest_collection_modifyitems(config, items):
     """Runtime test options."""
-    if config.getoption('--skip-social') or config.getoption('--headless'):
-        skip_social = pytest.mark.skip(reason='Skipping social login tests.')
-        for item in items:
-            if 'social' in items:
-                item.add_marker(skip_social)
+    # Runtime markers
+    run_social = config.getoption('--run-social')
+    mark_run_social = pytest.mark.skip(reason='Skipping non-social tests.')
+    skip_social = config.getoption('--skip-social')
+    mark_skip_social = pytest.mark.skip(reason='Skipping social login tests.')
+
+    # Apply runtime markers
+    for item in items:
+        if skip_social and 'social' in item.keywords:
+            item.add_marker(mark_skip_social)
+        if run_social and 'social' not in item.keywords:
+            item.add_marker(mark_run_social)
 
 
 def pytest_collectreport(report):
