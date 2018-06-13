@@ -24,6 +24,8 @@ wheels/
 .installed.cfg
 *.egg
 MANIFEST
+.DS_Store
+.gitignore.swp
 
 # PyInstaller
 #  Usually these files are written by a python script from a template
@@ -113,3 +115,5 @@ report.html
 assets/
 coverage.xml
 testrail.cfg
+
+.DS_Store

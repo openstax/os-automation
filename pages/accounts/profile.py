@@ -4,6 +4,7 @@ from time import sleep
 
 from pypom import Region
 from selenium.webdriver.common.by import By
+from selenium.webdriver.common.keys import Keys
 
 from pages.accounts import admin, home
 
@@ -30,17 +31,17 @@ class Profile(home.AccountsHome):
     @property
     def username(self):
         """Username field."""
-        return self.User(self)
+        return self.Username(self)
 
     @property
     def emails(self):
         """Email fields."""
-        return self.Email(self)
+        return self.Emails(self)
 
     @property
     def login_method(self):
         """Options for logging in."""
-        return self.LoginOption(self)
+        return self.LoginOptions(self)
 
     def log_out(self):
         """Log the user out."""
@@ -66,7 +67,6 @@ class Profile(home.AccountsHome):
     @property
     def is_admin(self):
         """Return True if a user is an Accounts administrator."""
-        sleep(0.25)
         return self.is_element_displayed(*self._popup_console_locator)
 
     @property
@@ -173,7 +173,8 @@ class Profile(home.AccountsHome):
         """Username assignment."""
 
         _root_locator = (By.XPATH, '//div[div[contains(text(),"Username")]]')
-        _username_locator = (By.CSS_SELECTOR, '#username + span input')
+        _username_locator = (By.CSS_SELECTOR, '#username')
+        _input_locator = (By.CSS_SELECTOR, "#username + span input")
 
         @property
         def username(self):
@@ -183,16 +184,24 @@ class Profile(home.AccountsHome):
         @username.setter
         def username(self, username):
             """Set a new username."""
+            self.find_element(*self._username_locator).click()
             self.find_element(*Profile._edit_clear_locator).click()
-            self.find_element(*self._username_locator).send_keys(username)
-            self.find_element(*Profile._edit_submit_locator)
-            return Profile(self)
+            self.find_element(*self._input_locator).send_keys(username)
+            self.find_element(*Profile._edit_submit_locator).click()
+            sleep(0.25)
+            return Profile(self.driver)
 
     class Emails(Region):
         """Email sections."""
 
         _root_locator = (By.XPATH, '//div[div[contains(text(),"Emails")]]')
         _email_locator = (By.CSS_SELECTOR, '.info > .email-entry')
+        _add_locator = (By.ID, 'add-an-email')
+        _text_locator = (By.CLASS_NAME, 'input-sm')
+        _unverified_locator = (By.CLASS_NAME, 'unconfirmed-warning')
+        _add_email_locator = (By.ID, 'add-an-email')
+        _email_form_locator = (By.CSS_SELECTOR, '.editable-input input')
+        _email_submit_locator = (By.CSS_SELECTOR, '[type=submit]')
 
         @property
         def emails(self):
@@ -200,11 +209,49 @@ class Profile(home.AccountsHome):
             return [self.Email(self, element)
                     for element in self.find_elements(*self._email_locator)]
 
+        def add_email(self, email):
+            """Add a email to the account's email list."""
+            sleep(0.1)
+            self.find_element(*self._add_email_locator).click()
+            sleep(0.1)
+            self.find_element(*self._email_form_locator).send_keys(email)
+            self.find_element(*self._email_submit_locator).click()
+            sleep(0.1)
+            self.driver.refresh()
+            
         class Email(Region):
             """Individual email section."""
 
             _email_locator = (By.CLASS_NAME, 'value')
             _unverified_locator = (By.CLASS_NAME, 'unconfirmed-warning')
+
+            _delete_locator = (By.CSS_SELECTOR, '.glyphicon-trash + a')
+            _ok_locator = (By.CSS_SELECTOR, '.btn-danger')
+            _specific_locator = (By.CSS_SELECTOR, '.editable-click  .value')
+            _unverified_btn_locator = \
+                (By.CSS_SELECTOR, '.unconfirmed-warning > *')
+            _confirmation_btn_locator = \
+                (By.CSS_SELECTOR, '.button_to>[type="submit"]')
+
+            def delete(self):
+                """Delete an individual email section."""
+                self.find_element(*self._specific_locator).click()
+                sleep(0.25)
+                self.find_element(*self._delete_locator).click()
+                sleep(0.25)
+                self.find_element(*self._ok_locator).click()
+            
+
+            def resend_confirmation(self):
+                """Resend confirmation email for a certain email."""
+                self.find_element(*self._unverified_btn_locator).click()
+                sleep(0.1)
+                self.find_element(*self._confirmation_btn_locator).click()
+
+            @property
+            def is_confirmed(self):
+                """Check if the email is already verified."""
+                return 'verified' in self._root.get_attribute('class')
 
     class LoginOptions(Region):
         """Login options."""
@@ -255,7 +302,6 @@ class Profile(home.AccountsHome):
             _action_locator = (By.PARTIAL_LINK_TEXT, 'UnknownAction')
             _template_locator = (By.PARTIAL_LINK_TEXT, 'Template')
             _not_yet_implemented_locator = (By.PARTIAL_LINK_TEXT, 'NotYetImplemented')
-    
 
             def task_locate(self):
                 try: 
@@ -268,14 +314,12 @@ class Profile(home.AccountsHome):
                     return self.find_element(*self._security_locator) 
                 except NoSuchElementException: 
                     return None
-                
 
             def routing_locate(self):
                 try: 
                     return self.find_element(*self._routing_locator) 
                 except NoSuchElementException: 
                     return None
-                
 
             def controller_locate(self):
                 try: 
@@ -346,8 +390,6 @@ class Profile(home.AccountsHome):
                     return self.find_element(*self._api_locator) 
                 except NoSuchElementException: 
                     return None
-
-
 
 class AccountException(Exception):
     """Account exception."""

@@ -1,7 +1,5 @@
 """Test the Accounts home page."""
 
-import os
-
 import pytest
 from selenium.common.exceptions import NoSuchElementException, TimeoutException
 
@@ -27,14 +25,12 @@ def test_open_home_page(accounts_base_url, selenium):
 @test_case('C195136')
 @nondestructive
 @accounts
-def test_login_student(accounts_base_url, selenium):
+def test_login_student(accounts_base_url, selenium, student):
     """Student login test."""
-    user = os.getenv('STUDENT_USER', '')
-    password = os.getenv('STUDENT_PASSWORD', '')
     page = Home(selenium, accounts_base_url).open()
     assert(not page.logged_in), 'Active user session unexpected'
-    page.log_in(user, password)
-    assert(page.logged_in), 'User "{0}" not logged in'.format(user)
+    page.log_in(*student)
+    assert(page.logged_in), 'User "{0}" not logged in'.format(student[0])
 
 
 @test_case('C195137')
@@ -77,13 +73,13 @@ def test_unknown_login(accounts_base_url, selenium):
 @test_case('C195139')
 @nondestructive
 @accounts
-def test_invalid_password(accounts_base_url, selenium):
+def test_invalid_password(accounts_base_url, selenium, student):
     """Invalid password error message test.
 
     The password you provided...
     """
     # Enter a valid user but invalid password (blank)
-    user = os.getenv('STUDENT_USER', '')
+    user = student[0]
     password = ''
     page = Home(selenium, accounts_base_url).open()
     with pytest.raises(TimeoutException):
@@ -99,6 +95,7 @@ def test_invalid_password(accounts_base_url, selenium):
 def test_password_reset(accounts_base_url, selenium):
     """Reset a user's password."""
     # get a temporary e-mail
+    assert False
     page = GuerrillaMail(selenium).open()
     email = page.header.email
     old_password = Utility.random_hex(12)
