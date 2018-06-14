@@ -39,3 +39,12 @@ def chrome_options(chrome_options, pytestconfig):
     chrome_options.add_argument('--lang=en')
 
     return chrome_options
+
+
+@pytest.fixture
+def firefox_options(firefox_options, pytestconfig):
+    """Set Firefox options."""
+    if pytestconfig.getoption('--headless'):
+        firefox_options.headless = True
+
+    return firefox_options
