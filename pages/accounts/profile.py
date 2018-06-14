@@ -3,7 +3,6 @@
 from time import sleep
 
 from pypom import Region
-from selenium.common.exceptions import NoSuchElementException
 from selenium.webdriver.common.by import By
 
 from pages.accounts import admin, home
@@ -271,127 +270,108 @@ class Profile(home.AccountsHome):
         _users_locator = (By.LINK_TEXT, 'Users')
         _misc_locator = (By.LINK_TEXT, 'Misc')
         _links_locator = (By.LINK_TEXT, 'Links')
-        _full_console_locator = (By.PARTIAL_LINK_TEXT, 'Console')
+        _full_console_locator = (By.LINK_TEXT, 'Full Console >>')
 
         @property
         def misc(self):
+            """Goes to misc tab of the pop up console."""
             self.find_element(*self._misc_locator).click()
             return self.Misc(self)
 
         @property
         def users(self):
+            """Goes to user tab of the pop up console."""
             self.find_element(*self._users_locator).click()
             return self.Users(self)
 
         @property
         def links(self):
+            """Goes to links tab of the pop up console."""
             self.find_element(*self._links_locator).click()
             return self.Links(self)
 
-        @property
         def full_console(self):
+            """Goes to full_console tab of the pop up console."""
             self.find_element(*self._full_console_locator).click()
+            return self
 
         class Misc(Region):
-            _task_locator = (By.PARTIAL_LINK_TEXT, 'Run')
-            _security_locator = (By.PARTIAL_LINK_TEXT, 'SecurityTransgression')
-            _routing_locator = (By.PARTIAL_LINK_TEXT, 'RoutingError')
-            _controller_locator = (By.PARTIAL_LINK_TEXT, 'UnknownController')
-            _action_locator = (By.PARTIAL_LINK_TEXT, 'UnknownAction')
-            _template_locator = (By.PARTIAL_LINK_TEXT, 'Template')
-            _not_yet_implemented_locator = (
-                By.PARTIAL_LINK_TEXT, 'NotYetImplemented')
+            """Misc section."""
 
-            def task_locate(self):
-                try:
-                    return self.find_element(*self._task_locator)
-                except NoSuchElementException:
-                    return None
+            _users_locator = (By.LINK_TEXT, 'Users')
+            _links_locator = (By.LINK_TEXT, 'Links')
+            _full_console_locator = (By.LINK_TEXT, 'Full Console >>')
 
-            def security_locate(self):
-                try:
-                    return self.find_element(*self._security_locator)
-                except NoSuchElementException:
-                    return None
+            def go_to_user_section(self):
+                """Go to user section on the tab."""
+                self.find_element(*self._users_locator).click()
+                return self
 
-            def routing_locate(self):
-                try:
-                    return self.find_element(*self._routing_locator)
-                except NoSuchElementException:
-                    return None
+            def go_to_links_section(self):
+                """Go to links section on the tab."""
+                self.find_element(*self._links_locator).click()
+                return self
 
-            def controller_locate(self):
-                try:
-                    return self.find_element(*self._controller_locator)
-                except NoSuchElementException:
-                    return None
-
-            def action_locate(self):
-                try:
-                    return self.find_element(*self._action_locator)
-                except NoSuchElementException:
-                    return None
-
-            def template_locate(self):
-                try:
-                    return self.find_element(*self._template_locator)
-                except NoSuchElementException:
-                    return None
-
-            def not_yet_locate(self):
-                try:
-                    return self.find_element(*self.
-                                             _not_yet_implemented_locator)
-                except NoSuchElementException:
-                    return None
+            def go_to_full_section(self):
+                """Go to full section on the tab."""
+                self.find_element(*self._full_console_locator).click()
+                return self
 
         class Users(Region):
+            """User section."""
+
             _search_bar_locator = (By.ID, 'search_terms')
             _search_button_locator = (By.NAME, 'commit')
 
-            def search_bar(self):
-                try:
-                    return self.find_element(*self._search_bar_locator)
-                except NoSuchElementException:
-                    return None
+            @property
+            def search_empty(self):
+                """Search given string."""
+                self.find_element(*self._search_bar_locator).send_keys(
+                    "0teacher")
+                self.find_element(*self._search_button_locator).click()
+                sleep(1)
+                return self.Results(self)
 
-            def search_button(self):
-                try:
-                    return self.find_element(*self._search_bar_locator)
-                except NoSuchElementException:
-                    return None
+            class Results(Region):
+                """Seach list."""
+
+                _teacher_link_locator = (By.LINK_TEXT, "0teacher")
+
+                def go_to_teacher_link(self):
+                    """Go to teahcer's link from the search."""
+                    self.find_element(*self._teacher_link_locator).click()
+                    return self
 
         class Links(Region):
+            """Link section."""
+
             _security_log_locator = (By.PARTIAL_LINK_TEXT, 'Security')
             _application_locator = (By.PARTIAL_LINK_TEXT, 'OAuth')
             _print_locator = (By.PARTIAL_LINK_TEXT, 'FinePrint')
             _api_locator = (By.PARTIAL_LINK_TEXT, 'API')
 
-            def search_security(self):
-                try:
-                    return self.find_element(*self._security_log_locator)
-                except NoSuchElementException:
-                    return None
+            def go_to_security_log(self):
+                """Goes to the security log."""
+                self.find_element(*self._security_log_locator).click()
+                return self
 
-            def search_application(self):
-                try:
-                    return self.find_element(*self._application_locator)
-                except NoSuchElementException:
-                    return None
+            def go_to_oauth_application(self):
+                """Goes to the OAuth application."""
+                self.find_element(*self._application_locator).click()
+                return self
 
-            def search_print(self):
-                try:
-                    return self.find_element(*self._print_locator)
-                except NoSuchElementException:
-                    return None
+            def go_to_fineprint(self):
+                """Goes to the FinePrint."""
+                self.find_element(*self._print_locator).click()
+                return self
 
-            def search_api(self):
-                try:
-                    return self.find_element(*self._api_locator)
-                except NoSuchElementException:
-                    return None
+            def go_to_api(self):
+                """Goes to the API v1 documentation."""
+                self.find_element(*self._api_locator).click()
+                return self
 
 
 class AccountException(Exception):
     """Account exception."""
+
     pass

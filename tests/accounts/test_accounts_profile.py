@@ -246,67 +246,36 @@ def test_admin_pop_up_console(accounts_base_url, admin, selenium):
     assert(page.logged_in), 'User "{0}" not logged in'.format(admin[0])
     assert(page.is_admin), 'User is not an administrator'
     assert(page.has_username), 'No username found'
-    popup = page.open_popup_console()
-
-    misc = popup.misc
-    assert(misc.task_locate())
-    assert(misc.security_locate())
-    assert(misc.routing_locate())
-    assert(misc.controller_locate())
-    assert(misc.action_locate())
-    assert(misc.template_locate())
-    assert(misc.not_yet_locate())
-    # link of misc tests
-    misc.task_locate().click()
-    assert("cron" in selenium.current_url)
 
     popup = page.open_popup_console()
-    popup.misc.security_locate().click()
-    assert("security_transgression" in selenium.current_url)
-
-    popup = page.open_popup_console()
-    popup.misc.routing_locate().click()
-    assert("routing_error" in selenium.current_url)
-
-    popup = page.open_popup_console()
-    popup.misc.controller_locate().click()
-    assert("unknown_controller" in selenium.current_url)
-
-    popup = page.open_popup_console()
-    popup.misc.action_locate().click()
-    assert("unknown_action" in selenium.current_url)
-
-    popup = page.open_popup_console()
-    popup.misc.template_locate().click()
-    assert("missing_template" in selenium.current_url)
-
-    popup = page.open_popup_console()
-    popup.misc.not_yet_locate().click()
-    assert("not_yet_implemented" in selenium.current_url)
-
-    # User
-    popup = page.open_popup_console()
-    assert(popup.users.search_bar())
-    assert(popup.users.search_button())
-
-    # Links
-    popup.links.search_security().click()
+    popup.links.go_to_security_log()
     assert("security_log" in selenium.current_url)
 
     selenium.back()
     popup = page.open_popup_console()
-    popup.links.search_application().click()
+    popup.links.go_to_oauth_application()
     assert("applications" in selenium.current_url)
 
     selenium.back()
     popup = page.open_popup_console()
-    popup.links.search_print().click()
+    popup.links.go_to_fineprint()
     assert("print" in selenium.current_url)
 
     selenium.back()
     popup = page.open_popup_console()
-    popup.links.search_api().click()
+    popup.links.go_to_api()
     assert("api/docs/v1" in selenium.current_url)
+
+    selenium.back()
+    popup = page.open_popup_console()
+    popup.full_console()
+    assert("admin/console" in selenium.current_url)
+
+    selenium.back()
+    popup = page.open_popup_console()
+    result = popup.users.search_empty
+    result.go_to_teacher_link()
+    assert("admin/security_log" in selenium.current_url)
 
 
 @test_case('C195558')
