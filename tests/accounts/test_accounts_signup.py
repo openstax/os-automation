@@ -96,6 +96,68 @@ def test_non_student_account_signup(accounts_base_url, selenium, teacher):
         'Not logged in as a new {0}'.format(account_type)
 
 
+@test_case('')
+@accounts
+def test_student_account_signup_with_facebook(accounts_base_url, selenium,
+                                              facebook, gmail, student):
+    """Test student user signup using a Facebook login."""
+    # GIVEN: A valid Facebook account
+    # AND: At the Accounts sign up page
+    page = Signup(selenium, accounts_base_url).open()
+    user, password = facebook
+
+    # WHEN: A student attempts to sign up using a Google social account
+    page.account_signup(
+        email=user,
+        _type='Student',
+        provider='google',
+        kwargs={
+            'email_password': password,
+            'news': False,
+            'school': 'OpenStax Automation',
+            'social': 'facebook',
+        }
+    )
+
+    # THEN: An account is created using their social profile
+
+    # WHEN: The user logs out
+    # AND: Logs in using the social profile
+
+    # THEN: The user is taken to their profile
+
+
+@test_case('')
+@accounts
+def test_student_account_signup_with_google(accounts_base_url, selenium,
+                                            google, student):
+    """Test student user signup using a Google login."""
+    # GIVEN: A valid Google account
+    # AND: At the Accounts sign up page
+    page = Signup(selenium, accounts_base_url).open()
+    user, password = google
+
+    # WHEN: A student attempts to sign up using a Google social account
+    page.account_signup(
+        email=user,
+        _type='Student',
+        provider='google',
+        kwargs={
+            'email_password': password,
+            'news': False,
+            'school': 'OpenStax Automation',
+            'social': 'google',
+        }
+    )
+
+    # THEN: An account is created using their social profile
+
+    # WHEN: The user logs out
+    # AND: Logs in using the social profile
+
+    # THEN: The user is taken to their profile
+
+
 def subject_list(size=1):
     """Return a list of subjects for an elevated signup."""
     subjects = len(Signup.SUBJECTS)

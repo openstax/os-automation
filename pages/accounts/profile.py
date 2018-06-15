@@ -4,7 +4,6 @@ from time import sleep
 
 from pypom import Region
 from selenium.webdriver.common.by import By
-from selenium.webdriver.common.keys import Keys
 
 from pages.accounts import admin, home
 
@@ -218,7 +217,7 @@ class Profile(home.AccountsHome):
             self.find_element(*self._email_submit_locator).click()
             sleep(0.1)
             self.driver.refresh()
-            
+
         class Email(Region):
             """Individual email section."""
 
@@ -240,7 +239,6 @@ class Profile(home.AccountsHome):
                 self.find_element(*self._delete_locator).click()
                 sleep(0.25)
                 self.find_element(*self._ok_locator).click()
-            
 
             def resend_confirmation(self):
                 """Resend confirmation email for a certain email."""
@@ -252,9 +250,6 @@ class Profile(home.AccountsHome):
             def is_confirmed(self):
                 """Check if the email is already verified."""
                 return 'verified' in self._root.get_attribute('class')
-
-       
-
 
     class LoginOptions(Region):
         """Login options."""
