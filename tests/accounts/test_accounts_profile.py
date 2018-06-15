@@ -273,9 +273,23 @@ def test_admin_pop_up_console(accounts_base_url, admin, selenium):
 
     selenium.back()
     popup = page.open_popup_console()
-    result = popup.users.search_empty
-    result.go_to_teacher_link()
-    assert("admin/security_log" in selenium.current_url)
+    result = popup.users.search_for("teacher")
+    assert(len(result[0].find_data()) == 7)
+    assert(result[10].id.isdigit())
+    assert(not result[10].is_test)
+
+    result[10].edit()
+    assert("edit" in selenium.current_url)
+    page.driver.switch_to_window(page.driver.window_handles[0])
+
+    result[10].username_link
+    assert("security_log" in selenium.current_url)
+
+    selenium.back()
+    popup = page.open_popup_console()
+    result = popup.users.search_for("teacher")
+    result[10].sign_in_as()
+    assert(not page.is_admin), 'User should not be an administrator'
 
 
 @test_case('C195558')

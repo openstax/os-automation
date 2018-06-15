@@ -6,6 +6,7 @@ from pypom import Region
 from selenium.webdriver.common.by import By
 
 from pages.accounts import admin, home
+from pages.utils.utilities import Utility
 
 
 class Profile(home.AccountsHome):
@@ -322,24 +323,91 @@ class Profile(home.AccountsHome):
 
             _search_bar_locator = (By.ID, 'search_terms')
             _search_button_locator = (By.NAME, 'commit')
+            _row_locator = (By.CSS_SELECTOR, "tr.action-list-data-row")
 
-            @property
-            def search_empty(self):
+            def search_for(self, topic):
                 """Search given string."""
                 self.find_element(*self._search_bar_locator).send_keys(
-                    "0teacher")
+                    topic)
                 self.find_element(*self._search_button_locator).click()
                 sleep(1)
-                return self.Results(self)
+                return [self.Result(self, el)
+                        for el in self.find_elements(*self._row_locator)]
 
-            class Results(Region):
-                """Seach list."""
+            class Result(Region):
+                """class for the search list column."""
 
-                _teacher_link_locator = (By.LINK_TEXT, "0teacher")
+                _data_locator = (By.CSS_SELECTOR, ".action-list-col-6")
+                _id_locator = \
+                    (By.CSS_SELECTOR, '.action-list-col-6:nth-child(1)')
+                _username_locator = (By.CSS_SELECTOR, '.action-list-col-6 a')
+                _first_name_locator = \
+                    (By.CSS_SELECTOR, '.action-list-col-6:nth-child(3)')
+                _last_name_locator = \
+                    (By.CSS_SELECTOR, '.action-list-col-6:nth-child(4)')
+                _is_admin = \
+                    (By.CSS_SELECTOR, '.action-list-col-6:nth-child(5)')
+                _is_test = (By.CSS_SELECTOR, '.action-list-col-6:nth-child(6)')
+                _sign_in_locator = (By.LINK_TEXT, 'Sign in as')
+                _edit_locator = (By.LINK_TEXT, 'Edit')
 
-                def go_to_teacher_link(self):
-                    """Go to teahcer's link from the search."""
-                    self.find_element(*self._teacher_link_locator).click()
+                def find_data(self):
+                    """Return all the data by columns."""
+                    return self.find_elements(*self._data_locator)
+
+                @property
+                def id(self):
+                    """Return the user id."""
+                    return self.find_element(*self._id_locator).text
+
+                @property
+                def username(self):
+                    """Return the username."""
+                    return self.find_element(*self._username_locator).text
+
+                @property
+                def username_link(self):
+                    """Return the username specific link."""
+                    self.find_element(*self._username_locator).click()
+                    return self
+
+                @property
+                def first_name(self):
+                    """Return the frist name."""
+                    return self.find_element(*self._first_name_locator).text
+
+                @property
+                def last_name(self):
+                    """Return the last name."""
+                    return self.find_element(*self._last_name_locator).text
+
+                @property
+                def is_admin(self):
+                    """Return the admin."""
+                    return self.find_element(
+                        *self._is_admin).text.lower() == 'yes'
+
+                @property
+                def is_test(self):
+                    """Return the test."""
+                    return self.find_element(
+                        *self._is_test).text.lower() == "yes"
+
+                def sign_in_as(self):
+                    """Return the sign in page."""
+                    self.find_element(*self._sign_in_locator).click()
+
+                    if "terms" in self.driver.current_url:
+                        checkbox_id = 'agreement_i_agree'
+                        target = self.find(By.ID, checkbox_id)
+                        target.click()
+                        target = self.find(By.ID, 'agreement_submit')
+                        target.click()
+                    return self
+
+                def edit(self):
+                    """Return the edit page."""
+                    Utility.switch_to(self.driver, self._edit_locator)
                     return self
 
         class Links(Region):
