@@ -1,4 +1,5 @@
-"""Home page objects."""
+"""Tutor Home page objects."""
+
 # from pypom import Region
 # from selenium.webdriver.common.by import By
 

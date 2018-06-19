@@ -1,4 +1,4 @@
-"""Basic page parent for all Accounts pages."""
+"""Basic page parent for Tutor pages."""
 
 from time import sleep
 

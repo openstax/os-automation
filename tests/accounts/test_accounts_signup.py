@@ -5,7 +5,7 @@ import os
 from pages.accounts.signup import Signup
 from pages.utils.email import GuerrillaMail
 from pages.utils.utilities import Utility
-from tests.markers import accounts, test_case
+from tests.markers import accounts, social, test_case
 
 
 @test_case('C195549')
@@ -98,6 +98,7 @@ def test_non_student_account_signup(accounts_base_url, selenium, teacher):
 
 @test_case('')
 @accounts
+@social
 def test_student_account_signup_with_facebook(accounts_base_url, selenium,
                                               facebook, gmail, student):
     """Test student user signup using a Facebook login."""
@@ -129,6 +130,7 @@ def test_student_account_signup_with_facebook(accounts_base_url, selenium,
 
 @test_case('')
 @accounts
+@social
 def test_student_account_signup_with_google(accounts_base_url, selenium,
                                             google, student):
     """Test student user signup using a Google login."""
