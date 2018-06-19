@@ -1,7 +1,9 @@
-from test.markers import web, test_case
+from test.markers import web, test_case, expected_failure, nondestructive
 
 @test_case('')
 @web
+@expected_failure
+@nondestructive
 def test_edit_higher_ed_page(web_base_url, seleniumm, admin):
     """Tests ability to edit higher education page."""
     # GIVEN: Logged into the website content management system as a admin
@@ -15,6 +17,8 @@ def test_edit_higher_ed_page(web_base_url, seleniumm, admin):
 
 @test_case('')
 @web
+@expected_failure
+@nondestructive
 def test_edit_partner_page(web_base_url, seleniumm, admin):
     """Tests ability to edit partner page."""
     # GIVEN: Logged into the website content management system as a admin
@@ -30,6 +34,8 @@ def test_edit_partner_page(web_base_url, seleniumm, admin):
 
 @test_case('')
 @web
+@expected_failure
+@nondestructive
 def test_edit_support_page(web_base_url, seleniumm, admin):
     """Tests ability to edit support page."""
     # GIVEN: Logged into the website content management system as a admin
@@ -45,6 +51,8 @@ def test_edit_support_page(web_base_url, seleniumm, admin):
 
 @test_case('')
 @web
+@expected_failure
+@nondestructive
 def test_edit_add_books(web_base_url, seleniumm, admin):
     """Tests ability to edit or add books."""
     # GIVEN: Logged into the website content management system as a admin

@@ -1,7 +1,9 @@
-from test.markers import web, test_case
+from test.markers import web, test_case, expected_failure, nondestructive
 
 @test_case('')
 @web
+@expected_failure
+@nondestructive
 def test_view_about_us(web_base_url, selenium):
     """Tests ability go to about us page."""
     # GIVEN: On the OpenStax homepage
@@ -13,6 +15,8 @@ def test_view_about_us(web_base_url, selenium):
 
 @test_case('')
 @web
+@expected_failure
+@nondestructive
 def test_view_about_us_hyperlinks(web_base_url, selenium):
     """Tests hyperlinks are present in about us page."""
     # GIVEN: On the OpenStax homepage
@@ -24,6 +28,8 @@ def test_view_about_us_hyperlinks(web_base_url, selenium):
 
 @test_case('')
 @web
+@expected_failure
+@nondestructive
 def test_view_team_members(web_base_url, selenium):
     """Tests ability to view team members."""
     # GIVEN: On the OpenStax homepage

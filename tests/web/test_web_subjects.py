@@ -1,7 +1,9 @@
-from test.markers import web, test_case
+from test.markers import web, test_case, expected_failure, nondestructive
 
 @test_case('')
 @web
+@expected_failure
+@nondestructive
 def test_get_book_links(web_base_url, selenium):
     """Tests ability to view get book links."""
     # GIVEN: On the OpenStax homepage
@@ -15,6 +17,8 @@ def test_get_book_links(web_base_url, selenium):
 
 @test_case('')
 @web
+@expected_failure
+@nondestructive
 def test_textbook_table_of_contents(web_base_url, selenium):
     """Tests ability to view textbook table of contents."""
     # GIVEN: On the OpenStax homepage
@@ -28,6 +32,8 @@ def test_textbook_table_of_contents(web_base_url, selenium):
 
 @test_case('')
 @web
+@expected_failure
+@nondestructive
 def test_view_textbook_online(web_base_url, selenium):
     """Tests ability to view textbook online."""
     # GIVEN: On the OpenStax homepage
@@ -41,6 +47,8 @@ def test_view_textbook_online(web_base_url, selenium):
 
 @test_case('')
 @web
+@expected_failure
+@nondestructive
 def test_textbook_pdf_download(web_base_url, selenium):
     """Tests ability to download math pdf."""
     # GIVEN: On the OpenStax homepage
@@ -54,6 +62,8 @@ def test_textbook_pdf_download(web_base_url, selenium):
 
 @test_case('')
 @web
+@expected_failure
+@nondestructive
 def test_order_print(web_base_url, selenium):
     """Tests ability to order print copy."""
     # GIVEN: On the OpenStax homepage
@@ -67,6 +77,8 @@ def test_order_print(web_base_url, selenium):
 
 @test_case('')
 @web
+@expected_failure
+@nondestructive
 def test_kindle_download(web_base_url, selenium):
     """Tests ability to download kindle version."""
     # GIVEN: On the OpenStax homepage
@@ -80,6 +92,8 @@ def test_kindle_download(web_base_url, selenium):
 
 @test_case('')
 @web
+@expected_failure
+@nondestructive
 def test_bookshare_download(web_base_url, selenium):
     """Tests ability to download bookshare version."""
     # GIVEN: On the OpenStax homepage
@@ -93,6 +107,8 @@ def test_bookshare_download(web_base_url, selenium):
 
 @test_case('')
 @web
+@expected_failure
+@nondestructive
 def test_ibook_download(web_base_url, selenium):
     """Tests ability to download iBook version."""
     # GIVEN: On the OpenStax homepage
@@ -106,6 +122,8 @@ def test_ibook_download(web_base_url, selenium):
 
 @test_case('')
 @web
+@expected_failure
+@nondestructive
 def test_textbook_summary_visible(web_base_url, selenium):
     """Tests visibility of textbook summary."""
     # GIVEN: On the OpenStax homepage
@@ -118,6 +136,8 @@ def test_textbook_summary_visible(web_base_url, selenium):
 
 @test_case('')
 @web
+@expected_failure
+@nondestructive
 def test_textbook_author_visible(web_base_url, selenium):
     """Tests visibility of textbook author."""
     # GIVEN: On the OpenStax homepage
@@ -130,6 +150,8 @@ def test_textbook_author_visible(web_base_url, selenium):
 
 @test_case('')
 @web
+@expected_failure
+@nondestructive
 def test_textbook_errata_visible(web_base_url, selenium):
     """Tests visibility of errata list."""
     # GIVEN: On the OpenStax homepage
@@ -143,6 +165,8 @@ def test_textbook_errata_visible(web_base_url, selenium):
 
 @test_case('')
 @web
+@expected_failure
+@nondestructive
 def test_textbook_isbn_visible(web_base_url, selenium):
     """Tests visibility of isbn."""
     # GIVEN: On the OpenStax homepage
@@ -155,6 +179,8 @@ def test_textbook_isbn_visible(web_base_url, selenium):
 
 @test_case('')
 @web
+@expected_failure
+@nondestructive
 def test_textbook_license_visible(web_base_url, selenium):
     """Tests visibility of license."""
     # GIVEN: On the OpenStax homepage
@@ -167,6 +193,8 @@ def test_textbook_license_visible(web_base_url, selenium):
 
 @test_case('')
 @web
+@expected_failure
+@nondestructive
 def test_textbook_signup(web_base_url, selenium):
     """Tests textbook signup to learn more button."""
     # GIVEN: On the OpenStax homepage
@@ -181,6 +209,8 @@ def test_textbook_signup(web_base_url, selenium):
 
 @test_case('')
 @web
+@expected_failure
+@nondestructive
 def test_instructor_resources(web_base_url, selenium):
     """Tests ability to download instructor resources."""
     # GIVEN: On the OpenStax homepage
@@ -197,6 +227,8 @@ def test_instructor_resources(web_base_url, selenium):
 
 @test_case('')
 @web
+@expected_failure
+@nondestructive
 def test_student_resources(web_base_url, selenium):
     """Tests ability to download student resources."""
     # GIVEN: On the OpenStax homepage

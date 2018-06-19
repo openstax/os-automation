@@ -1,7 +1,9 @@
-from test.markers import web, test_case
+from test.markers import web, test_case, expected_failure, nondestructive
 
 @test_case('')
 @web
+@expected_failure
+@nondestructive
 def test_view_about_tutor(web_base_url, selenium):
     """Tests ability to view about OpenStax tutor page."""
     # GIVEN: On the OpenStax homepage
@@ -14,6 +16,8 @@ def test_view_about_tutor(web_base_url, selenium):
 
 @test_case('')
 @web
+@expected_failure
+@nondestructive
 def test_scaling_about_tutor(web_base_url, selenium):
     """Tests ability to scale about OpenStax tutor page."""
     # GIVEN: On the OpenStax homepage
@@ -28,6 +32,8 @@ def test_scaling_about_tutor(web_base_url, selenium):
 
 @test_case('')
 @web
+@expected_failure
+@nondestructive
 def test_access_your_course(web_base_url, selenium):
     """Tests ability access course."""
     # GIVEN: On the OpenStax homepage
@@ -42,6 +48,8 @@ def test_access_your_course(web_base_url, selenium):
 
 @test_case('')
 @web
+@expected_failure
+@nondestructive
 def test_about_tutor_learn_more(web_base_url, selenium):
     """Tests about OpenStax tutor learn more button."""
     # GIVEN: On the OpenStax homepage
@@ -56,6 +64,8 @@ def test_about_tutor_learn_more(web_base_url, selenium):
 
 @test_case('')
 @web
+@expected_failure
+@nondestructive
 def test_view_openstax_beta(web_base_url, selenium):
     """Tests ability to view OpenStax beta section of about tutor."""
     # GIVEN: On the OpenStax homepage
@@ -70,6 +80,8 @@ def test_view_openstax_beta(web_base_url, selenium):
 
 @test_case('')
 @web
+@expected_failure
+@nondestructive
 def test_view_what_students_see(web_base_url, selenium):
     """Tests ability to view OpenStax beta section of about tutor."""
     # GIVEN: On the OpenStax homepage
@@ -86,6 +98,8 @@ def test_view_what_students_see(web_base_url, selenium):
 
 @test_case('')
 @web
+@expected_failure
+@nondestructive
 def test_view_current_future(web_base_url, selenium):
     """Tests ability to view current future plans section of about tutor."""
     # GIVEN: On the OpenStax homepage
@@ -99,6 +113,8 @@ def test_view_current_future(web_base_url, selenium):
 
 @test_case('')
 @web
+@expected_failure
+@nondestructive
 def test_view_10dollars_toward(web_base_url, selenium):
     """Tests ability to view 10 dollar goes toward section of about tutor."""
     # GIVEN: On the OpenStax homepage
@@ -112,6 +128,8 @@ def test_view_10dollars_toward(web_base_url, selenium):
 
 @test_case('')
 @web
+@expected_failure
+@nondestructive
 def test_view_faq_questions(web_base_url, selenium):
     """Tests ability to view faq questions section of about tutor."""
     # GIVEN: At the Openstax homepage
