@@ -77,7 +77,7 @@ class Google(GoogleBase):
     class Email(Region):
         """Email container."""
 
-        _from_locator = (By.CSS_SELECTOR, '.yW .yP')
+        _from_locator = (By.CSS_SELECTOR, '.yW span[email]')
         _subject_locator = (By.CLASS_NAME, 'bog')
         _excerpt_locator = (By.CSS_SELECTOR, '.y6 .y2')
 
@@ -149,7 +149,7 @@ class GuerrillaMail(Page):
     @property
     def openedmail(self):
         """Return a opened email region."""
-        return self.Openedmail(self)
+        return self.OpenedMail(self)
 
     class Header(Region):
         """E-mail address controls."""
