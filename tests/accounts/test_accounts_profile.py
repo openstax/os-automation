@@ -101,10 +101,22 @@ def test_profile_name_field(accounts_base_url, selenium, student):
 
 
 @test_case('C195551')
-@expected_failure
 @accounts
-def test_profile_username_field(accounts_base_url, selenium):
+def test_profile_username_field(accounts_base_url, selenium, student):
     """Test the user's username field."""
+    # setup
+    page = Profile(selenium, accounts_base_url).open()
+    page.log_in(*student)
+    assert (page.logged_in), 'User is not logged in'
+    # at profile, store original values
+    old_username = page.username.username
+    new_username = Utility.random_hex()
+    # set new values
+    page.username.username = new_username
+    assert (page.username.username != old_username), 'Username change failed'
+    # reset the fields to the original values
+    page.username.username = old_username
+    assert (page.username.username == old_username), 'Username reset failed'
 
 
 @test_case('C195552')
@@ -229,7 +241,7 @@ def test_profile_login_using_facebook(accounts_base_url, facebook, selenium,
                                       student):
     """Test the Facebook login method."""
     # GIVEN the user had added Facebook as an alternative login method
-    # AND is not logged in
+    # AND the user is not logged in
     page = Profile(selenium, accounts_base_url).open()
     assert(not page.logged_in), 'Already logged in'
 
@@ -242,10 +254,59 @@ def test_profile_login_using_facebook(accounts_base_url, facebook, selenium,
 
 @test_case('C195557')
 @nondestructive
-@expected_failure
 @accounts
-def test_admin_pop_up_console(accounts_base_url, selenium):
+def test_admin_pop_up_console(accounts_base_url, admin, selenium):
     """Test the pop up console."""
+    page = Profile(selenium, accounts_base_url).open()
+    assert(not page.logged_in), 'Active user session unexpected'
+    page.log_in(*admin)
+    assert(page.logged_in), 'User "{0}" not logged in'.format(admin[0])
+    assert(page.is_admin), 'User is not an administrator'
+    assert(page.has_username), 'No username found'
+
+    popup = page.open_popup_console()
+    popup.links.go_to_security_log()
+    assert("security_log" in selenium.current_url)
+
+    selenium.back()
+    popup = page.open_popup_console()
+    popup.links.go_to_oauth_application()
+    assert("applications" in selenium.current_url)
+
+    selenium.back()
+    popup = page.open_popup_console()
+    popup.links.go_to_fineprint()
+    assert("print" in selenium.current_url)
+
+    selenium.back()
+    popup = page.open_popup_console()
+    popup.links.go_to_api()
+    assert("api/docs/v1" in selenium.current_url)
+
+    selenium.back()
+    popup = page.open_popup_console()
+    popup.full_console()
+    assert("admin/console" in selenium.current_url)
+
+    selenium.back()
+    popup = page.open_popup_console()
+    result = popup.users.search_for("teacher")
+    assert(len(result[0].find_data()) == 7)
+    assert(result[10].id.isdigit())
+    assert(not result[10].is_test)
+
+    result[10].edit()
+    assert("edit" in selenium.current_url)
+    page.driver.switch_to_window(page.driver.window_handles[0])
+
+    result[10].username_link
+    assert("security_log" in selenium.current_url)
+
+    selenium.back()
+    popup = page.open_popup_console()
+    result = popup.users.search_for("teacher")
+    result[10].sign_in_as()
+    assert(not page.is_admin), 'User should not be an administrator'
 
 
 @test_case('C195558')

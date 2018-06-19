@@ -6,6 +6,7 @@ from pypom import Region
 from selenium.webdriver.common.by import By
 
 from pages.accounts import admin, home
+from pages.utils.utilities import Utility
 
 
 class Profile(home.AccountsHome):
@@ -30,7 +31,7 @@ class Profile(home.AccountsHome):
     @property
     def username(self):
         """Username field."""
-        return self.User(self)
+        return self.Username(self)
 
     @property
     def emails(self):
@@ -40,7 +41,7 @@ class Profile(home.AccountsHome):
     @property
     def login_method(self):
         """Options for logging in."""
-        return self.LoginOption(self)
+        return self.LoginOptions(self)
 
     def log_out(self):
         """Log the user out."""
@@ -53,7 +54,8 @@ class Profile(home.AccountsHome):
         if not self.is_admin:
             raise AccountException('User is not an administrator')
         self.find_element(*self._popup_console_locator).click()
-        return self.PopupConcole(self)
+        sleep(0.25)
+        return self.PopupConsole(self)
 
     def open_full_console(self):
         """Open the full admin console."""
@@ -66,7 +68,6 @@ class Profile(home.AccountsHome):
     @property
     def is_admin(self):
         """Return True if a user is an Accounts administrator."""
-        sleep(0.25)
         return self.is_element_displayed(*self._popup_console_locator)
 
     @property
@@ -85,7 +86,6 @@ class Profile(home.AccountsHome):
         LAST = 2
         SUFFIX = 3
 
-        _root_locator = (By.CSS_SELECTOR, '.row.name')
         _full_name_locator = (By.ID, 'name')
         _input_locator = (By.CLASS_NAME, 'form-control')
         _edit_clear_locator = (By.CLASS_NAME, 'editable-clear-x')
@@ -194,7 +194,8 @@ class Profile(home.AccountsHome):
         """Username assignment."""
 
         _root_locator = (By.XPATH, '//div[div[contains(text(),"Username")]]')
-        _username_locator = (By.CSS_SELECTOR, '#username + span input')
+        _username_locator = (By.CSS_SELECTOR, '#username')
+        _input_locator = (By.CSS_SELECTOR, "#username + span input")
 
         @property
         def username(self):
@@ -204,10 +205,12 @@ class Profile(home.AccountsHome):
         @username.setter
         def username(self, username):
             """Set a new username."""
+            self.find_element(*self._username_locator).click()
             self.find_element(*Profile._edit_clear_locator).click()
-            self.find_element(*self._username_locator).send_keys(username)
-            self.find_element(*Profile._edit_submit_locator)
-            return Profile(self)
+            self.find_element(*self._input_locator).send_keys(username)
+            self.find_element(*Profile._edit_submit_locator).click()
+            sleep(0.25)
+            return Profile(self.driver)
 
     class Emails(Region):
         """Email sections."""
@@ -290,7 +293,175 @@ class Profile(home.AccountsHome):
     class PopupConsole(Region):
         """Popup console interaction."""
 
-        _root_locator = (By.CSS_SELECTOR, '.modal-content')
+        _users_locator = (By.LINK_TEXT, 'Users')
+        _misc_locator = (By.LINK_TEXT, 'Misc')
+        _links_locator = (By.LINK_TEXT, 'Links')
+        _full_console_locator = (By.LINK_TEXT, 'Full Console >>')
+
+        @property
+        def misc(self):
+            """Goes to misc tab of the pop up console."""
+            self.find_element(*self._misc_locator).click()
+            return self.Misc(self)
+
+        @property
+        def users(self):
+            """Goes to user tab of the pop up console."""
+            self.find_element(*self._users_locator).click()
+            return self.Users(self)
+
+        @property
+        def links(self):
+            """Goes to links tab of the pop up console."""
+            self.find_element(*self._links_locator).click()
+            return self.Links(self)
+
+        def full_console(self):
+            """Goes to full_console tab of the pop up console."""
+            self.find_element(*self._full_console_locator).click()
+            return self
+
+        class Misc(Region):
+            """Misc section."""
+
+            _users_locator = (By.LINK_TEXT, 'Users')
+            _links_locator = (By.LINK_TEXT, 'Links')
+            _full_console_locator = (By.LINK_TEXT, 'Full Console >>')
+
+            def go_to_user_section(self):
+                """Go to user section on the tab."""
+                self.find_element(*self._users_locator).click()
+                return self
+
+            def go_to_links_section(self):
+                """Go to links section on the tab."""
+                self.find_element(*self._links_locator).click()
+                return self
+
+            def go_to_full_section(self):
+                """Go to full section on the tab."""
+                self.find_element(*self._full_console_locator).click()
+                return self
+
+        class Users(Region):
+            """User section."""
+
+            _search_bar_locator = (By.ID, 'search_terms')
+            _search_button_locator = (By.NAME, 'commit')
+            _row_locator = (By.CSS_SELECTOR, "tr.action-list-data-row")
+
+            def search_for(self, topic):
+                """Search given string."""
+                self.find_element(*self._search_bar_locator).send_keys(
+                    topic)
+                self.find_element(*self._search_button_locator).click()
+                sleep(1)
+                return [self.Result(self, el)
+                        for el in self.find_elements(*self._row_locator)]
+
+            class Result(Region):
+                """class for the search list column."""
+
+                _data_locator = (By.CSS_SELECTOR, ".action-list-col-6")
+                _id_locator = \
+                    (By.CSS_SELECTOR, '.action-list-col-6:nth-child(1)')
+                _username_locator = (By.CSS_SELECTOR, '.action-list-col-6 a')
+                _first_name_locator = \
+                    (By.CSS_SELECTOR, '.action-list-col-6:nth-child(3)')
+                _last_name_locator = \
+                    (By.CSS_SELECTOR, '.action-list-col-6:nth-child(4)')
+                _is_admin = \
+                    (By.CSS_SELECTOR, '.action-list-col-6:nth-child(5)')
+                _is_test = (By.CSS_SELECTOR, '.action-list-col-6:nth-child(6)')
+                _sign_in_locator = (By.LINK_TEXT, 'Sign in as')
+                _edit_locator = (By.LINK_TEXT, 'Edit')
+
+                def find_data(self):
+                    """Return all the data by columns."""
+                    return self.find_elements(*self._data_locator)
+
+                @property
+                def id(self):
+                    """Return the user id."""
+                    return self.find_element(*self._id_locator).text
+
+                @property
+                def username(self):
+                    """Return the username."""
+                    return self.find_element(*self._username_locator).text
+
+                @property
+                def username_link(self):
+                    """Return the username specific link."""
+                    self.find_element(*self._username_locator).click()
+                    return self
+
+                @property
+                def first_name(self):
+                    """Return the frist name."""
+                    return self.find_element(*self._first_name_locator).text
+
+                @property
+                def last_name(self):
+                    """Return the last name."""
+                    return self.find_element(*self._last_name_locator).text
+
+                @property
+                def is_admin(self):
+                    """Return the admin."""
+                    return self.find_element(
+                        *self._is_admin).text.lower() == 'yes'
+
+                @property
+                def is_test(self):
+                    """Return the test."""
+                    return self.find_element(
+                        *self._is_test).text.lower() == "yes"
+
+                def sign_in_as(self):
+                    """Return the sign in page."""
+                    self.find_element(*self._sign_in_locator).click()
+
+                    if "terms" in self.driver.current_url:
+                        checkbox_id = 'agreement_i_agree'
+                        target = self.find(By.ID, checkbox_id)
+                        target.click()
+                        target = self.find(By.ID, 'agreement_submit')
+                        target.click()
+                    return self
+
+                def edit(self):
+                    """Return the edit page."""
+                    Utility.switch_to(self.driver, self._edit_locator)
+                    return self
+
+        class Links(Region):
+            """Link section."""
+
+            _security_log_locator = (By.PARTIAL_LINK_TEXT, 'Security')
+            _application_locator = (By.PARTIAL_LINK_TEXT, 'OAuth')
+            _print_locator = (By.PARTIAL_LINK_TEXT, 'FinePrint')
+            _api_locator = (By.PARTIAL_LINK_TEXT, 'API')
+
+            def go_to_security_log(self):
+                """Goes to the security log."""
+                self.find_element(*self._security_log_locator).click()
+                return self
+
+            def go_to_oauth_application(self):
+                """Goes to the OAuth application."""
+                self.find_element(*self._application_locator).click()
+                return self
+
+            def go_to_fineprint(self):
+                """Goes to the FinePrint."""
+                self.find_element(*self._print_locator).click()
+                return self
+
+            def go_to_api(self):
+                """Goes to the API v1 documentation."""
+                self.find_element(*self._api_locator).click()
+                return self
 
 
 class AccountException(Exception):
