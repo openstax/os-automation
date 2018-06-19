@@ -1,9 +1,9 @@
+from test.markers import web, test_case
 
 @test_case('')
 @web
 def test_view_our_impact(web_base_url, selenium):
     """Tests ability to view our impact page."""
-    
     # GIVEN: On the OpenStax homepage
 
     # WHEN: Click "Our Impact"
@@ -15,11 +15,9 @@ def test_view_our_impact(web_base_url, selenium):
 @web
 def test_view_insitutions(web_base_url, selenium):
     """Tests ability to view insitutions using openstax."""
-    
     # GIVEN: On the OpenStax homepage
 
     # WHEN: Click on "Our Impact" on the header
-
     # AND: Click "See a full list of institutions that have adopted openstax"
 
     # THEN: User views OpenStax Institutional Partners and Affiliate Schools
