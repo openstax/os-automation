@@ -402,4 +402,3 @@ def test_view_current_score(tutor_base_url, selenium, teacher):
     # cell for the desired student
 
     # THEN: The user is presented with current score
-

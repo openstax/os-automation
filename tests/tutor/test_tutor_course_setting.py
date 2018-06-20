@@ -101,4 +101,3 @@ def test_cancel_changing_course_time_zone(tutor_base_url, selenium, teacher):
     # AND: Click x
 
     # THEN: Course time zone shouldn't change
-

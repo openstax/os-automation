@@ -230,4 +230,3 @@ def test_exclude_a_question(tutor_base_url, selenium, teacher):
     # AND: Click "exclude question"
 
     # THEN: The chosen question is excluded
-

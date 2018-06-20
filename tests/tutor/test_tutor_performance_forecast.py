@@ -92,4 +92,3 @@ def test_perforemance_forecast_weaker_areas(tutor_base_url, selenium, teacher):
     # AND: Click on the desired period
 
     # THEN: Weaker Areas show up to four problematic sections
-
