@@ -670,4 +670,4 @@ def test_term_appearance_exist(tutor_base_url, selenium, teacher):
     # WHEN: Log in as teacher and go to that course page.
     # AND: Enters a course.
 
-    # THEN: the teacher is shown the terms when they changed
+    # THEN: the teacher is shown the terms when they changed.

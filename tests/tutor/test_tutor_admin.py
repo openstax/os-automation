@@ -523,5 +523,5 @@ def test_delete_targeted_contract(tutor_base_url, selenium, admin):
     # WHEN: Go to Tutor admin console
     # AND: Click on ""Legal"" in the navbar
     # AND: In the drop down click on ""Targeted Contract""
-    # AND: Click on ""delete""
+    # AND: Click on ""delete"".
 
