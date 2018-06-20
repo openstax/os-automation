@@ -1,4 +1,4 @@
-"""Test case for creating, editting, deleting the homework."""
+"""Tests for instructors creating, modifying and deleting homeworks."""
 
 from tests.markers import expected_failure, test_case, tutor
 

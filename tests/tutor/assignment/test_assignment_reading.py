@@ -1,4 +1,4 @@
-"""Test case for creating, editting, deleting the reading."""
+"""Tests for instructors creating, modifying and deleting readings."""
 
 from tests.markers import expected_failure, test_case, tutor
 
