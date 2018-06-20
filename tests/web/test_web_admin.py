@@ -1,11 +1,10 @@
 """Tests the admin page."""
 
-from tests.markers import expected_failure, nondestructive, test_case, web
+from tests.markers import expected_failure, test_case, web
 
 
 @test_case('')
 @expected_failure
-@nondestructive
 @web
 def test_edit_higher_ed_page(web_base_url, seleniumm, admin):
     """Tests ability to edit higher education page."""
@@ -20,7 +19,6 @@ def test_edit_higher_ed_page(web_base_url, seleniumm, admin):
 
 @test_case('')
 @expected_failure
-@nondestructive
 @web
 def test_edit_partner_page(web_base_url, seleniumm, admin):
     """Tests ability to edit partner page."""
@@ -37,7 +35,6 @@ def test_edit_partner_page(web_base_url, seleniumm, admin):
 
 @test_case('')
 @expected_failure
-@nondestructive
 @web
 def test_edit_support_page(web_base_url, seleniumm, admin):
     """Tests ability to edit support page."""
@@ -54,7 +51,6 @@ def test_edit_support_page(web_base_url, seleniumm, admin):
 
 @test_case('')
 @expected_failure
-@nondestructive
 @web
 def test_edit_add_books(web_base_url, seleniumm, admin):
     """Tests ability to edit or add books."""
