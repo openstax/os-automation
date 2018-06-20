@@ -6,6 +6,7 @@ from pypom import Region
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as expect
 
+from pages.accounts import profile
 from pages.accounts.base import AccountsBase
 from pages.accounts.signup import Signup
 from pages.salesforce.home import Salesforce
@@ -68,6 +69,7 @@ class AccountsHome(AccountsBase):
                 .send_keys(password)
             self.find_element(*self._login_submit_button_locator).click()
             self.wait.until(lambda _: self.logged_in)
+            return profile.Profile(self.driver)
 
         def facebook_login(self, user, facebook_user, password):
             """Log into the site with facebook."""
@@ -89,6 +91,7 @@ class AccountsHome(AccountsBase):
                         self._fb_safari_specific_locator))
                 self.find_element(*self._fb_safari_specific_locator).click()
             sleep(2)
+            return profile.Profile(self.driver)
 
         def google_login(self, user, google_user, password):
             """Log into the site with google."""
@@ -107,10 +110,12 @@ class AccountsHome(AccountsBase):
                 .send_keys(password)
             self.find_element(*self._google_pass_next_locator).click()
             sleep(2)
+            return profile.Profile(self.driver)
 
         def reset_password(self, user, new_password):
             """Reset a current user's password."""
-            assert(False), 'work to be done'
+            # TODO: add password reset method
+            return
 
         @property
         def is_help_shown(self):
