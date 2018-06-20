@@ -88,6 +88,14 @@ class Utility(object):
         return template.format(area=area_code, local=randint(100, 199))
 
     @classmethod
+    def fake_email(cls, first_name, surname, id=False):
+        """Return a name-based fake email."""
+        template = ('{first}.{second}.{random}@os.fake.org')
+        return template.format(first=first_name,
+                               second=surname,
+                               random=id if id else Utility.random(100, 999))
+
+    @classmethod
     def new_tab(cls, driver):
         """Open another browser tab."""
         driver.execute_script('window.open();')
