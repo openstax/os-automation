@@ -1,12 +1,13 @@
-"""Tests for the OpenStax home webpage"""
+"""Tests for the OpenStax home webpage."""
 
-from tests.markers import test_case, web
+from tests.markers import expected_failure, test_case, web
 
 
 @test_case()
 @web
+@expected_failure
 def test_top_navigation_bar_present(web_base_url, selenium):
-    """test if the top navigation bar is present"""
+    """Test if the top navigation bar is present."""
     # GIVEN: On the OpenStax homepage
     # THEN: Page with navigation bar with about us,
     # supporters, blog, give, help, Rice logo is displayed
@@ -14,8 +15,9 @@ def test_top_navigation_bar_present(web_base_url, selenium):
 
 @test_case()
 @web
+@expected_failure
 def test_top_navigation_bar(web_base_url, selenium):
-    """test if the top navigation bar is working"""
+    """Test if the top navigation bar is working."""
     # GIVEN: On the OpenStax homepage
     # WHEN: On top of the page, click About us.
     # THEN: User is taken to the About us page
@@ -23,8 +25,9 @@ def test_top_navigation_bar(web_base_url, selenium):
 
 @test_case()
 @web
+@expected_failure
 def test_supporter_button(web_base_url, selenium):
-    """test if the supporter button is working"""
+    """Test if the supporter button is working."""
     # GIVEN: On the OpenStax homepage
     # WHEN: On top of the page, click Supporters.
     # THEN: User is taken to the Supporters page
@@ -32,8 +35,9 @@ def test_supporter_button(web_base_url, selenium):
 
 @test_case()
 @web
+@expected_failure
 def test_blog_button(web_base_url, selenium):
-    """test if the blog button is working"""
+    """Test if the blog button is working."""
     # GIVEN: On the OpenStax homepage
     # WHEN: On top of the page, click Supporters.
     # THEN: User is taken to the Supporters page
@@ -41,8 +45,9 @@ def test_blog_button(web_base_url, selenium):
 
 @test_case()
 @web
+@expected_failure
 def test_nav_bar_when_reduced(web_base_url, selenium):
-    """test if the nav bar is present when screen size reduced"""
+    """Test if the nav bar is present when screen size reduced."""
     # GIVEN: On the OpenStax homepage
     # WHEN: On top of the page, click on Give button
     # THEN: User is taken to the Give page
@@ -50,8 +55,9 @@ def test_nav_bar_when_reduced(web_base_url, selenium):
 
 @test_case()
 @web
+@expected_failure
 def test_nav_bar_when_maxed(web_base_url, selenium):
-    """test if the nav bar is present when screen size is maxed"""
+    """Test if the nav bar is present when screen size is maxed."""
     # GIVEN: On the OpenStax homepage
     # WHEN: On top of the page, find the top navigation bar
 # AND: Click on help button
@@ -60,8 +66,9 @@ def test_nav_bar_when_maxed(web_base_url, selenium):
 
 @test_case()
 @web
+@expected_failure
 def test_rice_logo_on_nav(web_base_url, selenium):
-    """test if rice logo link works on nav bar"""
+    """Test if rice logo link works on nav bar."""
     # GIVEN: On the OpenStax homepage
     # WHEN: On top of the page, click Rice logo
     # THEN: User is taken to the Rice home page
@@ -69,8 +76,9 @@ def test_rice_logo_on_nav(web_base_url, selenium):
 
 @test_case()
 @web
+@expected_failure
 def test_nav_components(web_base_url, selenium):
-    """test if the nav bar is visible and contains all the components"""
+    """Test if the nav bar is visible and contains all the components."""
     # GIVEN: On the OpenStax homepage
     # THEN: Page with white navigation bar with Openstax logo with statement
     # "Access. The future of education.", Subjects,
@@ -79,8 +87,9 @@ def test_nav_components(web_base_url, selenium):
 
 @test_case()
 @web
+@expected_failure
 def test_subject_tech_drop_down_list(web_base_url, selenium):
-    """test if hovering over subjects or tech creates a drop down list"""
+    """Test if hovering over subjects or tech creates a drop down list."""
     # GIVEN: On the OpenStax homepage
     # WHEN: Decrease the screen size
     # THEN: OpenStax navigation bar goes to the top of the page, and
@@ -90,8 +99,9 @@ def test_subject_tech_drop_down_list(web_base_url, selenium):
 
 @test_case()
 @web
+@expected_failure
 def test_nav_bar_present_other_page(web_base_url, selenium):
-    """test if nav bar is present on page other than home page"""
+    """Test if nav bar is present on page other than home page."""
     # GIVEN: On the OpenStax homepage
     # WHEN: Go to bottom of the page where it says "OpenStax Partners"
     # AND: Click on the partners
@@ -102,8 +112,9 @@ def test_nav_bar_present_other_page(web_base_url, selenium):
 
 @test_case()
 @web
+@expected_failure
 def test_our_impact(web_base_url, selenium):
-    """test if our impact works properly on navbar"""
+    """Test if our impact works properly on navbar."""
     # GIVEN: On the OpenStax homepage
     # WHEN: Find "Using OpenStax in User's course again this semester?"
     # and click "Let us know"
@@ -117,8 +128,9 @@ def test_our_impact(web_base_url, selenium):
 
 @test_case()
 @web
+@expected_failure
 def test_drop_down_list_when_decreased(web_base_url, selenium):
-    """test if drop down list is working on decreased window size"""
+    """Test if drop down list is working on decreased window size."""
     # GIVEN: On the OpenStax homepage
     # WHEN: Decrease the window size until some of
     # the OpenStax navigation bar disappears
@@ -131,8 +143,9 @@ def test_drop_down_list_when_decreased(web_base_url, selenium):
 
 @test_case()
 @web
+@expected_failure
 def test_nav_bar_within_website(web_base_url, selenium):
-    """test if the nav bar stays within website"""
+    """Test if the nav bar stays within website."""
     # GIVEN: On the OpenStax homepage
     # WHEN: Go to books
     # THEN: Navigation bar on the home page is displayed, and also on the
@@ -141,8 +154,9 @@ def test_nav_bar_within_website(web_base_url, selenium):
 
 @test_case()
 @web
+@expected_failure
 def test_footer_displayed(web_base_url, selenium):
-    """test if footer is properly displayed on homepage"""
+    """Test if footer is properly displayed on homepage."""
     # GIVEN: On the OpenStax homepage
     # WHEN: Go to the bottom of the page where user
     # can see the footer with dark background
@@ -157,8 +171,9 @@ def test_footer_displayed(web_base_url, selenium):
 
 @test_case()
 @web
+@expected_failure
 def test_footer_adjust(web_base_url, selenium):
-    """test if footer adjusts properly as screen gets bigger"""
+    """Test if footer adjusts properly as screen gets bigger."""
     # GIVEN: On the OpenStax homepage
     # WHEN: Go to Subjects page
     # AND: Go to Technology page
@@ -169,8 +184,9 @@ def test_footer_adjust(web_base_url, selenium):
 
 @test_case()
 @web
+@expected_failure
 def test_footer_all_page(web_base_url, selenium):
-    """test if footer is visible on all pages"""
+    """Test if footer is visible on all pages."""
     # GIVEN: On the OpenStax homepage
     # WHEN: Go to bottom of the page and click on
     # Terms of use in the footer with dark background
@@ -179,8 +195,9 @@ def test_footer_all_page(web_base_url, selenium):
 
 @test_case()
 @web
+@expected_failure
 def test_terms_of_use(web_base_url, selenium):
-    """test if terms of use link works"""
+    """Test if terms of use link works."""
     # GIVEN: On the OpenStax homepage
     # WHEN: Go to bottom of the page and click on
     # Terms of use in the footer with dark background
@@ -189,8 +206,9 @@ def test_terms_of_use(web_base_url, selenium):
 
 @test_case()
 @web
+@expected_failure
 def test_accessiblity(web_base_url, selenium):
-    """test if accessiblity works properly"""
+    """Test if accessiblity works properly."""
     # GIVEN: On the OpenStax homepage
     # WHEN: Go to bottom of the page and click on Accessibility
     # statement in the footer with dark background
@@ -199,8 +217,9 @@ def test_accessiblity(web_base_url, selenium):
 
 @test_case()
 @web
+@expected_failure
 def test_privacy_policy(web_base_url, selenium):
-    """test if privacy policy works properly"""
+    """Test if privacy policy works properly."""
     # GIVEN: On the OpenStax homepage
     # WHEN: Go to bottom of the page and click on
     # privacy policy in the footer with dark background
@@ -209,8 +228,9 @@ def test_privacy_policy(web_base_url, selenium):
 
 @test_case()
 @web
+@expected_failure
 def test_open_source(web_base_url, selenium):
-    """test if open source works properly"""
+    """Test if open source works properly."""
     # GIVEN: On the OpenStax homepage
     # WHEN: Go to bottom of the page and
     # click on Open Source in the footer with dark background
@@ -219,8 +239,9 @@ def test_open_source(web_base_url, selenium):
 
 @test_case()
 @web
+@expected_failure
 def test_press_kit(web_base_url, selenium):
-    """test if the press kit works properly"""
+    """Test if the press kit works properly."""
     # GIVEN: On the OpenStax homepage
     # WHEN: Go to bottom of the page and click
     # on press kit in the footer with dark background
@@ -229,8 +250,9 @@ def test_press_kit(web_base_url, selenium):
 
 @test_case()
 @web
+@expected_failure
 def test_newsletter(web_base_url, selenium):
-    """test if newsletter works properly"""
+    """Test if newsletter works properly."""
     # GIVEN: On the OpenStax homepage
     # WHEN: Go to bottom of the page and click on
     # newsletter in the footer with dark background
@@ -239,8 +261,9 @@ def test_newsletter(web_base_url, selenium):
 
 @test_case()
 @web
+@expected_failure
 def test_contact_hyperlink(web_base_url, selenium):
-    """test if contacy hyperlink works properly"""
+    """Test if contacy hyperlink works properly."""
     # GIVEN: On the OpenStax homepage
     # WHEN: Go to bottom of the page and click on
     # Contact us in the footer with dark background
@@ -249,8 +272,9 @@ def test_contact_hyperlink(web_base_url, selenium):
 
 @test_case()
 @web
+@expected_failure
 def test_facebook(web_base_url, selenium):
-    """test facebook link"""
+    """Test facebook link."""
     # GIVEN: On the OpenStax homepage
     # WHEN: Go to bottom of the page and click on Facebook
     # logo in the footer with dark background
@@ -259,8 +283,9 @@ def test_facebook(web_base_url, selenium):
 
 @test_case()
 @web
+@expected_failure
 def test_linkedin(web_base_url, selenium):
-    """test linkedin link"""
+    """Test linkedin link."""
     # GIVEN: On the OpenStax homepage
     # WHEN: Go to bottom of the page and
     # click on Linkedin logo in the footer with dark background
@@ -269,8 +294,9 @@ def test_linkedin(web_base_url, selenium):
 
 @test_case()
 @web
+@expected_failure
 def test_twitter(web_base_url, selenium):
-    """test twitter link"""
+    """Test twitter link."""
     # GIVEN: On the OpenStax homepage
     # WHEN: Go to bottom of the page and click on
     # Twitter logo in the footer with dark background
@@ -279,8 +305,9 @@ def test_twitter(web_base_url, selenium):
 
 @test_case()
 @web
+@expected_failure
 def test_donation_banner(web_base_url, selenium):
-    """test the persence of donation banner"""
+    """Test the persence of donation banner."""
     # GIVEN: On the OpenStax homepage
     # WHEN: On the OpenStax homepage
     # THEN: The orange Give Now sticky is visible the first 5 times the site
@@ -289,8 +316,9 @@ def test_donation_banner(web_base_url, selenium):
 
 @test_case()
 @web
+@expected_failure
 def test_banner(web_base_url, selenium):
-    """test if banner is present"""
+    """Test if banner is present."""
     # GIVEN: On the OpenStax homepage
     # WHEN: On the OpenStax homepage
     # THEN: Banner is visible and should switch every few seconds
@@ -298,8 +326,9 @@ def test_banner(web_base_url, selenium):
 
 @test_case()
 @web
+@expected_failure
 def test_give_now_for_frequent(web_base_url, selenium):
-    """test if give now is present for frequent visitor"""
+    """Test if give now is present for frequent visitor."""
     # GIVEN: On the OpenStax homepage
     # WHEN: On the OpenStax homepage
     # THEN: The orange Give Now sticky is not visible after visiting
@@ -308,8 +337,9 @@ def test_give_now_for_frequent(web_base_url, selenium):
 
 @test_case()
 @web
+@expected_failure
 def test_quotes(web_base_url, selenium):
-    """test if quotes by prof are present"""
+    """Test if quotes by prof are present."""
     # GIVEN: On the OpenStax homepage
     # WHEN: On the OpenStax homepage
     # THEN: Homepage displays a quote from one of our textbook heroes
@@ -317,8 +347,9 @@ def test_quotes(web_base_url, selenium):
 
 @test_case()
 @web
+@expected_failure
 def test_suscribe_form(web_base_url, selenium):
-    """test if suscribe form is present"""
+    """Test if suscribe form is present."""
     # GIVEN: On the OpenStax homepage
     # WHEN: On the OpenStax homepage
     # THEN: Users is able to access the subscribe form from the homepage.
@@ -327,8 +358,9 @@ def test_suscribe_form(web_base_url, selenium):
 
 @test_case()
 @web
+@expected_failure
 def test_renewal(web_base_url, selenium):
-    """test if renewal form is present"""
+    """Test if renewal form is present."""
     # GIVEN: On the OpenStax homepage
     # WHEN: On the OpenStax homepage
     # THEN: Faculty is able to access the renewal form from the homepage.
@@ -337,8 +369,9 @@ def test_renewal(web_base_url, selenium):
 
 @test_case()
 @web
+@expected_failure
 def test_homepage_reduced(web_base_url, selenium):
-    """test if homepage is displayed on reduced screen size"""
+    """Test if homepage is displayed on reduced screen size."""
     # GIVEN: On the OpenStax homepage
     # WHEN: On the OpenStax homepage
     # THEN: The homepage is displayed on the reduced screen size
@@ -346,8 +379,9 @@ def test_homepage_reduced(web_base_url, selenium):
 
 @test_case()
 @web
+@expected_failure
 def test_hamburger_menu(web_base_url, selenium):
-    """test if hamburger menu is present on reduced screen size"""
+    """Test if hamburger menu is present on reduced screen size."""
     # GIVEN: On the OpenStax homepage
     # WHEN: On the OpenStax homepage
     # THEN: The header collapses into a hamburger menu
@@ -355,8 +389,9 @@ def test_hamburger_menu(web_base_url, selenium):
 
 @test_case()
 @web
+@expected_failure
 def test_contact_us(web_base_url, selenium):
-    """test if contact us page is visible"""
+    """Test if contact us page is visible."""
     # GIVEN: On the OpenStax homepage
     # WHEN: Go to bottom of the page and
     # click on contact us in the footer with dark background
@@ -365,8 +400,9 @@ def test_contact_us(web_base_url, selenium):
 
 @test_case()
 @web
+@expected_failure
 def test_info_send_when_not_filled(web_base_url, selenium):
-    """test if info is sent when not all info is filled"""
+    """Test if info is sent when not all info is filled."""
     # GIVEN: On the OpenStax homepage
     # WHEN: Go to bottom of the page and
     # click on contact us in the footer with dark background
@@ -378,8 +414,9 @@ def test_info_send_when_not_filled(web_base_url, selenium):
 
 @test_case()
 @web
+@expected_failure
 def test_message_sent_when_filled(web_base_url, selenium):
-    """test if message is sent when all info is filled"""
+    """Test if message is sent when all info is filled."""
     # GIVEN: On the OpenStax homepage
     # WHEN: Go to bottom of the page and
     # click on contact us in the footer with dark background
@@ -390,8 +427,9 @@ def test_message_sent_when_filled(web_base_url, selenium):
 
 @test_case()
 @web
+@expected_failure
 def test_message_when__invalid(web_base_url, selenium):
-    """test if message is sent when email is not valid"""
+    """Test if message is sent when email is not valid."""
     # GIVEN: On the OpenStax homepage
     # WHEN: Go to bottom of the page and
     # click on contact us in the footer with dark background
@@ -405,8 +443,9 @@ def test_message_when__invalid(web_base_url, selenium):
 
 @test_case()
 @web
+@expected_failure
 def test_support_center(web_base_url, selenium):
-    """test if support center link works properly"""
+    """Test if support center link works properly."""
     # GIVEN: On the OpenStax homepage
     # WHEN: Go to bottom of the page and
     # click on contact us in the footer with dark background
@@ -419,8 +458,9 @@ def test_support_center(web_base_url, selenium):
 
 @test_case()
 @web
+@expected_failure
 def test_box(web_base_url, selenium):
-    """test if box is visible on contact us page"""
+    """Test if box is visible on contact us page."""
     # GIVEN: On the OpenStax homepage
     # WHEN: Go to bottom of the page and
     # click on contact us in the footer with dark background
@@ -429,8 +469,9 @@ def test_box(web_base_url, selenium):
 
 @test_case()
 @web
+@expected_failure
 def test_openstax_mailing_address(web_base_url, selenium):
-    """test if openstax mailing address is properly displayed"""
+    """Test if openstax mailing address is properly displayed."""
     # GIVEN: On the OpenStax homepage
     # WHEN: Go to bottom of the page and
     # click on contact us in the footer with dark background
@@ -440,8 +481,9 @@ def test_openstax_mailing_address(web_base_url, selenium):
 
 @test_case()
 @web
+@expected_failure
 def test_view_options_on_donating(web_base_url, selenium):
-    """test if all donate options are availble"""
+    """Test if all donate options are availble."""
     # GIVEN: On the OpenStax homepage
     # WHEN: From the give page
     # AND: Scroll down to the bottom of the page
@@ -454,8 +496,9 @@ def test_view_options_on_donating(web_base_url, selenium):
 
 @test_case()
 @web
+@expected_failure
 def test_submit_donation_question(web_base_url, selenium):
-    """test if user could submit question about donation"""
+    """Test if user could submit question about donation."""
     # GIVEN: On the OpenStax homepage
     # WHEN: From the give page
     # AND: Scroll down to the bottom of the page and
@@ -468,8 +511,9 @@ def test_submit_donation_question(web_base_url, selenium):
 
 @test_case()
 @web
+@expected_failure
 def test_alpha(web_base_url, selenium):
-    """test entering an alpha character takes user to first item on the list"""
+    """Test entering an alpha character takes user to the first item."""
     # GIVEN: On the OpenStax homepage
     # WHEN: Click Give link/ Give banner
     # AND: Select a donation amount and click the donate button
@@ -480,8 +524,9 @@ def test_alpha(web_base_url, selenium):
 
 @test_case()
 @web
+@expected_failure
 def test_donation_fields(web_base_url, selenium):
-    """test if donation field is required"""
+    """Test if donation field is required."""
     # GIVEN: On the OpenStax homepage
     # WHEN: Click on the give link
     # AND: Select price user'd like to donate and click the donate button
@@ -492,8 +537,9 @@ def test_donation_fields(web_base_url, selenium):
 
 @test_case()
 @web
+@expected_failure
 def test_view_social_media(web_base_url, selenium):
-    """test if social media option is avaible upon donating"""
+    """Test if social media option is avaible upon donating."""
     # GIVEN: On the OpenStax homepage
     # WHEN: Click on the give link
     # AND: Select price user'd like to donate and click the donate button
@@ -507,8 +553,9 @@ def test_view_social_media(web_base_url, selenium):
 
 @test_case()
 @web
+@expected_failure
 def test_top_article(web_base_url, selenium):
-    """test if the top article link functions properly"""
+    """Test if the top article link functions properly."""
     # GIVEN: On the OpenStax homepage
     # WHEN: From the top nav bar find Blog button and click it
     # AND: On the region below header, click the title of the article
@@ -517,8 +564,9 @@ def test_top_article(web_base_url, selenium):
 
 @test_case()
 @web
+@expected_failure
 def test_top_article_read_more(web_base_url, selenium):
-    """test if the read more link functions properly"""
+    """Test if the read more link functions properly."""
     # GIVEN: On the OpenStax homepage
     # WHEN: From the top nav bar find Blog button and click it
     # AND: On the region below header, click Read More
@@ -527,8 +575,9 @@ def test_top_article_read_more(web_base_url, selenium):
 
 @test_case()
 @web
+@expected_failure
 def test_sign_up_from_blog(web_base_url, selenium):
-    """test if user could use the sign up button from blog"""
+    """Test if user could use the sign up button from blog."""
     # GIVEN: On the OpenStax homepage
     # WHEN: From the top nav bar find Blog button and click it
     # AND: Find the Sign Up button on the page and click it
@@ -537,8 +586,9 @@ def test_sign_up_from_blog(web_base_url, selenium):
 
 @test_case()
 @web
+@expected_failure
 def test_navigate_to_all_subjects(web_base_url, selenium):
-    """test if user could navigate to all subjects from home"""
+    """Test if user could navigate to all subjects from home."""
     # GIVEN: On the OpenStax homepage
     # WHEN: Click "Subject" on the top right to open the drop down menu
     # AND: Click "All"
@@ -547,8 +597,9 @@ def test_navigate_to_all_subjects(web_base_url, selenium):
 
 @test_case()
 @web
+@expected_failure
 def test_navigate_to_ap_subjects(web_base_url, selenium):
-    """test if user could navigate to ap subjects from home"""
+    """Test if user could navigate to ap subjects from home."""
     # GIVEN: On the OpenStax homepage
     # WHEN: Click "Subject" on the top right to open the drop down menu
     # AND: Click "AP"
@@ -557,8 +608,9 @@ def test_navigate_to_ap_subjects(web_base_url, selenium):
 
 @test_case()
 @web
+@expected_failure
 def test_navigate_to_math_subjects(web_base_url, selenium):
-    """test if user could navigate to math subjects from home"""
+    """Test if user could navigate to math subjects from home."""
     # GIVEN: On the OpenStax homepage
     # WHEN: Click "Subject" on the top right to open the drop down menu
     # AND: Click "Math"
@@ -567,8 +619,9 @@ def test_navigate_to_math_subjects(web_base_url, selenium):
 
 @test_case()
 @web
+@expected_failure
 def test_navigate_to_soci_subjects(web_base_url, selenium):
-    """test if user could navigate to all subjects from home"""
+    """Test if user could navigate to all subjects from home."""
     # GIVEN: On the OpenStax homepage
     # WHEN: Click "Subject" on the top right to open the drop down menu
     # AND: Click "Social Science"
@@ -577,8 +630,9 @@ def test_navigate_to_soci_subjects(web_base_url, selenium):
 
 @test_case()
 @web
+@expected_failure
 def test_navigate_to_humanities_subjects(web_base_url, selenium):
-    """test if user could navigate to all subjects from home"""
+    """Test if user could navigate to all subjects from home."""
     # GIVEN: On the OpenStax homepage
     # WHEN: Click "Subject" on the top right to open the drop down menu
     # AND: Click "Humanites"
@@ -587,8 +641,9 @@ def test_navigate_to_humanities_subjects(web_base_url, selenium):
 
 @test_case()
 @web
+@expected_failure
 def test_navigate_to_science_subjects(web_base_url, selenium):
-    """test if user could navigate to all subjects from home"""
+    """Test if user could navigate to all subjects from home."""
     # GIVEN: On the OpenStax homepage
     # WHEN: Click "Subject" on the top right to open the drop down menu
     # AND: Click "Science"
@@ -597,8 +652,9 @@ def test_navigate_to_science_subjects(web_base_url, selenium):
 
 @test_case()
 @web
+@expected_failure
 def test_explore_subjects(web_base_url, selenium):
-    """test if the explore all subjects button works properly"""
+    """Test if the explore all subjects button works properly."""
     # GIVEN: On the OpenStax homepage
     # WHEN:  Click "Explore All subjects"
     # THEN: Textbooks of all subjects should be displayed
