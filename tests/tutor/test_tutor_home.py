@@ -5,6 +5,7 @@ from tests.markers import expected_failure, nondestructive, test_case, tutor
 
 
 @test_case('')
+@expected_failure
 @nondestructive
 @tutor
 def test_open_home_page(tutor_base_url, selenium):
@@ -15,6 +16,7 @@ def test_open_home_page(tutor_base_url, selenium):
 
 @test_case('')
 @expected_failure
+@nondestructive
 @tutor
 def test_tutor_home_page(tutor_base_url, selenium):
     """Test the tutor home page."""
@@ -27,6 +29,7 @@ def test_tutor_home_page(tutor_base_url, selenium):
 
 @test_case('')
 @expected_failure
+@nondestructive
 @tutor
 def test_sales_force_support_page(tutor_base_url, selenium):
     """Test the salesforce support page."""
@@ -39,6 +42,7 @@ def test_sales_force_support_page(tutor_base_url, selenium):
 
 @test_case('')
 @expected_failure
+@nondestructive
 @tutor
 def test_accounts_log_in_page(tutor_base_url, selenium):
     """Test the accounts log in page."""
@@ -53,6 +57,7 @@ def test_accounts_log_in_page(tutor_base_url, selenium):
 
 @test_case('')
 @expected_failure
+@nondestructive
 @tutor
 def test_crest_rice_home_page(tutor_base_url, selenium):
     """Test the rice home page using crest."""
@@ -65,6 +70,7 @@ def test_crest_rice_home_page(tutor_base_url, selenium):
 
 @test_case('')
 @expected_failure
+@nondestructive
 @tutor
 def test_footer_rice_home_page(tutor_base_url, selenium):
     """Test the rice home page using footer."""
@@ -77,6 +83,7 @@ def test_footer_rice_home_page(tutor_base_url, selenium):
 
 @test_case('')
 @expected_failure
+@nondestructive
 @tutor
 def test_tutor_term_page(tutor_base_url, selenium):
     """Test the tutor term page."""
