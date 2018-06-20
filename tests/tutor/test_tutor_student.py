@@ -1,10 +1,12 @@
-"""Test case from 1 ~ 88 for tutor page."""
+"""Test case for tutor page student interaction and activities."""
 
-from tests.markers import accounts, test_case
+from tests.markers import accounts, expected_failure, test_case, tutor
 
 
 @test_case('')
 @accounts
+@expected_failure
+@tutor
 def test_tutor_home_page(tutor_base_url, selenium):
     """Test the tutor home page."""
     # GIVEN: A web browser
@@ -16,6 +18,8 @@ def test_tutor_home_page(tutor_base_url, selenium):
 
 @test_case('')
 @accounts
+@expected_failure
+@tutor
 def test_sales_force_support_page(tutor_base_url, selenium):
     """Test the salesforce support page."""
     # GIVEN: The Tutor home page
@@ -27,6 +31,8 @@ def test_sales_force_support_page(tutor_base_url, selenium):
 
 @test_case('')
 @accounts
+@expected_failure
+@tutor
 def test_accounts_log_in_page(tutor_base_url, selenium):
     """Test the accounts log in page."""
     # GIVEN: The Tutor home page
@@ -40,6 +46,8 @@ def test_accounts_log_in_page(tutor_base_url, selenium):
 
 @test_case('')
 @accounts
+@expected_failure
+@tutor
 def test_crest_rice_home_page(tutor_base_url, selenium):
     """Test the rice home page using crest."""
     # GIVEN: The Tutor home page
@@ -51,6 +59,8 @@ def test_crest_rice_home_page(tutor_base_url, selenium):
 
 @test_case('')
 @accounts
+@expected_failure
+@tutor
 def test_footer_rice_home_page(tutor_base_url, selenium):
     """Test the rice home page using footer."""
     # GIVEN: The Tutor home page
@@ -62,6 +72,8 @@ def test_footer_rice_home_page(tutor_base_url, selenium):
 
 @test_case('')
 @accounts
+@expected_failure
+@tutor
 def test_tutor_term_page(tutor_base_url, selenium):
     """Test the tutor term page."""
     # GIVEN: The Tutor home page
@@ -73,6 +85,8 @@ def test_tutor_term_page(tutor_base_url, selenium):
 
 @test_case('')
 @accounts
+@expected_failure
+@tutor
 def test_tutor_payment_page(tutor_base_url, selenium, student):
     """Test the tutor payment page."""
     # GIVEN: Tutor page logged in as a student
@@ -86,6 +100,8 @@ def test_tutor_payment_page(tutor_base_url, selenium, student):
 
 @test_case('')
 @accounts
+@expected_failure
+@tutor
 def test_tutor_invoice_page(tutor_base_url, selenium, student):
     """Test the tutor invoice page."""
     # GIVEN: Tutor page logged in as a student
@@ -99,6 +115,8 @@ def test_tutor_invoice_page(tutor_base_url, selenium, student):
 
 @test_case('')
 @accounts
+@expected_failure
+@tutor
 def test_tutor_dashboard_page(tutor_base_url, selenium, student):
     """Test the tutor dashboard page."""
     # GIVEN: The Tutor page logged in as a student
@@ -112,6 +130,8 @@ def test_tutor_dashboard_page(tutor_base_url, selenium, student):
 
 @test_case('')
 @accounts
+@expected_failure
+@tutor
 def test_bypass_course_picker_page(tutor_base_url, selenium, student):
     """Test the tutor bypassing the course picker page."""
     # GIVEN: The Tutor home page logged in as a student
@@ -125,6 +145,8 @@ def test_bypass_course_picker_page(tutor_base_url, selenium, student):
 
 @test_case('')
 @accounts
+@expected_failure
+@tutor
 def test_open_reading_assignment_page(tutor_base_url, selenium, student):
     """Test the tutor open reading assignment page."""
     # GIVEN: The Tutor home page logged as a student
@@ -140,6 +162,8 @@ def test_open_reading_assignment_page(tutor_base_url, selenium, student):
 
 @test_case('')
 @accounts
+@expected_failure
+@tutor
 def test_reading_questions(tutor_base_url, selenium, student):
     """Test the reading questions."""
     # GIVEN: Logged into Tutor as a student
@@ -159,6 +183,8 @@ def test_reading_questions(tutor_base_url, selenium, student):
 
 @test_case('')
 @accounts
+@expected_failure
+@tutor
 def test_textbook_from_quiz(tutor_base_url, selenium, student):
     """Test the corresponding section of textbook from quiz."""
     # GIVEN: Logged into Tutor as a student
@@ -178,6 +204,8 @@ def test_textbook_from_quiz(tutor_base_url, selenium, student):
 
 @test_case('')
 @accounts
+@expected_failure
+@tutor
 def test_dashboard_from_assignment_page(tutor_base_url, selenium, student):
     """Test the back to dashboard from reading assignment."""
     # GIVEN: Logged into Tutor as a student
@@ -195,6 +223,8 @@ def test_dashboard_from_assignment_page(tutor_base_url, selenium, student):
 
 @test_case('')
 @accounts
+@expected_failure
+@tutor
 def test_assignment_review_page(tutor_base_url, selenium, student):
     """Test the tutor assignment review."""
     # GIVEN: Logged into Tutor as a student
@@ -212,6 +242,8 @@ def test_assignment_review_page(tutor_base_url, selenium, student):
 
 @test_case('')
 @accounts
+@expected_failure
+@tutor
 def test_spaced_practice_assessment(tutor_base_url, selenium, student):
     """Test the spaced practice assessment."""
     # GIVEN: Logged into Tutor as a student
@@ -231,6 +263,8 @@ def test_spaced_practice_assessment(tutor_base_url, selenium, student):
 
 @test_case('')
 @accounts
+@expected_failure
+@tutor
 def test_personalized_assessment(tutor_base_url, selenium, student):
     """Test the personalized assessment."""
     # GIVEN: Logged into Tutor as a student
@@ -248,6 +282,8 @@ def test_personalized_assessment(tutor_base_url, selenium, student):
 
 @test_case('')
 @accounts
+@expected_failure
+@tutor
 def test_assignment_done_pop_up(tutor_base_url, selenium, student):
     """Test the pop up for  # WHEN assignment is finished."""
     # GIVEN: Logged into Tutor as a student
@@ -265,6 +301,8 @@ def test_assignment_done_pop_up(tutor_base_url, selenium, student):
 
 @test_case('')
 @accounts
+@expected_failure
+@tutor
 def test_complete_reading(tutor_base_url, selenium, student):
     """Test that complete reading assignment is shown on dashboard."""
     # GIVEN: Logged into Tutor as a student
@@ -286,6 +324,8 @@ def test_complete_reading(tutor_base_url, selenium, student):
 
 @test_case('')
 @accounts
+@expected_failure
+@tutor
 def test_homework_submit_button(tutor_base_url, selenium, student):
     """Test the homework submit button."""
     # GIVEN: Logged into Tutor as a student
@@ -305,6 +345,8 @@ def test_homework_submit_button(tutor_base_url, selenium, student):
 
 @test_case('')
 @accounts
+@expected_failure
+@tutor
 def test_correct_answer(tutor_base_url, selenium, student):
     """Test the correct answer on the homework assignment."""
     # GIVEN: Logged into Tutor as a student
@@ -322,6 +364,8 @@ def test_correct_answer(tutor_base_url, selenium, student):
 
 @test_case('')
 @accounts
+@expected_failure
+@tutor
 def test_assignment_error_page(tutor_base_url, selenium, student):
     """Test the tutor assignment error page."""
     # GIVEN: Logged into Tutor as a student
@@ -338,6 +382,8 @@ def test_assignment_error_page(tutor_base_url, selenium, student):
 
 @test_case('')
 @accounts
+@expected_failure
+@tutor
 def test_assignment_from_link(tutor_base_url, selenium, student):
     """Test the tutor assignment comes from link."""
     # GIVEN: Logged into Tutor as a student
@@ -353,6 +399,8 @@ def test_assignment_from_link(tutor_base_url, selenium, student):
 
 @test_case('')
 @accounts
+@expected_failure
+@tutor
 def test_dashboard_from_homework(tutor_base_url, selenium, student):
     """Test the back to dashboard button."""
     # GIVEN: Logged into Tutor as a student
@@ -370,6 +418,8 @@ def test_dashboard_from_homework(tutor_base_url, selenium, student):
 
 @test_case('')
 @accounts
+@expected_failure
+@tutor
 def test_previous_question(tutor_base_url, selenium, student):
     """Test the previous question icon."""
     # GIVEN: Logged into Tutor as a student
@@ -391,6 +441,8 @@ def test_previous_question(tutor_base_url, selenium, student):
 
 @test_case('')
 @accounts
+@expected_failure
+@tutor
 def test_navigate_question(tutor_base_url, selenium, student):
     """Test the breadcrub of questions."""
     # GIVEN: Logged into Tutor as a student
@@ -409,6 +461,8 @@ def test_navigate_question(tutor_base_url, selenium, student):
 
 @test_case('')
 @accounts
+@expected_failure
+@tutor
 def test_user_performance_bar(tutor_base_url, selenium, student):
     """Test the user performance bar."""
     # GIVEN: Logged into Tutor as a studnet
@@ -425,6 +479,8 @@ def test_user_performance_bar(tutor_base_url, selenium, student):
 
 @test_case('')
 @accounts
+@expected_failure
+@tutor
 def test_performance_bar_question(tutor_base_url, selenium, student):
     """Test the performance bar questions."""
     # GIVEN: Logged into Tutor as a student
@@ -443,6 +499,8 @@ def test_performance_bar_question(tutor_base_url, selenium, student):
 
 @test_case('')
 @accounts
+@expected_failure
+@tutor
 def test_performance_bar_answer(tutor_base_url, selenium, student):
     """Test the performance bar answers."""
     # GIVEN: Logged into Tutor as a student
@@ -463,6 +521,8 @@ def test_performance_bar_answer(tutor_base_url, selenium, student):
 
 @test_case('')
 @accounts
+@expected_failure
+@tutor
 def test_performance_bar_submit(tutor_base_url, selenium, student):
     """Test the performance bar submit button."""
     # GIVEN: Logged on Tutor as a student
@@ -479,6 +539,8 @@ def test_performance_bar_submit(tutor_base_url, selenium, student):
 
 @test_case('')
 @accounts
+@expected_failure
+@tutor
 def test_performance_bar_assessment(tutor_base_url, selenium, student):
     """Test the performance bar assessment."""
     # GIVEN: Logged on Tutor as a student
@@ -499,6 +561,8 @@ def test_performance_bar_assessment(tutor_base_url, selenium, student):
 
 @test_case('')
 @accounts
+@expected_failure
+@tutor
 def test_performance_bar_feedback(tutor_base_url, selenium, student):
     """Test the performance bar feedback."""
     # GIVEN: Logged on Tutor as a student
@@ -517,6 +581,8 @@ def test_performance_bar_feedback(tutor_base_url, selenium, student):
 
 @test_case('')
 @accounts
+@expected_failure
+@tutor
 def test_performance_bar_breadcrumb(tutor_base_url, selenium, student):
     """Test the performance bar breadcrumb."""
     # GIVEN: Logged on Tutor as a student
@@ -536,6 +602,8 @@ def test_performance_bar_breadcrumb(tutor_base_url, selenium, student):
 
 @test_case('')
 @accounts
+@expected_failure
+@tutor
 def test_external_assignment_page(tutor_base_url, selenium, student):
     """Test the external assignment."""
     # GIVEN: Logged on Tutor as a student
@@ -551,6 +619,8 @@ def test_external_assignment_page(tutor_base_url, selenium, student):
 
 @test_case('')
 @accounts
+@expected_failure
+@tutor
 def test_external_assignment_direction(tutor_base_url, selenium, student):
     """Test the external assignment direction."""
     # GIVEN: Logged on Tutor as a student
@@ -568,6 +638,8 @@ def test_external_assignment_direction(tutor_base_url, selenium, student):
 
 @test_case('')
 @accounts
+@expected_failure
+@tutor
 def test_external_assignment_under_tab(tutor_base_url, selenium, student):
     """Test the external assignment through the tab on dashboard."""
     # GIVEN: Logged into Tutor as a student
@@ -586,6 +658,8 @@ def test_external_assignment_under_tab(tutor_base_url, selenium, student):
 
 @test_case('')
 @accounts
+@expected_failure
+@tutor
 def test_external_assignment_instruction(tutor_base_url, selenium, student):
     """Test the external assignment instructions."""
     # GIVEN: Logged into Tutor as a student
@@ -601,6 +675,8 @@ def test_external_assignment_instruction(tutor_base_url, selenium, student):
 
 @test_case('')
 @accounts
+@expected_failure
+@tutor
 def test_external_assignment_to_dashboard(tutor_base_url, selenium, student):
     """Test the external assignment to dashboard button."""
     # GIVEN: Logged into Tutor as a student
@@ -623,6 +699,8 @@ def test_external_assignment_to_dashboard(tutor_base_url, selenium, student):
 
 @test_case('')
 @accounts
+@expected_failure
+@tutor
 def test_clicked_external_assignment(tutor_base_url, selenium, student):
     """Test the link of external assignment."""
     # GIVEN: Logged into Tutor as a student
@@ -645,6 +723,8 @@ def test_clicked_external_assignment(tutor_base_url, selenium, student):
 
 @test_case('')
 @accounts
+@expected_failure
+@tutor
 def test_score_page(tutor_base_url, selenium, student):
     """Test the score page."""
     # GIVEN:  Logged into Tutor as a student
@@ -660,6 +740,8 @@ def test_score_page(tutor_base_url, selenium, student):
 
 @test_case('')
 @accounts
+@expected_failure
+@tutor
 def test_average_section(tutor_base_url, selenium, student):
     """Test the average section of the homework assignment."""
     # GIVEN:  Logged into Tutor as a student
@@ -679,6 +761,8 @@ def test_average_section(tutor_base_url, selenium, student):
 
 @test_case('')
 @accounts
+@expected_failure
+@tutor
 def test_change_student_id(tutor_base_url, selenium, student):
     """Test the changing student id."""
     # GIVEN: Logged into Tutor as a student
@@ -696,6 +780,8 @@ def test_change_student_id(tutor_base_url, selenium, student):
 
 @test_case('')
 @accounts
+@expected_failure
+@tutor
 def test_change_id_to_dashboard(tutor_base_url, selenium, student):
     """Test student can go back to dashnoard from changing id page."""
     # GIVEN: Logged into Tutor as a student
@@ -713,6 +799,8 @@ def test_change_id_to_dashboard(tutor_base_url, selenium, student):
 
 @test_case('')
 @accounts
+@expected_failure
+@tutor
 def test_save_student_id(tutor_base_url, selenium, student):
     """Test the changed student id is saved."""
     # GIVEN: Logged into Tutor as a student
@@ -732,6 +820,8 @@ def test_save_student_id(tutor_base_url, selenium, student):
 
 @test_case('')
 @accounts
+@expected_failure
+@tutor
 def test_performance_forcast(tutor_base_url, selenium, student):
     """Test the performance forcast."""
     # GIVEN: Logged into Tutor as a student
@@ -747,6 +837,8 @@ def test_performance_forcast(tutor_base_url, selenium, student):
 
 @test_case('')
 @accounts
+@expected_failure
+@tutor
 def test_performance_forcast_info_icon(tutor_base_url, selenium, student):
     """Test the performance forcast info icon."""
     # GIVEN: Logged into Tutor as a student
@@ -768,6 +860,8 @@ def test_performance_forcast_info_icon(tutor_base_url, selenium, student):
 
 @test_case('')
 @accounts
+@expected_failure
+@tutor
 def test_performance_color_key(tutor_base_url, selenium, student):
     """Test the performance color key."""
     # GIVEN: Logged into Tutor as a student
@@ -787,6 +881,8 @@ def test_performance_color_key(tutor_base_url, selenium, student):
 
 @test_case('')
 @accounts
+@expected_failure
+@tutor
 def test_return_to_dashboard_button(tutor_base_url, selenium, student):
     """Test the return to dashboard button."""
     # GIVEN: Logged into Tutor as a student
@@ -800,6 +896,8 @@ def test_return_to_dashboard_button(tutor_base_url, selenium, student):
 
 @test_case('')
 @accounts
+@expected_failure
+@tutor
 def test_performance_forcast_with_zero_question(
         tutor_base_url, selenium, student):
     """Test the performance forcast with zero questions."""
@@ -820,6 +918,8 @@ def test_performance_forcast_with_zero_question(
 
 @test_case('')
 @accounts
+@expected_failure
+@tutor
 def test_performance_forcast_weak_area(tutor_base_url, selenium, student):
     """Test the weak area of the performance forcast."""
     # GIVEN: Logged into Tutor as a student
@@ -841,6 +941,8 @@ def test_performance_forcast_weak_area(tutor_base_url, selenium, student):
 
 @test_case('')
 @accounts
+@expected_failure
+@tutor
 def test_performance_forcast_individual_section(
         tutor_base_url, selenium, student):
     """Test the individual sections of forcast."""
@@ -860,6 +962,8 @@ def test_performance_forcast_individual_section(
 
 @test_case('')
 @accounts
+@expected_failure
+@tutor
 def test_performance_forcast_chapter(tutor_base_url, selenium, student):
     """Test the performance forcast chapter bar."""
     # GIVEN: Logged into Tutor as a student
@@ -882,6 +986,8 @@ def test_performance_forcast_chapter(tutor_base_url, selenium, student):
 
 @test_case('')
 @accounts
+@expected_failure
+@tutor
 def test_performance_forcast_section_bar(tutor_base_url, selenium, student):
     """Test the performance forcast section bar."""
     # GIVEN: Logged into Tutor as a student
@@ -902,6 +1008,8 @@ def test_performance_forcast_section_bar(tutor_base_url, selenium, student):
 
 @test_case('')
 @accounts
+@expected_failure
+@tutor
 def test_performance_forcast_without_data(tutor_base_url, selenium, student):
     """Test the performance forcast individual section without enough data."""
     # GIVEN: Logged into Tutor as a student
@@ -920,6 +1028,8 @@ def test_performance_forcast_without_data(tutor_base_url, selenium, student):
 
 @test_case('')
 @accounts
+@expected_failure
+@tutor
 def test_performance_forcast_finished_assignment(
         tutor_base_url, selenium, student):
     """Test the performance forcast with finished assignment."""
@@ -937,6 +1047,8 @@ def test_performance_forcast_finished_assignment(
 
 @test_case('')
 @accounts
+@expected_failure
+@tutor
 def test_payment_option(tutor_base_url, selenium, student):
     """Test the tutor payment option section."""
     # GIVEN: Logged into Tutor as a student
@@ -953,6 +1065,8 @@ def test_payment_option(tutor_base_url, selenium, student):
 
 @test_case('')
 @accounts
+@expected_failure
+@tutor
 def test_course_payment(tutor_base_url, selenium, student):
     """Test the process of making payment for a course."""
     # GIVEN: Logged into Tutor as a student
@@ -971,6 +1085,8 @@ def test_course_payment(tutor_base_url, selenium, student):
 
 @test_case('')
 @accounts
+@expected_failure
+@tutor
 def test_invalid__card_payment(tutor_base_url, selenium, student):
     """Test the tutor invalid payment methods."""
     # GIVEN: Logged into Tutor as a student with newly enrolled paid course
@@ -989,6 +1105,8 @@ def test_invalid__card_payment(tutor_base_url, selenium, student):
 
 @test_case('')
 @accounts
+@expected_failure
+@tutor
 def test_unfilled_purchase(tutor_base_url, selenium, student):
     """Test the tutor assignment review."""
     # GIVEN: Logged into Tutor as a student
@@ -1002,6 +1120,8 @@ def test_unfilled_purchase(tutor_base_url, selenium, student):
 
 @test_case('')
 @accounts
+@expected_failure
+@tutor
 def test_join_trial_course(tutor_base_url, selenium, student):
     """Test the tutor 14 days trial."""
     # GIVEN: Logged into Tutor as a student with a expired trial course
@@ -1013,6 +1133,8 @@ def test_join_trial_course(tutor_base_url, selenium, student):
 
 @test_case('')
 @accounts
+@expected_failure
+@tutor
 def test_expired_course(tutor_base_url, selenium, student):
     """Test the expired course."""
     # GIVEN: Logged into Tutor as an student with a expired trial course
@@ -1024,6 +1146,8 @@ def test_expired_course(tutor_base_url, selenium, student):
 
 @test_case('')
 @accounts
+@expected_failure
+@tutor
 def test_access_user_course(tutor_base_url, selenium, student):
     """Test the access user"s course button."""
     # GIVEN: Logged into Tutor as a student with a free trial course
@@ -1037,6 +1161,8 @@ def test_access_user_course(tutor_base_url, selenium, student):
 
 @test_case('')
 @accounts
+@expected_failure
+@tutor
 def test_trial_course_access(tutor_base_url, selenium, student):
     """Test access to the trial course."""
     # GIVEN: Logged into Tutor as a student
@@ -1051,6 +1177,8 @@ def test_trial_course_access(tutor_base_url, selenium, student):
 
 @test_case('')
 @accounts
+@expected_failure
+@tutor
 def test_enrollment_url(tutor_base_url, selenium, student):
     """Test the enrollment url for the student and the teacher works."""
     # GIVEN:  Logged into Tutor as teacher that has paid course
@@ -1070,6 +1198,8 @@ def test_enrollment_url(tutor_base_url, selenium, student):
 
 @test_case('')
 @accounts
+@expected_failure
+@tutor
 def test_free_trial_nag(tutor_base_url, selenium, student):
     """Test the tutor assignment review."""
     # GIVEN: Logged into Tutor as a student
@@ -1083,6 +1213,8 @@ def test_free_trial_nag(tutor_base_url, selenium, student):
 
 @test_case('')
 @accounts
+@expected_failure
+@tutor
 def test_full_access_to_trial(tutor_base_url, selenium, student):
     """Test the full trial payment from trial."""
     # GIVEN: Logged into Tutor as a student
@@ -1098,6 +1230,8 @@ def test_full_access_to_trial(tutor_base_url, selenium, student):
 
 @test_case('')
 @accounts
+@expected_failure
+@tutor
 def test_free_trial_tag_disappear(tutor_base_url, selenium, student):
     """Test the free trial tag disappearing."""
     # GIVEN: Logged into Tutor as a student
@@ -1113,6 +1247,8 @@ def test_free_trial_tag_disappear(tutor_base_url, selenium, student):
 
 @test_case('')
 @accounts
+@expected_failure
+@tutor
 def test_not_payed_course_skip_payment(tutor_base_url, selenium, student):
     """Test that course not payed skips the payment section."""
     # GIVEN:  Logged into tutor as a student
@@ -1126,6 +1262,8 @@ def test_not_payed_course_skip_payment(tutor_base_url, selenium, student):
 
 @test_case('')
 @accounts
+@expected_failure
+@tutor
 def test_buy_free_trial(tutor_base_url, selenium, student):
     """Test buying a course from free trial."""
     # GIVEN: Logged into Tutor as a student
@@ -1143,6 +1281,8 @@ def test_buy_free_trial(tutor_base_url, selenium, student):
 
 @test_case('')
 @accounts
+@expected_failure
+@tutor
 def test_teacher_dashboard(tutor_base_url, selenium, teacher):
     """Test the teacher dashboard."""
     # GIVEN: Logged into Tutor as a teacher
@@ -1155,6 +1295,8 @@ def test_teacher_dashboard(tutor_base_url, selenium, teacher):
 
 @test_case('')
 @accounts
+@expected_failure
+@tutor
 def test_preview_course(tutor_base_url, selenium, teacher):
     """Test the preview course section."""
     # GIVEN: Logged into Tutor as a teacher
@@ -1166,6 +1308,8 @@ def test_preview_course(tutor_base_url, selenium, teacher):
 
 @test_case('')
 @accounts
+@expected_failure
+@tutor
 def test_copy_course_page(tutor_base_url, selenium, teacher):
     """Test the copy course page."""
     # GIVEN: Logged into Tutor as a teacher
@@ -1181,6 +1325,8 @@ def test_copy_course_page(tutor_base_url, selenium, teacher):
 
 @test_case('')
 @accounts
+@expected_failure
+@tutor
 def test_roster_period_page(tutor_base_url, selenium, teacher):
     """Test the roster period in preview course."""
     # GIVEN: Logged into Tutor as a teacher
@@ -1201,6 +1347,8 @@ def test_roster_period_page(tutor_base_url, selenium, teacher):
 
 @test_case('')
 @accounts
+@expected_failure
+@tutor
 def test_preview_calendar(tutor_base_url, selenium, teacher):
     """Test the preview course calendar's assignment samples."""
     # GIVEN: Logged into Tutor as a teacher
@@ -1215,6 +1363,8 @@ def test_preview_calendar(tutor_base_url, selenium, teacher):
 
 @test_case('')
 @accounts
+@expected_failure
+@tutor
 def test_add_reading(tutor_base_url, selenium, teacher):
     """Test the adding reading assignment."""
     # GIVEN: Logged into Tutor as a teacher
@@ -1237,6 +1387,8 @@ def test_add_reading(tutor_base_url, selenium, teacher):
 
 @test_case('')
 @accounts
+@expected_failure
+@tutor
 def test_adding_reading_draft(tutor_base_url, selenium, teacher):
     """Test adding the reading draft to dashboard."""
     # GIVEN: Logged into Tutor as a teacher
@@ -1260,6 +1412,8 @@ def test_adding_reading_draft(tutor_base_url, selenium, teacher):
 
 @test_case('')
 @accounts
+@expected_failure
+@tutor
 def test_edit_published_reading(tutor_base_url, selenium, teacher):
     """Test editting the published reading."""
     # GIVEN: Logged into Tutor as a teacher
@@ -1282,6 +1436,8 @@ def test_edit_published_reading(tutor_base_url, selenium, teacher):
 
 @test_case('')
 @accounts
+@expected_failure
+@tutor
 def test_publish_reading_draft(tutor_base_url, selenium, teacher):
     """Test editting the reading draft and publish."""
     # GIVEN: Logged into Tutor as a teacher
@@ -1304,6 +1460,8 @@ def test_publish_reading_draft(tutor_base_url, selenium, teacher):
 
 @test_case('')
 @accounts
+@expected_failure
+@tutor
 def test_cancel_reading_edits(tutor_base_url, selenium, teacher):
     """Test cancelling reading assignments edits."""
     # GIVEN: Logged into Tutor as a teacher
@@ -1325,6 +1483,8 @@ def test_cancel_reading_edits(tutor_base_url, selenium, teacher):
 
 @test_case('')
 @accounts
+@expected_failure
+@tutor
 def test_cancel_reading_draft(tutor_base_url, selenium, teacher):
     """Test cancelling reading draft edits."""
     # GIVEN: Logged into Tutor as a teacher
@@ -1346,6 +1506,8 @@ def test_cancel_reading_draft(tutor_base_url, selenium, teacher):
 
 @test_case('')
 @accounts
+@expected_failure
+@tutor
 def test_delete_published_reading(tutor_base_url, selenium, teacher):
     """Test the deleting the published reading."""
     # GIVEN: Logged into Tutor as a teacher
@@ -1365,6 +1527,8 @@ def test_delete_published_reading(tutor_base_url, selenium, teacher):
 
 @test_case('')
 @accounts
+@expected_failure
+@tutor
 def test_delete_reading_draft(tutor_base_url, selenium, teacher):
     """Test deleting the reading draft."""
     # GIVEN: Logged into Tutor as a teacher
@@ -1384,6 +1548,8 @@ def test_delete_reading_draft(tutor_base_url, selenium, teacher):
 
 @test_case('')
 @accounts
+@expected_failure
+@tutor
 def test_see_what_student_see(tutor_base_url, selenium, teacher):
     """Test the see what student see button."""
     # GIVEN: Logged into Tutor as a teacher
@@ -1401,6 +1567,8 @@ def test_see_what_student_see(tutor_base_url, selenium, teacher):
 
 @test_case('')
 @accounts
+@expected_failure
+@tutor
 def test_add_homework(tutor_base_url, selenium, teacher):
     """Test adding homework to a course."""
     # GIVEN: Logged into Tutor as a teacher
@@ -1418,6 +1586,8 @@ def test_add_homework(tutor_base_url, selenium, teacher):
 
 @test_case('')
 @accounts
+@expected_failure
+@tutor
 def test_add_homework_draft(tutor_base_url, selenium, teacher):
     """Test addomg homework draft to a course."""
     # GIVEN: Logged into Tutor as a teacher
@@ -1436,6 +1606,8 @@ def test_add_homework_draft(tutor_base_url, selenium, teacher):
 
 @test_case('')
 @accounts
+@expected_failure
+@tutor
 def test_publish_existing_unopened_homework(tutor_base_url, selenium, teacher):
     """Test publishing existing unopened homework."""
     # GIVEN: Logged into Tutor as a teacher
