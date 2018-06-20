@@ -1,4 +1,4 @@
-"""Test case for tutor page student interaction and activities."""
+"""Test case for tutor page student payment interaction."""
 
 from tests.markers import expected_failure, nondestructive, test_case, tutor
 

@@ -1,4 +1,4 @@
-"""Test case for homework logged in as teacher."""
+"""Test case for creating, editting, deleting the homework."""
 
 from tests.markers import expected_failure, test_case, tutor
 

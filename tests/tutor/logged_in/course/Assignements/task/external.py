@@ -1,4 +1,4 @@
-"""Test case for tutor page student interaction and activities."""
+"""Test case for external assignment interaction and activities."""
 
 from tests.markers import accounts, expected_failure, test_case, tutor
 

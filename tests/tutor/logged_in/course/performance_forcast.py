@@ -1,4 +1,4 @@
-"""Test case for tutor page student interaction and activities."""
+"""Test cases for performance forcast functionality."""
 
 from tests.markers import expected_failure, test_case, tutor
 
