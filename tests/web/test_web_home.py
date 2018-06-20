@@ -1,6 +1,6 @@
 """Tests for the OpenStax home webpage."""
 
-from tests.markers import expected_failure, test_case, web
+from tests.markers import expected_failure, nondestructive, test_case, web
 
 
 @test_case()
@@ -554,3 +554,17 @@ def test_explore_subjects(web_base_url, selenium):
     # GIVEN: On the OpenStax homepage
     # WHEN:  Click "Explore All subjects"
     # THEN: Textbooks of all subjects should be displayed
+
+
+@test_case('')
+@expected_failure
+@nondestructive
+@web
+def test_view_home(web_base_url, selenium):
+    """Tests ability view homepage from other pages."""
+    # GIVEN: On the OpenStax homepage.
+
+    # WHEN: Click "About Us".
+    # AND: Click the OpenStax logo on the upper left corner.
+
+    # THEN: On homepage.

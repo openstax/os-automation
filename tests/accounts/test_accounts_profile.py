@@ -46,16 +46,21 @@ def test_admin_profile(accounts_base_url, admin, selenium):
 @accounts
 def test_name_get_properties(accounts_base_url, selenium, student):
     """Test the getter methods for the name segments."""
+    # GIVEN: A logged in student user
     page = Profile(selenium, accounts_base_url).open()
     page.log_in(*student)
-    assert(page.logged_in), 'User is not logged in'
-    name = page.name.full_name()
+
+    # WHEN: We request the user's full name
+    # AND: We request the user's title, first name, surname and suffix
+    name = page.name.full_name
     page.name.open()
     getters = [
         page.name.title,
         page.name.first_name,
         page.name.last_name,
         page.name.suffix]
+
+    # THEN: The user's full name should match the various name parts
     assert(name == ' '.join(getters).strip()), \
         'Names do not match'
 
@@ -64,32 +69,34 @@ def test_name_get_properties(accounts_base_url, selenium, student):
 @accounts
 def test_profile_name_field(accounts_base_url, selenium, student):
     """Test the user's name field."""
-    # setup
+    # GIVEN: A logged in student user
     page = Profile(selenium, accounts_base_url).open()
     page.log_in(*student)
-    assert(page.logged_in), 'User is not logged in'
-    # at profile, store original values
-    page.name.open()
     name = page.name.get_name_parts()
-    page.name.cancel()
+
+    # WHEN: The user changes their name
     new_name = Utility.random_name()
-    # set new values
     page.name.open()
-    page.name.title = new_name[0]
-    page.name.first_name = new_name[1]
-    page.name.last_name = new_name[2]
-    page.name.suffix = new_name[3]
+    page.name.title = new_name[page.name.TITLE]
+    page.name.first_name = new_name[page.name.FIRST]
+    page.name.last_name = new_name[page.name.LAST]
+    page.name.suffix = new_name[page.name.SUFFIX]
     page.name.confirm()
-    assert(page.name.full_name() == ' '.join(new_name).strip()), \
+
+    # THEN: The user's name is changed
+    assert(page.name.full_name == ' '.join(new_name).strip()), \
         'Names do not match'
-    # reset the fields to the original values
+
+    # WHEN: The user resets their name
     page.name.open()
-    page.name.title = name[0]
-    page.name.first_name = name[1]
-    page.name.last_name = name[2]
-    page.name.suffix = name[3]
+    page.name.title = name[page.name.TITLE]
+    page.name.first_name = name[page.name.FIRST]
+    page.name.last_name = name[page.name.LAST]
+    page.name.suffix = name[page.name.SUFFIX]
     page.name.confirm()
-    assert(page.name.full_name() == ' '.join(name).strip()), \
+
+    # THEN: The user's name is reset
+    assert(page.name.full_name == ' '.join(name).strip()), \
         'Names do not match'
 
 
@@ -117,26 +124,37 @@ def test_profile_username_field(accounts_base_url, selenium, student):
 @accounts
 def test_profile_email_fields(accounts_base_url, selenium, student):
     """Test the user's email fields."""
-    # setup
-    page = Profile(selenium, base_url).open()
+    # GIVEN: A logged in student
+    page = Profile(selenium, accounts_base_url).open()
     page.log_in(*student)
-    assert(page.logged_in), 'User is not logged in'
-    # add a new email
-    prelen = len(page.emails.emails)
-    page.emails.add_email()
-    pastlen = len(page.emails.emails)
-    assert (pastlen == prelen + 1), "Email is not added properly"
-    # delete the new email added
+
+    # WHEN: The student adds a new email to the account
+    initial_email_count = len(page.emails.emails)
+    name = page.name.get_name_parts()
+    fake_email = Utility.fake_email(name[page.name.FIRST],
+                                    name[page.name.LAST])
+    page.emails.add_email(fake_email)
+    emails_after_add = len(page.emails.emails)
+
+    # THEN: The new email is attached to the account
+    assert(emails_after_add == initial_email_count + 1), \
+        "Email was not added"
+
+    # WHEN: The new email is deleted
     email = page.emails.emails[-1]
     email.delete()
-    finallen = len(page.emails.emails)
-    assert (pastlen == finallen + 1), "Email is not deleted properly"
+    final_email_count = len(page.emails.emails)
+
+    # THEN: The email is removed from the account
+    assert(final_email_count == initial_email_count), \
+        "Email did not deleted properly"
 
 
 @test_case('C195554')
 @expected_failure
 @accounts
-def test_verify_an_existing_unverified_email(accounts_base_url, selenium, student):
+def test_verify_an_existing_unverified_email(accounts_base_url, selenium,
+                                             student):
     """Test the user email verification process."""
     # GIVEN the user is valid and has a existing unverified email
     page = GuerrillaMail(selenium).open()
@@ -166,7 +184,7 @@ def test_verify_an_existing_unverified_email(accounts_base_url, selenium, studen
     new_email = page.emails.emails.pop()
     assert new_email.is_confirmed, "The email isn't verified"
 
-    
+
 @test_case('C195553')
 @accounts
 def test_add_a_verified_email(accounts_base_url, selenium, student):
@@ -177,7 +195,7 @@ def test_add_a_verified_email(accounts_base_url, selenium, student):
     page = GuerrillaMail(selenium).open()
     email = page.header.email
     assert email is not None, "Didn't get guerrilla email"
-    page = Profile(page.driver).open()
+    page = Profile(page.driver, accounts_base_url).open()
     page.log_in(*student)
     page.emails.add_email(email)
 
@@ -193,23 +211,25 @@ def test_add_a_verified_email(accounts_base_url, selenium, student):
     assert 'openstax.org/confirm?' in selenium.current_url
 
     # THEN the email should appear as confirmed
-    page = Profile(page.driver).open()
+    page = Profile(page.driver, accounts_base_url).open()
     new_email = page.emails.emails.pop()
     assert new_email.is_confirmed, "The email isn't verified"
 
-    
+
 @test_case('C195555')
 @accounts
 @social
-def test_profile_login_using_google(accounts_base_url, google, selenium, student):
+def test_profile_login_using_google(accounts_base_url, google, selenium,
+                                    student):
     """Test the Gmail login method."""
-    # GIVEN the user had added Google as an alternative login method and is not logged in
+    # GIVEN the user had added Google as an alternative login method
+    # AND the user is not logged in
     page = Profile(selenium, accounts_base_url).open()
     assert(not page.logged_in), 'Already logged in'
-    
+
     # WHEN the user logs into OpenStax through a Google account
     page.login.google_login(student[0], *google)
-    
+
     # THEN the user is logged in
     assert (page.logged_in), 'Failed to login with google'
 
@@ -217,25 +237,76 @@ def test_profile_login_using_google(accounts_base_url, google, selenium, student
 @test_case('C195556')
 @accounts
 @social
-def test_profile_login_using_facebook(accounts_base_url, facebook, selenium, student):
+def test_profile_login_using_facebook(accounts_base_url, facebook, selenium,
+                                      student):
     """Test the Facebook login method."""
-    # GIVEN the user had added Facebook as an alternative login method and is not logged in
+    # GIVEN the user had added Facebook as an alternative login method
+    # AND the user is not logged in
     page = Profile(selenium, accounts_base_url).open()
     assert(not page.logged_in), 'Already logged in'
-    
+
     # WHEN the user logs into OpenStax through a Facebook account
     page.login.facebook_login(student[0], *facebook)
-    
-    # THEN the user is logged in 
+
+    # THEN the user is logged in
     assert (page.logged_in), 'Failed to login with facebook'
 
 
 @test_case('C195557')
 @nondestructive
-@expected_failure
 @accounts
-def test_admin_pop_up_console(accounts_base_url, selenium):
+def test_admin_pop_up_console(accounts_base_url, admin, selenium):
     """Test the pop up console."""
+    page = Profile(selenium, accounts_base_url).open()
+    assert(not page.logged_in), 'Active user session unexpected'
+    page.log_in(*admin)
+    assert(page.logged_in), 'User "{0}" not logged in'.format(admin[0])
+    assert(page.is_admin), 'User is not an administrator'
+    assert(page.has_username), 'No username found'
+
+    popup = page.open_popup_console()
+    popup.links.go_to_security_log()
+    assert("security_log" in selenium.current_url)
+
+    selenium.back()
+    popup = page.open_popup_console()
+    popup.links.go_to_oauth_application()
+    assert("applications" in selenium.current_url)
+
+    selenium.back()
+    popup = page.open_popup_console()
+    popup.links.go_to_fineprint()
+    assert("print" in selenium.current_url)
+
+    selenium.back()
+    popup = page.open_popup_console()
+    popup.links.go_to_api()
+    assert("api/docs/v1" in selenium.current_url)
+
+    selenium.back()
+    popup = page.open_popup_console()
+    popup.full_console()
+    assert("admin/console" in selenium.current_url)
+
+    selenium.back()
+    popup = page.open_popup_console()
+    result = popup.users.search_for("teacher")
+    assert(len(result[0].find_data()) == 7)
+    assert(result[10].id.isdigit())
+    assert(not result[10].is_test)
+
+    result[10].edit()
+    assert("edit" in selenium.current_url)
+    page.driver.switch_to_window(page.driver.window_handles[0])
+
+    result[10].username_link
+    assert("security_log" in selenium.current_url)
+
+    selenium.back()
+    popup = page.open_popup_console()
+    result = popup.users.search_for("teacher")
+    result[10].sign_in_as()
+    assert(not page.is_admin), 'User should not be an administrator'
 
 
 @test_case('C195558')
@@ -249,10 +320,10 @@ def test_go_to_full_console(accounts_base_url, admin, selenium):
     page.log_in(*admin)
     assert(page.logged_in), 'User is not logged in'
     assert(page.is_admin), 'User is not an administrator'
-    
+
     # WHEN the user clicks the full console
     page.open_full_console()
-    
+
     # THEN the user is routed to the full console page
     assert('/admin/console' in selenium.current_url), \
         'Not at the Full Admin Console page'
