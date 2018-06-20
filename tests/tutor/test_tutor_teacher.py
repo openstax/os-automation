@@ -1,20 +1,20 @@
 """Test the Tutor teacher functions."""
 
-from tests.markers import nondestructive, test_case, tutor, expected_failure
+from tests.markers import expected_failure, nondestructive, test_case, tutor
 
 
 @expected_failure
 @test_case('')
 @tutor
 def test_edit_an_unopened_homework(tutor_base_url, selenium, teacher):
-    """Edit an unopened homework as teacher."""
+    """Edit an unopened homework."""
     # GIVEN: Logged into Tutor as a teacher
     # AND: Has an existing course with an open homework
 
     # WHEN: Go to a course with unopened homework
     # AND: Click on an unopened homework
     # AND: Change all the required fields
-    # AND: Click “publish"
+    # AND: Click "publish"
 
     # THEN: User is taken back to the Calendar
     # AND: The edits should be saved
@@ -24,7 +24,7 @@ def test_edit_an_unopened_homework(tutor_base_url, selenium, teacher):
 @test_case('')
 @tutor
 def test_edit_an_opened_homework(tutor_base_url, selenium, teacher):
-    """Edit an opened homework as teacher."""
+    """Edit an opened homework."""
     # GIVEN: Logged into Tutor as a teacher
     # AND: Has an existing course with an open homework
 
@@ -37,11 +37,12 @@ def test_edit_an_opened_homework(tutor_base_url, selenium, teacher):
     # AND: The edits should be saved
 
 
+@expected_failure
+@nondestructive
 @test_case('')
 @tutor
-@nondestructive
 def test_cancel_edit_homework(tutor_base_url, selenium, teacher):
-    """Cancel editing a published homework as teacher."""
+    """Cancel editing a published homework."""
     # GIVEN: Logged into Tutor as a teacher
     # AND: Has an existing course with an published homework
 
@@ -55,11 +56,11 @@ def test_cancel_edit_homework(tutor_base_url, selenium, teacher):
 
 
 @expected_failure
+@nondestructive
 @test_case('')
 @tutor
-@nondestructive
 def test_cancel_edit_draft(tutor_base_url, selenium, teacher):
-    """Cancel editing a published homework draft as teacher."""
+    """Cancel editing a published homework draft."""
     # GIVEN: Logged into Tutor as a teacher
     # AND: has an existing homework draft
 
@@ -76,7 +77,7 @@ def test_cancel_edit_draft(tutor_base_url, selenium, teacher):
 @test_case('')
 @tutor
 def test_delete_an_opened_homework(tutor_base_url, selenium, teacher):
-    """Delete an opened homework as teacher."""
+    """Delete an opened homework."""
     # GIVEN: Logged into Tutor as a teacher
     # AND: Has an existing course with an opened homework
 
@@ -93,7 +94,7 @@ def test_delete_an_opened_homework(tutor_base_url, selenium, teacher):
 @test_case('')
 @tutor
 def test_delete_an_unopened_homework(tutor_base_url, selenium, teacher):
-    """Delete an unopened homework as teacher."""
+    """Delete an unopened homework."""
     # GIVEN: Logged into Tutor as a teacher
     # AND: Has an existing course with an unopened homework
 
@@ -110,7 +111,7 @@ def test_delete_an_unopened_homework(tutor_base_url, selenium, teacher):
 @test_case('')
 @tutor
 def test_delete_a_homework_draft(tutor_base_url, selenium, teacher):
-    """Delete an homework draft as teacher."""
+    """Delete an homework draft."""
     # GIVEN: Logged into Tutor as a teacher
     # AND: Has an existing course with a homework draft
 
@@ -140,11 +141,11 @@ def test_edit_a_homework_draft(tutor_base_url, selenium, teacher):
 
 
 @expected_failure
+@nondestructive
 @test_case('')
 @tutor
-@nondestructive
 def test_see_what_students_see_button(tutor_base_url, selenium, teacher):
-    """Test visibility of "see what student can see" button."""
+    """Test visibility of 'see what student can see' button."""
     # GIVEN: Logged into Tutor as a teacher
     # AND: Has an existing course with a reading or homework
 
@@ -158,7 +159,7 @@ def test_see_what_students_see_button(tutor_base_url, selenium, teacher):
 @test_case('')
 @tutor
 def test_publish_an_external_assignment(tutor_base_url, selenium, teacher):
-    """Publish an external assignment as teacher."""
+    """Publish an external assignment."""
     # GIVEN: Logged into Tutor as a teacher
 
     # WHEN: click a date on the dashboard, then click "add external assignment"
@@ -173,7 +174,7 @@ def test_publish_an_external_assignment(tutor_base_url, selenium, teacher):
 @test_case('')
 @tutor
 def test_save_external_assignment_as_draft(tutor_base_url, selenium, teacher):
-    """Save an external assignment draft as teacher."""
+    """Save an external assignment draft."""
     # GIVEN: Logged into Tutor as a teacher
     # AND: Has an existing course
 
@@ -189,7 +190,7 @@ def test_save_external_assignment_as_draft(tutor_base_url, selenium, teacher):
 @test_case('')
 @tutor
 def test_edit_an_external_assignment(tutor_base_url, selenium, teacher):
-    """Edit an external assignment as teacher."""
+    """Edit an external assignment."""
     # GIVEN: Logged into Tutor as a teacher
     # AND: Has an existing course with an external assignment
 
@@ -206,29 +207,29 @@ def test_edit_an_external_assignment(tutor_base_url, selenium, teacher):
 @test_case('')
 @tutor
 def test_edit_an_external_draft(tutor_base_url, selenium, teacher):
-    """Edit an external assignment draft as teacher."""
+    """Edit an external assignment draft."""
     # GIVEN: Logged into Tutor as a teacher
     # AND: Has an existing course with a draft external assignment
 
     # WHEN: Click on an external assignment draft
     # AND: Change all the required fields
-    # AND: Click “publish"
+    # AND: Click "publish"
 
     # THEN: User is taken back to the Calender
-    # AND: Edited draft is published"
+    # AND: Edited draft is published
 
 
 @expected_failure
 @test_case('')
 @tutor
 def test_delete_an_external_assignment(tutor_base_url, selenium, teacher):
-    """Delete an external assignment as teacher."""
+    """Delete an external assignment."""
     # GIVEN: Logged into Tutor as a teacher
     # AND: Has an existing course with an external assignment
 
     # WHEN: Go to the course with external assignment
     # AND: Click on an external assignment
-    # AND: Click “delete""
+    # AND: Click “delete"
 
     # THEN: User is taken back to the Calender
     # AND: The external assignment is no longer visible on the calendar"
@@ -238,7 +239,7 @@ def test_delete_an_external_assignment(tutor_base_url, selenium, teacher):
 @test_case('')
 @tutor
 def test_delete_an_external_draft(tutor_base_url, selenium, teacher):
-    """Delete an external assignment draft as teacher."""
+    """Delete an external assignment draft."""
     # GIVEN: Logged into Tutor as a teacher
     # AND: Has an existing course with a draft external assignment
 
@@ -251,28 +252,28 @@ def test_delete_an_external_draft(tutor_base_url, selenium, teacher):
 
 
 @expected_failure
+@nondestructive
 @test_case('')
 @tutor
-@nondestructive
 def test_cancel_edit_external_assignment(tutor_base_url, selenium, teacher):
-    """Cancel editing an external assignment as teacher."""
+    """Cancel editing an external assignment."""
     # GIVEN: Logged into Tutor as a teacher
     # AND: Has an existing course with an external assignment
 
     # WHEN: Click on an external assignment.
     # AND: Change all the required fields
-    # AND: Click “cancel""
+    # AND: Click “cancel"
 
     # THEN: User is taken back to the Calender
     # AND: No changes should be made on the assignment
 
 
 @expected_failure
+@nondestructive
 @test_case('')
 @tutor
-@nondestructive
 def test_cancel_edit_an_external_draft(tutor_base_url, selenium, teacher):
-    """Cancel editing an external assignment draft as teacher."""
+    """Cancel editing an external assignment draft."""
     # GIVEN: Logged into Tutor as a teacher
     # AND: Has an existing course with an external assignment draft
 
@@ -285,12 +286,12 @@ def test_cancel_edit_an_external_draft(tutor_base_url, selenium, teacher):
 
 
 @expected_failure
+@nondestructive
 @test_case('')
 @tutor
-@nondestructive
 def test_add_external_assignment_with_empty_fields(tutor_base_url, selenium,
                                                    teacher):
-    """Cancel editing an external assignment as teacher."""
+    """Cancel editing an external assignment."""
     # GIVEN: Logged into Tutor as a teacher
     # AND: Has an existing course
 
@@ -305,13 +306,13 @@ def test_add_external_assignment_with_empty_fields(tutor_base_url, selenium,
 @test_case('')
 @tutor
 def test_add_a_new_event(tutor_base_url, selenium, teacher):
-    """Add a new event as teacher."""
+    """Add a new event."""
     # GIVEN: Logged into Tutor as a teacher
     # AND: Has an existing course
 
     # WHEN: Go to the course page
     # AND: Click on a date on the dashboard
-    # AND: Click ""add event""
+    # AND: Click "add event"
     # AND: Fill in all the required fields
     # AND: click "Publish"
 
@@ -323,11 +324,11 @@ def test_add_a_new_event(tutor_base_url, selenium, teacher):
 @test_case('')
 @tutor
 def test_save_an_event_draft(tutor_base_url, selenium, teacher):
-    """Saving a draft event as teacher."""
+    """Saving a draft event."""
     # GIVEN: Logged into Tutor as a teacher
     # AND: Has an existing course
 
-    # WHEN: click on a date on the dashboard, then click ""add event""
+    # WHEN: click on a date on the dashboard, then click "add event"
     # AND: fill in all the required fields
     # AND: click "Save as Draft"
 
@@ -339,7 +340,7 @@ def test_save_an_event_draft(tutor_base_url, selenium, teacher):
 @test_case('')
 @tutor
 def test_edit_a_published_event(tutor_base_url, selenium, teacher):
-    """Edit a published event as teacher."""
+    """Edit a published event."""
     # GIVEN: Logged into Tutor as a teacher
     # AND: Has an existing course
     # AND: Has an published event
@@ -356,50 +357,50 @@ def test_edit_a_published_event(tutor_base_url, selenium, teacher):
 @test_case('')
 @tutor
 def test_edit_an_event_draft(tutor_base_url, selenium, teacher):
-    """Edit an draft event as teacher."""
+    """Edit an draft event."""
     # GIVEN: Logged into Tutor as a teacher
     # AND: Has an existing course
     # AND: Has an draft event
 
     # WHEN: Click on  event draft
     # AND: Change all the required fields
-    # AND: Click “Publish""
+    # AND: Click "Publish"
 
     # THEN: User is taken back to the Calender
     # AND: The event draft should be visible on the calendar with updated info
 
 
 @expected_failure
+@nondestructive
 @test_case('')
 @tutor
-@nondestructive
 def test_cancel_edit_a_draft(tutor_base_url, selenium, teacher):
-    """Cancel editing a draft event as teacher."""
+    """Cancel editing a draft event."""
     # GIVEN: Logged into Tutor as a teacher
     # AND: Has an existing course
     # AND: Has an draft event
 
     # WHEN: Click on  event draft
     # AND: Change all the required fields
-    # AND: Click “Cancel""
+    # AND: Click "Cancel"
 
     # THEN: User is taken back to the Calender
     # AND: No changes should be made on the draft
 
 
 @expected_failure
+@nondestructive
 @test_case('')
 @tutor
-@nondestructive
 def test_cancel_edit_a_published_event(tutor_base_url, selenium, teacher):
-    """Cancel editing a published event as teacher."""
+    """Cancel editing a published event."""
     # GIVEN: Logged into Tutor as a teacher
     # AND: Has an existing course
     # AND: Has an published event
 
     # WHEN: Click on  published event
     # AND: Change all the required fields
-    # AND: Click “Cancel""
+    # AND: Click "Cancel"
 
     # THEN: User is taken back to the Calender
     # AND: No changes should be made on the event
@@ -409,7 +410,7 @@ def test_cancel_edit_a_published_event(tutor_base_url, selenium, teacher):
 @test_case('')
 @tutor
 def test_delete_a_published_event(tutor_base_url, selenium, teacher):
-    """Delete a published event as teacher."""
+    """Delete a published event."""
     # GIVEN: Logged into Tutor as a teacher
     # AND: Has an existing course
     # AND: Has an published event
@@ -425,39 +426,39 @@ def test_delete_a_published_event(tutor_base_url, selenium, teacher):
 @test_case('')
 @tutor
 def test_delete_an_event_draft(tutor_base_url, selenium, teacher):
-    """Delete a draft event as teacher."""
+    """Delete a draft event."""
     # GIVEN: Logged into Tutor as a teacher
     # AND: Has an existing course
     # AND: Has an draft event
 
     # WHEN: Click on draft event
-    # AND: Click ""Delete""
+    # AND: Click "Delete"
 
     # THEN: User is taken back to the Calender
     # AND: The deleted event draft should no longer be visible
 
 
 @expected_failure
+@nondestructive
 @test_case('')
 @tutor
-@nondestructive
 def test_view_student_scores(tutor_base_url, selenium, teacher):
-    """View student scores as teacher."""
+    """View student scores."""
     # GIVEN: Logged into Tutor as a teacher
     # AND: Has an existing course
 
-    # WHEN: Click on the ""Student Scores"" button
+    # WHEN: Click on the "Student Scores" button
     # AND: Click on the tab for the desired period
 
-    # THEN: Scores for selected period are displayed in a table"
+    # THEN: Scores for selected period are displayed in a table
 
 
 @expected_failure
+@nondestructive
 @test_case('')
 @tutor
-@nondestructive
 def test_section_tab(tutor_base_url, selenium, teacher):
-    """Switch to view different sections of student scores as teacher."""
+    """Switch to view different sections of student scores."""
     # GIVEN: Logged into Tutor as a teacher
     # AND: Has an existing course with more than one sections
 
@@ -467,29 +468,29 @@ def test_section_tab(tutor_base_url, selenium, teacher):
 
 
 @expected_failure
+@nondestructive
 @test_case('')
 @tutor
-@nondestructive
 def test_switch_between_score_representation(
         tutor_base_url, selenium, teacher):
-    """Switch to view different representations of scores as teacher."""
+    """Switch to view different representations of scores."""
     # GIVEN: Logged into Tutor as a teacher
     # AND: Has an existing course
 
     # WHEN: Click on a course
     # AND: Go to student scores
-    # AND: switch between ""display as: %/#""
+    # AND: switch between "display as: %/#"
 
     # THEN: The representation of score representation change accordingly
 
 
 @expected_failure
+@nondestructive
 @test_case('')
 @tutor
-@nondestructive
 def test_download_spreadsheet_of_class_score(
         tutor_base_url, selenium, teacher):
-    """Download class scores as a spreadsheet as teacher."""
+    """Download class scores as a spreadsheet."""
     # GIVEN: Logged into Tutor as a teacher
     # AND: Has an existing course
 
@@ -499,13 +500,13 @@ def test_download_spreadsheet_of_class_score(
     # AND: Select destination for saved spreadsheet in the pop up
     # AND: Click on the "Save" Button on the pop up
 
-    # THEN: Spreadsheet of scores is saved as an xlsx file"
+    # THEN: Spreadsheet of scores is saved as an xlsx file
 
 
 @expected_failure
+@nondestructive
 @test_case('')
 @tutor
-@nondestructive
 def test_view_performance_forecast_for_single_student(tutor_base_url, selenium,
                                                       teacher):
     """View performance forecast for a single student from score page."""
@@ -513,34 +514,34 @@ def test_view_performance_forecast_for_single_student(tutor_base_url, selenium,
     # AND: Has an existing course
 
     # WHEN: Click on a course
-    # AND: Click on the ""Student Scores"" button
+    # AND: Click on the "Student Scores" button
     # AND: Click on the name of selected student
 
     # THEN: Performance Forecast for selected student is displayed
 
 
 @expected_failure
+@nondestructive
 @test_case('')
 @tutor
-@nondestructive
 def test_sort_the_student_list_by_last_name(tutor_base_url, selenium, teacher):
-    """Sort student by last name in the score page as teacher."""
+    """Sort student by last name in the score page."""
     # GIVEN: Logged into Tutor as a teacher
     # AND: Has an existing course
     # AND: Has at least two students
 
     # WHEN: Click on a course
-    # AND: Click on the ""Student Scores"" button
-    # AND: Click on ""Name and Student ID"" on the table
-    # AND: Click on ""Name and Student ID"" on the table again
+    # AND: Click on the "Student Scores" button
+    # AND: Click on "Name and Student ID" on the table
+    # AND: Click on "Name and Student ID" on the table again
 
     # THEN: The students are sorted alphabetically by last name.
 
 
 @expected_failure
+@nondestructive
 @test_case('')
 @tutor
-@nondestructive
 def test_sort_score_by_assignment_completion(tutor_base_url, selenium,
                                              teacher):
     """Sort student by completion of an assignment in the score page."""
@@ -557,9 +558,9 @@ def test_sort_score_by_assignment_completion(tutor_base_url, selenium,
 
 
 @expected_failure
+@nondestructive
 @test_case('')
 @tutor
-@nondestructive
 def test_sort_score_by_assignment_score(tutor_base_url, selenium, teacher):
     """Sort student by scores of an assignment in the score page."""
     # GIVEN: Logged into Tutor as a teacher
@@ -568,8 +569,8 @@ def test_sort_score_by_assignment_score(tutor_base_url, selenium, teacher):
     # AND: Has a graded assignment
 
     # WHEN: If the user has more than one course, click on a Tutor course name
-    # AND: Click on the ""Student Scores"" button
-    # AND: Click ""Score""
+    # AND: Click on the "Student Scores" button
+    # AND: Click "Score"
 
     # THEN: Students are sorted by completion of selected assignment.
 
@@ -578,24 +579,24 @@ def test_sort_score_by_assignment_score(tutor_base_url, selenium, teacher):
 @test_case('')
 @tutor
 def test_edit_score_weights(tutor_base_url, selenium, teacher):
-    """Edit score weights as teacher."""
+    """Edit score weights."""
     # GIVEN: Logged into Tutor as a teacher
     # AND: Has an existing course
 
     # WHEN: If the user has more than one course, click on a Tutor course name
     # AND: Click on the "Student Scores" button
-    # AND: Click ""set weights"" on the page
+    # AND: Click "set weights" on the page
 
     # THEN: A window for edit weights should pop up
     # AND: user should be able to change the weights from this window
 
 
 @expected_failure
+@nondestructive
 @test_case('')
 @tutor
-@nondestructive
 def test_cancel_edit_score_weights(tutor_base_url, selenium, teacher):
-    """Cancel editing score weights as teacher."""
+    """Cancel editing score weights."""
     # GIVEN: Logged into Tutor as a teacher
     # AND: Has an existing course
 
@@ -610,11 +611,11 @@ def test_cancel_edit_score_weights(tutor_base_url, selenium, teacher):
 
 
 @expected_failure
+@nondestructive
 @test_case('')
 @tutor
-@nondestructive
 def test_click_see_why_in_score_weights(tutor_base_url, selenium, teacher):
-    """Go to "see why" blog page from score weights as teacher"""
+    """Go to 'see why' blog page from score weights."""
     # GIVEN: Logged into Tutor as a teacher
     # AND: Has an existing course
 
@@ -627,43 +628,42 @@ def test_click_see_why_in_score_weights(tutor_base_url, selenium, teacher):
 
 
 @expected_failure
+@nondestructive
 @test_case('')
 @tutor
-@nondestructive
 def test_scrolling_in_assignments_section(tutor_base_url, selenium, teacher):
-    """ScrolL left and right in assignment section in score page."""
+    """Scroll left and right in assignment section in score page."""
     # GIVEN: Logged into Tutor as a teacher
     # AND: Has an existing course
 
-    # WHEN: Click on the ""Student Scores"" button
+    # WHEN: Click on the "Student Scores" button
     # AND: Scroll left or right in the table of scores for view assignments
 
     # THEN: Table should move accordingly with the scrolling"
 
 
 @expected_failure
+@nondestructive
 @test_case('')
 @tutor
-@nondestructive
 def test_score_page_for_section_with_no_scores(tutor_base_url, selenium,
                                                teacher):
-    """Test proper messages in score page for a section that has no score to
-    display."""
+    """Test messages for no score sections in score page."""
     # GIVEN: Logged into Tutor as a teacher
     # AND: Has an existing course
     # AND: The class has no student or no assignment
 
-    # WHEN: Click on the ""Student Scores"" button
+    # WHEN: Click on the "Student Scores" button
 
     # THEN: The page contains button to settings and roaster"
 
 
 @expected_failure
+@nondestructive
 @test_case('')
 @tutor
-@nondestructive
 def test_view_overall_students_performance(tutor_base_url, selenium, teacher):
-    """View the overall performance of students in scores page as teacher."""
+    """View the overall performance of students in scores page."""
     # GIVEN: Logged into Tutor as a teacher
     # AND: Has an existing course
     # AND: Has finished assignment
@@ -676,11 +676,11 @@ def test_view_overall_students_performance(tutor_base_url, selenium, teacher):
 
 
 @expected_failure
+@nondestructive
 @test_case('')
 @tutor
-@nondestructive
 def test_view_student_assignment_detail(tutor_base_url, selenium, teacher):
-    """View student's assignment from score page as teacher."""
+    """View student's assignment from score page."""
     # GIVEN: Logged into Tutor as a teacher
     # AND: Has an existing course
     # AND: Has finished assignment
@@ -692,9 +692,9 @@ def test_view_student_assignment_detail(tutor_base_url, selenium, teacher):
 
 
 @expected_failure
+@nondestructive
 @test_case('')
 @tutor
-@nondestructive
 def test_no_score_is_displayed_for_readings(tutor_base_url, selenium, teacher):
     """Check no score for readings in the score page."""
     # GIVEN: Logged into Tutor as a teacher
@@ -708,15 +708,15 @@ def test_no_score_is_displayed_for_readings(tutor_base_url, selenium, teacher):
 
 
 @expected_failure
+@nondestructive
 @test_case('')
 @tutor
-@nondestructive
 def test_scores_info_icon(tutor_base_url, selenium, teacher):
     """Check the info icon in the score page displays proper information."""
     # GIVEN: Logged into Tutor as a teacher
 
-    # WHEN:  Click on the ""Student Scores"" button
-    # AND:  Click on the info icon next to ""Class Performance""
+    # WHEN:  Click on the "Student Scores" button
+    # AND:  Click on the info icon next to "Class Performance"
 
     # THEN: The info icon displays a definition of how class and overall scores
     # are calculated
@@ -726,15 +726,15 @@ def test_scores_info_icon(tutor_base_url, selenium, teacher):
 @test_case('')
 @tutor
 def test_accept_late_work(tutor_base_url, selenium, teacher):
-    """Accept late work in the score page as teacher."""
+    """Accept late work in the score page."""
     # GIVEN: Logged into Tutor as a teacher
     # AND: Has an existing course
     # AND: Student has submitted late homework or readings
 
-    # WHEN:  Click on the ""Student Scores"" button
+    # WHEN:  Click on the "Student Scores" button
     # AND: Scroll until an assignment with an orange triangle is found
     # AND: Click on the orange triangle at the upper right  of a progress cell
-    # AND: Click "Accept late score" OR ""Accept late progress""
+    # AND: Click "Accept late score" OR "Accept late progress"
 
     # THEN: The late score replaces the score at due date
 
@@ -743,12 +743,12 @@ def test_accept_late_work(tutor_base_url, selenium, teacher):
 @test_case('')
 @tutor
 def test_unaccept_late_work(tutor_base_url, selenium, teacher):
-    """Unaccept late work in the score page as teacher."""
+    """Unaccept late work in the score page."""
     # GIVEN: Logged into Tutor as a teacher
     # AND: Has an existing course
     # AND: Has accepted student's late homework or reading
 
-    # WHEN: Click on the ""Student Scores"" button
+    # WHEN: Click on the "Student Scores" button
     # AND: Scroll until an assignment with an orange triangle is found
     # AND: Click on the orange triangle at the upper right of a progress cell
     # AND: Click "Use this score" OR "Use this Progress"
@@ -757,13 +757,12 @@ def test_unaccept_late_work(tutor_base_url, selenium, teacher):
 
 
 @expected_failure
+@nondestructive
 @test_case('')
 @tutor
-@nondestructive
 def test_external_assignments_in_the_scores_export(tutor_base_url, selenium,
                                                    teacher):
-    """Check that external assignments should not be included in exported
-    scores."""
+    """Check that external assignments are not included in exported scores."""
     # GIVEN: Logged into Tutor as a teacher
     # AND: Has an existing course
     # AND: Has given an external assignment
@@ -775,9 +774,9 @@ def test_external_assignments_in_the_scores_export(tutor_base_url, selenium,
 
 
 @expected_failure
+@nondestructive
 @test_case('')
 @tutor
-@nondestructive
 def test_dropped_students_in_student_scores(tutor_base_url, selenium, teacher):
     """Check removal of dropped students in scores page."""
     # GIVEN: Logged into Tutor as a teacher
@@ -792,9 +791,9 @@ def test_dropped_students_in_student_scores(tutor_base_url, selenium, teacher):
 
 
 @expected_failure
+@nondestructive
 @test_case('')
 @tutor
-@nondestructive
 def test_moved_students_in_student_scores(tutor_base_url, selenium, teacher):
     """Check moved students appear in their current sections in scores."""
     # GIVEN: Logged into Tutor as a teacher
@@ -808,9 +807,9 @@ def test_moved_students_in_student_scores(tutor_base_url, selenium, teacher):
 
 
 @expected_failure
+@nondestructive
 @test_case('')
 @tutor
-@nondestructive
 def test_view_score_at_due_date(tutor_base_url, selenium, teacher):
     """Check teacher view scores at due date in score's page."""
     # GIVEN: Logged into Tutor as a teacher
@@ -824,16 +823,16 @@ def test_view_score_at_due_date(tutor_base_url, selenium, teacher):
 
 
 @expected_failure
+@nondestructive
 @test_case('')
 @tutor
-@nondestructive
 def test_view_current_score(tutor_base_url, selenium, teacher):
-    """View current score in score's page as teacher."""
+    """View current score in score's page."""
     # GIVEN: Logged into Tutor as a teacher
     # AND: Has an existing course
     # AND: Has given an assignment
 
-    # WHEN: Click ""Student Scores"" from the calendar dashboard
+    # WHEN: Click "Student Scores" from the calendar dashboard
     # AND: Click on the orange flag in the upper right corner of a progress
     # cell for the desired student
 
@@ -841,11 +840,11 @@ def test_view_current_score(tutor_base_url, selenium, teacher):
 
 
 @expected_failure
+@nondestructive
 @test_case('')
 @tutor
-@nondestructive
 def test_view_period_performance_forecast(tutor_base_url, selenium, teacher):
-    """View performance forecast page as teacher."""
+    """View performance forecast page."""
     # GIVEN: Logged into Tutor as a teacher
     # AND: Has an existing course
 
@@ -856,11 +855,11 @@ def test_view_period_performance_forecast(tutor_base_url, selenium, teacher):
 
 
 @expected_failure
+@nondestructive
 @test_case('')
 @tutor
-@nondestructive
 def test_performance_forecast_info_icon(tutor_base_url, selenium, teacher):
-    """View info icon in performance forecast page as teacher."""
+    """View info icon in performance forecast page."""
     # GIVEN: Logged into Tutor as a teacher
     # AND: Has an existing course
 
@@ -871,11 +870,11 @@ def test_performance_forecast_info_icon(tutor_base_url, selenium, teacher):
 
 
 @expected_failure
+@nondestructive
 @test_case('')
 @tutor
-@nondestructive
 def test_view_the_performance_color_key(tutor_base_url, selenium, teacher):
-    """View performance color key in performance forecast page as teacher."""
+    """View performance color key in performance forecast page."""
     # GIVEN: Logged into Tutor as a teacher
     # AND: Has an existing course
 
@@ -885,11 +884,11 @@ def test_view_the_performance_color_key(tutor_base_url, selenium, teacher):
 
 
 @expected_failure
+@nondestructive
 @test_case('')
 @tutor
-@nondestructive
 def test_period_tabs_are_shown(tutor_base_url, selenium, teacher):
-    """Check period tabs in performance forecast page as teacher."""
+    """Check period tabs in performance forecast page."""
     # GIVEN: Logged into Tutor as a teacher
     # AND: Has an existing course
     # AND: Has more than one period
@@ -900,12 +899,11 @@ def test_period_tabs_are_shown(tutor_base_url, selenium, teacher):
 
 
 @expected_failure
+@nondestructive
 @test_case('')
 @tutor
-@nondestructive
 def test_period_with_zero_answers(tutor_base_url, selenium, teacher):
-    """Check that a period with no answers doesn't show section breakdowns
-    in perforemance forecast."""
+    """Check that a period with no answers doesn't show section breakdowns."""
     # GIVEN: Logged into Tutor as a teacher
     # AND: Has an existing course
     # AND: Has a period that hasn't answered assignments
@@ -918,12 +916,11 @@ def test_period_with_zero_answers(tutor_base_url, selenium, teacher):
 
 
 @expected_failure
+@nondestructive
 @test_case('')
 @tutor
-@nondestructive
 def test_perforemance_forecast_weaker_areas(tutor_base_url, selenium, teacher):
-    """Check weaker areas show up to four problematic sections in
-    performance forecast."""
+    """Check weaker areas show up to four problematic sections."""
     # GIVEN: Logged into Tutor as a teacher
     # AND: Has an existing course
 
@@ -934,11 +931,11 @@ def test_perforemance_forecast_weaker_areas(tutor_base_url, selenium, teacher):
 
 
 @expected_failure
+@nondestructive
 @test_case('')
 @tutor
-@nondestructive
 def test_review_all_questions(tutor_base_url, selenium, teacher):
-    """View questions in question library as teacher."""
+    """View questions in question library."""
     # GIVEN: Logged into Tutor as a teacher
     # AND: Has an existing course
 
@@ -953,7 +950,7 @@ def test_review_all_questions(tutor_base_url, selenium, teacher):
 @test_case('')
 @tutor
 def test_exclude_certain_questions(tutor_base_url, selenium, teacher):
-    """Exclude certain questions in question library as teacher."""
+    """Exclude certain questions in question library."""
     # GIVEN: Logged into Tutor as a teacher
     # AND: Has an existing course
 
@@ -966,17 +963,16 @@ def test_exclude_certain_questions(tutor_base_url, selenium, teacher):
 
 
 @expected_failure
+@nondestructive
 @test_case('')
 @tutor
-@nondestructive
 def test_switch_between_reading_and_homework_questions(
         tutor_base_url, selenium, teacher):
-    """Switch to view reading and homework questions in question library
-    as teacher."""
+    """Switch to view reading and homework questions in question library."""
     # GIVEN: Logged into Tutor as a teacher
     # AND: Has an existing course
 
-    # WHEN: Click ""Question Library"" from the user menu
+    # WHEN: Click "Question Library" from the user menu
     # AND: Select a section or chapter
     # AND: Click "Show Questions"
     # AND: Click on the "Reading" tab
@@ -985,15 +981,15 @@ def test_switch_between_reading_and_homework_questions(
 
 
 @expected_failure
+@nondestructive
 @test_case('')
 @tutor
-@nondestructive
 def test_question_library_pinned_tab(tutor_base_url, selenium, teacher):
     """Check the pinned tab to the top of the screen in question library."""
     # GIVEN: Logged into Tutor as a teacher
     # AND: Has an existing course
 
-    # WHEN: Click ""Question Library"" from the user menu
+    # WHEN: Click "Question Library" from the user menu
     # AND: Select a section or chapter
     # AND: Click "Show Questions"
     # AND: Scroll down
@@ -1002,9 +998,9 @@ def test_question_library_pinned_tab(tutor_base_url, selenium, teacher):
 
 
 @expected_failure
+@nondestructive
 @test_case('')
 @tutor
-@nondestructive
 def test_browse_corresponding_chapter_in_the_book(tutor_base_url, selenium,
                                                   teacher):
     """Browse questions of a certain chapter in question library."""
@@ -1019,9 +1015,9 @@ def test_browse_corresponding_chapter_in_the_book(tutor_base_url, selenium,
 
 
 @expected_failure
+@nondestructive
 @test_case('')
 @tutor
-@nondestructive
 def test_section_in_question_library(tutor_base_url, selenium, teacher):
     """Jump between chapters with breadcrumbs in question library."""
     # GIVEN: Logged into Tutor as a teacher
@@ -1037,9 +1033,9 @@ def test_section_in_question_library(tutor_base_url, selenium, teacher):
 
 
 @expected_failure
+@nondestructive
 @test_case('')
 @tutor
-@nondestructive
 def test_go_to_question_details(tutor_base_url, selenium, teacher):
     """Go to question details page in question library."""
     # GIVEN: Logged into Tutor as a teacher
@@ -1054,11 +1050,11 @@ def test_go_to_question_details(tutor_base_url, selenium, teacher):
 
 
 @expected_failure
+@nondestructive
 @test_case('')
 @tutor
-@nondestructive
 def test_report_errata_about_questions(tutor_base_url, selenium, teacher):
-    """Report a errata for a question in question library as teacher."""
+    """Report a errata for a question in question library."""
     # GIVEN: Logged into Tutor as a teacher
     # AND: Has an existing course
 
@@ -1073,11 +1069,11 @@ def test_report_errata_about_questions(tutor_base_url, selenium, teacher):
 
 
 @expected_failure
+@nondestructive
 @test_case('')
 @tutor
-@nondestructive
 def test_preview_feedback(tutor_base_url, selenium, teacher):
-    """Preview feedback for a question in question library as teacher."""
+    """Preview feedback for a question in question library."""
     # GIVEN: Logged into Tutor as a teacher
     # AND: Has an existing course
 
@@ -1091,9 +1087,9 @@ def test_preview_feedback(tutor_base_url, selenium, teacher):
 
 
 @expected_failure
+@nondestructive
 @test_case('')
 @tutor
-@nondestructive
 def test_switch_between_questions(tutor_base_url, selenium, teacher):
     """Switch between questions using arrows in question library."""
     # GIVEN: Logged into Tutor as a teacher
@@ -1109,9 +1105,9 @@ def test_switch_between_questions(tutor_base_url, selenium, teacher):
 
 
 @expected_failure
+@nondestructive
 @test_case('')
 @tutor
-@nondestructive
 def test_go_to_card_view(tutor_base_url, selenium, teacher):
     """Switch to card view in question library."""
     # GIVEN: Logged into Tutor as a teacher
@@ -1127,12 +1123,11 @@ def test_go_to_card_view(tutor_base_url, selenium, teacher):
 
 
 @expected_failure
+@nondestructive
 @test_case('')
 @tutor
-@nondestructive
 def test_errata_with_empty_fields(tutor_base_url, selenium, teacher):
-    """Attempt to suggest a correction in question library without filling
-    in required fields."""
+    """Attempt to suggest a correction without filling in required fields."""
     # GIVEN: Logged into Tutor as a teacher
     # AND: Has an existing course
 
@@ -1144,15 +1139,14 @@ def test_errata_with_empty_fields(tutor_base_url, selenium, teacher):
     # AND: Do not fill out the required fields, click "submit"
 
     # THEN: Could not submit the form.
-    # AND: User is prompted to fill out the required field."
+    # AND: User is prompted to fill out the required field.
 
 
 @expected_failure
 @test_case('')
 @tutor
 def test_exclude_a_question(tutor_base_url, selenium, teacher):
-    """Exclude a question in question details in question library as
-    teacher."""
+    """Exclude a question in question details in question library."""
     # GIVEN: Logged into Tutor as a teacher
     # AND: Has an existing course
 
@@ -1162,14 +1156,14 @@ def test_exclude_a_question(tutor_base_url, selenium, teacher):
     # AND: Click "question details"
     # AND: Click "exclude question"
 
-    # THEN: The chosen question is excluded
+    # THEN: The chosen question is excluded.
 
 
 @expected_failure
 @test_case('')
 @tutor
 def test_create_a_new_course(tutor_base_url, selenium, teacher):
-    """Create a new course as teacher."""
+    """Create a new course."""
     # GIVEN: Logged into Tutor as a teacher
 
     # WHEN: From menu, click "create a course"
@@ -1183,7 +1177,7 @@ def test_create_a_new_course(tutor_base_url, selenium, teacher):
 @test_case('')
 @tutor
 def test_copy_a_course_from_past_courses(tutor_base_url, selenium, teacher):
-    """Copy a new course from a existing course as teacher."""
+    """Copy a new course from a existing course."""
     # GIVEN: Logged into Tutor as a teacher
     # AND: Has an existing course
 
@@ -1195,32 +1189,32 @@ def test_copy_a_course_from_past_courses(tutor_base_url, selenium, teacher):
 
 
 @expected_failure
+@nondestructive
 @test_case('')
 @tutor
-@nondestructive
 def test_cancel_creating_a_new_course(tutor_base_url, selenium, teacher):
-    """Cancel creating a new course as teacher."""
+    """Cancel creating a new course."""
     # GIVEN: Logged into Tutor as a teacher
 
     # WHEN: From menu, click "create a course"
     # AND: Fill out the form
-    # AND: Click ""cancel""
+    # AND: Click "cancel"
 
     # THEN: User is taken back to course picker.
     # AND: No course is created.
 
 
 @expected_failure
+@nondestructive
 @test_case('')
 @tutor
-@nondestructive
 def test_cancel_copying_a_new_course(tutor_base_url, selenium, teacher):
-    """Cancel copying a new course as teacher."""
+    """Cancel copying a new course."""
     # GIVEN: Logged into Tutor as a teacher
 
     # WHEN: Choose a course user want to copy, then click "copy this course"
     # AND: Fill out the form
-    # AND: Click ""cancel""
+    # AND: Click "cancel"
 
     # THEN: User is taken back to course picker.
     # AND: No course is created.
@@ -1231,8 +1225,7 @@ def test_cancel_copying_a_new_course(tutor_base_url, selenium, teacher):
 @tutor
 def test_create_new_course_with_empty_fields(
         tutor_base_url, selenium, teacher):
-    """Attempt to create a new course without filling in required fields
-    as teacher."""
+    """Attempt to create a new course without filling in required fields."""
     # GIVEN: Logged into Tutor as a teacher
 
     # WHEN: From menu, click "create a course"
@@ -1243,26 +1236,25 @@ def test_create_new_course_with_empty_fields(
 
 
 @expected_failure
+@nondestructive
 @test_case('')
 @tutor
-@nondestructive
 def test_copy_course_with_empty_fields(tutor_base_url, selenium, teacher):
-    """Attempt to copy a course without filling in required fields as
-    teacher."""
+    """Attempt to copy a course without filling in required fields."""
     # GIVEN: Logged into Tutor as a teacher
     # AND: Has an existing course
 
-    # WHEN: Choose a course user want to copy, click ""copy this course""
+    # WHEN: Choose a course user want to copy, click "copy this course"
     # AND: Fill out the form, leaving some of the fields blank
 
     # THEN: course could not be created.
-    # AND: User is prompted to fill in the required fields."
+    # AND: User is prompted to fill in the required fields.
 
 
 @expected_failure
+@nondestructive
 @test_case('')
 @tutor
-@nondestructive
 def test_copy_course_with_old_version_textbook(tutor_base_url, selenium,
                                                teacher):
     """Attempt to copy a course with old version textbook should fail."""
@@ -1273,14 +1265,14 @@ def test_copy_course_with_old_version_textbook(tutor_base_url, selenium,
     # AND: Fill out the form
 
     # THEN: Course could not be created.
-    # AND: User should see massage: "the textbook is too old to be supported. "
+    # AND: User should see massage: "the textbook is too old to be supported".
 
 
 @expected_failure
 @test_case('')
 @tutor
 def test_change_course_name(tutor_base_url, selenium, teacher):
-    """Change course name in course setting as teacher."""
+    """Change course name in course setting."""
     # GIVEN: Logged into Tutor as a teacher
     # AND: Has an existing course
 
@@ -1293,11 +1285,11 @@ def test_change_course_name(tutor_base_url, selenium, teacher):
 
 
 @expected_failure
+@nondestructive
 @test_case('')
 @tutor
-@nondestructive
 def test_switch_between_setting_tabs(tutor_base_url, selenium, teacher):
-    """Switch between tabs in course setting as teacher."""
+    """Switch between tabs in course setting."""
     # GIVEN: Logged into Tutor as a teacher
     # AND: Has an existing course
 
@@ -1309,11 +1301,11 @@ def test_switch_between_setting_tabs(tutor_base_url, selenium, teacher):
 
 
 @expected_failure
+@nondestructive
 @test_case('')
 @tutor
-@nondestructive
 def test_student_enrollment_url(tutor_base_url, selenium, teacher):
-    """View student enrollment url for different sections as teacher."""
+    """View student enrollment url for different sections."""
     # GIVEN: Logged into Tutor as a teacher
     # AND: Has an existing course
 
@@ -1327,7 +1319,7 @@ def test_student_enrollment_url(tutor_base_url, selenium, teacher):
 @test_case('')
 @tutor
 def test_change_course_time_zone(tutor_base_url, selenium, teacher):
-    """Change course time zone in course settings as teacher."""
+    """Change course time zone in course settings."""
     # GIVEN: Logged into Tutor as a teacher
     # AND: Has an existing course
 
@@ -1341,11 +1333,11 @@ def test_change_course_time_zone(tutor_base_url, selenium, teacher):
 
 
 @expected_failure
+@nondestructive
 @test_case('')
 @tutor
-@nondestructive
 def test_cancel_changing_course_name(tutor_base_url, selenium, teacher):
-    """Cancel changing course name in course settings as teacher."""
+    """Cancel changing course name in course settings."""
     # GIVEN: Logged into Tutor as a teacher
     # AND: Has an existing course
 
@@ -1359,11 +1351,11 @@ def test_cancel_changing_course_name(tutor_base_url, selenium, teacher):
 
 
 @expected_failure
+@nondestructive
 @test_case('')
 @tutor
-@nondestructive
 def test_cancel_changing_course_time_zone(tutor_base_url, selenium, teacher):
-    """Cancel changing course time zone in course settings as teacher."""
+    """Cancel changing course time zone in course settings."""
     # GIVEN:  Logged into tutor as a teacher
     # AND: has an existing course
 
@@ -1380,7 +1372,7 @@ def test_cancel_changing_course_time_zone(tutor_base_url, selenium, teacher):
 @test_case('')
 @tutor
 def test_add_a_new_section(tutor_base_url, selenium, teacher):
-    """Add a new section in course roster as teacher."""
+    """Add a new section in course roster."""
     # GIVEN: Logged into tutor as a teacher
     # AND: has a existing course
 
@@ -1396,7 +1388,7 @@ def test_add_a_new_section(tutor_base_url, selenium, teacher):
 @test_case('')
 @tutor
 def test_add_a_new_instructor(tutor_base_url, selenium, teacher):
-    """Add a new instruction in course roster as teacher."""
+    """Add a new instruction in course roster."""
     # GIVEN: Logged into tutor as a teacher
     # AND: has a existing course
 
@@ -1409,11 +1401,11 @@ def test_add_a_new_instructor(tutor_base_url, selenium, teacher):
 
 
 @expected_failure
+@nondestructive
 @test_case('')
 @tutor
-@nondestructive
 def test_roster_switch_between_sections(tutor_base_url, selenium, teacher):
-    """Switch view between sections in course roster as teacher."""
+    """Switch view between sections in course roster."""
     # GIVEN: Logged into tutor as a teacher
     # AND: has a existing course
 
@@ -1428,7 +1420,7 @@ def test_roster_switch_between_sections(tutor_base_url, selenium, teacher):
 @test_case('')
 @tutor
 def test_rename_a_section(tutor_base_url, selenium, teacher):
-    """Rename a section in course roster as teacher."""
+    """Rename a section in course roster."""
     # GIVEN: Logged into tutor as a teacher
     # AND: has a existing course
 
@@ -1444,7 +1436,7 @@ def test_rename_a_section(tutor_base_url, selenium, teacher):
 @test_case('')
 @tutor
 def test_delete_a_section(tutor_base_url, selenium, teacher):
-    """Delete a section in course roster as teacher."""
+    """Delete a section in course roster."""
     # GIVEN: Logged into tutor as a teacher
     # AND: has a existing course with two sections
 
@@ -1457,11 +1449,11 @@ def test_delete_a_section(tutor_base_url, selenium, teacher):
 
 
 @expected_failure
+@nondestructive
 @test_case('')
 @tutor
-@nondestructive
 def test_cancel_delete_a_section(tutor_base_url, selenium, teacher):
-    """Cancel deleting a section in course roster as teacher."""
+    """Cancel deleting a section in course roster."""
     # GIVEN: Logged into tutor as a teacher
     # AND: has a existing course with two sections
 
