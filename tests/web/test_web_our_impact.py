@@ -1,4 +1,4 @@
-from test.markers import web, test_case, expected_failure, nondestructive
+from tests.markers import web, test_case, expected_failure, nondestructive
 
 @test_case('')
 @web
