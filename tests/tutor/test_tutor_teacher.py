@@ -45,7 +45,7 @@ def test_cancel_edit_homework(tutor_base_url, selenium, teacher):
     """Cancel editing a published homework."""
     # GIVEN: Logged into Tutor as a teacher
     # AND: Has an existing course with an published homework
-    @expected_failure
+
     # WHEN: Go to a course with published homework
     # AND: Click on an published homework
     # AND: Change all the required fields
