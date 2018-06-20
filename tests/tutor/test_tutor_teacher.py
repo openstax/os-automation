@@ -45,7 +45,7 @@ def test_cancel_edit_homework(tutor_base_url, selenium, teacher):
     """Cancel editing a published homework."""
     # GIVEN: Logged into Tutor as a teacher
     # AND: Has an existing course with an published homework
-
+    @expected_failure
     # WHEN: Go to a course with published homework
     # AND: Click on an published homework
     # AND: Change all the required fields
@@ -1138,8 +1138,8 @@ def test_errata_with_empty_fields(tutor_base_url, selenium, teacher):
     # AND: Click "suggest an error"
     # AND: Do not fill out the required fields, click "submit"
 
-    # THEN: Could not submit the form.
-    # AND: User is prompted to fill out the required field.
+    # THEN: Could not submit the form
+    # AND: User is prompted to fill out the required field
 
 
 @expected_failure
@@ -1156,7 +1156,7 @@ def test_exclude_a_question(tutor_base_url, selenium, teacher):
     # AND: Click "question details"
     # AND: Click "exclude question"
 
-    # THEN: The chosen question is excluded.
+    # THEN: The chosen question is excluded
 
 
 @expected_failure
@@ -1200,8 +1200,8 @@ def test_cancel_creating_a_new_course(tutor_base_url, selenium, teacher):
     # AND: Fill out the form
     # AND: Click "cancel"
 
-    # THEN: User is taken back to course picker.
-    # AND: No course is created.
+    # THEN: User is taken back to course picker
+    # AND: No course is created
 
 
 @expected_failure
@@ -1216,8 +1216,8 @@ def test_cancel_copying_a_new_course(tutor_base_url, selenium, teacher):
     # AND: Fill out the form
     # AND: Click "cancel"
 
-    # THEN: User is taken back to course picker.
-    # AND: No course is created.
+    # THEN: User is taken back to course picker
+    # AND: No course is created
 
 
 @expected_failure
@@ -1231,8 +1231,8 @@ def test_create_new_course_with_empty_fields(
     # WHEN: From menu, click "create a course"
     # AND: Fill out the form, leaving some of the fields blank
 
-    # THEN: Course could not be created.
-    # AND: User is prompted to fill out the required fields. "
+    # THEN: Course could not be created
+    # AND: User is prompted to fill out the required fields
 
 
 @expected_failure
@@ -1247,8 +1247,8 @@ def test_copy_course_with_empty_fields(tutor_base_url, selenium, teacher):
     # WHEN: Choose a course user want to copy, click "copy this course"
     # AND: Fill out the form, leaving some of the fields blank
 
-    # THEN: course could not be created.
-    # AND: User is prompted to fill in the required fields.
+    # THEN: Course could not be created
+    # AND: User is prompted to fill in the required fields
 
 
 @expected_failure
@@ -1264,8 +1264,8 @@ def test_copy_course_with_old_version_textbook(tutor_base_url, selenium,
     # WHEN: Choose a course with old version textbook, click "copy this course"
     # AND: Fill out the form
 
-    # THEN: Course could not be created.
-    # AND: User should see massage: "the textbook is too old to be supported".
+    # THEN: Course could not be created
+    # AND: User should see massage: "the textbook is too old to be supported."
 
 
 @expected_failure
