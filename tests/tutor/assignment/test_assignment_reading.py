@@ -59,7 +59,7 @@ def test_edit_published_reading(tutor_base_url, selenium, teacher):
 
     # AND: Has an existing course
 
-    # AND: Has a publish reading
+    # AND: Has a published reading
 
     # WHEN: The user clicks on the course
 

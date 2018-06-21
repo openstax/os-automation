@@ -28,8 +28,7 @@ def test_performance_bar_question(tutor_base_url, selenium, student):
     # AND: Has enrolled in a course
 
     # WHEN: The user clicks on a enrolled course
-    # AND: The user clicks one of the section performance
-    # bars from the dashboard
+    # AND: The user clicks on the section performance bar
     # AND: If there is a text box, input text
 
     # THEN: "Answer" button can be clicked
@@ -45,7 +44,6 @@ def test_performance_bar_answer(tutor_base_url, selenium, student):
 
     # WHEN: The user clicks on a enrolled course
     # AND: The user clicks one of the section performance bars
-    # from the dashboard
     # AND: If there is a text box, the user input text
     # AND: The user clicks the 'Answer' button
 
@@ -138,16 +136,12 @@ def test_performance_forecast_info_icon_for_a_student(tutor_base_url, selenium,
                                                       student):
     """Test the performance forecast info icon."""
     # GIVEN: Logged into Tutor as a student
-    # AND: Has enrolled in a class
+    # AND: Has an existing course and is on the dahboard
 
-    # WHEN: The user goes into an enrolled class
-    # AND: The user clicks on the user menu in the upper right
-    # corner of the page
-    # AND: The user clicks on "Performance Forecast"
-    # AND: The user hovers the cursor over the info icon that is next to the
-    # "Performance Forecast" header
+    # WHEN: Click on "Performance Forecast" in the user menu
+    # AND: The user hovers the cursor over the info icon
 
-    # THEN: Page with Info icon showing an explanation of the data is loaded
+    # THEN: Info icon shows an explanation of the data
 
 
 @expected_failure
@@ -244,7 +238,7 @@ def test_performance_forecast_chapter(tutor_base_url, selenium, student):
     # GIVEN: Logged into Tutor as a student
     # AND: Has enrolled in a class
 
-    # WHEN: The user goes to the enrolled class
+    # WHEN: The user goes to the enrolled class dashboard
     # AND: The user clicks on the user menu in the upper right corner
     # AND: The user clicks on "Performance Forecast"
     # AND: The user scrolls to the Individual Chapters section
