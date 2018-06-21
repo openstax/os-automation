@@ -134,7 +134,8 @@ def test_performance_forecast(tutor_base_url, selenium, student):
 @test_case('')
 @expected_failure
 @tutor
-def test_performance_forecast_info_icon(tutor_base_url, selenium, student):
+def test_performance_forecast_info_icon_for_a_student(tutor_base_url, selenium,
+                                                      student):
     """Test the performance forecast info icon."""
     # GIVEN: Logged into Tutor as a student
     # AND: Has enrolled in a class
@@ -147,6 +148,22 @@ def test_performance_forecast_info_icon(tutor_base_url, selenium, student):
     # "Performance Forecast" header
 
     # THEN: Page with Info icon showing an explanation of the data is loaded
+
+
+@expected_failure
+@nondestructive
+@test_case('')
+@tutor
+def test_performance_forecast_info_icon_for_a_teacher(tutor_base_url, selenium,
+                                                      teacher):
+    """View info icon in performance forecast page."""
+    # GIVEN: Logged into Tutor as a teacher
+    # AND: Has an existing course
+
+    # WHEN: Click on "Performance Forecast" in the user menu
+    # AND: Hover the cursor over the info icon
+
+    # THEN: Info icon shows an explanation of the data
 
 
 @test_case('')
@@ -299,21 +316,6 @@ def test_view_period_performance_forecast(tutor_base_url, selenium, teacher):
     # AND: Click on the desired period
 
     # THEN: The period Performance Forecast is presented to the user
-
-
-@expected_failure
-@nondestructive
-@test_case('')
-@tutor
-def test_performance_forecast_info_icon(tutor_base_url, selenium, teacher):
-    """View info icon in performance forecast page."""
-    # GIVEN: Logged into Tutor as a teacher
-    # AND: Has an existing course
-
-    # WHEN: Click on "Performance Forecast" in the user menu
-    # AND: Hover the cursor over the info icon
-
-    # THEN: Info icon shows an explanation of the data
 
 
 @expected_failure
