@@ -1,6 +1,7 @@
 """Test cases for performance forecast functionality."""
 
-from tests.markers import expected_failure, test_case, tutor
+from tests.markers import expected_failure, nondestructive  # noqa
+from tests.markers import test_case, tutor  # noqa
 
 
 @test_case('')
