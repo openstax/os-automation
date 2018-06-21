@@ -136,7 +136,7 @@ def test_performance_forecast_info_icon_for_a_student(tutor_base_url, selenium,
                                                       student):
     """Test the performance forecast info icon."""
     # GIVEN: Logged into Tutor as a student
-    # AND: Has an existing course and is on the dahboard
+    # AND: Has an existing course and is on the course dahboard
 
     # WHEN: Click on "Performance Forecast" in the user menu
     # AND: The user hovers the cursor over the info icon
