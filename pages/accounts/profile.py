@@ -280,15 +280,63 @@ class Profile(home.AccountsHome):
     class LoginOptions(Region):
         """Login options."""
 
-        class ActiveOption(Region):
+        _active_option_locator = (
+            By.CSS_SELECTOR, '.enabled-providers .authentication')
+        _inactive_option_locator = (
+            By.CSS_SELECTOR, '.other-sign-in .authentication')
+        _inactive_option_expander_locator = (By.ID, 'enable-other-sign-in')
+
+        def get_active_options(self):
+            """Return current, active log in options."""
+            return [self.Option(self, el) for el in
+                    self.find_elements(*self._active_option_locator)]
+
+        def get_other_options(self):
+            """Return inactive log in options."""
+            return [self.Option(self, el) for el in
+                    self.find_elements(*self._inactive_option_locator)]
+
+        def view_other_options(self):
+            """Open the inactive option menu."""
+            link = self.find_element(*self._inactive_option_expander_locator)
+            if link.is_displayed():
+                link.click()
+                sleep(0.25)
+            return self
+
+        class Option(Region):
             """Login options."""
 
-            _root_locator = (By.CSS_SELECTOR, '.enabled-providers')
+            _name_locator = (By.CLASS_NAME, 'name')
+            _edit_button_locator = (By.CLASS_NAME, 'edit')
+            _delete_button_locator = (By.CLASS_NAME, 'delete')
+            _add_button_locator = (By.CLASS_NAME, 'add')
 
-        class InactiveOption(Region):
-            """Additional login options requiring setup."""
+            @property
+            def name(self):
+                """Return the option name."""
+                return self.find_element(*self._name_locator).text
 
-            _root_locator = (By.CSS_SELECTOR, '.other-sign-in')
+            @property
+            def edit(self):
+                """Edit the login option."""
+                self.find_element(*self._edit_button_locator).click()
+                sleep(0.5)
+                return self
+
+            @property
+            def delete(self):
+                """Delete an active login option."""
+                self.find_element(*self._delete_button_locator).click()
+                sleep(0.5)
+                return self
+
+            @property
+            def add(self):
+                """Add an inactive login option."""
+                self.find_element(*self._add_button_locator).click()
+                sleep(0.5)
+                return self
 
     class PopupConsole(Region):
         """Popup console interaction."""
