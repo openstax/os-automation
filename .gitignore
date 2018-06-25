@@ -24,6 +24,8 @@ wheels/
 .installed.cfg
 *.egg
 MANIFEST
+.DS_Store
+.gitignore.swp
 
 # PyInstaller
 #  Usually these files are written by a python script from a template
@@ -105,6 +107,8 @@ venv.bak/
 
 # JetBrains
 .idea/
+
+.DS_Store
 
 # test report
 report.html

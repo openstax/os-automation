@@ -4,10 +4,10 @@ from tests.markers import expected_failure, nondestructive, test_case, tutor
 
 
 @expected_failure
-@nondestructive
 @test_case('')
+@nondestructive
 @tutor
-def test_view_calendar(tutor_base_url, selenium, teacher):
+def test_view_the_instructor_calendar(tutor_base_url, selenium, teacher):
     """Test teacher to view the calendar."""
     # GIVEN: A logged in teacher user
     # AND: has a existing course
@@ -18,11 +18,11 @@ def test_view_calendar(tutor_base_url, selenium, teacher):
 
 
 @expected_failure
-@nondestructive
 @test_case('')
+@nondestructive
 @tutor
-def test_view_student_score_w_calendar_button(tutor_base_url,
-                                              selenium, teacher):
+def test_view_student_scores_with_the_calendar_button(
+        tutor_base_url, selenium, teacher):
     """Test teacher to view student score with calendar button."""
     # GIVEN: A logged in teacher user
     # AND: has a existing course
@@ -69,11 +69,11 @@ def test_edit_an_opened_homework(tutor_base_url, selenium, teacher):
 
 
 @expected_failure
-@nondestructive
 @test_case('')
+@nondestructive
 @tutor
-def test_view_performance_forecast_w_calendar_button(tutor_base_url,
-                                                     selenium, teacher):
+def test_view_performance_forecast_using_the_calendar_button(
+        tutor_base_url, selenium, teacher):
     """Test teacher to view performance forecast with calendar button."""
     # GIVEN: A logged in teacher user
     # AND: has a existing course
@@ -84,7 +84,11 @@ def test_view_performance_forecast_w_calendar_button(tutor_base_url,
     # THEN: the teacher is presented with performance forecast fot the sections
 
 
-def test_cancel_edit_homework(tutor_base_url, selenium, teacher):
+@expected_failure
+@test_case('')
+@nondestructive
+@tutor
+def test_cancel_editing_homework(tutor_base_url, selenium, teacher):
     """Cancel editing a published homework."""
     # GIVEN: Logged into Tutor as a teacher
     # AND: Has an existing course with an published homework
@@ -98,10 +102,10 @@ def test_cancel_edit_homework(tutor_base_url, selenium, teacher):
 
 
 @expected_failure
-@nondestructive
 @test_case('')
+@nondestructive
 @tutor
-def test_view_reading_assignment_summary(tutor_base_url, selenium, teacher):
+def test_view_a_reading_assignment_summary(tutor_base_url, selenium, teacher):
     """Test teacher to view a reading assignment summary."""
     # GIVEN: A logged in teacher user
     # AND: has a existing course
@@ -115,10 +119,10 @@ def test_view_reading_assignment_summary(tutor_base_url, selenium, teacher):
 
 
 @expected_failure
-@nondestructive
 @test_case('')
+@nondestructive
 @tutor
-def test_view_homework_assignment_summary(tutor_base_url, selenium, teacher):
+def test_view_a_homework_assignment_summary(tutor_base_url, selenium, teacher):
     """Test teacher to view a homework assignment ."""
     # GIVEN: A logged in teacher user
     # AND: has a homework assignment
@@ -131,10 +135,11 @@ def test_view_homework_assignment_summary(tutor_base_url, selenium, teacher):
 
 
 @expected_failure
-@nondestructive
 @test_case('')
+@nondestructive
 @tutor
-def test_view_external_assignment_summary(tutor_base_url, selenium, teacher):
+def test_view_an_external_assignment_summary(
+        tutor_base_url, selenium, teacher):
     """Test teacher to view an external assignment."""
     # GIVEN: A logged in teacher user
     # AND: has an external assignment
@@ -148,10 +153,10 @@ def test_view_external_assignment_summary(tutor_base_url, selenium, teacher):
 
 
 @expected_failure
-@nondestructive
 @test_case('')
+@nondestructive
 @tutor
-def test_view_event_summary(tutor_base_url, selenium, teacher):
+def test_view_an_event_summary(tutor_base_url, selenium, teacher):
     """Test teacher to view an event."""
     # GIVEN: A logged in teacher user
     # AND: has a existing course
@@ -164,11 +169,11 @@ def test_view_event_summary(tutor_base_url, selenium, teacher):
 
 
 @expected_failure
-@nondestructive
 @test_case('')
+@nondestructive
 @tutor
-def test_open_reference_book_w_calendar_button(tutor_base_url,
-                                               selenium, teacher):
+def test_open_the_reference_book_with_the_calendar_button(
+        tutor_base_url, selenium, teacher):
     """Test teacher to open a reference book with calendar button."""
     # GIVEN: A logged in teacher user
     # AND: has a existing course
@@ -179,7 +184,11 @@ def test_open_reference_book_w_calendar_button(tutor_base_url,
     # THEN: The teacher is presented with the book in a new tab
 
 
-def test_cancel_edit_draft(tutor_base_url, selenium, teacher):
+@expected_failure
+@test_case('')
+@nondestructive
+@tutor
+def test_cancel_editing_a_draft_homework(tutor_base_url, selenium, teacher):
     """Cancel editing a published homework draft."""
     # GIVEN: Logged into Tutor as a teacher
     # AND: has an existing homework draft
@@ -230,7 +239,7 @@ def test_delete_an_unopened_homework(tutor_base_url, selenium, teacher):
 @expected_failure
 @test_case('')
 @tutor
-def test_delete_a_homework_draft(tutor_base_url, selenium, teacher):
+def test_delete_a_draft_homework(tutor_base_url, selenium, teacher):
     """Delete an homework draft."""
     # GIVEN: Logged into Tutor as a teacher
     # AND: Has an existing course with a homework draft
@@ -247,7 +256,7 @@ def test_delete_a_homework_draft(tutor_base_url, selenium, teacher):
 @expected_failure
 @test_case('')
 @tutor
-def test_edit_a_homework_draft(tutor_base_url, selenium, teacher):
+def test_edit_a_draft_homework(tutor_base_url, selenium, teacher):
     """Edit a homework draft."""
     # GIVEN: Logged into Tutor as a teacher
     # AND: Has an existing course with a draft homework
@@ -264,7 +273,7 @@ def test_edit_a_homework_draft(tutor_base_url, selenium, teacher):
 @test_case('')
 @nondestructive
 @tutor
-def test_return_to_course_picker(tutor_base_url, selenium, teacher):
+def test_return_to_the_course_picker(tutor_base_url, selenium, teacher):
     """Test teacher return to course picker by clicking logo."""
     # GIVEN: A logged in teacher user
     # AND: has a existing course
@@ -280,7 +289,7 @@ def test_return_to_course_picker(tutor_base_url, selenium, teacher):
 @test_case('')
 @nondestructive
 @tutor
-def test_add_by_drag(tutor_base_url, selenium, teacher):
+def test_add_assignments_by_drag_and_drop(tutor_base_url, selenium, teacher):
     """Test teacher to add assignments/readings/events by drag and drop."""
     # GIVEN: A logged in teacher user
     # AND: has a existing course
@@ -313,13 +322,13 @@ def test_add_assignment_to_past_day(tutor_base_url, selenium, teacher):
 @test_case('')
 @nondestructive
 @tutor
-def test_question_library(tutor_base_url, selenium, teacher):
+def test_question_library_loads(tutor_base_url, selenium, teacher):
     """Test if question library works under teacher."""
     # GIVEN: A logged in teacher user
     # AND: has a existing course
 
     # WHEN:  Select a Tutor course
-    # AND: Click ""question library"" from the calendar"
+    # AND: Click question library from the calendar"
 
     # THEN: user should be taken to the question library
 
@@ -328,7 +337,8 @@ def test_question_library(tutor_base_url, selenium, teacher):
 @test_case('')
 @nondestructive
 @tutor
-def test_training_wheels_dashboard(tutor_base_url, selenium, teacher):
+def test_view_instructor_training_wheels_for_the_dashboard(
+        tutor_base_url, selenium, teacher):
     """Test teacher to use training wheels for dashboard`."""
     # GIVEN: A logged in teacher user
 
@@ -487,8 +497,8 @@ def test_cancel_edit_external_assignment(tutor_base_url, selenium, teacher):
 
 
 @expected_failure
-@nondestructive
 @test_case('')
+@nondestructive
 @tutor
 def test_term_appearance_exist(tutor_base_url, selenium, teacher):
     """Test terms/PP appearance for onboarding | existing instructor."""
@@ -501,10 +511,10 @@ def test_term_appearance_exist(tutor_base_url, selenium, teacher):
 
 
 @expected_failure
-@nondestructive
 @test_case('')
+@nondestructive
 @tutor
-def test_cancel_edit_an_external_draft(tutor_base_url, selenium, teacher):
+def test_cancel_editing_an_external_draft(tutor_base_url, selenium, teacher):
     """Cancel editing an external assignment draft."""
     # GIVEN: Logged into Tutor as a teacher
     # AND: Has an existing course with an external assignment draft
@@ -518,10 +528,10 @@ def test_cancel_edit_an_external_draft(tutor_base_url, selenium, teacher):
 
 
 @expected_failure
-@nondestructive
 @test_case('')
+@nondestructive
 @tutor
-def test_physics_stu_preview_vidz(tutor_base_url, selenium, teacher):
+def test_physics_student_preview_videos(tutor_base_url, selenium, teacher):
     """Test teacher to embed physics student preview videos."""
     # GIVEN: A logged in teacher user
 
@@ -534,11 +544,11 @@ def test_physics_stu_preview_vidz(tutor_base_url, selenium, teacher):
 
 
 @expected_failure
-@nondestructive
 @test_case('')
+@nondestructive
 @tutor
-def test_add_external_assignment_with_empty_fields(tutor_base_url, selenium,
-                                                   teacher):
+def test_add_external_assignment_with_empty_fields(
+        tutor_base_url, selenium, teacher):
     """Cancel editing an external assignment."""
     # GIVEN: Logged into Tutor as a teacher
     # AND: Has an existing course
@@ -619,10 +629,10 @@ def test_edit_an_event_draft(tutor_base_url, selenium, teacher):
 
 
 @expected_failure
-@nondestructive
 @test_case('')
+@nondestructive
 @tutor
-def test_soci_stu_preview_vidz(tutor_base_url, selenium, teacher):
+def test_sociology_student_preview_videos(tutor_base_url, selenium, teacher):
     """Test teacher to embed sociology student preview videos."""
     # GIVEN: A logged in teacher user
 
@@ -636,8 +646,8 @@ def test_soci_stu_preview_vidz(tutor_base_url, selenium, teacher):
 
 
 @expected_failure
-@nondestructive
 @test_case('')
+@nondestructive
 @tutor
 def test_cancel_edit_a_draft(tutor_base_url, selenium, teacher):
     """Cancel editing a draft event."""
@@ -654,10 +664,10 @@ def test_cancel_edit_a_draft(tutor_base_url, selenium, teacher):
 
 
 @expected_failure
-@nondestructive
 @test_case('')
+@nondestructive
 @tutor
-def test_bio_stu_preview_vidz(tutor_base_url, selenium, teacher):
+def test_biology_student_preview_videos(tutor_base_url, selenium, teacher):
     """Test teacher to embed biology student preview videos."""
     # GIVEN: A logged in teacher user
 
