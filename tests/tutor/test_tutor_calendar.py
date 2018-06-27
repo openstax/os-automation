@@ -427,6 +427,7 @@ def test_edit_an_external_draft(tutor_base_url, selenium, teacher):
     # THEN: User is taken back to the Calender
     # AND: Edited draft is published
 
+
 @expected_failure
 @test_case('')
 @tutor

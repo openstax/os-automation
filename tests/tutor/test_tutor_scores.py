@@ -262,7 +262,7 @@ def test_view_student_assignment_detail(tutor_base_url, selenium, teacher):
 def test_no_score_is_displayed_for_readings(tutor_base_url, selenium, teacher):
     """Check no score for readings in the score page."""
     # GIVEN: Logged into Tutor as a teacher
-    # AND: User is at "student scores" page for a course with a finished reading
+    # AND: User is at "student scores" page for a course with finished reading
 
     # WHEN: Click on the "Student Scores" button
     # AND: Scroll to a reading assignment
@@ -317,7 +317,6 @@ def test_unaccept_late_work(tutor_base_url, selenium, teacher):
     # THEN: The score is converted back to the score at due date
 
 
-
 @expected_failure
 @nondestructive
 @test_case('')
@@ -340,7 +339,7 @@ def test_external_assignments_in_the_scores_export(tutor_base_url, selenium,
 def test_dropped_students_in_student_scores(tutor_base_url, selenium, teacher):
     """Check removal of dropped students in scores page."""
     # GIVEN: Logged into Tutor as a teacher
-    # AND: User is at "student scores" page for a course with an dropped student
+    # AND: User is at "student scores" page for a course with a dropped student
 
     # WHEN: Click on the period from which user have dropped the student
 
@@ -359,6 +358,7 @@ def test_moved_students_in_student_scores(tutor_base_url, selenium, teacher):
     # WHEN: Click on the period to which the student was moved
 
     # THEN: The user is presented with the moved student under their new period
+
 
 @expected_failure
 @nondestructive

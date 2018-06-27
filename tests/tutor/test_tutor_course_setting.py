@@ -17,7 +17,6 @@ def test_change_course_name(tutor_base_url, selenium, teacher):
     # AND: user should be able to edit course name
 
 
-
 @expected_failure
 @nondestructive
 @test_case('')

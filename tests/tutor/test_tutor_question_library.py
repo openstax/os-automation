@@ -33,7 +33,6 @@ def test_exclude_certain_questions(tutor_base_url, selenium, teacher):
     # THEN: Question is excluded
 
 
-
 @expected_failure
 @nondestructive
 @test_case('')

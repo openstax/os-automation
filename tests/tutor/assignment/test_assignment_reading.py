@@ -100,6 +100,7 @@ def test_cancel_reading_draft(tutor_base_url, selenium, teacher):
 
     # THEN: The changes made on the reading draft is not saved
 
+
 @test_case('')
 @expected_failure
 @tutor
