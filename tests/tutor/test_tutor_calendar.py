@@ -203,12 +203,12 @@ def test_question_library(tutor_base_url, selenium, teacher):
 def test_training_wheels_dashboard(tutor_base_url, selenium, teacher):
     """Test teacher to use training wheels for dashboard`."""
     # GIVEN: A logged in teacher user
-
-    # WHEN: Click on a current course to navigate to Dashboard
+    # AND: Click on a current course to navigate to Dashboard
     # AND: Activate Spy Mode
     # AND: Pop-up should show with the options
     # ""View Tips Now"" and ""View Later""
-    # AND:Click ""View Tips Now""
+
+    # WHEN: Click ""View Tips Now""
 
     # THEN: User should be taken through a training wheels tour
     # detailing the creation of assignments,

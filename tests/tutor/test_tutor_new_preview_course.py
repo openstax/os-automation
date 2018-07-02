@@ -28,8 +28,7 @@ def test_nag_in_preview_course_expires(tutor_base_url, selenium, teacher):
     """Test 'Nag' in preview course - preview expires."""
     # GIVEN: logged in as a teacher account that doesn't
     # already have any courses
-
-    # WHEN: Navigate to preview course
+    # AND: Navigate to preview course
     # AND: Get course number/title
     # AND: Login as admin on separate browser
     # AND: Go to dropdown > Admin > Course Organization > Courses
@@ -38,7 +37,8 @@ def test_nag_in_preview_course_expires(tutor_base_url, selenium, teacher):
     # AND: Click to edit
     # AND: Change the End Date to be soon (~1 or 2 min)
     # AND: Navigate back to teacher account
-    # AND: Refresh after the new course End Date has passed
+
+    # WHEN: Refresh after the new course End Date has passed
 
     # THEN: Nag should show up urging Tutor Adoption and saying
     # "Preview Course has expired"
