@@ -29,10 +29,10 @@ def test_back_to_scores(tutor_base_url, selenium, teacher):
     """Test teacher to go back to scores."""
     # GIVEN: A logged in teacher user
     # AND: has a existing course
-    # AND: Select a Tutor course
-    # AND: Go to student scores
 
-    # WHEN:  Go to dashboard/performance forecast/question library""
+    # WHEN: Select a Tutor course
+    # AND: Go to student scores
+    # AND: Go to dashboard/performance forecast/question library""
 
     # THEN: back to scores"" button should be present
     # AND: clicking ""back to scores"" button should take user back to scores"

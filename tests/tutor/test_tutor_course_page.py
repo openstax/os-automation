@@ -57,10 +57,10 @@ def test_super_training_wheel(tutor_base_url, selenium, teacher):
 def test_training_wheel_no_reappear(tutor_base_url, selenium, teacher):
     """Test training wheel doesn't reappear after teacher create a course."""
     # GIVEN: A logged in teacher user
-    # AND: Check that the "Create a Course" training wheel pops up
-    # AND: Navigate to another page
 
-    # WHEN: Click back to the "My Courses" page
+    # WHEN: Check that the ""Create a Course"" training wheel pops up
+    # AND: Navigate to another page
+    # AND: Click back to the ""My Courses"" page
 
     # THEN: User is able to see "Create a Course" training wheel.
 
@@ -124,11 +124,11 @@ def test_nag_new_course(tutor_base_url, selenium, teacher):
 def test_nag_second_login(tutor_base_url, selenium, teacher):
     """Test 'Nag' teachers upon their second login/session."""
     # GIVEN: logged in Tutor as a new verified teacher
-    # AND: Create a full tutor course
+
+    # WHEN: Create a full tutor course
     # AND: Mess around in course a bit
     # AND: Leave the course
-
-    # WHEN: Return to the course
+    # AND: Return to the course
 
     # THEN: User should see the Nag message pop up
 
@@ -140,12 +140,12 @@ def test_nag_second_login(tutor_base_url, selenium, teacher):
 def test_nag_reappears(tutor_base_url, selenium, teacher):
     """Test 'Nag' reappears if user select 'I don't know yet' option."""
     # GIVEN: logged in Tutor as a new verified teacher
-    # AND: Create full tutor course
+
+    # WHEN: Create full tutor course
     # AND: Answer with the ""I don't know yet"" option
     # AND: Log out from teacher
     # AND: Log back into teacher
-
-    # WHEN:  Click back on the same course user just made
+    # AND: Click back on the same course user just made
 
     # THEN: User should see the Nag message pop up
 
@@ -177,12 +177,12 @@ def test_nag_not_reappear(tutor_base_url, selenium, teacher):
     'I don't know yet' option.
     """
     # GIVEN: logged in Tutor as a new verified teacher
-    # AND:  Create full tutor course
+
+    # WHEN:  Create full tutor course
     # AND: Answer with any option BUT the ""I don't know yet"" option
     # AND: Log out from teacher
     # AND: Log back into teacher
-
-    # WHEN: Click back on the same course user just made
+    # AND: Click back on the same course user just made
 
     # THEN: The "Nag" should not pop back up
 

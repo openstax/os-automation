@@ -11,11 +11,11 @@ def test_back_to_question_library(tutor_base_url, selenium, teacher):
     """Test teacher to go back to question library."""
     # GIVEN: A logged in teacher user
     # AND: has a existing course
-    # AND: Go to question library
+
+    # WHEN: Go to question library
     # AND: Go to performance forecast/dashboard,
     # ""back to question library"" button should be present
-
-    # WHEN:  Click on the ""back to question library""
+    # AND: Click on the ""back to question library""
 
     # THEN: User is taken back to question library page
 
