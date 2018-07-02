@@ -40,14 +40,14 @@ def test_view_student_scores_with_the_calendar_button(
 def test_edit_an_unopened_homework(tutor_base_url, selenium, teacher):
     """Edit an unopened homework."""
     # GIVEN: Logged into Tutor as a teacher
-    # AND: Has an existing course with an open homework
+    # AND: Has an existing course
 
     # WHEN: Go to a course with unopened homework
     # AND: Click on an unopened homework
     # AND: Change all the required fields
     # AND: Click "publish"
 
-    # THEN: User is taken back to the Calendar
+    # THEN: User is taken back to the Calender
     # AND: The edits should be saved
 
 
@@ -91,9 +91,9 @@ def test_view_performance_forecast_using_the_calendar_button(
 def test_cancel_editing_homework(tutor_base_url, selenium, teacher):
     """Cancel editing a published homework."""
     # GIVEN: Logged into Tutor as a teacher
-    # AND: Has an existing course with an published homework
-    # WHEN: Go to a course with published homework
-    # AND: Click on an published homework
+    # AND: User is at a course with published homework
+
+    # WHEN: Click on edit an published homework
     # AND: Change all the required fields
     # AND: Click "Cancel"
 
@@ -191,10 +191,9 @@ def test_open_the_reference_book_with_the_calendar_button(
 def test_cancel_editing_a_draft_homework(tutor_base_url, selenium, teacher):
     """Cancel editing a published homework draft."""
     # GIVEN: Logged into Tutor as a teacher
-    # AND: has an existing homework draft
+    # AND: User is at a course with an existing homework draft
 
-    # WHEN: Go to a course with a homework draft
-    # AND: Click on the homework draft
+    # WHEN: Click on edit the homework draft
     # AND: Change all the required fields
     # AND: Click on "Cancel"
 
@@ -208,10 +207,9 @@ def test_cancel_editing_a_draft_homework(tutor_base_url, selenium, teacher):
 def test_delete_an_opened_homework(tutor_base_url, selenium, teacher):
     """Delete an opened homework."""
     # GIVEN: Logged into Tutor as a teacher
-    # AND: Has an existing course with an opened homework
+    # AND: User is at a course with an opened homework
 
-    # WHEN: Go to a course with open homework
-    # AND: Click on an opened homework
+    # WHEN: Click on an opened homework
     # AND: Click "Delete"
     # AND: Click "Yes"
 
@@ -225,10 +223,9 @@ def test_delete_an_opened_homework(tutor_base_url, selenium, teacher):
 def test_delete_an_unopened_homework(tutor_base_url, selenium, teacher):
     """Delete an unopened homework."""
     # GIVEN: Logged into Tutor as a teacher
-    # AND: Has an existing course with an unopened homework
+    # AND: User is at a course with an unopened homework
 
-    # WHEN: Go to a course with unopened homework
-    # AND: Click on an unopened homework
+    # WHEN: Click on an unopened homework
     # AND: Click "Delete"
     # AND: Click "Yes"
 
@@ -242,7 +239,7 @@ def test_delete_an_unopened_homework(tutor_base_url, selenium, teacher):
 def test_delete_a_draft_homework(tutor_base_url, selenium, teacher):
     """Delete an homework draft."""
     # GIVEN: Logged into Tutor as a teacher
-    # AND: Has an existing course with a homework draft
+    # AND: User is at a course with a homework draft
 
     # WHEN: Go to a course with homework draft
     # AND: Click on the homework draft
@@ -259,9 +256,9 @@ def test_delete_a_draft_homework(tutor_base_url, selenium, teacher):
 def test_edit_a_draft_homework(tutor_base_url, selenium, teacher):
     """Edit a homework draft."""
     # GIVEN: Logged into Tutor as a teacher
-    # AND: Has an existing course with a draft homework
+    # AND: User is at a course with a homework draft
 
-    # WHEN: Click on a homework draft
+    # WHEN: Click on edit a homework draft
     # AND: Change all the required fields
     # AND: Click "publish"
 
@@ -360,12 +357,12 @@ def test_view_instructor_training_wheels_for_the_dashboard(
 def test_see_what_students_see_button(tutor_base_url, selenium, teacher):
     """Test visibility of 'see what student can see' button."""
     # GIVEN: Logged into Tutor as a teacher
-    # AND: Has an existing course with a reading or homework
+    # AND: User is at a course with a reading or homework
 
     # WHEN: click on the reading or homework
-    # AND: Click "edit"
+    # AND: Click "Edit"
 
-    # THEN: The "see what student can see" button should be visible"
+    # THEN: The "see what student can see" button should be visible
 
 
 @expected_failure
@@ -405,10 +402,9 @@ def test_save_external_assignment_as_draft(tutor_base_url, selenium, teacher):
 def test_edit_an_external_assignment(tutor_base_url, selenium, teacher):
     """Edit an external assignment."""
     # GIVEN: Logged into Tutor as a teacher
-    # AND: Has an existing course with an external assignment
+    # AND: User is at a course with an external assignment
 
-    # WHEN: Go to course with an external assignment
-    # AND: Click on the external assignment
+    # WHEN: Click on edit the external assignment
     # AND: Change all the required fields
     # AND: Click "publish"
 
@@ -422,9 +418,9 @@ def test_edit_an_external_assignment(tutor_base_url, selenium, teacher):
 def test_edit_an_external_draft(tutor_base_url, selenium, teacher):
     """Edit an external assignment draft."""
     # GIVEN: Logged into Tutor as a teacher
-    # AND: Has an existing course with a draft external assignment
+    # AND: User is at a course with an draft external assignment
 
-    # WHEN: Click on an external assignment draft
+    # WHEN: Click on edit an external assignment draft
     # AND: Change all the required fields
     # AND: Click "publish"
 
@@ -438,14 +434,14 @@ def test_edit_an_external_draft(tutor_base_url, selenium, teacher):
 def test_delete_an_external_assignment(tutor_base_url, selenium, teacher):
     """Delete an external assignment."""
     # GIVEN: Logged into Tutor as a teacher
-    # AND: Has an existing course with an external assignment
+    # AND: User is at a course with an external assignment
 
-    # WHEN: Go to the course with external assignment
-    # AND: Click on an external assignment
-    # AND: Click “delete"
+    # WHEN: Click on an external assignment
+    # AND: Click "delete"
+    # AND: Click "yes"
 
     # THEN: User is taken back to the Calender
-    # AND: The external assignment is no longer visible on the calendar"
+    # AND: The external assignment is no longer visible on the calendar
 
 
 @expected_failure
@@ -454,7 +450,7 @@ def test_delete_an_external_assignment(tutor_base_url, selenium, teacher):
 def test_delete_an_external_draft(tutor_base_url, selenium, teacher):
     """Delete an external assignment draft."""
     # GIVEN: Logged into Tutor as a teacher
-    # AND: Has an existing course with a draft external assignment
+    # AND: User is at a course with a draft external assignment
 
     # WHEN: Click on an external assignment draft
     # AND: Click "delete"
@@ -486,11 +482,11 @@ def test_term_appearance_new(tutor_base_url, selenium, teacher):
 def test_cancel_edit_external_assignment(tutor_base_url, selenium, teacher):
     """Cancel editing an external assignment."""
     # GIVEN: Logged into Tutor as a teacher
-    # AND: Has an existing course with an external assignment
+    # AND: User is at a course with an external assignment
 
     # WHEN: Click on an external assignment.
     # AND: Change all the required fields
-    # AND: Click “cancel"
+    # AND: Click "cancel"
 
     # THEN: User is taken back to the Calender
     # AND: No changes should be made on the assignment
@@ -517,11 +513,11 @@ def test_term_appearance_exist(tutor_base_url, selenium, teacher):
 def test_cancel_editing_an_external_draft(tutor_base_url, selenium, teacher):
     """Cancel editing an external assignment draft."""
     # GIVEN: Logged into Tutor as a teacher
-    # AND: Has an existing course with an external assignment draft
+    # AND: User is at a course with an external assignment draft
 
-    # WHEN: Click on an external assignment draft
+    # WHEN: Click on edit an external assignment draft
     # AND: Change all the required fields
-    # AND: Click “cancel"
+    # AND: Click "Cancel"
 
     # THEN: User is taken back to the Calender
     # AND: No changes should be made on the draft
@@ -551,9 +547,9 @@ def test_add_external_assignment_with_empty_fields(
         tutor_base_url, selenium, teacher):
     """Cancel editing an external assignment."""
     # GIVEN: Logged into Tutor as a teacher
-    # AND: Has an existing course
+    # AND: User is at a course with an external assignment
 
-    # WHEN: Click on an external assignment
+    # WHEN: Click on edit an external assignment
     # AND: Change some of the required fields and leave some blank
     # AND: Click "Publish"
 
@@ -566,10 +562,9 @@ def test_add_external_assignment_with_empty_fields(
 def test_add_a_new_event(tutor_base_url, selenium, teacher):
     """Add a new event."""
     # GIVEN: Logged into Tutor as a teacher
-    # AND: Has an existing course
+    # AND: User is at a course calendar
 
-    # WHEN: Go to the course page
-    # AND: Click on a date on the dashboard
+    # WHEN: Click on a date on the dashboard
     # AND: Click "add event"
     # AND: Fill in all the required fields
     # AND: click "Publish"
@@ -586,7 +581,8 @@ def test_save_an_event_draft(tutor_base_url, selenium, teacher):
     # GIVEN: Logged into Tutor as a teacher
     # AND: Has an existing course
 
-    # WHEN: click on a date on the dashboard, then click "add event"
+    # WHEN: click on a date on the dashboard
+    # AND: click "add event"
     # AND: fill in all the required fields
     # AND: click "Save as Draft"
 
@@ -600,15 +596,14 @@ def test_save_an_event_draft(tutor_base_url, selenium, teacher):
 def test_edit_a_published_event(tutor_base_url, selenium, teacher):
     """Edit a published event."""
     # GIVEN: Logged into Tutor as a teacher
-    # AND: Has an existing course
-    # AND: Has an published event
+    # AND: User is at a course with a published event
 
-    # WHEN: Click on a published event
+    # WHEN: Click on edit a published event
     # AND: Change all the required fields
     # AND: Click "Publish"
 
     # THEN: User is taken back to the Calender
-    # AND: The event should be visible on the calendar with its info updated"
+    # AND: The event should be visible on the calendar with its info updated
 
 
 @expected_failure
@@ -617,10 +612,9 @@ def test_edit_a_published_event(tutor_base_url, selenium, teacher):
 def test_edit_an_event_draft(tutor_base_url, selenium, teacher):
     """Edit an draft event."""
     # GIVEN: Logged into Tutor as a teacher
-    # AND: Has an existing course
-    # AND: Has an draft event
+    # AND: User is at a course with a draft event
 
-    # WHEN: Click on  event draft
+    # WHEN: Click on edit event draft
     # AND: Change all the required fields
     # AND: Click "Publish"
 
@@ -652,10 +646,9 @@ def test_sociology_student_preview_videos(tutor_base_url, selenium, teacher):
 def test_cancel_edit_a_draft(tutor_base_url, selenium, teacher):
     """Cancel editing a draft event."""
     # GIVEN: Logged into Tutor as a teacher
-    # AND: Has an existing course
-    # AND: Has an draft event
+    # AND: User is at a course with a draft event
 
-    # WHEN: Click on  event draft
+    # WHEN: Click on edit event draft
     # AND: Change all the required fields
     # AND: Click "Cancel"
 
@@ -686,10 +679,9 @@ def test_biology_student_preview_videos(tutor_base_url, selenium, teacher):
 def test_cancel_edit_a_published_event(tutor_base_url, selenium, teacher):
     """Cancel editing a published event."""
     # GIVEN: Logged into Tutor as a teacher
-    # AND: Has an existing course
-    # AND: Has an published event
+    # AND: User is at a course with a published event
 
-    # WHEN: Click on  published event
+    # WHEN: Click on published event
     # AND: Change all the required fields
     # AND: Click "Cancel"
 
@@ -703,11 +695,11 @@ def test_cancel_edit_a_published_event(tutor_base_url, selenium, teacher):
 def test_delete_a_published_event(tutor_base_url, selenium, teacher):
     """Delete a published event."""
     # GIVEN: Logged into Tutor as a teacher
-    # AND: Has an existing course
-    # AND: Has an published event
+    # AND: User is at a course with a published event
 
-    # WHEN: Click on  published event
+    # WHEN: Click on published event
     # AND: Click "Delete"
+    # AND: Click "yes"
 
     # THEN: User is taken back to the Calender
     # AND: The deleted event should no longer be visible
@@ -719,11 +711,11 @@ def test_delete_a_published_event(tutor_base_url, selenium, teacher):
 def test_delete_an_event_draft(tutor_base_url, selenium, teacher):
     """Delete a draft event."""
     # GIVEN: Logged into Tutor as a teacher
-    # AND: Has an existing course
-    # AND: Has an draft event
+    # AND: User is at a course with a draft event
 
     # WHEN: Click on draft event
     # AND: Click "Delete"
+    # AND: Click "yes"
 
     # THEN: User is taken back to the Calender
     # AND: The deleted event draft should no longer be visible
