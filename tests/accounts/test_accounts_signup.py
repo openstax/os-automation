@@ -32,7 +32,7 @@ def test_student_account_signup(accounts_base_url, selenium):
 
 @test_case('C205362')
 @accounts
-def test_instructor_account_signup(accounts_base_url, selenium):
+def test_instructor_account_signup(accounts_base_url, selenium, teacher):
     """Test non-student user signup."""
     page = GuerrillaMail(selenium).open()
     email = page.header.email
@@ -40,7 +40,7 @@ def test_instructor_account_signup(accounts_base_url, selenium):
     subjects = subject_list(Utility.random(1, 5))
     page.account_signup(
         email=email,
-        password=os.getenv('TEACHER_PASSWORD'),
+        password=teacher[1],
         _type=Signup.INSTRUCTOR,
         provider='guerrilla',
         kwargs={
@@ -60,7 +60,7 @@ def test_instructor_account_signup(accounts_base_url, selenium):
 
 @test_case('C195550')
 @accounts
-def test_non_student_account_signup(accounts_base_url, selenium):
+def test_non_student_account_signup(accounts_base_url, selenium, teacher):
     """Test non-student user signup."""
     page = GuerrillaMail(selenium).open()
     email = page.header.email
@@ -78,7 +78,7 @@ def test_non_student_account_signup(accounts_base_url, selenium):
     subjects = subject_list(Utility.random(1, 5))
     page.account_signup(
         email=email,
-        password=os.getenv('TEACHER_PASSWORD'),
+        password=teacher[1],
         _type=account_title,
         provider='guerrilla',
         kwargs={

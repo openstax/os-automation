@@ -77,7 +77,7 @@ class Google(GoogleBase):
     class Email(Region):
         """Email container."""
 
-        _from_locator = (By.CSS_SELECTOR, '.yW .yP')
+        _from_locator = (By.CSS_SELECTOR, '.yW span[email]')
         _subject_locator = (By.CLASS_NAME, 'bog')
         _excerpt_locator = (By.CSS_SELECTOR, '.y6 .y2')
 
@@ -124,6 +124,11 @@ class GuerrillaMail(Page):
         self.wait.until(
             lambda _: self.find_element(*self._root_locator).is_displayed())
 
+    def wait_for_email(self):
+        """Wait for more than one email in inbox."""
+        n = len(self.emails)
+        self.wait.until(lambda _: len(self.emails) > n)
+
     @property
     def header(self):
         """Return the e-mail control panel."""
@@ -139,7 +144,12 @@ class GuerrillaMail(Page):
     def compose(self):
         """Return a composition page."""
         self.find_element(*self._compose_locator).click()
-        return Compose(self.selenium)
+        return Compose(self.driver)
+
+    @property
+    def openedmail(self):
+        """Return a opened email region."""
+        return self.OpenedMail(self)
 
     class Header(Region):
         """E-mail address controls."""
@@ -211,6 +221,7 @@ class GuerrillaMail(Page):
 
         _subject_locator = (By.CLASS_NAME, 'td3')
         _excerpt_locator = (By.CLASS_NAME, 'email-excerpt')
+        _emails_locator = (By.CSS_SELECTOR, 'tbody > tr')
 
         @property
         def subject(self):
@@ -233,6 +244,23 @@ class GuerrillaMail(Page):
             if self.has_pin:
                 return (MATCHER.search(self.excerpt).group())[-6:]
             raise EmailVerificationError('No pin found')
+
+        def open_email(self):
+            """Open this email."""
+            Utility.scroll_to(self.driver, self._subject_locator)
+            sleep(4)
+            self.find_element(*self._subject_locator).click()
+            sleep(0.5)
+            self.driver.refresh()
+
+    class OpenedMail(Region):
+        """The email page after it's opened."""
+
+        _confirmation_link_locator = (By.CSS_SELECTOR, '.email_body a')
+
+        def confirm_email(self):
+            """Clicks the openstax email confirmation link."""
+            Utility.switch_to(self.driver, self._confirmation_link_locator)
 
 
 class Compose(GuerrillaMail):
