@@ -12,11 +12,9 @@ def test_homework_submit_button(tutor_base_url, selenium, student):
 
     # AND: Has enrolled in a course
 
-    # AND: Has an open homework assignment
+    # AND: Is on a open homework assignment
 
-    # WHEN: The user clicks on homework assignment
-
-    # AND: The user clicks one of the answer choices
+    # WHEN: The user clicks one of the answer choices
 
     # THEN: The selected answer is light blue
 
@@ -110,8 +108,6 @@ def test_previous_question(tutor_base_url, selenium, student):
     # AND: The user clicks on the previous question icon
 
     # THEN: The user is taken to the previous question
-
-    # AND: The assessment is answered
 
 
 @test_case('')

@@ -24,10 +24,9 @@ def test_average_section(tutor_base_url, selenium, student):
     """Test the average section of the homework assignment."""
     # GIVEN:  Logged into Tutor as a student
     # AND: Has enrolled in a class
-    # AND: Has a homework assignment
+    # AND: Is on a homework assignment
 
-    # WHEN: The user clicks on a homework assignment
-    # AND: The user clicks on an answer
+    # WHEN: The user clicks on an answer for hw assignment
     # AND: The user clicks on the arrow next to the average
 
     # THEN: See the average section widen

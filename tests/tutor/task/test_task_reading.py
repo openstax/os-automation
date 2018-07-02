@@ -11,9 +11,7 @@ def test_open_reading_assignment_page(tutor_base_url, selenium, student):
     """Test the tutor open reading assignment page."""
     # GIVEN: The Tutor home page logged as a student
 
-    # AND: The student Has enrolled in a course
-
-    # AND: The student has an open reading assignment in that course
+    # AND: Has an open reading assignment in that course
 
     # WHEN: The user clicks on the reading assignment
 
@@ -28,17 +26,13 @@ def test_reading_questions(tutor_base_url, selenium, student):
     """Test the reading questions."""
     # GIVEN: Logged into Tutor as a student
 
-    # AND: Has enrolled in a course
-
     # AND: Has an open reading assignment
 
     # WHEN: The user clicks on the reading assignment
 
-    # AND: The user continues through the assignment
+    # AND: The user goes through all of the assignment
 
-    # THEN: The review questions load
-
-    # AND: The student is able to submit answers for all questions
+    # THEN: "You are done" message shows up
 
 
 @test_case('')
@@ -51,11 +45,9 @@ def test_textbook_from_quiz(tutor_base_url, selenium, student):
 
     # AND: Has enrolled in a course
 
-    # AND: Has an open reading assignment
+    # AND: Is on a reading assignment
 
-    # WHEN: The user clicks on the reading assignment
-
-    # AND: The user goes to an assessment
+    # WHEN: Click on the right arrow
 
     # AND: The user clicks the "Comes from <section name>" link
 
@@ -90,11 +82,9 @@ def test_assignment_review_page(tutor_base_url, selenium, student):
 
     # AND: Enrolled in a course
 
-    # AND: Has a reading assignment
+    # AND: Is on a reading assignment
 
-    # WHEN: The user clicks on the reading assignment
-
-    # AND: The user clicks on the "Continue" button
+    # WHEN: The user clicks on the "Continue" button
 
     # THEN: The corresponding reading assignment review loads
 
@@ -108,15 +98,13 @@ def test_spaced_practice_assessment(tutor_base_url, selenium, student):
 
     # AND: Enrolled in a course
 
-    # AND: Has a reading assignment
+    # AND: Is on a reading assignment
 
     # AND: Has done at least three assignments before
 
-    # WHEN: The user clicks on the reading assignment
+    # WHEN: The user continues on the reading assignment
 
-    # AND: The user continues on the reading assignment
-
-    # THEN: A Spaced Practice assessment is assigned
+    # THEN: A Spaced Practice assessment may or may not be assigned
 
 
 @test_case('')
@@ -128,13 +116,11 @@ def test_personalized_assessment(tutor_base_url, selenium, student):
 
     # AND: Enrolled in a course
 
-    # AND: Has a reading assignment
+    # AND: Is on a reading assignment
 
-    # WHEN: The user clicks on the reading assignment
+    # WHEN: The user goes through readings and click "Continue" button
 
-    # AND: The user goes through readings and click "Continue" button
-
-    # THEN: A Personalized assessment  is assigned
+    # THEN: A Personalized assessment may or may not be assigned
 
 
 @test_case('')
@@ -146,11 +132,9 @@ def test_assignment_done_pop_up(tutor_base_url, selenium, student):
 
     # AND: Enrolled in a course
 
-    # AND: Has a reading assignment
+    # AND: Is on a reading assignment
 
-    # WHEN: The user click on the reading assignment
-
-    # AND: The user completes the assignment
+    # WHEN: The user completes the assignment
 
     # THEN: The user is shown "User are done"
 
@@ -164,14 +148,10 @@ def test_complete_reading(tutor_base_url, selenium, student):
 
     # AND: Has enrolled in a course
 
-    # AND: Has an open reading assignment
+    # AND: Is on a open reading assignment
 
-    # WHEN: The user selected the reading assignment
-
-    # AND: The user works the assignment
+    # WHEN: The user completes the assignment
 
     # AND: The user clicks "Back to Dashboard" button
 
-    # THEN: The Dashboard page for that course loads
-
-    # AND: The reading is marked "completed" on the dashboard
+    # THEN: Taken back to the dashboard
