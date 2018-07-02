@@ -88,6 +88,7 @@ def test_cancel_delete_a_section(tutor_base_url, selenium, teacher):
     # THEN: The section should not be deleted
 
 
+@expected_failure
 @test_case('')
 @tutor
 def test_cancel_renaming_a_section(tutor_base_url, selenium, teacher):
@@ -101,6 +102,7 @@ def test_cancel_renaming_a_section(tutor_base_url, selenium, teacher):
     # THEN: The section name should not change
 
 
+@expected_failure
 @test_case('')
 @tutor
 def test_edit_student_id(tutor_base_url, selenium, teacher):
