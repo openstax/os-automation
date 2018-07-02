@@ -10,11 +10,9 @@ from tests.markers import expected_failure, nondestructive, test_case, tutor
 def test_add_to_catalog_offerings(tutor_base_url, selenium, admin):
     """Test admin to add to catalog offerings."""
     # GIVEN: logged in as admin
-
-    # WHEN: Go to Tutor admin console
-    # AND: Click on ""Course Organization""
-    # AND: In the drop down click on ""Catalog Offerings""
-    # AND: Click the ""Add Offerings"" button
+    # AND: At the Tutor admin console
+    
+    # WHEN: Click the ""Add Offerings"" button
     # AND: Fill out the required fields
     # AND: Click the ""Save"" button
 
@@ -29,11 +27,9 @@ def test_add_to_catalog_offerings(tutor_base_url, selenium, admin):
 def test_edit_catalog(tutor_base_url, selenium, admin):
     """Test admin to edit catalog in catalog offereings."""
     # GIVEN: logged in as admin
+    # AND: At the Catalog Offerings Page
 
-    # WHEN: Go to Tutor admin console
-    # AND: Click on ""Course Organization"" in the navbar
-    # AND: On the drop down click on ""Catalog Offerings""
-    # AND: On the side of a course listing click the ""Edit"" button
+    # WHEN: On the side of a course listing click the ""Edit"" button
     # AND: Change one or more of the fields
     # AND: Click save"
 
