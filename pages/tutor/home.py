@@ -9,6 +9,7 @@ from pages.tutor.dashboard import TutorDashboard
 
 
 class TutorHome(TutorBase):
+    """Tutor home page for users that are not logged in"""
 
     _login_btn_locator = (By.CSS_SELECTOR, '.login')
 

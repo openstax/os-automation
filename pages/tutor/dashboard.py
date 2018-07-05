@@ -15,6 +15,7 @@ class TutorDashboard(TutorBase):
 
     @property
     def courses_region(self):
+        """Returns all courses region"""
         return self.Courses(self)
 
     class Courses(Region):
