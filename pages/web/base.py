@@ -1,7 +1,14 @@
 """Basic page parent for all OpenStax Web pages."""
 
+import time
+
 from pypom import Page, Region
+from selenium.webdriver import ActionChains
 from selenium.webdriver.common.by import By
+
+from regions.web.web_nav import WebNav
+from regions.web.openstax_nav import OpenStaxNav
+from regions.web.footer import Footer
 
 
 class WebBase(Page):
@@ -16,30 +23,30 @@ class WebBase(Page):
 
     @property
     def header(self):
-        """Return Web header."""
+        """Return web header."""
         return self.Header(self)
 
     @property
     def footer(self):
-        """Return Web footer."""
+        """Return web footer."""
         return self.Footer(self)
 
     class Header(Region):
         """Web page header."""
 
-        _root_locator = (By.CLASS_NAME, 'container')
+        _root_locator = (By.CLASS_NAME, 'page-header')
 
         @property
         def is_header_displayed(self):
             """Header display boolean."""
             return self.loaded
 
-    class Footer(Region):
-        """Web page footer."""
-
-        _root_locator = (By.TAG_NAME, 'footer')
+        @property
+        def web_nav(self):
+            """Web nav region."""
+            return self.WebNav(self)
 
         @property
-        def is_footer_displayed(self):
-            """Footer display boolean."""
-            return self.loaded
+        def openstax_nav(self):
+            """Openstax nav region."""
+            return self.OpenStaxNav(self)
