@@ -1,7 +1,5 @@
 """Basic page parent for all OpenStax Web pages."""
 
-import time
-
 from pypom import Page, Region
 from selenium.webdriver import ActionChains
 from selenium.webdriver.common.by import By
