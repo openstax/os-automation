@@ -99,14 +99,10 @@ class TutorBase(Page):
         @property
         def show_terms_of_use(self):
             """Display the terms of use."""
-            self.find_element(*self._terms_locator).click()
+            self.find_element(*self._terms_link_locator).click()
             sleep(1)
             return self
 
         def go_to_gdpr(self):
             """Go to the Rice GPDR compliance page."""
             return GeneralDataPrivacyRegulation(self.driver)
-
-    class Nav(Region):
-        """Tutor nav bar for logged in teacher and students"""
-        pass
