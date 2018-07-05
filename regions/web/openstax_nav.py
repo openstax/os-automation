@@ -83,7 +83,7 @@ class OpenStaxNav(Region):
         """Goes to the about tutor page."""
         ActionChains(self.driver).move_to_element(*self._technology_dropdown_locator).click(*self._about_tutor_locator).perform()
         sleep(1)
-        return About_Tutor(self.driver)
+        return AboutTutor(self.driver)
 
     def go_to_partners(self):
         """Goes to the partners page."""
@@ -95,7 +95,7 @@ class OpenStaxNav(Region):
         """Goes to the our impact page."""
         self.find_element(*self._our_impact_locator).click()
         sleep(1)
-        return Our_Impact(self.driver)
+        return OurImpact(self.driver)
 
     def go_to_login(self):
         """Goes to the our impact page."""

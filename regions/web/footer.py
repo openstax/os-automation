@@ -45,13 +45,13 @@ class Footer(Region):
         """Goes to the privacy policy page"""
         self.find_element(*self._privacy_policy_locator).click()
         sleep(1)
-        return Privacy_Policy(self.driver)
+        return PrivacyPolicy(self.driver)
 
     def go_to_accessibility_statement(self):
         """Goes to the accessibility statement page"""
         self.find_element(*self._accessibility_statement_locator).click()
         sleep(1)
-        return Accessibility_Statement(self.driver)
+        return AccessibilityStatement(self.driver)
 
     def go_to_open_source(self):
         """Goes to the openstax github page"""
@@ -75,7 +75,7 @@ class Footer(Region):
         """Goes to the newsletter page"""
         self.find_element(*self._newsletter_locator).click()
         sleep(1)
-        return Newsletter_Signup(self.driver)
+        return NewsletterSignup(self.driver)
 
     def go_to_facebook(self):
         """Goes to the facebook page"""
