@@ -504,6 +504,7 @@ def test_term_appearance_exist(tutor_base_url, selenium, teacher):
     # AND: Enters a course.
 
     # THEN: the teacher is shown the terms when they changed.
+    # AND: No changes should be made on the draft
 
 
 @expected_failure
@@ -513,11 +514,11 @@ def test_term_appearance_exist(tutor_base_url, selenium, teacher):
 def test_cancel_editing_an_external_draft(tutor_base_url, selenium, teacher):
     """Cancel editing an external assignment draft."""
     # GIVEN: Logged into Tutor as a teacher
-    # AND: User is at a course with an external assignment draft
+    # AND: Has an existing course with an external assignment draft
 
-    # WHEN: Click on edit an external assignment draft
+    # WHEN: Click on an external assignment draft
     # AND: Change all the required fields
-    # AND: Click "Cancel"
+    # AND: Click “cancel"
 
     # THEN: User is taken back to the Calender
     # AND: No changes should be made on the draft
