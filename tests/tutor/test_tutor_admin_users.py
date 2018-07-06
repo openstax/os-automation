@@ -28,5 +28,5 @@ def test_view_user_info(tutor_base_url, selenium, admin):
     # AND: At the Users page
 
     # WHEN: Click on the ""Info"" button
-    
+
     # THEN: User is taken to a page containing user info.

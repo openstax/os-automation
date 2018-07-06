@@ -29,7 +29,7 @@ def test_view_student(tutor_base_url, selenium, admin):
     # GIVEN: at Tutor admin console
     # AND: Click on "Course Organization"
     # AND: In the drop down click on "Courses"
-    
+
     # WHEN: Click the ""List Students"" button next to one of the courses
 
     # THEN: A list of students in the course is displayed
