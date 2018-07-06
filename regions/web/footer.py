@@ -1,9 +1,7 @@
 """Footer region"""
 
-import time
-
+from time import sleep
 from pypom import Region
-from selenium.webdriver import ActionChains
 from selenium.webdriver.common.by import By
 
 
@@ -15,8 +13,10 @@ class Footer(Region):
     _license_locator = (By.CSS_SELECTOR, "a[href*='license']")
     _terms_of_service_locator = (By.CSS_SELECTOR, "a[href*='tos']")
     _privacy_policy_locator = (By.CSS_SELECTOR, "a[href*='privacy-policy']")
-    _accessibility_statement_locator = (By.CSS_SELECTOR, "a[href*='accessibility-statement']")
-    _open_source_locator = (By.CSS_SELECTOR, "a[href*='https://github.com/openstax']")
+    _accessibility_statement_locator = (
+        By.CSS_SELECTOR, "a[href*='accessibility-statement']")
+    _open_source_locator = (
+        By.CSS_SELECTOR, "a[href*='https://github.com/openstax']")
     _contact_us_locator = (By.CSS_SELECTOR, "a[href*='contact']")
     _press_locator = (By.CSS_SELECTOR, "a[href*='press']")
     _newsletter_locator = (By.PARTIAL_LINK_TEXT, "Newsletter")

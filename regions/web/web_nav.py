@@ -1,9 +1,7 @@
 """Web nav region."""
 
-import time
-
+from time import sleep
 from pypom import Region
-from selenium.webdriver import ActionChains
 from selenium.webdriver.common.by import By
 
 
