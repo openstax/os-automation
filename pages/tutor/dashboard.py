@@ -11,6 +11,7 @@ class TutorDashboard(TutorBase):
     """Tutor dashboard page object."""
 
     URL_TEMPLATE = '/dashboard'
+
     _root_locator = (By.CLASS_NAME, 'tutor-root')
 
     @property
