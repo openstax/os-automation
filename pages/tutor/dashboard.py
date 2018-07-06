@@ -4,8 +4,7 @@ from pypom import Region
 from selenium.webdriver.common.by import By
 
 from pages.tutor.base import TutorBase
-
-# from pages.tutor.course import TutorCourse
+from pages.tutor.course import TutorCourse
 
 
 class TutorDashboard(TutorBase):
@@ -19,10 +18,16 @@ class TutorDashboard(TutorBase):
         """Return all courses region."""
         return self.Courses(self)
 
+    @property
+    def nav(self):
+        """Return the nav region."""
+        from regions.tutor.nav import TutorNav
+        return TutorNav(self)
+
     def go_to_first_course(self):
         """Go to the first course."""
         self.courses_region.courses[0].go_to_course()
-        # return TutorCourse(self.driver)
+        return TutorCourse(self.driver)
 
     class Courses(Region):
         """Courses sections."""
@@ -44,4 +49,4 @@ class TutorDashboard(TutorBase):
             def go_to_course(self):
                 """Go to the course page for this course."""
                 self.find_element(*self._card_locator).click()
-                # return TutorCourse(self.driver)
+                return TutorCourse(self.driver)

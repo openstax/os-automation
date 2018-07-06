@@ -12,6 +12,7 @@ from pages.salesforce.home import Salesforce
 
 class AccountsHome(AccountsBase):
     """Home page base."""
+
     URL_TEMPLATE = ''
 
     @property
@@ -24,7 +25,7 @@ class AccountsHome(AccountsBase):
         return self.Login(self).login(user, password)
 
     def service_log_in(self, user, password):
-        """Log into the site with a specific user from another service"""
+        """Log into the site with a specific user from another service."""
         return self.Login(self).service_login(user, password)
 
     @property
@@ -64,26 +65,20 @@ class AccountsHome(AccountsBase):
             return 'profile' in self.driver.current_url
 
         def login(self, user, password):
-            """Log into the site with a specific user."""
-            self.find_element(*self._user_field_locator).send_keys(user)
-            self.find_element(*self._login_submit_button_locator).click()
-            sleep(1)
-            self.find_element(*self._password_field_locator) \
-                .send_keys(password)
-            self.find_element(*self._login_submit_button_locator).click()
+            """Log into the accounts with a specific user."""
+            self.service_login(user, password)
             self.wait.until(lambda _: self.logged_in)
             from pages.accounts.profile import Profile
             return Profile(self.driver)
 
         def service_login(self, user, password):
-            """Log into the site with a specific user from another service"""
+            """Log into the site with a specific user from another service."""
             self.find_element(*self._user_field_locator).send_keys(user)
             self.find_element(*self._login_submit_button_locator).click()
             sleep(1)
             self.find_element(*self._password_field_locator) \
                 .send_keys(password)
             self.find_element(*self._login_submit_button_locator).click()
-
 
         def facebook_login(self, user, facebook_user, password):
             """Log into the site with facebook."""
