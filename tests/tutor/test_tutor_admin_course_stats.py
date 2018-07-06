@@ -10,9 +10,8 @@ from tests.markers import expected_failure, nondestructive, test_case, tutor
 def test_view_course_stats(tutor_base_url, selenium, admin):
     """Test admin to view course stats."""
     # GIVEN: logged in as admin
+    # AND: At the Stats Page
 
-    # WHEN: Go to Tutor admin console
-    # AND: Click on ""Stats"" in the navbar
-    # AND: In the drop down click on ""Courses""
+    # WHEN: In the drop down click on ""Courses""
 
     # THEN: The course stats page is loaded

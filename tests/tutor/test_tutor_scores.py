@@ -40,10 +40,9 @@ def test_average_section(tutor_base_url, selenium, student):
 def test_view_student_scores(tutor_base_url, selenium, teacher):
     """View student scores."""
     # GIVEN: Logged into Tutor as a teacher
-    # AND: Has an existing course
+    # AND: User is at "student scores" page for a course
 
-    # WHEN: Click on the "Student Scores" button
-    # AND: Click on the tab for the desired period
+    # WHEN: Click on the tab for the desired period
 
     # THEN: Scores for selected period are displayed in a table
 
@@ -55,7 +54,7 @@ def test_view_student_scores(tutor_base_url, selenium, teacher):
 def test_section_tab(tutor_base_url, selenium, teacher):
     """Switch to view different sections of student scores."""
     # GIVEN: Logged into Tutor as a teacher
-    # AND: Has an existing course with more than one sections
+    # AND: User is at a course calendar
 
     # WHEN: Click on the "Student Scores" button
 
@@ -70,11 +69,9 @@ def test_switch_between_score_representation(
         tutor_base_url, selenium, teacher):
     """Switch to view different representations of scores."""
     # GIVEN: Logged into Tutor as a teacher
-    # AND: Has an existing course
+    # AND: User is at "student scores" page for a course
 
-    # WHEN: Click on a course
-    # AND: Go to student scores
-    # AND: switch between "display as: %/#"
+    # WHEN: Click on the tab "display as: %/#"
 
     # THEN: The representation of score representation change accordingly
 
@@ -87,11 +84,9 @@ def test_download_spreadsheet_of_class_score(
         tutor_base_url, selenium, teacher):
     """Download class scores as a spreadsheet."""
     # GIVEN: Logged into Tutor as a teacher
-    # AND: Has an existing course
+    # AND: User is at "student scores" page for a course
 
-    # WHEN: Click on a course
-    # AND: Click on the "Student Scores" button
-    # AND: Click on the "Export" button
+    # WHEN: Click on the "Export" button
     # AND: Select destination for saved spreadsheet in the pop up
     # AND: Click on the "Save" Button on the pop up
 
@@ -106,11 +101,9 @@ def test_view_performance_forecast_for_single_student(tutor_base_url, selenium,
                                                       teacher):
     """View performance forecast for a single student from score page."""
     # GIVEN: Logged into Tutor as a teacher
-    # AND: Has an existing course
+    # AND: User is at "student scores" page for a course
 
-    # WHEN: Click on a course
-    # AND: Click on the "Student Scores" button
-    # AND: Click on the name of selected student
+    # WHEN: Click on the name of selected student
 
     # THEN: Performance Forecast for selected student is displayed
 
@@ -122,15 +115,12 @@ def test_view_performance_forecast_for_single_student(tutor_base_url, selenium,
 def test_sort_the_student_list_by_last_name(tutor_base_url, selenium, teacher):
     """Sort student by last name in the score page."""
     # GIVEN: Logged into Tutor as a teacher
-    # AND: Has an existing course
-    # AND: Has at least two students
+    # AND: User is at "student scores" page with at least two students
 
-    # WHEN: Click on a course
-    # AND: Click on the "Student Scores" button
-    # AND: Click on "Name and Student ID" on the table
+    # WHEN: Click on "Name and Student ID" on the table
     # AND: Click on "Name and Student ID" on the table again
 
-    # THEN: The students are sorted alphabetically by last name.
+    # THEN: The students are sorted alphabetically by last name
 
 
 @expected_failure
@@ -141,13 +131,10 @@ def test_sort_score_by_assignment_completion(tutor_base_url, selenium,
                                              teacher):
     """Sort student by completion of an assignment in the score page."""
     # GIVEN: Logged into Tutor as a teacher
-    # AND: Has an existing course
-    # AND: Has at least two students
-    # AND: Students has somewhat finished an assignment
+    # AND: User is at "student scores" page for with at least two students
+    # AND: The students have finished some assignments
 
-    # WHEN: If the user has more than one course, click on a Tutor course name
-    # AND: Click on the "Student Scores" button
-    # AND: Click "Progress"
+    # WHEN: Click "Progress"
 
     # THEN: Students are sorted by completion of selected assignment.
 
@@ -159,13 +146,10 @@ def test_sort_score_by_assignment_completion(tutor_base_url, selenium,
 def test_sort_score_by_assignment_score(tutor_base_url, selenium, teacher):
     """Sort student by scores of an assignment in the score page."""
     # GIVEN: Logged into Tutor as a teacher
-    # AND: Has an existing course
-    # AND: Has at least two students
-    # AND: Has a graded assignment
+    # AND: User is at "student scores" page with at least two students
+    # AND: The students have graded assignments
 
-    # WHEN: If the user has more than one course, click on a Tutor course name
-    # AND: Click on the "Student Scores" button
-    # AND: Click "Score"
+    # WHEN: Click "Score"
 
     # THEN: Students are sorted by completion of selected assignment.
 
@@ -176,11 +160,9 @@ def test_sort_score_by_assignment_score(tutor_base_url, selenium, teacher):
 def test_edit_score_weights(tutor_base_url, selenium, teacher):
     """Edit score weights."""
     # GIVEN: Logged into Tutor as a teacher
-    # AND: Has an existing course
+    # AND: User is at "student scores" page for a course
 
-    # WHEN: If the user has more than one course, click on a Tutor course name
-    # AND: Click on the "Student Scores" button
-    # AND: Click "set weights" on the page
+    # WHEN: Click "set weights" on the page
 
     # THEN: A window for edit weights should pop up
     # AND: user should be able to change the weights from this window
@@ -193,14 +175,9 @@ def test_edit_score_weights(tutor_base_url, selenium, teacher):
 def test_cancel_edit_score_weights(tutor_base_url, selenium, teacher):
     """Cancel editing score weights."""
     # GIVEN: Logged into Tutor as a teacher
-    # AND: Has an existing course
+    # AND: User is at "student scores" page for a course
 
-    # WHEN: If the user has more than one course, click on a Tutor course name
-    # AND: Click on the "Student Scores" button
-    # AND: Click "set weights" on the page
-    # AND. click "set weights" on the page
-    # AND.  change some weights in the popup window
-    # AND. click cancel button
+    # WHEN: Click "set weights" on the page
 
     # THEN: User is taken back to the scores page, nothing should change
 
@@ -212,14 +189,12 @@ def test_cancel_edit_score_weights(tutor_base_url, selenium, teacher):
 def test_click_see_why_in_score_weights(tutor_base_url, selenium, teacher):
     """Go to 'see why' blog page from score weights."""
     # GIVEN: Logged into Tutor as a teacher
-    # AND: Has an existing course
+    # AND: User is at "student scores" page for a course
 
-    # WHEN: If the user has more than one course, click on a Tutor course name
-    # AND: Click on the "Student Scores" button
-    # AND: click "set weights" at student scores page
-    # AND: click "see why" from the set weights page
+    # WHEN: Click "set weights" at student scores page
+    # AND: Click "see why" from the set weights page
 
-    # THEN: the openstax blog should open up in another tab"
+    # THEN: the openstax blog should open up in another tab
 
 
 @expected_failure
@@ -229,12 +204,11 @@ def test_click_see_why_in_score_weights(tutor_base_url, selenium, teacher):
 def test_scrolling_in_assignments_section(tutor_base_url, selenium, teacher):
     """Scroll left and right in assignment section in score page."""
     # GIVEN: Logged into Tutor as a teacher
-    # AND: Has an existing course
+    # AND: User is at "student scores" page for a course
 
-    # WHEN: Click on the "Student Scores" button
-    # AND: Scroll left or right in the table of scores for view assignments
+    # WHEN: Scroll left or right in the table of scores for viewing assignments
 
-    # THEN: Table should move accordingly with the scrolling"
+    # THEN: Table should move accordingly with the scrolling
 
 
 @expected_failure
@@ -245,12 +219,11 @@ def test_score_page_for_section_with_no_scores(tutor_base_url, selenium,
                                                teacher):
     """Test messages for no score sections in score page."""
     # GIVEN: Logged into Tutor as a teacher
-    # AND: Has an existing course
-    # AND: The class has no student or no assignment
+    # AND: The user has a class with no student or no assignment
 
     # WHEN: Click on the "Student Scores" button
 
-    # THEN: The page contains button to settings and roaster"
+    # THEN: The page contains button to settings and roaster
 
 
 @expected_failure
@@ -260,14 +233,12 @@ def test_score_page_for_section_with_no_scores(tutor_base_url, selenium,
 def test_view_overall_students_performance(tutor_base_url, selenium, teacher):
     """View the overall performance of students in scores page."""
     # GIVEN: Logged into Tutor as a teacher
-    # AND: Has an existing course
-    # AND: Has finished assignment
+    # AND: User is at "student scores" page for with a finished assignment
 
-    # WHEN:  Click on the "Student Scores" button
-    # AND: Click on the tab for the chosen period
+    # WHEN: Click on the tab for the chosen period
     # AND: Click on the "Review" button under the selected reading or homework.
 
-    # THEN: Each question has a correct response displayed"
+    # THEN: Each question has a correct response displayed
 
 
 @expected_failure
@@ -277,11 +248,9 @@ def test_view_overall_students_performance(tutor_base_url, selenium, teacher):
 def test_view_student_assignment_detail(tutor_base_url, selenium, teacher):
     """View student's assignment from score page."""
     # GIVEN: Logged into Tutor as a teacher
-    # AND: Has an existing course
-    # AND: Has finished assignment
+    # AND: User is at "student scores" page with a finished assignment
 
-    # WHEN:  Click on the "Student Scores" button
-    # AND: click a student's score for a specific assignment
+    # WHEN: Click a student's score for a specific assignment
 
     # THEN: the teacher is taken to the assignment page with student's answers
 
@@ -293,10 +262,9 @@ def test_view_student_assignment_detail(tutor_base_url, selenium, teacher):
 def test_no_score_is_displayed_for_readings(tutor_base_url, selenium, teacher):
     """Check no score for readings in the score page."""
     # GIVEN: Logged into Tutor as a teacher
-    # AND: Has an existing course
-    # AND: Has finished reading
+    # AND: User is at "student scores" page for a course with finished reading
 
-    # WHEN:  Click on the "Student Scores" button
+    # WHEN: Click on the "Student Scores" button
     # AND: Scroll to a reading assignment
 
     # THEN: The user is presented with progress icon but no score for reading
@@ -309,12 +277,12 @@ def test_no_score_is_displayed_for_readings(tutor_base_url, selenium, teacher):
 def test_scores_info_icon(tutor_base_url, selenium, teacher):
     """Check the info icon in the score page displays proper information."""
     # GIVEN: Logged into Tutor as a teacher
+    # AND: User is at "student scores" page for a course
 
-    # WHEN:  Click on the "Student Scores" button
-    # AND:  Click on the info icon next to "Class Performance"
+    # WHEN: Click on the info icon next to "Class Performance"
 
     # THEN: The info icon displays a definition of how class and overall scores
-    # are calculated
+    # are calculated.
 
 
 @expected_failure
@@ -323,13 +291,12 @@ def test_scores_info_icon(tutor_base_url, selenium, teacher):
 def test_accept_late_work(tutor_base_url, selenium, teacher):
     """Accept late work in the score page."""
     # GIVEN: Logged into Tutor as a teacher
-    # AND: Has an existing course
-    # AND: Student has submitted late homework or readings
+    # AND: Student has submitted late homework or readings for a course
+    # AND: User is at "student scores" page for this course
 
-    # WHEN:  Click on the "Student Scores" button
-    # AND: Scroll until an assignment with an orange triangle is found
-    # AND: Click on the orange triangle at the upper right  of a progress cell
-    # AND: Click "Accept late score" OR "Accept late progress"
+    # WHEN: Scroll until an assignment with an orange triangle is found
+    # AND: Click on the orange triangle at the upper right of a progress cell
+    # AND: Click ""Accept late score"" OR "Accept late progress"
 
     # THEN: The late score replaces the score at due date
 
@@ -340,15 +307,14 @@ def test_accept_late_work(tutor_base_url, selenium, teacher):
 def test_unaccept_late_work(tutor_base_url, selenium, teacher):
     """Unaccept late work in the score page."""
     # GIVEN: Logged into Tutor as a teacher
-    # AND: Has an existing course
-    # AND: Has accepted student's late homework or reading
+    # AND: Teacher has admitted late homework or readings for a course
+    # AND: User is at ""student scores"" page for this course
 
-    # WHEN: Click on the "Student Scores" button
-    # AND: Scroll until an assignment with an orange triangle is found
+    # WHEN: Scroll until an assignment with an orange triangle is found
     # AND: Click on the orange triangle at the upper right of a progress cell
     # AND: Click "Use this score" OR "Use this Progress"
 
-    # THEN: The score is converted back to the score at due date"
+    # THEN: The score is converted back to the score at due date
 
 
 @expected_failure
@@ -359,11 +325,9 @@ def test_external_assignments_in_the_scores_export(tutor_base_url, selenium,
                                                    teacher):
     """Check that external assignments are not included in exported scores."""
     # GIVEN: Logged into Tutor as a teacher
-    # AND: Has an existing course
-    # AND: Has given an external assignment
+    # AND: User is at "student scores" page for a course with an external
 
-    # WHEN: Click "Student Scores" from user menu
-    # AND: Click "Export"
+    # WHEN: Click "Export"
 
     # THEN: External assignments are not included in the scores export
 
@@ -375,12 +339,9 @@ def test_external_assignments_in_the_scores_export(tutor_base_url, selenium,
 def test_dropped_students_in_student_scores(tutor_base_url, selenium, teacher):
     """Check removal of dropped students in scores page."""
     # GIVEN: Logged into Tutor as a teacher
-    # AND: Has an existing course
-    # AND: Has dropped student(s)
+    # AND: User is at "student scores" page for a course with a dropped student
 
-    # WHEN: Click the user menu
-    # AND: Click "Student Scores"
-    # AND: Click on the period from which user have dropped the student
+    # WHEN: Click on the period from which user have dropped the student
 
     # THEN: Dropped student should not be displayed in Student Scores
 
@@ -392,11 +353,9 @@ def test_dropped_students_in_student_scores(tutor_base_url, selenium, teacher):
 def test_moved_students_in_student_scores(tutor_base_url, selenium, teacher):
     """Check moved students appear in their current sections in scores."""
     # GIVEN: Logged into Tutor as a teacher
-    # AND: Has an existing course
-    # AND: Has moved a student's period
+    # AND: User is at "student scores" page for a course with an moved student
 
-    # WHEN: Click "Student Scores" from the user menu
-    # AND: Click on the period to which the student was moved
+    # WHEN: Click on the period to which the student was moved
 
     # THEN: The user is presented with the moved student under their new period
 
@@ -409,7 +368,6 @@ def test_view_score_at_due_date(tutor_base_url, selenium, teacher):
     """Check teacher view scores at due date in score's page."""
     # GIVEN: Logged into Tutor as a teacher
     # AND: Has an existing course
-    # AND: Has at least one student
     # AND: Student has finished one assignment
 
     # WHEN: Click "Student Scores" from the user menu
@@ -424,11 +382,8 @@ def test_view_score_at_due_date(tutor_base_url, selenium, teacher):
 def test_view_current_score(tutor_base_url, selenium, teacher):
     """View current score in score's page."""
     # GIVEN: Logged into Tutor as a teacher
-    # AND: Has an existing course
-    # AND: Has given an assignment
+    # AND: User is at "student scores" page for a course with an assignment
 
-    # WHEN: Click "Student Scores" from the calendar dashboard
-    # AND: Click on the orange flag in the upper right corner of a progress
-    # cell for the desired student
+    # WHEN: Click on the orange flag in the upper right of a progress cell
 
-    # THEN: The user is presented with current score
+    # THEN: The user is presented with current score"
