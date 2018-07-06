@@ -74,6 +74,8 @@ class TutorNav(Region):
         """Go to tutor help articles."""
         self.find_element(*self._help_dropdown_locator).click()
         self.find_element(*self._help_articles_locator).click()
+        from pages.salesforce.home import Salesforce
+        return Salesforce(self.driver)
 
     def go_to_get_started(self):
         """Open tutor get started guide in a new tab."""
