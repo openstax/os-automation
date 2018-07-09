@@ -60,8 +60,8 @@ def test_nav_bar_when_maxed(web_base_url, selenium):
     """Test if the nav bar is present when screen size is maxed."""
     # GIVEN: On the OpenStax homepage
     # WHEN: On top of the page, find the top navigation bar
-# AND: Click on help button
-# THEN: User is taken to the Help page
+    # AND: Click on help button
+    # THEN: User is taken to the Help page
 
 
 @test_case()
@@ -309,9 +309,8 @@ def test_twitter(web_base_url, selenium):
 def test_donation_banner(web_base_url, selenium):
     """Test the persence of donation banner."""
     # GIVEN: On the OpenStax homepage
-    # WHEN: On the OpenStax homepage
-    # THEN: The orange Give Now sticky is visible the first 5 times the site
-    # is visited
+    # WHEN: Reload the page 5 more times
+    # THEN: The orange Give Now sticky is visible every time except the last
 
 
 @test_case()
@@ -322,17 +321,6 @@ def test_banner(web_base_url, selenium):
     # GIVEN: On the OpenStax homepage
     # WHEN: On the OpenStax homepage
     # THEN: Banner is visible and should switch every few seconds
-
-
-@test_case()
-@web
-@expected_failure
-def test_give_now_for_frequent(web_base_url, selenium):
-    """Test if give now is present for frequent visitor."""
-    # GIVEN: On the OpenStax homepage
-    # WHEN: On the OpenStax homepage
-    # THEN: The orange Give Now sticky is not visible after visiting
-    # the site 5 times or visiting the Give page at least once
 
 
 @test_case()
@@ -373,8 +361,8 @@ def test_renewal(web_base_url, selenium):
 def test_homepage_reduced(web_base_url, selenium):
     """Test if homepage is displayed on reduced screen size."""
     # GIVEN: On the OpenStax homepage
-    # WHEN: On the OpenStax homepage
-    # THEN: The homepage is displayed on the reduced screen size
+    # WHEN: Reduce screen size
+    # THEN: All elements are present on the reduced size
 
 
 @test_case()
@@ -383,7 +371,7 @@ def test_homepage_reduced(web_base_url, selenium):
 def test_hamburger_menu(web_base_url, selenium):
     """Test if hamburger menu is present on reduced screen size."""
     # GIVEN: On the OpenStax homepage
-    # WHEN: On the OpenStax homepage
+    # WHEN: Reduce screen size
     # THEN: The header collapses into a hamburger menu
 
 
@@ -396,88 +384,6 @@ def test_contact_us(web_base_url, selenium):
     # WHEN: Go to bottom of the page and
     # click on contact us in the footer with dark background
     # THEN: Contact page is loaded.
-
-
-@test_case()
-@web
-@expected_failure
-def test_info_send_when_not_filled(web_base_url, selenium):
-    """Test if info is sent when not all info is filled."""
-    # GIVEN: On the OpenStax homepage
-    # WHEN: Go to bottom of the page and
-    # click on contact us in the footer with dark background
-    # AND: Click orange send button
-    # THEN: The message should not send
-    # AND: String "Please fill out this field" should be displayed where the
-    # input boxes are empty
-
-
-@test_case()
-@web
-@expected_failure
-def test_support_center(web_base_url, selenium):
-    """Test if support center link works properly."""
-    # GIVEN: On the OpenStax homepage
-    # WHEN: Go to bottom of the page and
-    # click on contact us in the footer with dark background
-    # AND: Decrease the size of the screen
-    # THEN: The screen size decreases
-    # AND: The components in the window also adjust
-    # and becomes horizontally
-    # ordered.
-
-
-@test_case()
-@web
-@expected_failure
-def test_box(web_base_url, selenium):
-    """Test if box is visible on contact us page."""
-    # GIVEN: On the OpenStax homepage
-    # WHEN: Go to bottom of the page and
-    # click on contact us in the footer with dark background
-    # THEN: A box with green background with string "Contact Us" is displayed
-
-
-@test_case()
-@web
-@expected_failure
-def test_alpha(web_base_url, selenium):
-    """Test entering an alpha character takes user to the first item."""
-    # GIVEN: On the OpenStax homepage
-    # WHEN: Click Give link/ Give banner
-    # AND: Select a donation amount and click the donate button
-    # AND: Type an alpha key when in the country or state drop down
-    # THEN: First state or country that starts with the letter they typed is
-    # displayed.
-
-
-@test_case()
-@web
-@expected_failure
-def test_donation_fields(web_base_url, selenium):
-    """Test if donation field is required."""
-    # GIVEN: On the OpenStax homepage
-    # WHEN: Click on the give link
-    # AND: Select price user'd like to donate and click the donate button
-    # AND: Fill out required fields
-    # THEN: User should be able to submit the form
-    # by filling out the entire form minus title
-
-
-@test_case()
-@web
-@expected_failure
-def test_view_social_media(web_base_url, selenium):
-    """Test if social media option is avaible upon donating."""
-    # GIVEN: On the OpenStax homepage
-    # WHEN: Click on the give link
-    # AND: Select price user'd like to donate and click the donate button
-    # AND: Fill out required fields (everything but "title" field)
-    # AND: Click "Continue"
-    # AND: Fill out credit card information
-    # AND: Once completed click confirm
-    # THEN: Give page is loaded back. The donate buttons is gone
-    # and social media icons (facebook, twitter, linkedin) should be visible.
 
 
 @test_case()

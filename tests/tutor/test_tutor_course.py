@@ -87,10 +87,9 @@ def test_free_trial_tag_disappear(tutor_base_url, selenium, student):
 def test_preview_calendar(tutor_base_url, selenium, teacher):
     """Test the preview course calendar's assignment samples."""
     # GIVEN: Logged into Tutor as a teacher
-
     # AND: Has a preview course
 
     # WHEN: The user goes to a preview course
 
-    # THEN: From the calendar, the user should be able see sample
-    # assignments and readings
+    # THEN: From the calendar, the user should be able see sample assignments
+    # and readings
