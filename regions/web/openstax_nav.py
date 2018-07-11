@@ -1,6 +1,7 @@
 """Openstax nav region."""
 
 from time import sleep
+
 from pypom import Region
 from selenium.webdriver import ActionChains
 from selenium.webdriver.common.by import By
@@ -40,6 +41,7 @@ class OpenStaxNav(Region):
             .click(*self._all_subjects_locator)\
             .perform()
         sleep(1)
+        from pages.web.subjects import Subjects
         return Subjects(self.driver)
 
     def go_to_subjects_math(self):
@@ -49,6 +51,7 @@ class OpenStaxNav(Region):
             .click(*self._math_subjects_locator)\
             .perform()
         sleep(1)
+        from pages.web.subjects import Subjects
         return Subjects(self.driver)
 
     def go_to_subjects_science(self):
@@ -58,6 +61,7 @@ class OpenStaxNav(Region):
             .click(*self._science_subjects_locator)\
             .perform()
         sleep(1)
+        from pages.web.subjects import Subjects
         return Subjects(self.driver)
 
     def go_to_subjects_social_sciences(self):
@@ -67,6 +71,7 @@ class OpenStaxNav(Region):
             .click(*self._social_sciences_subjects_locator)\
             .perform()
         sleep(1)
+        from pages.web.subjects import Subjects
         return Subjects(self.driver)
 
     def go_to_subjects_humanities(self):
@@ -76,6 +81,7 @@ class OpenStaxNav(Region):
             .click(*self._humanities_subjects_locator)\
             .perform()
         sleep(1)
+        from pages.web.subjects import Subjects
         return Subjects(self.driver)
 
     def go_to_subjects_ap(self):
@@ -85,6 +91,7 @@ class OpenStaxNav(Region):
             .click(*self._ap_subjects_locator)\
             .perform()
         sleep(1)
+        from pages.web.subjects import Subjects
         return Subjects(self.driver)
 
     def go_to_technology_options(self):
@@ -94,16 +101,18 @@ class OpenStaxNav(Region):
             .click(*self._technology_options_locator)\
             .perform()
         sleep(1)
+        from pages.web.technology import Technology
         return Technology(self.driver)
 
     def go_to_about_tutor(self):
-        """Goes to the about tutor page."""
+        """Goes to the about Tutor page."""
         ActionChains(self.driver)\
             .move_to_element(*self._technology_dropdown_locator)\
             .click(*self._about_tutor_locator)\
             .perform()
         sleep(1)
-        return AboutTutor(self.driver)
+        from pages.web.tutor_marketing import TutorMarketing
+        return TutorMarketing(self.driver)
 
     def go_to_partners(self):
         """Goes to the partners page."""
@@ -112,16 +121,19 @@ class OpenStaxNav(Region):
             .click(*self._openstax_partners_locator)\
             .perform()
         sleep(1)
+        from pages.web.partners import Partners
         return Partners(self.driver)
 
     def go_to_our_impact(self):
         """Goes to the our impact page."""
         self.find_element(*self._our_impact_locator).click()
         sleep(1)
+        from pages.web.impact import OurImpact
         return OurImpact(self.driver)
 
     def go_to_login(self):
         """Goes to the our impact page."""
         self.find_element(*self._login_locator).click()
         sleep(1)
+        from pages.account.home import AccountsHome
         return AccountsHome(self.driver)

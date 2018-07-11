@@ -3,9 +3,9 @@
 from pypom import Page, Region
 from selenium.webdriver.common.by import By
 
-from regions.web.web_nav import WebNav
-from regions.web.openstax_nav import OpenStaxNav
 from regions.web.footer import Footer
+from regions.web.openstax_nav import OpenStaxNav
+from regions.web.web_nav import WebNav
 
 
 class WebBase(Page):
