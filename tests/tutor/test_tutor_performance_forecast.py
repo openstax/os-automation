@@ -12,8 +12,7 @@ def test_user_performance_bar(tutor_base_url, selenium, student):
     # GIVEN: Logged into Tutor as a student
     # AND: Has enrolled in a course
 
-    # WHEN: The user clicks on a enrolled course
-    # AND: The user clicks on the user performance bars
+    # WHEN: The user clicks on the user performance bars of a enrolled course
 
     # THEN: The header bar, containing the course name, OpenStax logo,
     # and user menu link are visible.
@@ -25,11 +24,9 @@ def test_user_performance_bar(tutor_base_url, selenium, student):
 def test_performance_bar_question(tutor_base_url, selenium, student):
     """Test the performance bar questions."""
     # GIVEN: Logged into Tutor as a student
-    # AND: Has enrolled in a course
+    # AND: Is on a course dashboard
 
-    # WHEN: The user clicks on a enrolled course
-    # AND: The user clicks one of the section performance
-    # bars from the dashboard
+    # WHEN: The user clicks on the section performance bar
     # AND: If there is a text box, input text
 
     # THEN: "Answer" button can be clicked
@@ -41,11 +38,9 @@ def test_performance_bar_question(tutor_base_url, selenium, student):
 def test_performance_bar_answer(tutor_base_url, selenium, student):
     """Test the performance bar answers."""
     # GIVEN: Logged into Tutor as a student
-    # AND: Has enrolled in a course
+    # AND: Is on a course dashboard
 
-    # WHEN: The user clicks on a enrolled course
-    # AND: The user clicks one of the section performance bars
-    # from the dashboard
+    # WHEN: The user clicks one of the section performance bars
     # AND: If there is a text box, the user input text
     # AND: The user clicks the 'Answer' button
 
@@ -58,7 +53,7 @@ def test_performance_bar_answer(tutor_base_url, selenium, student):
 def test_performance_bar_submit(tutor_base_url, selenium, student):
     """Test the performance bar submit button."""
     # GIVEN: Logged on Tutor as a student
-    # AND: Has enrolled in a course
+    # AND: Is on a course dashboard
 
     # WHEN: The user clicks on one of the section of the performance bars
     # AND: The user filled out the text box and click on a multiple
@@ -110,8 +105,7 @@ def test_performance_bar_breadcrumb(tutor_base_url, selenium, student):
     # AND: Has enrolled in a course
 
     # WHEN: The user clicks on one of the section of the performance bars
-    # AND: The user filled out the text box
-    # AND: The user clicks on a multiple choice answer
+    # AND: The user filled out the text box and multiple choice
     # AND: The user submits the answer
 
     # THEN: Correctness for the completed question is visible in the breadcrumb
@@ -123,7 +117,7 @@ def test_performance_bar_breadcrumb(tutor_base_url, selenium, student):
 def test_performance_forecast(tutor_base_url, selenium, student):
     """Test the performance forecast."""
     # GIVEN: Logged into Tutor as a student
-    # AND: Has enrolled in a class
+    # AND: Is on a class dashboard
 
     # WHEN: The user clicks on the user menu in the upper right corner
     # AND: The user clicks on "Performance Forecast"
@@ -138,16 +132,12 @@ def test_performance_forecast_info_icon_for_a_student(tutor_base_url, selenium,
                                                       student):
     """Test the performance forecast info icon."""
     # GIVEN: Logged into Tutor as a student
-    # AND: Has enrolled in a class
+    # AND: Is on a class dahboard
 
-    # WHEN: The user goes into an enrolled class
-    # AND: The user clicks on the user menu in the upper right
-    # corner of the page
-    # AND: The user clicks on "Performance Forecast"
-    # AND: The user hovers the cursor over the info icon that is next to the
-    # "Performance Forecast" header
+    # WHEN: Click on "Performance Forecast"
+    # AND: The user hovers the cursor over the info icon next to the header
 
-    # THEN: Page with Info icon showing an explanation of the data is loaded
+    # THEN: Info icon shows an explanation of the data
 
 
 @expected_failure
@@ -158,6 +148,7 @@ def test_performance_forecast_info_icon_for_a_teacher(tutor_base_url, selenium,
                                                       teacher):
     """View info icon in performance forecast page."""
     # GIVEN: Logged into Tutor as a teacher
+
     # AND: User is at a course's "performance forecast" page
 
     # WHEN: Hover the cursor over the info icon
@@ -171,10 +162,9 @@ def test_performance_forecast_info_icon_for_a_teacher(tutor_base_url, selenium,
 def test_performance_color_key(tutor_base_url, selenium, student):
     """Test the performance color key."""
     # GIVEN: Logged into Tutor as a student
-    # AND: Has enrolled in a class
+    # AND: Is on a class dashboard
 
-    # WHEN: The user goes into an enrolled class
-    # AND: The user clicks on the user menu in the upper right corner
+    # WHEN: The user clicks on the user menu in the upper right corner
     # of the page
     # AND: The user clicks on "Performance Forecast"
 
@@ -189,11 +179,10 @@ def test_performance_forecast_with_zero_question(
         tutor_base_url, selenium, student):
     """Test the performance forecast with zero questions."""
     # GIVEN: Logged into Tutor as a student
-    # AND: Has enrolled in a class
+    # AND: Is on a class dashboard
     # AND: Has not done many questions before
 
-    # WHEN: The user clicks on the user menu in the upper right corner
-    # AND: The user clicks on "Performance Forecast"
+    # WHEN: The user clicks on "Performance Forecast" on the user menu
 
     # THEN: Presented with blank performance forecast with no section
     # breakdowns and the words "User haven't worked enough problems
@@ -206,13 +195,10 @@ def test_performance_forecast_with_zero_question(
 def test_performance_forecast_weak_area(tutor_base_url, selenium, student):
     """Test the weak area of the performance forecast."""
     # GIVEN: Logged into Tutor as a student
-    # AND: Has enrolled in a class
+    # AND: Is on a class dashboard
     # AND: Has finished some assignments before
 
-    # WHEN: The user goes into an enrolled class
-    # AND: The user clicks on the user menu in the upper right
-    # corner of the page
-    # AND: The user clicks on "Performance Forecast"
+    # WHEN: The user clicks on "Performance Forecast" on the user menu
 
     # THEN: The user is presented with up to four problematic sections
     # under My Weaker Areas
@@ -227,8 +213,7 @@ def test_performance_forecast_individual_section(
     # GIVEN: Logged into Tutor as a student
     # AND: Has enrolled in a class
 
-    # WHEN: The user clicks on the user menu in the upper right corner
-    # AND: The user clicks on "Performance Forecast"
+    # WHEN: The user clicks on "Performance Forecast" on the user menu
     # AND: The user scrolls to Individual Chapters section
 
     # THEN: User is presented with chapters listed on top and their
@@ -243,9 +228,7 @@ def test_performance_forecast_chapter(tutor_base_url, selenium, student):
     # GIVEN: Logged into Tutor as a student
     # AND: Has enrolled in a class
 
-    # WHEN: The user goes to the enrolled class
-    # AND: The user clicks on the user menu in the upper right corner
-    # AND: The user clicks on "Performance Forecast"
+    # WHEN: The user clicks on "Performance Forecast" on the user menu
     # AND: The user scrolls to the Individual Chapters section
     # AND: The user clicks on a chapter bar
 
@@ -261,8 +244,7 @@ def test_performance_forecast_section_bar(tutor_base_url, selenium, student):
     # GIVEN: Logged into Tutor as a student
     # AND: Has enrolled in a class
 
-    # WHEN: The user clicks on the user menu in the upper right corner
-    # AND: The user clicks on "Performance Forecast"
+    # WHEN: The user clicks on "Performance Forecast" on the user menu
     # AND: The user scrolls to the Individual Chapters section
     # AND: The user clicks on a section bar
 
@@ -278,8 +260,7 @@ def test_performance_forecast_without_data(tutor_base_url, selenium, student):
     # GIVEN: Logged into Tutor as a student
     # AND: Has enrolled in a class
 
-    # WHEN: The user clicks on the user menu in the upper right corner
-    # AND: The user clicks on "Performance Forecast"
+    # WHEN: The user clicks on "Performance Forecast" on the user menu
     # AND: The user scrolls to the Individual Chapters section
 
     # THEN: User is presented with the "Practice More To Get Forecast"

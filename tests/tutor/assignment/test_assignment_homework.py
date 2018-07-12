@@ -10,7 +10,6 @@ def test_add_homework(tutor_base_url, selenium, teacher):
     """Test adding homework to a course."""
     # GIVEN: Logged into Tutor as a teacher
     # AND: Has an existing course
-
     # WHEN:  The user clicks on a date on the dashboard
     # AND: Click "add homework"
     # AND: Fill in all the required fields
@@ -40,9 +39,7 @@ def test_publish_existing_unopened_homework(tutor_base_url, selenium, teacher):
     """Test publishing existing unopened homework."""
     # GIVEN: Logged into Tutor as a teacher
 
-    # AND: Has an existing course
-
-    # WHEN: The user goes to a course with unopened homework
+    # AND: Has an existing course and unopened homework
 
     # AND: Click on an unopened hw
 
