@@ -9,13 +9,10 @@ from tests.markers import expected_failure, test_case, tutor
 def test_add_homework(tutor_base_url, selenium, teacher):
     """Test adding homework to a course."""
     # GIVEN: Logged into Tutor as a teacher
-
     # AND: Has an existing course
-
-    # WHEN: The user clicks on a date on the dashboard
-
+    
+    # WHEN:  The user clicks on a date on the dashboard
     # AND: Click "add homework"
-
     # AND: Fill in all the required fields
 
     # THEN:  Click "Publish" button
@@ -27,17 +24,13 @@ def test_add_homework(tutor_base_url, selenium, teacher):
 def test_add_homework_draft(tutor_base_url, selenium, teacher):
     """Test addomg homework draft to a course."""
     # GIVEN: Logged into Tutor as a teacher
-
     # AND: Has an existing course
 
-    # WHEN: The user clicks on a date on the dashboard, then click
-    # "Add Homework"
-
+    # WHEN: Clicks on a date on the dashboard, then click "Add Homework"
     # AND: Fill in all the required fields
-
     # AND: Click "Save as Draft"
 
-    # THEN: HW draft should be visible on the calendar
+    # THEN: homework draft should be visible on the calendar
 
 
 @test_case('')

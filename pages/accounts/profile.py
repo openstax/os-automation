@@ -5,11 +5,11 @@ from time import sleep
 from pypom import Region
 from selenium.webdriver.common.by import By
 
-from pages.accounts import admin, home
+from pages.accounts.home import AccountsHome
 from pages.utils.utilities import Utility
 
 
-class Profile(home.AccountsHome):
+class Profile(AccountsHome):
     """Profile page."""
 
     URL_TEMPLATE = '/profile'
@@ -47,7 +47,7 @@ class Profile(home.AccountsHome):
         """Log the user out."""
         self.find_element(*self._log_out_locator).click()
         sleep(1)
-        return home.AccountsHome(self.driver)
+        return AccountsHome(self.driver)
 
     def open_popup_console(self):
         """Open the small admin console."""
@@ -63,7 +63,8 @@ class Profile(home.AccountsHome):
             raise AccountException('User is not an administrator')
         self.find_element(*self._full_console_locator).click()
         sleep(1)
-        return admin.AccountsAdmin(self.driver)
+        from pages.accounts.admin import AccountsAdmin
+        return AccountsAdmin(self.driver)
 
     @property
     def is_admin(self):
