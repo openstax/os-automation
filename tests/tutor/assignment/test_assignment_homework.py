@@ -49,7 +49,7 @@ def test_publish_existing_unopened_homework(tutor_base_url, selenium, teacher):
 
     # AND: Has an existing course and unopened homework
 
-    # AND: Click on an unopened hw
+    # WHEN: Click on an unopened hw
 
     # AND: Change all the required fields
 

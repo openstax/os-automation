@@ -67,21 +67,21 @@ class TutorCourse(Page):
     class Performance_forcast(Region):
         """Performance forcast region."""
 
-        practice_more_locator = (By.CLASS_NAME, "no-data")
-        weakest_topic_locator = (By.CLASS_NAME, "weakest")
-        view_all_topic_locator = (
-            By.XPATH, "//*[contains(text(), 'View All Topics')]")
+        _practice_more_locator = (By.CLASS_NAME, "no-data")
+        _weakest_topic_locator = (By.CLASS_NAME, "weakest")
+        _view_all_topic_locator = (
+            By.CSS_SELECTOR, 'button.view-performance-forecast')
 
         def practice_more(self):
             """Prcatice more buttons."""
-            return self.find_elements(*self.practice_more_locator)
+            return self.find_elements(*self._practice_more_locator)
 
         def go_to_weakest_topic(self):
             """Weakest topic button."""
-            self.find_element(*self.weakest_topic_locator).click()
+            self.find_element(*self._weakest_topic_locator).click()
             return self
 
         def go_to_view_all_topic_locator(self):
             """All topic button."""
-            self.find_element(*self.view_all_topic_locator).click()
+            self.find_element(*self._view_all_topic_locator).click()
             return self
