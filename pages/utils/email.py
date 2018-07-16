@@ -3,13 +3,17 @@
 import re
 from time import sleep
 
+import requests
 from pypom import Page, Region
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as expect
 
 from pages.utils.utilities import Utility
 
-MATCHER = re.compile(r'(PIN\:? \d{6})')
+PIN_MATCHER = re.compile(r'(PIN\:? \d{6})')
+URL_MATCHER = re.compile(
+    r'(https:\/\/accounts([-\w]*)?\.openstax\.org\/confirm\?code=\w{1,64})'
+)
 
 
 class GoogleBase(Page):
@@ -100,13 +104,13 @@ class Google(GoogleBase):
         @property
         def has_pin(self):
             """Return True if a pin string is in the body excerpt."""
-            return MATCHER.search(self.excerpt)
+            return PIN_MATCHER.search(self.excerpt)
 
         @property
         def get_pin(self):
             """Return the numeric pin."""
             if self.has_pin:
-                return (MATCHER.search(self.excerpt).group())[-6:]
+                return (PIN_MATCHER.search(self.excerpt).group())[-6:]
             raise EmailVerificationError('No pin found')
 
 
@@ -236,13 +240,13 @@ class GuerrillaMail(Page):
         @property
         def has_pin(self):
             """Return True if a pin string is in the body excerpt."""
-            return MATCHER.search(self.excerpt)
+            return PIN_MATCHER.search(self.excerpt)
 
         @property
         def get_pin(self):
             """Return the numeric pin."""
             if self.has_pin:
-                return (MATCHER.search(self.excerpt).group())[-6:]
+                return (PIN_MATCHER.search(self.excerpt).group())[-6:]
             raise EmailVerificationError('No pin found')
 
         def open_email(self):
@@ -298,6 +302,162 @@ class Compose(GuerrillaMail):
         self.find_element(*self._send_button_locator).click()
         sleep(1.0)
         return GuerrillaMail(self.selenium)
+
+
+class RestMail(object):
+    """RestMail API for non-interactive e-mail testing."""
+
+    MAIL_URL = 'http://restmail.net/mail/{username}'
+
+    def __init__(self, username):
+        """Initialize a mailbox."""
+        self._inbox = []
+        self.username = username
+
+    @property
+    def inbox(self):
+        """Return the e-mail messages."""
+        return self._inbox
+
+    def get_mail(self):
+        """Get email for a dynamic user."""
+        messages = requests.get(self.MAIL_URL.format(username=self.username))
+        self._inbox = [self.Email(message) for message in messages.json()]
+        return self.inbox
+
+    def wait_for_mail(self):
+        """Sleep for 5 seconds."""
+        sleep(5.0)
+        self.get_mail()
+        return self
+
+    @property
+    def size(self):
+        """Return the number of messages in the inbox."""
+        return self._inbox.__len__
+
+    def empty(self):
+        """Delete all message in the inbox."""
+        requests.delete(self.MAIL_URL.format(username=self.username))
+
+    class Email(object):
+        """E-mail message structure."""
+
+        def __init__(self, package):
+            """Read possible RestMail fields."""
+            self._html = self._pull_data('html', package, '')
+            self._text = self._pull_data('text', package, '')
+            self._headers = self._pull_data('headers', package, {})
+            self._subject = self._pull_data('subject', package, '')
+            self._references = self._pull_data('references', package, [])
+            self._id = self._pull_data('messageId', package, '')
+            self._reply = self._pull_data('inReplyTo', package, [])
+            self._priority = self._pull_data('priority', package, '')
+            self._from = self._pull_data('from', package, [])
+            self._to = self._pull_data('to', package, [])
+            self._date = self._pull_data('date', package, '')
+            self._received = self._pull_data('receivedDate', package, '')
+            self._received_at = self._pull_data('receivedAt', package, '')
+            self._excerpt = (
+                self._text if self._text else (
+                    self._subject
+                )
+            )
+
+        def _pull_data(self, field, package, default):
+            """Pull data from the JSON package."""
+            return package[field] if field in package else default
+
+        @property
+        def html(self):
+            """Return the HTML formatted message body."""
+            return self._html
+
+        @property
+        def text(self):
+            """Return the unformatted message body."""
+            return self._text
+
+        @property
+        def excerpt(self):
+            """Return an excerpt from the HTML, text, or subject fields."""
+            return self._excerpt
+
+        @property
+        def headers(self):
+            """Return a dict of email headers."""
+            return self._headers
+
+        @property
+        def subject(self):
+            """Return the message subject."""
+            return self._subject
+
+        @property
+        def id(self):
+            """Return the message ID."""
+            return self._id
+
+        @property
+        def priority(self):
+            """Return the message priority."""
+            return self._priority
+
+        @property
+        def sender(self):
+            """Return the sender."""
+            return self._from
+
+        @property
+        def recipients(self):
+            """Return the list of recipients."""
+            return self._to
+
+        @property
+        def date(self):
+            """Return the UTC message date and time."""
+            return self._date
+
+        @property
+        def received_on(self):
+            """Return the message receive date."""
+            return self._received
+
+        @property
+        def received_at(self):
+            """Return the message receive time."""
+            return self._received_at
+
+        @property
+        def has_pin(self):
+            """Return True if a pin string is in the body excerpt."""
+            return bool(PIN_MATCHER.search(self._excerpt))
+
+        @property
+        def pin(self):
+            """Return the numeric pin."""
+            if self.has_pin:
+                return (PIN_MATCHER.search(self._excerpt).group())[-6:]
+            raise EmailVerificationError('No pin found')
+
+        @property
+        def has_link(self):
+            """Return True if a confirmation URL is in the excerpt."""
+            return bool(URL_MATCHER.search(self._excerpt))
+
+        @property
+        def confirmation_link(self):
+            """Access the confirmation URL link."""
+            if self.has_link:
+                return URL_MATCHER.search(self._excerpt).group()
+            raise EmailVerificationError('No confirmation link found')
+
+        def confirm_email(self):
+            """Access the confirmation link."""
+            send = requests.get(self.confirmation_link)
+            if not send.status_code == requests.codes.ok:
+                raise EmailVerificationError('Email not confirmed. ({code})'
+                                             .format(code=send.status_code))
 
 
 class EmailVerificationError(Exception):
