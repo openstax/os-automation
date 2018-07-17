@@ -4,7 +4,6 @@ import pytest
 from selenium.common.exceptions import NoSuchElementException, TimeoutException
 
 from pages.accounts.home import AccountsHome as Home
-from pages.utils.email import GuerrillaMail
 from pages.utils.utilities import Utility
 from tests.markers import accounts, expected_failure, nondestructive, test_case
 
@@ -12,10 +11,15 @@ from tests.markers import accounts, expected_failure, nondestructive, test_case
 @test_case('C195135')
 @nondestructive
 @accounts
-def test_open_home_page(accounts_base_url, selenium):
+def test_open_the_Accounts_home_page(accounts_base_url, selenium):
     """Basic start test."""
+    # GIVEN: A web browser
+
+    # WHEN: Open the home page
     page = Home(selenium, accounts_base_url).open()
-    assert(page)
+
+    # THEN: The Accounts Home page loads
+    # AND: The OpenStax and Rice logos are displayed
     assert(page.header.is_header_displayed), 'Accounts header is not shown'
     assert(page.footer.is_footer_displayed), 'Accounts footer is not shown'
     page.header.go_to_accounts_home()
@@ -25,28 +29,41 @@ def test_open_home_page(accounts_base_url, selenium):
 @test_case('C195136')
 @nondestructive
 @accounts
-def test_login_student(accounts_base_url, selenium, student):
-    """Student login test."""
+def test_log_in_as_a_student(accounts_base_url, selenium, student):
+    """Student log in test."""
+    # GIVEN: the Accounts Home page is open
+    # AND: valid credentials for a student user
     page = Home(selenium, accounts_base_url).open()
-    assert(not page.logged_in), 'Active user session unexpected'
+
+    # WHEN: the student user logs in
     page.log_in(*student)
+
+    # THEN: the student is logged in
+    # AND: the student's profile is displayed
     assert(page.logged_in), 'User "{0}" not logged in'.format(student[0])
+    assert(page.title == "My Account"), 'Not viewing a profile'
 
 
 @test_case('C195137')
 @nondestructive
 @accounts
-def test_blank_login(accounts_base_url, selenium):
-    """Blank username error message test.
-
-    Username or email can't...
-    """
-    # Enter a blank username
+def test_attempt_to_log_in_with_a_blank_user(accounts_base_url, selenium):
+    """Blank username error message test."""
+    # GIVEN: the Accounts Home page is loaded
+    page = Home(selenium, accounts_base_url).open()
     user = ''
     password = ''
-    page = Home(selenium, accounts_base_url).open()
+
+    # WHEN: the "NEXT" button is clicked
     with pytest.raises(NoSuchElementException):
         page.log_in(user, password)
+
+    # THEN: the input box is shaded
+    # AND: an error message "Username or email can't be blank" is displayed
+    shade = page.login.get_error_color()
+    expected_color = 'rgb(242, 222, 222)'
+    assert(Utility.compare_colors(shade, expected_color)), \
+        'Wrong color ({color}) used'.format(color=shade)
     assert(page.login.get_login_error() ==
            "Username or email can't be blank"), \
         'Incorrect error message'
@@ -55,35 +72,72 @@ def test_blank_login(accounts_base_url, selenium):
 @test_case('C195138')
 @nondestructive
 @accounts
-def test_unknown_login(accounts_base_url, selenium):
-    """Unknown username error message test.
+def test_attempt_to_log_in_with_an_invalid_user(accounts_base_url, selenium):
+    """Unknown username error message test."""
+    # GIVEN: the Accounts Home page is loaded
+    page = Home(selenium, accounts_base_url).open()
 
-    We don't recognize this...
-    """
-    # Use a hex 20-digit number to generate an unknown username
+    # WHEN: an invalid username is entered
+    # AND: the "NEXT" button is clicked
     user = Utility().random_hex(20)
     password = ''
-    page = Home(selenium, accounts_base_url).open()
     with pytest.raises(NoSuchElementException):
         page.log_in(user, password)
+
+    # THEN: the input box is shaded
+    # AND: an error message "We don't recognize this username.
+    #      Please try again or use your email address instead." is displayed
+    shade = page.login.get_error_color()
+    expected_color = 'rgb(242, 222, 222)'
+    assert(Utility.compare_colors(shade, expected_color)), \
+        'Wrong color ({color}) used'.format(color=shade)
     assert('We don’t recognize this username.' in
-           page.login.get_login_error()), 'Incorrect error message'
+           page.login.get_login_error()), \
+        'Incorrect error message'
+
+
+@test_case('C208850')
+@expected_failure
+@nondestructive
+@accounts
+def test_attempt_to_log_in_with_an_invalid_email(accounts_base_url, selenium):
+    """Attempt to log in with an invalid/unknown email address."""
+    # GIVEN: the Accounts Home page is loaded
+
+    # WHEN: an invalid email address is entered
+    # AND: the "NEXT" button is clicked
+
+    # THEN: the input box is shaded
+    # AND: an error message "We don't recognize this email. Please try again."
+    #      is displayed
+    assert(False), 'Test script missing'
 
 
 @test_case('C195139')
 @nondestructive
 @accounts
-def test_invalid_password(accounts_base_url, selenium, student):
-    """Invalid password error message test.
-
-    The password you provided...
-    """
-    # Enter a valid user but invalid password (blank)
+def test_attempt_to_log_in_with_an_invalid_password(
+        accounts_base_url, selenium, student):
+    """Invalid password error message test."""
+    # GIVEN: the Accounts Home page is loaded
+    # AND: a valid username or e-mail address
+    page = Home(selenium, accounts_base_url).open()
     user = student[0]
     password = ''
-    page = Home(selenium, accounts_base_url).open()
+
+    # WHEN: the username or e-mail is entered
+    # AND: enters an invalid password
+    # AND: clicks the "LOG IN" button
     with pytest.raises(TimeoutException):
         page.log_in(user, password)
+
+    # THEN: the input box is shaded
+    # AND: an error message "The password you provided is incorrect."
+    #      is displayed# Enter a valid user but invalid password (blank)
+    shade = page.login.get_error_color()
+    expected_color = 'rgb(242, 222, 222)'
+    assert(Utility.compare_colors(shade, expected_color)), \
+        'Wrong color ({color}) used'.format(color=shade)
     assert(page.login.get_login_error() ==
            'The password you provided is incorrect.'), \
         'Incorrect error message'
@@ -92,60 +146,78 @@ def test_invalid_password(accounts_base_url, selenium, student):
 @test_case('C195542')
 @expected_failure
 @accounts
-def test_password_reset(accounts_base_url, selenium):
+def test_reset_a_users_password(accounts_base_url, selenium):
     """Reset a user's password."""
-    # get a temporary e-mail
-    assert False
-    page = GuerrillaMail(selenium).open()
-    email = page.header.email
-    old_password = Utility.random_hex(12)
-    # sign up using the temporary e-mail and a random password
-    page = Home(selenium, accounts_base_url).open()
-    assert(not page.logged_in), 'Active user session unexpected'
-    page.login.go_to_signup.account_signup(email=email, password=old_password)
-    assert(page.logged_in), 'Failed to log in to Accounts'
-    # reset a 'forgotten' password
-    page.log_out()
-    new_password = Utility.random_hex(12)
-    page.reset_password(email, new_password)
-    page.log_out()
-    assert(not page.logged_in), 'Active user session unexpected'
-    # try the new password
-    page.log_in(email, new_password)
-    assert(page.logged_in), 'Failed to log in to Accounts'
+    # GIVEN: a valid, accessible e-mail for a user
+    # AND: at the Accounts Home page is loaded
+
+    # WHEN: the e-mail is entered in the input box
+    # AND: click the "NEXT" button
+    # AND: click the "Click here to reset it." link
+
+    # THEN: a "Check your email" text box is displayed
+
+    # WHEN: open the "Reset your OpenStax password" e-mail
+    # AND: click the "Click here to reset your OpenStax password." link
+    # AND: a new password is entered in both input boxes
+    # AND: click the "RESET PASSWORD" button
+    # AND: click the "CONTINUE" button
+
+    # THEN: the user's profile is displayed
+    assert(False), 'Test script missing'
 
 
 @test_case('C195140')
 @nondestructive
 @accounts
-def test_help_toggle(accounts_base_url, selenium):
+def test_toggle_the_log_in_help_section(accounts_base_url, selenium):
     """Toggle the help section display."""
+    # GIVEN: The Accounts Home page loads
     page = Home(selenium, accounts_base_url).open()
-    assert(not page.login.is_help_shown), 'Help text is already visible'
+
+    # WHEN: The "Trouble logging in?" is clicked
     page.login.toggle_help
+
+    # THEN: The help text is displayed
     assert(page.login.is_help_shown), 'Help text is not visible'
+
+    # WHEN: The "Trouble logging in?" is clicked
+    page.login.toggle_help
+
+    # THEN: The help text is hidden
+    assert(not page.login.is_help_shown), 'Help text is still visible'
 
 
 @test_case('C195141')
 @nondestructive
 @accounts
-def test_salesforce_link(accounts_base_url, selenium):
+def test_go_to_the_salesforce_help_pages(accounts_base_url, selenium):
     """Go to Salesforce help pages."""
+    # GIVEN: the Accounts Home page is loaded
     page = Home(selenium, accounts_base_url).open()
+
+    # WHEN: the "Trouble logging in?" link is clicked
+    # AND: the "Visit our knowledge base for help" link is clicked
     salesforce = page.login.go_to_help
-    salesforce.wait_for_page_to_load()
-    assert(salesforce.driver.title == 'Salesforce Support page'), \
-        'Not at the Salesforce help page'
-    assert(salesforce.at_salesforce)
+
+    # THEN: the "Can't log in to your OpenStax account?" help article is
+    #       displayed in a new browser tab or window
+    assert(salesforce.title == "Can’t log in to your OpenStax account?"), \
+        'Not at the correct site or article'
 
 
 @test_case('C195142')
 @nondestructive
 @accounts
-def test_copyright(accounts_base_url, selenium):
+def test_view_the_accounts_copyright_notice(accounts_base_url, selenium):
     """View Accounts copyright notice."""
+    # GIVEN: the Accounts Home page is loaded
     page = Home(selenium, accounts_base_url).open()
+
+    # WHEN: the "Copyright © 2013-2018 Rice University" link is clicked
     page.footer.show_copyright
+
+    # THEN: the Copyright and Licensing Details page is displayed
     assert('Copyright and Licensing' in selenium.page_source), \
         'Copyright not shown'
 
@@ -153,10 +225,15 @@ def test_copyright(accounts_base_url, selenium):
 @test_case('C195143')
 @nondestructive
 @accounts
-def test_terms_of_use(accounts_base_url, selenium):
+def test_view_the_accounts_terms_of_use(accounts_base_url, selenium):
     """View Accounts terms of use."""
+    # GIVEN: the Accounts Home page is loaded
     page = Home(selenium, accounts_base_url).open()
+
+    # WHEN: the "Terms of Use" link is clicked
     page.footer.show_terms_of_use
+
+    # THEN: the "Site Terms & Policies" page is displayed
     assert('Site Terms' in page.driver.page_source), \
         'Terms of use not shown'
 
@@ -164,13 +241,18 @@ def test_terms_of_use(accounts_base_url, selenium):
 @test_case('C195144')
 @nondestructive
 @accounts
-def test_go_to_rice(accounts_base_url, selenium):
+def test_go_to_the_rice_home_page(accounts_base_url, selenium):
     """Follow the Rice link."""
+    # GIVEN: the Accounts Home page is loaded
     page = Home(selenium, accounts_base_url).open()
+
+    # WHEN: the Rice University logo is clicked
     rice = page.footer.go_to_rice()
+
+    # THEN: the Rice University web page is displayed
+    assert(rice.at_rice)
     assert(rice.driver.title == 'Rice University'), \
         'Not at the Rice University webpage'
-    assert(rice.at_rice)
 
 
 @test_case('C195543')
@@ -178,9 +260,16 @@ def test_go_to_rice(accounts_base_url, selenium):
 @accounts
 def test_go_to_account_signup(accounts_base_url, selenium):
     """Go to the account signup screen."""
-    from pages.accounts.signup import Signup
-    page = Home(selenium, accounts_base_url).open()
+    # GIVEN: a web browser
+    page = Home(selenium, accounts_base_url)
+
+    # WHEN: go to the Accounts Home page
+    # AND: the "Sign up here." link is clicked
+    page.open()
     verify = page.login.go_to_signup
+
+    # THEN: the "Sign up for an OpenStax account" page is displayed
+    from pages.accounts.signup import Signup
     assert(isinstance(verify, Signup)), \
         'Signup object not returned'
     assert('signup' in verify.driver.current_url), \
