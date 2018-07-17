@@ -3,6 +3,10 @@
 from pypom import Page, Region
 from selenium.webdriver.common.by import By
 
+from regions.web.footer import Footer
+from regions.web.openstax_nav import OpenStaxNav
+from regions.web.web_nav import WebNav
+
 
 class WebBase(Page):
     """Base class."""
@@ -22,24 +26,24 @@ class WebBase(Page):
     @property
     def footer(self):
         """Return Web footer."""
-        return self.Footer(self)
+        return Footer(self)
 
     class Header(Region):
         """Web page header."""
 
-        _root_locator = (By.CLASS_NAME, 'container')
+        _root_locator = (By.CLASS_NAME, 'page-header')
 
         @property
         def is_header_displayed(self):
             """Header display boolean."""
             return self.loaded
 
-    class Footer(Region):
-        """Web page footer."""
-
-        _root_locator = (By.TAG_NAME, 'footer')
+        @property
+        def web_nav(self):
+            """Web nav region."""
+            return WebNav(self)
 
         @property
-        def is_footer_displayed(self):
-            """Footer display boolean."""
-            return self.loaded
+        def openstax_nav(self):
+            """Openstax nav region."""
+            return OpenStaxNav(self)

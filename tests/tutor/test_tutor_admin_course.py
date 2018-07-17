@@ -10,10 +10,13 @@ from tests.markers import expected_failure, nondestructive, test_case, tutor
 def test_edit_course(tutor_base_url, selenium, admin):
     """Test admin to edit course."""
     # GIVEN: logged in as admin
+    
     # AND: At the Course Page
 
     # WHEN: Next to a course click on a the ""Edit"" button
+    
     # AND: Change one or more of the course fields
+
     # AND: Click the ""Save"" button
 
     # THEN: The course is edited and the changes are correctly updated
@@ -29,9 +32,12 @@ def test_add_course_to_incomplete(tutor_base_url, selenium, admin):
     # AND: At the Courses Page
 
     # WHEN: Click the ""Incomplete Bulk Ecosystem Update Jobs""
+    
     # AND: Click ""Add Course""
+
     # AND: Fill in necessary fields
-    # AND: Click ""Save""
+    
+    # AND: Click "Save"
 
     # THEN: A new course is added to the Incomplete Bulk Ecosystem.
 
