@@ -22,9 +22,9 @@ class TutorCourse(Page):
         return self.Weeks(self)
 
     @property
-    def performance_forcast(self):
+    def performance_forecast(self):
         """Pass performance forcast region."""
-        return self.Performance_forcast(self)
+        return self.PerformanceForecast(self)
 
     def past_work(self):
         """Clicks the past_work tab."""
@@ -39,13 +39,13 @@ class TutorCourse(Page):
         _this_week_assignments_locator = (By.CSS_SELECTOR, '.-this-week .task')
         _upcoming_assignments_locator = (By.CSS_SELECTOR, '.-upcoming .task')
 
-        def this_week_assignment(self):
+        def this_week_assignments(self):
             """Get all the this week's assignments."""
             return [self.Assignemnt(self, el)
                     for el in self.find_elements(
                         *self._this_week_assignments_locator)]
 
-        def upcoming_assignment(self):
+        def upcoming_assignments(self):
             """Get all the upcoming assignments."""
             return [self.Assignemnt(self, el)
                     for el in self.find_elements(
@@ -64,7 +64,7 @@ class TutorCourse(Page):
                 self.find_element(*self._image_locator).click()
                 return self
 
-    class Performance_forcast(Region):
+    class PerformanceForecast(Region):
         """Performance forcast region."""
 
         _practice_more_locator = (By.CLASS_NAME, "no-data")
