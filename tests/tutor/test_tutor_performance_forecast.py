@@ -148,10 +148,10 @@ def test_performance_forecast_info_icon_for_a_teacher(tutor_base_url, selenium,
                                                       teacher):
     """View info icon in performance forecast page."""
     # GIVEN: Logged into Tutor as a teacher
-    # AND: Is on a class dashboard
 
-    # WHEN: Click on the "Performance Forecast"
-    # AND: Hover the cursor over the info icon
+    # AND: User is at a course's "performance forecast" page
+
+    # WHEN: Hover the cursor over the info icon
 
     # THEN: Info icon shows an explanation of the data
 
@@ -290,10 +290,9 @@ def test_performance_forecast_finished_assignment(
 def test_view_period_performance_forecast(tutor_base_url, selenium, teacher):
     """View performance forecast page."""
     # GIVEN: Logged into Tutor as a teacher
-    # AND: Has an existing course
+    # AND: User is at a course's "performance forecast" page
 
-    # WHEN: Click on "Performance Forecast" in the user menu
-    # AND: Click on the desired period
+    # WHEN: Click on the desired period
 
     # THEN: The period Performance Forecast is presented to the user
 
@@ -334,14 +333,11 @@ def test_period_tabs_are_shown(tutor_base_url, selenium, teacher):
 def test_period_with_zero_answers(tutor_base_url, selenium, teacher):
     """Check that a period with no answers doesn't show section breakdowns."""
     # GIVEN: Logged into Tutor as a teacher
-    # AND: Has an existing course
-    # AND: Has a period that hasn't answered assignments
+    # AND: User is at the "performance forecast" page with no assignments
 
-    # WHEN: Click on "Performance Forecast" in the user menu
-    # AND: Click on the period with zero answers
+    # WHEN: Click on the period with zero answers
 
-    # THEN: The user should see no section breakdowns and the message:
-    # "There have been no questions worked for this period."
+    # THEN: The user should see no section breakdowns
 
 
 @expected_failure
@@ -351,9 +347,8 @@ def test_period_with_zero_answers(tutor_base_url, selenium, teacher):
 def test_perforemance_forecast_weaker_areas(tutor_base_url, selenium, teacher):
     """Check weaker areas show up to four problematic sections."""
     # GIVEN: Logged into Tutor as a teacher
-    # AND: Has an existing course
+    # AND: User is at the "performance forecast" page with at least two period
 
-    # WHEN: Click on "Performance Forecast" in the user menu
-    # AND: Click on the desired period
+    # WHEN: Click on the desired period
 
     # THEN: Weaker Areas show up to four problematic sections
