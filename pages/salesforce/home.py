@@ -12,6 +12,7 @@ class Salesforce(Page):
     URL_TEMPLATE = 'http://openstax.force.com/help/'
 
     _loader_locator = (By.CSS_SELECTOR, 'body')
+    _title_locator = (By.CLASS_NAME, 'articleTitle')
 
     def wait_for_page_to_load(self):
         """Override page load."""
@@ -22,3 +23,8 @@ class Salesforce(Page):
     def at_salesforce(self):
         """Return True if at the OpenStax Salesforce help page."""
         return 'force.com' in self.selenium.current_url
+
+    @property
+    def title(self):
+        """Return the article title."""
+        return self.find_element(*self._title_locator).text.strip()

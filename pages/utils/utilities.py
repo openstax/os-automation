@@ -4,6 +4,7 @@ from random import randint
 from time import sleep
 
 from faker import Faker
+from selenium.webdriver.support.color import Color
 from selenium.webdriver.support.ui import Select
 
 
@@ -112,3 +113,8 @@ class Utility(object):
         if len(driver.window_handles) > 1:
             driver.switch_to.window(
                 driver.window_handles[new_handle])
+
+    @classmethod
+    def compare_colors(cls, left, right):
+        """Return True if two RGB color strings match."""
+        return Color.from_string(left) == Color.from_string(right)

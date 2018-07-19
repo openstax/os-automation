@@ -9,7 +9,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 
 from pages.utils.email import EmailVerificationError, GoogleBase, GuerrillaMail
 from pages.utils.email import RestMail  # NOQA
-from tests.markers import nondestructive, test_case
+from tests.markers import expected_failure, nondestructive, test_case
 
 TEST_EMAIL_BODY = (
     'Welcome!\n\nEnter your 6-digit PIN in your browser to confirm '
@@ -24,6 +24,7 @@ TEST_EMAIL_BODY = (
 
 
 @test_case('C195537')
+@expected_failure
 @nondestructive
 def test_google_mail_user_has_pin_emails(gmail, selenium):
     """Test a Google Gmail user."""
