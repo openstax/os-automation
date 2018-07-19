@@ -6,7 +6,7 @@ from tests.markers import expected_failure, nondestructive, payments, test_case
 
 @nondestructive
 @payments
-@test_case('')
+@test_case('C208906')
 def test_os_log_in(payments_base_url, driver, admin):
     """Test logging in with os accounts."""
     # GIVEN:
@@ -21,7 +21,7 @@ def test_os_log_in(payments_base_url, driver, admin):
 
 @nondestructive
 @payments
-@test_case('')
+@test_case('C208907')
 def test_log_out_from_nav_bar(payments_base_url, driver, admin):
     """Test logging out from navbar."""
     # GIVEN: User is logged in as admin
@@ -35,7 +35,7 @@ def test_log_out_from_nav_bar(payments_base_url, driver, admin):
 
 @nondestructive
 @payments
-@test_case('')
+@test_case('C208908')
 def test_click_logo(payments_base_url, driver, admin):
     """Test clicking logo to go back to home page."""
     # GIVEN: User is logged in as admin
@@ -51,7 +51,7 @@ def test_click_logo(payments_base_url, driver, admin):
 
 @nondestructive
 @payments
-@test_case('')
+@test_case('C208909')
 def test_go_to_email_logs(payments_base_url, driver, admin):
     """Test email logs page."""
     # GIVEN: User is logged in as admin
@@ -74,7 +74,7 @@ def test_go_to_email_logs(payments_base_url, driver, admin):
 
 @nondestructive
 @payments
-@test_case('')
+@test_case('C208910')
 def test_go_to_orders(payments_base_url, driver, admin):
     """Test orders page."""
     # GIVEN: User is logged in as admin
@@ -97,7 +97,7 @@ def test_go_to_orders(payments_base_url, driver, admin):
 
 @nondestructive
 @payments
-@test_case('')
+@test_case('C210266')
 def test_go_into_order_detail(payments_base_url, driver, admin):
     """Test order's detail page."""
     # GIVEN: User is logged in as admin
@@ -114,7 +114,7 @@ def test_go_into_order_detail(payments_base_url, driver, admin):
 @expected_failure
 @nondestructive
 @payments
-@test_case('')
+@test_case('C208911')
 def test_email_log_for_student_payments(payments_base_url, driver,
                                         admin, student, teacher):
     """Docstring."""
@@ -130,7 +130,7 @@ def test_email_log_for_student_payments(payments_base_url, driver,
 @expected_failure
 @nondestructive
 @payments
-@test_case('')
+@test_case('C208912')
 def test_order_item_for_student_payments(payments_base_url, driver, admin):
     """Docstring."""
     # GIVEN: A new student's payment have just being made
@@ -145,7 +145,7 @@ def test_order_item_for_student_payments(payments_base_url, driver, admin):
 @expected_failure
 @nondestructive
 @payments
-@test_case('')
+@test_case('C208913')
 def test_order_item_for_student_refund(payments_base_url, driver, admin):
     """Docstring."""
     # GIVEN: A student has just submitted a refund request for a course
