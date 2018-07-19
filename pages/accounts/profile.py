@@ -14,6 +14,7 @@ class Profile(AccountsHome):
 
     URL_TEMPLATE = '/profile'
 
+    _title_locator = (By.CLASS_NAME, 'title')
     _log_out_locator = (By.CLASS_NAME, 'sign-out')
     _edit_clear_locator = (By.CLASS_NAME, 'editable-clear-x')
     _edit_submit_locator = (By.CLASS_NAME, 'editable-submit')
@@ -22,6 +23,11 @@ class Profile(AccountsHome):
     _popup_console_locator = (By.CSS_SELECTOR, '#upper-corner-console a')
     _full_console_locator = (By.CSS_SELECTOR,
                              '#upper-corner-console a:nth-last-child(2)')
+
+    @property
+    def title(self):
+        """Page title."""
+        return self.find_element(*self._title_locator).text
 
     @property
     def name(self):
