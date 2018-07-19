@@ -26,4 +26,5 @@ class Salesforce(Page):
 
     @property
     def title(self):
+        """Return the article title."""
         return self.find_element(*self._title_locator).text.strip()

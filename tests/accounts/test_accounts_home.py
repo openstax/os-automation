@@ -36,12 +36,12 @@ def test_log_in_as_a_student(accounts_base_url, selenium, student):
     page = Home(selenium, accounts_base_url).open()
 
     # WHEN: the student user logs in
-    page.log_in(*student)
+    profile = page.log_in(*student)
 
     # THEN: the student is logged in
     # AND: the student's profile is displayed
-    assert(page.logged_in), 'User "{0}" not logged in'.format(student[0])
-    assert(page.title == "My Account"), 'Not viewing a profile'
+    assert(profile.logged_in), 'User "{0}" not logged in'.format(student[0])
+    assert(profile.title == "My Account"), 'Not viewing a profile'
 
 
 @test_case('C195137')
@@ -61,7 +61,7 @@ def test_attempt_to_log_in_with_a_blank_user(accounts_base_url, selenium):
     # THEN: the input box is shaded
     # AND: an error message "Username or email can't be blank" is displayed
     shade = page.login.get_error_color()
-    expected_color = 'rgb(242, 222, 222)'
+    expected_color = 'rgba(241, 218, 218, 1)'
     assert(Utility.compare_colors(shade, expected_color)), \
         'Wrong color ({color}) used'.format(color=shade)
     assert(page.login.get_login_error() ==
@@ -88,7 +88,7 @@ def test_attempt_to_log_in_with_an_invalid_user(accounts_base_url, selenium):
     # AND: an error message "We don't recognize this username.
     #      Please try again or use your email address instead." is displayed
     shade = page.login.get_error_color()
-    expected_color = 'rgb(242, 222, 222)'
+    expected_color = 'rgba(241, 218, 218, 1)'
     assert(Utility.compare_colors(shade, expected_color)), \
         'Wrong color ({color}) used'.format(color=shade)
     assert('We don’t recognize this username.' in
@@ -135,7 +135,7 @@ def test_attempt_to_log_in_with_an_invalid_password(
     # AND: an error message "The password you provided is incorrect."
     #      is displayed# Enter a valid user but invalid password (blank)
     shade = page.login.get_error_color()
-    expected_color = 'rgb(242, 222, 222)'
+    expected_color = 'rgba(241, 218, 218, 1)'
     assert(Utility.compare_colors(shade, expected_color)), \
         'Wrong color ({color}) used'.format(color=shade)
     assert(page.login.get_login_error() ==

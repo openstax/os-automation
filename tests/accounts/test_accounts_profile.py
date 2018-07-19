@@ -191,6 +191,7 @@ def test_verify_an_email(
 
 
 @test_case('C195553')
+@expected_failure
 @accounts
 def test_add_a_verified_email_to_profile(accounts_base_url, selenium, student):
     """Test the ability to add an e-mail address to an existing user."""
@@ -247,6 +248,7 @@ def test_log_in_using_facebook(accounts_base_url, facebook, selenium, student):
 
 
 @test_case('C195557')
+@expected_failure
 @nondestructive
 @accounts
 def test_open_the_admin_pop_up_console(accounts_base_url, admin, selenium):
