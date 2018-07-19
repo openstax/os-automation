@@ -335,6 +335,16 @@ def test_twitter(web_base_url, selenium):
 @test_case()
 @web
 @expected_failure
+def test_donation_banner(web_base_url, selenium):
+    """Test the persence of donation banner."""
+    # GIVEN: On the OpenStax homepage
+    # WHEN: Reload the page 5 more times
+    # THEN: The orange Give Now sticky is visible every time except the last
+
+
+@test_case()
+@web
+@expected_failure
 def test_banner(web_base_url, selenium):
     """Test if banner is present."""
     # GIVEN: On the OpenStax homepage
@@ -386,6 +396,38 @@ def test_renewal(web_base_url, selenium):
     # method for clicking let us know goes into web.base model
     page.let_us_know()
     assert ('adopt' in page.current_url), 'renewal is not displayed'
+=======
+
+
+@test_case()
+@web
+@expected_failure
+def test_homepage_reduced(web_base_url, selenium):
+    """Test if homepage is displayed on reduced screen size."""
+    # GIVEN: On the OpenStax homepage
+    # WHEN: Reduce screen size
+    # THEN: All elements are present on the reduced size
+
+
+@test_case()
+@web
+@expected_failure
+def test_hamburger_menu(web_base_url, selenium):
+    """Test if hamburger menu is present on reduced screen size."""
+    # GIVEN: On the OpenStax homepage
+    # WHEN: Reduce screen size
+    # THEN: The header collapses into a hamburger menu
+
+
+@test_case()
+@web
+@expected_failure
+def test_contact_us(web_base_url, selenium):
+    """Test if contact us page is visible."""
+    # GIVEN: On the OpenStax homepage
+    # WHEN: Go to bottom of the page and
+    # click on contact us in the footer with dark background
+    # THEN: Contact page is loaded.
 
 
 @test_case()

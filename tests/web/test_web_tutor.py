@@ -8,7 +8,7 @@ from tests.markers import expected_failure, nondestructive, test_case, web
 @nondestructive
 @web
 def test_view_tutor(web_base_url, selenium):
-    """Tests ability to view tutor."""
+    """Tests ability to view tutor from the homepage."""
     # GIVEN: On the OpenStax homepage.
 
     # WHEN: Click "Technology".

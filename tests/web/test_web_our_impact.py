@@ -8,7 +8,7 @@ from tests.markers import expected_failure, nondestructive, test_case, web
 @nondestructive
 @web
 def test_view_our_impact(web_base_url, selenium):
-    """Tests ability to view our impact page."""
+    """Tests ability to view our impact page from the homepage."""
     # GIVEN: On the OpenStax homepage.
 
     # WHEN: Click "Our Impact".

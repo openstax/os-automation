@@ -88,10 +88,7 @@ def test_external_assignment_to_dashboard(tutor_base_url, selenium, student):
 
     # AND:  Has an external assignement
 
-    # WHEN: The user clicks on an external assignment under the tab "This Week"
-    # on the dashboard
-
-    # AND: The user clicks on the link to the external assignment
+    # WHEN: The user clicks on the link to the external assignment
 
     # AND: The user closes the assignement tab
 
@@ -112,10 +109,7 @@ def test_clicked_external_assignment(tutor_base_url, selenium, student):
 
     # AND:  Has an external assignement
 
-    # WHEN: The user clicks on an external assignment under the tab "This Week"
-    # on the dashboard
-
-    # AND: The user clicks on the link to the external assignment
+    # WHEN: The user clicks on the link to the external assignment
 
     # AND: The user closes the assignement tab
 
