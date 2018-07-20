@@ -118,3 +118,93 @@ class Utility(object):
     def compare_colors(cls, left, right):
         """Return True if two RGB color strings match."""
         return Color.from_string(left) == Color.from_string(right)
+
+    @classmethod
+    def get_test_credit_card(cls, card=None, status=None):
+        """Return a random card number and CVV for test transactions."""
+        braintree = Card()
+        _card = card if card else Status.VISA
+        _status = status if status else Status.VALID
+        test_cards = braintree.get_by(Status.STATUS, _status)
+        test_cards = braintree.get_by(Status.TYPE, _card, test_cards)
+        select = randint(0, len(test_cards) - 1)
+        use_card = test_cards[select]
+        return (use_card['number'], use_card['cvv'])
+
+
+class Card(object):
+    """Fake card objects."""
+
+    def __init__(self):
+        """Retrieve card numbers from BTP."""
+        import requests
+        from bs4 import BeautifulSoup
+
+        braintree = (
+            'https://developers.braintreepayments.com/'
+            'reference/general/testing/python'
+        )
+        section_list_selector = 'table:nth-of-type({position}) tbody tr'
+        response = requests.get(braintree)
+        if response.status_code != requests.codes.ok:
+            response.raise_for_status()
+        resp = BeautifulSoup(response.text, 'html.parser')
+        self.options = []
+
+        for card_status in range(Status.VALID, Status.OTHER + 1):
+            for card in resp.select(
+                    section_list_selector.format(position=card_status)):
+                fields = card.select('td')
+                card_processor = (Status.VISA
+                                  if fields[0].text[0] == '4'
+                                  else fields[1].text)
+                if card_processor == Status.AMEX:
+                    cvv = '{:04}'.format(randint(0, 9999))
+                else:
+                    cvv = '{:03}'.format(randint(0, 999))
+                rest = fields[2].text if len(fields) > 2 else ''
+                data = fields[1].text if card_status == Status.OTHER or  \
+                    card_status == Status.TYPED else ''
+                self.options.append({
+                    'number': fields[0].text,
+                    'cvv': cvv,
+                    'type': card_processor,
+                    'status': card_status,
+                    'response': rest,
+                    'data': data,
+                })
+
+    def get_by(self, field=None, state=None, use_list=None):
+        """Return a subset of test cards with a specific type."""
+        _field = field if field else Status.STATUS
+        _state = state if state else Status.VALID
+        _use_list = use_list if use_list else self.options
+        return list(
+            filter(
+                lambda card: card[_field] == _state,
+                _use_list
+            )
+        )
+
+
+class Status(object):
+    """Card states."""
+
+    STATUS = 'status'
+    VALID = 2
+    NO_VERIFY = 3
+    TYPED = 4
+    OTHER = 5
+
+    TYPE = 'type'
+    AMEX = 'American Express'
+    DINERS = 'Diners Club'
+    DISCOVER = 'Discover'
+    JCB = 'JCB'
+    MAESTRO = 'Maestro'
+    MC = 'Mastercard'
+    VISA = 'Visa'
+
+    RESPONSE = 'response'
+    DECLINED = 'processor declined'
+    FAILED = 'failed (3000)'
