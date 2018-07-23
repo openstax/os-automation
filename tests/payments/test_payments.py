@@ -1,6 +1,9 @@
 """All tests for openstax payment site."""
 
 from pages.payments.login import PaymentsLogin
+from pages.tutor.home import TutorHome
+from pages.tutor.student_enrolling import StudentEnroll
+from pages.accounts.profile import Profile
 from tests.markers import expected_failure, nondestructive, payments, test_case
 
 
@@ -115,31 +118,59 @@ def test_go_into_order_detail(payments_base_url, driver, admin):
 @nondestructive
 @payments
 @test_case('C208911')
-def test_email_log_for_student_payments(payments_base_url, driver,
-                                        admin, student, teacher):
-    """Docstring."""
+def test_email_log_for_student_payments(payments_base_url, tutor_base_url,
+                                        accounts_base_url, driver, admin,
+                                        student, teacher,address, city, zip,
+                                        visa, exp_date, cvv, billing):
+    """Test the new email log for student payments."""
     # GIVEN: A new student's payment have just being made
+    page = TutorHome(driver, tutor_base_url).open().log_in(*teacher)
+    page = page.nav.go_to_create_course().create_new_course()
+    course_url = page.nav.go_to_course_settings().get_access_url()
+    page = Profile(driver, accounts_base_url).open().log_out()
+    emails = page.log_in(*student).emails
+    page = StudentEnroll(driver, course_url).open().logged_in_enroll_pay_now()
+    page.payment_proceed(address, city, zip, visa, exp_date, cvv, billing)
 
     # WHEN: Go to payments and sign up as an admin
+    page = PaymentsLogin(driver, payments_base_url).open()
+    page = page.login_with_osa(*admin)
+
     # AND: Go to the email logs page
+    page = page.go_to_email_logs()
 
     # THEN: The new payment should show up in email logs page
-    pass
+    elist = page.email_list
+    email = elist.lastest_item.get_email_address
+    assert email in emails
 
 
 @expected_failure
 @nondestructive
 @payments
 @test_case('C208912')
-def test_order_item_for_student_payments(payments_base_url, driver, admin):
-    """Docstring."""
+def test_order_item_for_student_payments(payments_base_url, tutor_base_url,
+                                        accounts_base_url, driver, admin,
+                                        student, teacher,address, city, zip,
+                                        visa, exp_date, cvv, billing):
+    """Test the new order item for student payments."""
     # GIVEN: A new student's payment have just being made
+    page = TutorHome(driver, tutor_base_url).open().log_in(*teacher)
+    page = page.nav.go_to_create_course().create_new_course()
+    course_url = page.nav.go_to_course_settings().get_access_url()
+    page = Profile(driver, accounts_base_url).open().log_out()
+    page.log_in(*student)
+    page = StudentEnroll(driver, course_url).open().logged_in_enroll_pay_now()
+    page.payment_proceed(address, city, zip, visa, exp_date, cvv, billing)
 
     # WHEN: Go to payments and sign up as an admin
+    page = PaymentsLogin(driver, payments_base_url).open()
+    page = page.login_with_osa(*admin)
     # AND: Go to the orders page
-
+    page = page.go_to_orders().orders_list.lastest_item.click_item()
     # THEN: The new payment should show up as success
-    pass
+    transaction = page.transactions_list.lastest_item.get_status
+    assert transaction
 
 
 @expected_failure

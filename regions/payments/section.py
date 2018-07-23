@@ -26,5 +26,5 @@ class PaymentsListSection(Region):
         _btn_locator = (By.CSS_SELECTOR, 'th a')
 
         def click_item(self):
-            """Click into the curren item."""
+            """Click into the current item."""
             self.find_element(*self._btn_locator).click()

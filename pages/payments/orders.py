@@ -3,6 +3,7 @@
 from selenium.webdriver.common.by import By
 
 from pages.payments.base import PaymentsBase
+from pages.payments.orders_detail import PaymentOrdersDetail
 from regions.payments.nav import PaymentsNav
 from regions.payments.section import PaymentsListSection
 
@@ -32,6 +33,11 @@ class PaymentOrders(PaymentsBase):
             _identifier_locator = (By.CLASS_NAME, 'field-identifier')
             _product_locator = (By.CLASS_NAME, 'field-product')
             _uuid_locator = (By.CLASS_NAME, 'field-student_account_uuid')
+
+            def click_item(self):
+                """Click into the current item."""
+                self.find_element(*self._btn_locator).click()
+                return PaymentOrdersDetail(self.driver)
 
             @property
             def get_order_time(self):
