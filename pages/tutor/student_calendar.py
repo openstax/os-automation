@@ -4,7 +4,7 @@ from pypom import Page, Region
 from selenium.webdriver.common.by import By
 
 
-class TutorCourse(Page):
+class TutorStudentCalendar(Page):
     """Tutor course page."""
 
     _banner_locator = (By.CLASS_NAME, "course-title-banner")

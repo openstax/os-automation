@@ -7,7 +7,7 @@ from pages.tutor.base import TutorBase
 from pages.tutor.course import TutorCourse
 
 
-class TutorQuestionLibrary(TutorBase):
+class TutorScores(TutorBase):
     """Scores page object."""
 
     _change_display_locator = (By.CSS_SELECTOR, 'div > label:nth-child(2)')

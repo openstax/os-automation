@@ -20,6 +20,9 @@ class TutorNewCourse(TutorBase):
     _estimated_number_locator = (By.CSS_SELECTOR,
                                  'div.course-details-numbers.form-group input')
     _cancel_locator = (By.CSS_SELECTOR, 'button.cancel.btn.btn-default')
+    _close_locator = (By.PARTIAL_LINK_TEXT, "I'll get them later")
+    _get_locator = (By.PARTIAL_LINK_TEXT, "Got It")
+
 
     @property
     def nav(self):
@@ -37,6 +40,9 @@ class TutorNewCourse(TutorBase):
         self.find_element(*self._continue_locator).click()
         self.find_element(*self._estimated_number_locator).sendKeys("1")
         self.find_element(*self._continue_locator).click()
+        self.find_element(*self._close_locator).click()
+        self.find_element(*self._get_locator).click()
+        return TutorCalendar(self.driver)
 
     def cancel_create_course(self):
         """Cancel creating a new course"""
@@ -52,3 +58,4 @@ class TutorNewCourse(TutorBase):
         self.find_element(*self._continue_locator).click()
         self.find_element(*self._continue_locator).click()
         self.find_element(*self._continue_locator).click()
+
