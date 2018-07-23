@@ -248,18 +248,20 @@ def test_log_in_using_facebook(accounts_base_url, facebook, selenium, student):
 
 
 @test_case('C195557')
-@expected_failure
 @nondestructive
 @accounts
 def test_open_the_admin_pop_up_console(accounts_base_url, admin, selenium):
     """Test the pop up console."""
     # GIVEN: an admin user logged into Accounts
     # AND: the Profile page is loaded
+    page = Profile(selenium, accounts_base_url).open()
+    page.log_in(*admin)
 
     # WHEN: the user clicks the "Popup Console" link
+    page.open_popup_console()
 
     # THEN: the pop up console is displayed
-    assert(False), 'Test script missing'
+    assert page.is_popup_console_displayed, 'Failed to open the popup console.'
 
 
 @test_case('C195558')

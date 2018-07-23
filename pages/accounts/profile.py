@@ -21,6 +21,7 @@ class Profile(AccountsHome):
     _edit_cancel_locator = (By.CLASS_NAME, 'editable-cancel')
     _username_exists_locator = (By.CSS_SELECTOR, '#profile .row')
     _popup_console_locator = (By.CSS_SELECTOR, '#upper-corner-console a')
+    _popup_console_body_locator = (By.ID, 'admin_console_dialog')
     _full_console_locator = (By.CSS_SELECTOR,
                              '#upper-corner-console a:nth-last-child(2)')
 
@@ -71,6 +72,11 @@ class Profile(AccountsHome):
         sleep(1)
         from pages.accounts.admin import AccountsAdmin
         return AccountsAdmin(self.driver)
+
+    @property
+    def is_popup_console_displayed(self):
+        """Return True if the admin pop up console is open."""
+        return self.is_element_displayed(*self._popup_console_body_locator)
 
     @property
     def is_admin(self):
