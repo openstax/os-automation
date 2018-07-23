@@ -3,7 +3,6 @@
 import pytest
 
 from pages.accounts.profile import AccountException, Profile
-from pages.utils.email import GuerrillaMail
 from pages.utils.utilities import Utility
 from tests.markers import accounts, expected_failure, nondestructive  # noqa
 from tests.markers import social, test_case  # noqa
@@ -12,39 +11,47 @@ from tests.markers import social, test_case  # noqa
 @test_case('C195545')
 @nondestructive
 @accounts
-def test_user_profile(accounts_base_url, selenium, student):
+def test_a_users_profile(accounts_base_url, selenium, student):
     """Login as a student user with a username."""
+    # GIVEN: a valid student user login and password
     page = Profile(selenium, accounts_base_url).open()
-    assert(not page.logged_in), 'Active user session unexpected'
+
+    # WHEN: log into Accounts as the student
     page.log_in(*student)
+
+    # THEN: the admin console links not displayed
+    # AND: the profile shows the name, username if assigned, emails and log in
+    #      methods
     assert(page.logged_in), 'User "{0}" not logged in'.format(student[0])
     assert(not page.is_admin), 'User is an administrator'
     assert(page.has_username), 'No username found'
     with pytest.raises(AccountException):
         page.open_popup_console()
-    page.log_out()
-    assert('/login' in selenium.current_url), 'Not at the Accounts login page'
 
 
 @test_case('C195546')
 @nondestructive
 @accounts
-def test_admin_profile(accounts_base_url, admin, selenium):
+def test_an_administrators_profile(accounts_base_url, admin, selenium):
     """Login as an administrative user with a username."""
+    # GIVEN: a valid Accounts admin login and password
     page = Profile(selenium, accounts_base_url).open()
-    assert(not page.logged_in), 'Active user session unexpected'
+
+    # WHEN: log into Accounts as the admin
     page.log_in(*admin)
+
+    # THEN: the admin console links are displayed
+    # AND: the user's name, username if assigned, e-mails and log in methods
+    #      are shown
     assert(page.logged_in), 'User "{0}" not logged in'.format(admin[0])
     assert(page.is_admin), 'User is not an administrator'
     assert(page.has_username), 'No username found'
-    page.log_out()
-    assert('/login' in selenium.current_url), 'Not at the Accounts login page'
 
 
 @test_case('C195547')
 @nondestructive
 @accounts
-def test_name_get_properties(accounts_base_url, selenium, student):
+def test_get_the_name_properties(accounts_base_url, selenium, student):
     """Test the getter methods for the name segments."""
     # GIVEN: A logged in student user
     page = Profile(selenium, accounts_base_url).open()
@@ -67,7 +74,7 @@ def test_name_get_properties(accounts_base_url, selenium, student):
 
 @test_case('C195548')
 @accounts
-def test_profile_name_field(accounts_base_url, selenium, student):
+def test_set_the_name_properties(accounts_base_url, selenium, student):
     """Test the user's name field."""
     # GIVEN: A logged in student user
     page = Profile(selenium, accounts_base_url).open()
@@ -102,27 +109,36 @@ def test_profile_name_field(accounts_base_url, selenium, student):
 
 @test_case('C195551')
 @accounts
-def test_profile_username_field(accounts_base_url, selenium, student):
+def test_get_and_set_a_username(accounts_base_url, selenium, student):
     """Test the user's username field."""
-    # setup
+    # GIVEN: a user with a username
+    # AND: viewing their profile
     page = Profile(selenium, accounts_base_url).open()
     page.log_in(*student)
-    assert (page.logged_in), 'User is not logged in'
-    # at profile, store original values
     old_username = page.username.username
     new_username = Utility.random_hex()
-    # set new values
+
+    # WHEN: the username is clicked
+    # AND: new text is entered in the input field
+    # AND: the checkmark is clicked
     page.username.username = new_username
+
+    # THEN: the username field shows the change
     assert (page.username.username != old_username), 'Username change failed'
-    # reset the fields to the original values
+
+    # WHEN: the username is clicked
+    # AND: the original username is entered in the input field
+    # AND: the checkmark is clicked
     page.username.username = old_username
+
+    # THEN: the original username is shown
     assert (page.username.username == old_username), 'Username reset failed'
 
 
 @test_case('C195552')
 @nondestructive
 @accounts
-def test_profile_email_fields(accounts_base_url, selenium, student):
+def test_get_current_emails_and_status(accounts_base_url, selenium, student):
     """Test the user's email fields."""
     # GIVEN: A logged in student
     page = Profile(selenium, accounts_base_url).open()
@@ -134,196 +150,131 @@ def test_profile_email_fields(accounts_base_url, selenium, student):
     fake_email = Utility.fake_email(name[page.name.FIRST],
                                     name[page.name.LAST])
     page.emails.add_email(fake_email)
-    emails_after_add = len(page.emails.emails)
 
     # THEN: The new email is attached to the account
+    emails_after_add = len(page.emails.emails)
     assert(emails_after_add == initial_email_count + 1), \
-        "Email was not added"
+        'Email was not added'
 
     # WHEN: The new email is deleted
     email = page.emails.emails[-1]
     email.delete()
-    final_email_count = len(page.emails.emails)
 
     # THEN: The email is removed from the account
+    final_email_count = len(page.emails.emails)
     assert(final_email_count == initial_email_count), \
-        "Email did not deleted properly"
+        'Email did not deleted properly'
 
 
 @test_case('C195554')
 @expected_failure
 @accounts
-def test_verify_an_existing_unverified_email(accounts_base_url, selenium,
-                                             student):
+def test_verify_an_email(
+        accounts_base_url, selenium, student):
     """Test the user email verification process."""
-    # GIVEN the user is valid and has a existing unverified email
-    page = GuerrillaMail(selenium).open()
-    email = page.header.email
-    assert email is not None, "Didn't get guerrilla email"
-    page = Profile(page.driver).open()
-    page.log_in(*student)
-    page.emails.add_email(email)
-    new_email = page.emails.emails.pop()
+    # GIVEN: a student viewing their Accounts profile
 
-    # WHEN the user click resend confirmation
-    new_email.resend_confirmation()
+    # WHEN: add an email without verifying the email
+    # AND: clicks the email address
+    # AND: clicks the "Resend confirmation email" link
+    # AND: opens the second, verification email and click the confirmation link
+    # AND: close the new tab showing "Thank you for confirming your email
+    #      address."
+    # AND: reload the profile page
 
-    # THEN the user should receive new confirmation email
-    page = GuerrillaMail(page.driver, timeout=60).open()
-    page.wait_for_email()
-    assert len(page.emails) > 2, "Didn't receive email"
-    new_email = page.emails[0]
-    new_email.open_email()
+    # THEN: the new email does not have "unconfirmed" to the right of it
 
-    # WHEN the user click the confirmation link
-    page.openedmail.confirm_email()
-    assert 'openstax.org/confirm?' in selenium.current_url
+    # WHEN: delete the new email
 
-    # THEN the email should appear as confirmed
-    page = Profile(page.driver).open()
-    new_email = page.emails.emails.pop()
-    assert new_email.is_confirmed, "The email isn't verified"
+    # THEN: the email list is restored
+    assert(False), 'Test script missing'
 
 
 @test_case('C195553')
+@expected_failure
 @accounts
-def test_add_a_verified_email(accounts_base_url, selenium, student):
+def test_add_a_verified_email_to_profile(accounts_base_url, selenium, student):
     """Test the ability to add an e-mail address to an existing user."""
-    # GIVEN the user is valid
+    # GIVEN: a student viewing their Accounts profile
 
-    # WHEN the user add a new email
-    page = GuerrillaMail(selenium).open()
-    email = page.header.email
-    assert email is not None, "Didn't get guerrilla email"
-    page = Profile(page.driver, accounts_base_url).open()
-    page.log_in(*student)
-    page.emails.add_email(email)
+    # WHEN: add an email
+    # AND: opens the verification email and clicks the confirmation link
+    # AND: closes the new tab showing "Thank you for confirming your email
+    #      address."
+    # AND: reload the profile page
 
-    # THEN the user should receive a confirmation email automatically
-    page = GuerrillaMail(page.driver, timeout=60).open()
-    page.wait_for_email()
-    assert len(page.emails) > 1, "Didn't receive email"
-    new_email = page.emails[0]
-    new_email.open_email()
+    # THEN: the new email does not have "unconfirmed" to the right of it
 
-    # WHEN the user click the confirmation link
-    page.openedmail.confirm_email()
-    assert 'openstax.org/confirm?' in selenium.current_url
+    # WHEN: delete the new email
 
-    # THEN the email should appear as confirmed
-    page = Profile(page.driver, accounts_base_url).open()
-    new_email = page.emails.emails.pop()
-    assert new_email.is_confirmed, "The email isn't verified"
+    # THEN: the email list is restored
+    assert(False), 'Test script missing'
 
 
 @test_case('C195555')
 @accounts
 @social
-def test_profile_login_using_google(accounts_base_url, google, selenium,
-                                    student):
+def test_log_in_using_google(accounts_base_url, google, selenium, student):
     """Test the Gmail login method."""
-    # GIVEN the user had added Google as an alternative login method
-    # AND the user is not logged in
+    # GIVEN: a user with the Google authentication setup
+    # AND: the Accounts Home page is loaded
     page = Profile(selenium, accounts_base_url).open()
-    assert(not page.logged_in), 'Already logged in'
 
-    # WHEN the user logs into OpenStax through a Google account
+    # WHEN: the user enters the Gmail address in the input
+    # AND: clicks the "NEXT" button
+    # AND: clicks the "Log in with Google" button
     page.login.google_login(student[0], *google)
 
-    # THEN the user is logged in
+    # THEN: the user is taken to their profile
     assert (page.logged_in), 'Failed to login with google'
 
 
 @test_case('C195556')
 @accounts
 @social
-def test_profile_login_using_facebook(accounts_base_url, facebook, selenium,
-                                      student):
+def test_log_in_using_facebook(accounts_base_url, facebook, selenium, student):
     """Test the Facebook login method."""
-    # GIVEN the user had added Facebook as an alternative login method
-    # AND the user is not logged in
+    # GIVEN: a user with the Facebook authentication setup
+    # AND: the Accounts Home page is loaded
     page = Profile(selenium, accounts_base_url).open()
-    assert(not page.logged_in), 'Already logged in'
 
-    # WHEN the user logs into OpenStax through a Facebook account
+    # WHEN: the user enters the email address in the input
+    # AND: clicks the "NEXT" button
+    # AND: clicks the "Log in with Facebook" button
     page.login.facebook_login(student[0], *facebook)
 
-    # THEN the user is logged in
+    # THEN: the user is taken to their profile
     assert (page.logged_in), 'Failed to login with facebook'
 
 
 @test_case('C195557')
+@expected_failure
 @nondestructive
 @accounts
-def test_admin_pop_up_console(accounts_base_url, admin, selenium):
+def test_open_the_admin_pop_up_console(accounts_base_url, admin, selenium):
     """Test the pop up console."""
-    page = Profile(selenium, accounts_base_url).open()
-    assert(not page.logged_in), 'Active user session unexpected'
-    page.log_in(*admin)
-    assert(page.logged_in), 'User "{0}" not logged in'.format(admin[0])
-    assert(page.is_admin), 'User is not an administrator'
-    assert(page.has_username), 'No username found'
+    # GIVEN: an admin user logged into Accounts
+    # AND: the Profile page is loaded
 
-    popup = page.open_popup_console()
-    popup.links.go_to_security_log()
-    assert("security_log" in selenium.current_url)
+    # WHEN: the user clicks the "Popup Console" link
 
-    selenium.back()
-    popup = page.open_popup_console()
-    popup.links.go_to_oauth_application()
-    assert("applications" in selenium.current_url)
-
-    selenium.back()
-    popup = page.open_popup_console()
-    popup.links.go_to_fineprint()
-    assert("print" in selenium.current_url)
-
-    selenium.back()
-    popup = page.open_popup_console()
-    popup.links.go_to_api()
-    assert("api/docs/v1" in selenium.current_url)
-
-    selenium.back()
-    popup = page.open_popup_console()
-    popup.full_console()
-    assert("admin/console" in selenium.current_url)
-
-    selenium.back()
-    popup = page.open_popup_console()
-    result = popup.users.search_for("teacher")
-    assert(len(result[0].find_data()) == 7)
-    assert(result[10].id.isdigit())
-    assert(not result[10].is_test)
-
-    result[10].edit()
-    assert("edit" in selenium.current_url)
-    page.driver.switch_to_window(page.driver.window_handles[0])
-
-    result[10].username_link
-    assert("security_log" in selenium.current_url)
-
-    selenium.back()
-    popup = page.open_popup_console()
-    result = popup.users.search_for("teacher")
-    result[10].sign_in_as()
-    assert(not page.is_admin), 'User should not be an administrator'
+    # THEN: the pop up console is displayed
+    assert(False), 'Test script missing'
 
 
 @test_case('C195558')
 @nondestructive
 @accounts
-def test_go_to_full_console(accounts_base_url, admin, selenium):
+def test_go_to_the_admins_full_console(accounts_base_url, admin, selenium):
     """Go to the full console."""
-    # GIVEN the user is logged in as an administrator
+    # GIVEN: an admin user logged into Accounts
+    # AND: the Profile page is loaded
     page = Profile(selenium, accounts_base_url).open()
-    assert(not page.logged_in), 'User is not logged in'
     page.log_in(*admin)
-    assert(page.logged_in), 'User is not logged in'
-    assert(page.is_admin), 'User is not an administrator'
 
-    # WHEN the user clicks the full console
+    # WHEN: the user clicks the "Full Console" link
     page.open_full_console()
 
-    # THEN the user is routed to the full console page
+    # THEN: the admin control console page is loaded
     assert('/admin/console' in selenium.current_url), \
         'Not at the Full Admin Console page'

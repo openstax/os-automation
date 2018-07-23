@@ -6,14 +6,14 @@ from pypom import Region
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as expect
 
-from pages.accounts import profile
 from pages.accounts.base import AccountsBase
-from pages.accounts.signup import Signup
 from pages.salesforce.home import Salesforce
 
 
 class AccountsHome(AccountsBase):
     """Home page base."""
+
+    URL_TEMPLATE = ''
 
     @property
     def login(self):
@@ -23,6 +23,10 @@ class AccountsHome(AccountsBase):
     def log_in(self, user, password):
         """Log into the site with a specific user."""
         return self.Login(self).login(user, password)
+
+    def service_log_in(self, user, password):
+        """Log into the site with a specific user from another service."""
+        return self.Login(self).service_login(user, password)
 
     @property
     def logged_in(self):
@@ -40,6 +44,8 @@ class AccountsHome(AccountsBase):
         _login_help_locator = (By.CSS_SELECTOR, '.login-help')
         _salesforce_link_locator = (By.CSS_SELECTOR, '.login-help a')
         _salesforce_loader = (By.CSS_SELECTOR, 'div.body-and-support-buttons')
+        _input_field_locator = (By.CLASS_NAME, 'form-group')
+        _form_box_locator = (By.TAG_NAME, 'input')
         _error_locator = (By.CSS_SELECTOR, '.alert')
         _signup_locator = (By.CSS_SELECTOR, '.extra-info a')
 
@@ -58,18 +64,23 @@ class AccountsHome(AccountsBase):
         @property
         def logged_in(self):
             """Return True if a user is logged in."""
-            return 'profile' in self.selenium.current_url
+            return 'profile' in self.driver.current_url
 
         def login(self, user, password):
-            """Log into the site with a specific user."""
+            """Log into the accounts with a specific user."""
+            self.service_login(user, password)
+            self.wait.until(lambda _: self.logged_in)
+            from pages.accounts.profile import Profile
+            return Profile(self.driver)
+
+        def service_login(self, user, password):
+            """Log into the site with a specific user from another service."""
             self.find_element(*self._user_field_locator).send_keys(user)
             self.find_element(*self._login_submit_button_locator).click()
             sleep(1)
             self.find_element(*self._password_field_locator) \
                 .send_keys(password)
             self.find_element(*self._login_submit_button_locator).click()
-            self.wait.until(lambda _: self.logged_in)
-            return profile.Profile(self.driver)
 
         def facebook_login(self, user, facebook_user, password):
             """Log into the site with facebook."""
@@ -91,7 +102,8 @@ class AccountsHome(AccountsBase):
                         self._fb_safari_specific_locator))
                 self.find_element(*self._fb_safari_specific_locator).click()
             sleep(2)
-            return profile.Profile(self.driver)
+            from pages.accounts.profile import Profile
+            return Profile(self.driver)
 
         def google_login(self, user, google_user, password):
             """Log into the site with google."""
@@ -110,7 +122,8 @@ class AccountsHome(AccountsBase):
                 .send_keys(password)
             self.find_element(*self._google_pass_next_locator).click()
             sleep(2)
-            return profile.Profile(self.driver)
+            from pages.accounts.profile import Profile
+            return Profile(self.driver)
 
         def reset_password(self, user, new_password):
             """Reset a current user's password."""
@@ -148,9 +161,28 @@ class AccountsHome(AccountsBase):
             """Return Account log in error message."""
             return self.find_element(*self._error_locator).text
 
+        def get_error_color(self):
+            """Return the background color for missing or illegal fields."""
+            print(self.driver.page_source)
+            fields = self.find_elements(*self._input_field_locator)
+            issues = list(filter(
+                lambda element: 'has-error' in element.get_attribute('class'),
+                fields
+            ))
+            if not isinstance(issues, list):
+                issues = [issues]
+            if issues:
+                return (
+                    issues[0]
+                    .find_element(*self._form_box_locator)
+                    .value_of_css_property('background-color')
+                )
+            return None
+
         @property
         def go_to_signup(self):
             """Go to user signup."""
             self.find_element(*self._signup_locator).click()
             sleep(1)
+            from pages.accounts.signup import Signup
             return Signup(self.driver)

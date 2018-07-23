@@ -28,11 +28,9 @@ def test_change_id_to_dashboard(tutor_base_url, selenium, student):
     """Test student can go back to dashnoard from changing id page."""
     # GIVEN: Logged into Tutor as a student
 
-    # AND: Has enrolled in a class
+    # AND: Is on a class dashboard
 
-    # WHEN: The user goes into an enrolled class
-
-    # AND: The user clicks on "Change Student ID"
+    # WHEN: The user clicks on "Change Student ID"
 
     # AND: The user clicks on "Cancel"
 
@@ -46,11 +44,9 @@ def test_save_student_id(tutor_base_url, selenium, student):
     """Test the changed student id is saved."""
     # GIVEN: Logged into Tutor as a student
 
-    # AND: Has enrolled in a class
+    # AND: Is on a class dashboard
 
-    # WHEN: The user goes into an enrolled class
-
-    # AND: The user clicks on "Change Student ID"
+    # WHEN: The user clicks on "Change Student ID"
 
     # AND: The user enter the new student id number
 

@@ -8,10 +8,23 @@ from selenium.webdriver.support import expected_conditions as expect
 from selenium.webdriver.support.ui import WebDriverWait
 
 from pages.utils.email import EmailVerificationError, GoogleBase, GuerrillaMail
-from tests.markers import nondestructive, test_case
+from pages.utils.email import RestMail  # NOQA
+from tests.markers import expected_failure, nondestructive, test_case
+
+TEST_EMAIL_BODY = (
+    'Welcome!\n\nEnter your 6-digit PIN in your browser to confirm '
+    'your email address:\n\nYour PIN: 999999\n\nIf you have any '
+    'trouble using this PIN, you can also click the link below\nto '
+    'confirm your email address:\n\nhttps://openstax.org/fake/'
+    'registration/pin/url\n\nWe sent this message because someone '
+    'is trying to use ... to create an\nOpenStax account. If this '
+    'wasn\'t you, please disregard this message.\n\nRegards,\nThe '
+    'OpenStax Team'
+)
 
 
 @test_case('C195537')
+@expected_failure
 @nondestructive
 def test_google_mail_user_has_pin_emails(gmail, selenium):
     """Test a Google Gmail user."""
@@ -39,25 +52,17 @@ def test_google_mail_user_has_pin_emails(gmail, selenium):
 
 
 @test_case('C195538')
-@nondestructive
 def test_guerrilla_mail_received_pin_email(selenium):
     """Test a Guerrilla Mail user."""
     # GIVEN: A new Guerrilla Mail session
     page = GuerrillaMail(selenium).open()
 
     # WHEN: A template email with a pin is sent to the current email
+    # AND: The user waits for the message to show in the inbox
     page = page.compose.send_message(
         to=page.header.email,
         subject='[OpenStax] Use PIN 999999 to confirm your email address',
-        body=('Welcome!\n\nEnter your 6-digit PIN in your browser to confirm '
-              'your email address:\n\nYour PIN: 999999\n\nIf you have any '
-              'trouble using this PIN, you can also click the link below\nto '
-              'confirm your email address:\n\nhttps://openstax.org/fake/'
-              'registration/pin/url\n\nWe sent this message because someone '
-              'is trying to use ... to create an\nOpenStax account. If this '
-              'wasn\'t you, please disregard this message.\n\nRegards,\nThe '
-              'OpenStax Team'))
-    # AND: The user waits for the message to show in the inbox
+        body=(TEST_EMAIL_BODY))
     WebDriverWait(page.selenium, 30).until(
         expect.presence_of_element_located(
             (By.XPATH, '//*[contains(text(),"999999")]')))
@@ -100,3 +105,17 @@ def test_guerrilla_mail_received_pin_email(selenium):
     page.header.forget_address()
     assert(selenium.find_element('css selector', '#inbox-id input')
            .text == ''), 'Username not blank' '''
+
+
+@test_case('')
+def test_restmail_received_pin_email():
+    """Test a RestMail JSON email."""
+    # GIVEN: A RestMail address
+    username = 'openstax'
+    email = RestMail(username)
+
+    # WHEN: Access the rest API
+    box = email.get_mail()
+
+    # THEN: Able to retrieve a fake confirmation PIN
+    assert(box[-1].has_pin), 'PIN not found'

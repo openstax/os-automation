@@ -29,6 +29,11 @@ def chrome_options(chrome_options, pytestconfig):
     """Set Chrome options."""
     if pytestconfig.getoption('--headless'):
         chrome_options.headless = True
+        chrome67 = ('Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_5) '
+                    'AppleWebKit/537.36 (KHTML, like Gecko) Chrome/'
+                    '67.0.3396.99 Safari/537.36')
+        chrome_options.add_argument('--user-agent={agent}'
+                                    .format(agent=chrome67))
 
     # Required to run in Travis containers
     if pytestconfig.getoption('--no-sandbox'):

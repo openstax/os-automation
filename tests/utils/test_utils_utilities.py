@@ -3,7 +3,7 @@
 from selenium.webdriver.common.by import By
 
 from pages.accounts.home import AccountsHome as Home
-from pages.utils.utilities import Utility
+from pages.utils.utilities import Status, Utility
 from tests.markers import accounts, nondestructive, test_case
 
 
@@ -57,3 +57,15 @@ def test_browser_tab_open(accounts_base_url, selenium):
     Home(selenium, accounts_base_url).open()
     handles = Utility.new_tab(selenium)
     assert(len(handles) > 1), 'Only one window handle available'
+
+
+@test_case('C210267')
+@nondestructive
+def test_card_retrieval_from_braintree():
+    """Test retrieving dummy credit cards from the processor."""
+    get_card = Utility.get_test_credit_card()
+    assert(get_card), 'Failed to select a card'
+    get_card = Utility.get_test_credit_card(card=Status.MC)
+    assert(get_card), 'Failed to select a Mastercard'
+    get_card = Utility.get_test_credit_card(status=Status.DECLINED)
+    assert(get_card), 'Failed to select a declined card'

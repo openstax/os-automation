@@ -11,9 +11,7 @@ def test_tutor_payment_page(tutor_base_url, selenium, student):
     """Test the tutor payment page."""
     # GIVEN: Tutor page logged in as a student
 
-    # WHEN: The user clicks on the "Menu"
-
-    # AND: The user clicks on the "Manage payments" menu item
+    # WHEN: The user clicks on the "Manage payments" menu item
 
     # THEN: The Payment Management page loads
 
@@ -26,7 +24,7 @@ def test_tutor_invoice_page(tutor_base_url, selenium, student):
     """Test the tutor invoice page."""
     # GIVEN: Tutor page logged in as a student
 
-    # WHEN: The user clicks on "Manage payments"
+    # WHEN: The user clicks on "Manage payments" menu item
 
     # AND: The user clicks "Invoice" of any one of the transactions
 
@@ -61,9 +59,7 @@ def test_course_payment(tutor_base_url, selenium, student):
 
     # AND: The user sign Terms and Privacy policy
 
-    # AND: On payment option page, click on "Buy access now"
-
-    # AND: Fill out information correctly on Payment option page
+    # AND: Fill out information and click on "Buy access now"
 
     # THEN: Student gets confirmation that payment was accepted successfully,
     # and there should be an option to "Access User's Course"
@@ -126,8 +122,6 @@ def test_buy_free_trial(tutor_base_url, selenium, student):
     # AND: Enrolled in a class with 14 days trial mode
 
     # WHEN: The user clicks "Pay Now"
-
-    # AND: Enter credit card and other information
 
     # AND: Complete the payment
 

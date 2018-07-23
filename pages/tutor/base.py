@@ -5,7 +5,7 @@ from time import sleep
 from pypom import Page, Region
 from selenium.webdriver.common.by import By
 
-# from pages.accounts import home
+from pages.accounts.home import AccountsHome
 from pages.rice.gdpr import GeneralDataPrivacyRegulation
 from pages.rice.home import Rice
 from pages.salesforce.home import Salesforce
@@ -39,7 +39,7 @@ class TutorBase(Page):
 
     def go_to_log_in(self):
         """Go to the Accounts log in page for Tutor."""
-        # return home.AccountsHome(self)
+        return AccountsHome(self)
 
     def log_in(self, username, password):
         """Log into Tutor."""
@@ -99,7 +99,7 @@ class TutorBase(Page):
         @property
         def show_terms_of_use(self):
             """Display the terms of use."""
-            self.find_element(*self._terms_locator).click()
+            self.find_element(*self._terms_link_locator).click()
             sleep(1)
             return self
 
