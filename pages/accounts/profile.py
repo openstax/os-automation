@@ -75,7 +75,7 @@ class Profile(AccountsHome):
 
     @property
     def is_popup_console_displayed(self):
-        """Return True if the admin pop up console is open"""
+        """Return True if the admin pop up console is open."""
         return self.is_element_displayed(*self._popup_console_body_locator)
 
     @property
