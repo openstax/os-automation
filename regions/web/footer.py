@@ -18,17 +18,17 @@ class Footer(Region):
 
     @property
     def statements(self):
-        """Return Statement region"""
+        """Return Statement region."""
         return self.Statements(self)
 
     @property
     def content_links(self):
-        """Return ContentLinks region"""
+        """Return ContentLinks region."""
         return self.ContentLinks(self)
 
     @property
     def social_links(self):
-        """Return SocialLinks region"""
+        """Return SocialLinks region."""
         return self.SocialLinks(self)
 
     class Statements(Region):
@@ -40,19 +40,19 @@ class Footer(Region):
         _trademark_locator = (By.CSS_SELECTOR, 'ap-html')
 
         def hero_statement(self):
-            """Returns the hero banner statement."""
+            """Return the hero banner statement."""
             return self.find_element(*self._hero_quote_locator).text
 
         def nonprofit_statement(self):
-            """Returns the nonprofict statement."""
+            """Return the nonprofit statement."""
             return self.find_elements(*self._nonprofit_locator)[0].text
 
         def copyright_statement(self):
-            """Returns the copyright statement."""
+            """Return the copyright statement."""
             return self.find_elements(*self._copyright_locator)[1].text
 
         def trademark_statement(self):
-            """Returns the trademark statement."""
+            """Return the trademark statement."""
             return self.find_element(*self._trademark_locator).text
 
     class ContentLinks(Region):
