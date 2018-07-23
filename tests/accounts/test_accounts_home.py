@@ -97,20 +97,30 @@ def test_attempt_to_log_in_with_an_invalid_user(accounts_base_url, selenium):
 
 
 @test_case('C208850')
-@expected_failure
 @nondestructive
 @accounts
 def test_attempt_to_log_in_with_an_invalid_email(accounts_base_url, selenium):
     """Attempt to log in with an invalid/unknown email address."""
     # GIVEN: the Accounts Home page is loaded
-
+    page = Home(selenium, accounts_base_url).open()
+    email = Utility.fake_email('random', 'email')
+    password = ''
     # WHEN: an invalid email address is entered
     # AND: the "NEXT" button is clicked
+    with pytest.raises(NoSuchElementException):
+        page.log_in(email, password)
 
     # THEN: the input box is shaded
     # AND: an error message "We don't recognize this email. Please try again."
     #      is displayed
-    assert(False), 'Test script missing'
+    shade = page.login.get_error_color()
+    expected_color = 'rgba(241, 218, 218, 1)'
+    assert (Utility.compare_colors(shade, expected_color)), \
+        'Wrong color ({color}) used'.format(color=shade)
+    print(page.login.get_login_error())
+    assert ('We don’t recognize this email.' in
+            page.login.get_login_error()), \
+        'Incorrect error message'
 
 
 @test_case('C195139')
