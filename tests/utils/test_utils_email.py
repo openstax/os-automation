@@ -116,16 +116,18 @@ def test_guerrilla_mail_received_pin_email(selenium):
 def test_restmail_received_pin_email(gmail):
     """Test a RestMail JSON email."""
     # GIVEN: A RestMail address with a verification PIN email
+    username = 'openstax'
+    email = RestMail(username)
+    email.empty()  # clear the message inbox
+
     send = SendMail(*gmail, *GOOGLE)
     sender = ('OpenStax QA', 'noreply@openstax.org')
     recipient = ('OpenStax Automation', 'openstax@restmail.net')
-    send.send_mail(sender, recipient, TEST_EMAIL_SUBJECT, TEST_EMAIL_BODY)
-
-    username = 'openstax'
-    email = RestMail(username)
+    send.send_mail(recipient, sender, TEST_EMAIL_SUBJECT, TEST_EMAIL_BODY)
 
     # WHEN: Access the rest API
     box = email.get_mail()
 
     # THEN: Able to retrieve a fake confirmation PIN
+    assert(box), 'No emails recovered'
     assert(box[-1].has_pin), 'PIN not found'

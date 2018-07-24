@@ -327,7 +327,7 @@ class RestMail(object):
         """Get email for a dynamic user."""
         messages = requests.get(self.MAIL_URL.format(username=self.username))
         self._inbox = [self.Email(message) for message in messages.json()]
-        return self.inbox
+        return self._inbox
 
     def wait_for_mail(self):
         """Sleep for 5 seconds."""
@@ -497,7 +497,7 @@ class SendMail(object):
             msg['From'] = format_address(sender)
             msg['To'] = format_address(recipients)
             msg['Subject'] = subject
-            smtp.send_message(msg)
+            smtp.send_message(msg=msg)
 
 
 class EmailVerificationError(Exception):
