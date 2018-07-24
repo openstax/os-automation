@@ -8,6 +8,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 
 from pages.accounts import home, profile
 from pages.accounts.base import AccountsBase
+from pages.facebook.home import Facebook
 from pages.utils.email import Google, GuerrillaMail
 from pages.utils.utilities import Utility
 
@@ -66,8 +67,8 @@ class Signup(AccountsBase):
 
     _next_button_locator = (By.CSS_SELECTOR, '[type=submit]')
 
-    def account_signup(self, email, password,
-                       _type='Student', provider='guerrilla',
+    def account_signup(self, email,
+                       password=None, _type='Student', provider='guerrilla',
                        **kwargs):
         """Single signup entry point.
 
@@ -76,6 +77,7 @@ class Signup(AccountsBase):
         Args:
             email (str): An accessible e-mail address
             password (str): A user password
+                default: None
             _type (:obj:`str`, optional): New user account type -
                 Signup.STUDENT, Signup.INSTRUCTOR, Signup.ADMINISTRATOR,
                 Signup.LIBRARIAN, Signup.DESIGNER, Signup.OTHER
@@ -150,16 +152,24 @@ class Signup(AccountsBase):
         self.pin.verify_pin = pin
         self.next()
 
-        # set the initial password
-        self.password.password = password
-        self.password.confirmation = password
-        self.next()
+        if 'social' not in kwargs:
+            # set the initial password
+            self.password.password = password
+            self.password.confirmation = password
+            self.next()
+        elif kwargs['social'] == 'facebook':
+            # use Facebook
+            self.social.use_facebook.log_in(email, email_password)
+        else:
+            # use Google
+            self.social.use_google.log_in(email, email_password)
 
         # enter user details in group order
         # all users
-        self.user.first_name = kwargs['name'][Signup.FIRST]
-        self.user.last_name = kwargs['name'][Signup.LAST]
-        self.user.suffix = kwargs['name'][Signup.SUFFIX]
+        if 'social' not in kwargs:
+            self.user.first_name = kwargs['name'][Signup.FIRST]
+            self.user.last_name = kwargs['name'][Signup.LAST]
+            self.user.suffix = kwargs['name'][Signup.SUFFIX]
         self.user.school = kwargs['school']
         # elevated users
         if non_student_role:
@@ -180,6 +190,7 @@ class Signup(AccountsBase):
         # request e-mail confirmation for an elevated account
         if non_student_role:
             self.notice.get_confirmation_email()
+            sleep(0.5)
             self.next()
 
         return profile.Profile(self.driver)
@@ -210,6 +221,11 @@ class Signup(AccountsBase):
     def password(self):
         """Fill out the password fields."""
         return self.SetPassword(self)
+
+    @property
+    def social(self):
+        """Use a social login."""
+        return self.SocialLogin(self)
 
     @property
     def user(self):
@@ -306,8 +322,8 @@ class Signup(AccountsBase):
         """Set the user's password."""
 
         _password_locator = (By.ID, 'signup_password')
-        _password_confirmation_locator = (By.ID,
-                                          'signup_password_confirmation')
+        _password_confirmation_locator = (
+            By.ID, 'signup_password_confirmation')
         _error_locator = (By.CLASS_NAME, 'alert')
         _multi_error_locator = (By.CSS_SELECTOR, '.alert li')
         _go_to_social_locator = (By.CSS_SELECTOR, '[href$=social]')
@@ -430,7 +446,32 @@ class Signup(AccountsBase):
     class SocialLogin(Region):
         """Sign up using a social app profile."""
 
-        # TODO
+        URL_TEMPLATE = '/social'
+
+        _facebook_button_locator = (By.ID, 'facebook-login-button')
+        _google_button_locator = (By.ID, 'google-login-button')
+        _go_to_password_setup_locator = (By.CSS_SELECTOR, '[href$=password]')
+
+        @property
+        def use_facebook(self):
+            """Use Facebook to log in."""
+            self.find_element(*self._facebook_button_locator).click()
+            self.sleep(0.5)
+            return Facebook(self.driver)
+
+        @property
+        def use_google(self):
+            """Use Google to log in."""
+            self.find_element(*self._google_button_locator).click()
+            self.sleep(0.5)
+            return Google(self.driver)
+
+        @property
+        def use_a_password(self):
+            """Use a non-social log in."""
+            self.find_element(*self._go_to_password_setup_locator).click()
+            self.sleep(0.5)
+            return self.SetPassword(self)
 
     class InstructorVerification(Region):
         """Instructor verification fields."""

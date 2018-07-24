@@ -2,7 +2,7 @@
 
 from pages.accounts.signup import Signup
 from pages.utils.utilities import Utility
-from tests.markers import accounts, expected_failure, test_case
+from tests.markers import accounts, expected_failure, social, test_case
 
 
 @test_case('C195549')
@@ -59,6 +59,7 @@ def test_sign_up_as_an_instructor(accounts_base_url, selenium, teacher):
 
 @test_case('C195550')
 @expected_failure
+@social
 @accounts
 def test_sign_up_as_a_nonstudent_user(accounts_base_url, selenium, teacher):
     """Test non-student user signup."""
@@ -87,6 +88,7 @@ def test_sign_up_as_a_nonstudent_user(accounts_base_url, selenium, teacher):
 
 @test_case('C200745')
 @expected_failure
+@social
 @accounts
 def test_sign_up_as_a_facebook_user(accounts_base_url, selenium, facebook):
     """Test signing up with a Facebook account."""
