@@ -212,6 +212,7 @@ def test_add_a_verified_email_to_profile(accounts_base_url, selenium, student):
 
 
 @test_case('C195555')
+@expected_failure
 @accounts
 @social
 def test_log_in_using_google(accounts_base_url, google, selenium, student):
@@ -230,6 +231,7 @@ def test_log_in_using_google(accounts_base_url, google, selenium, student):
 
 
 @test_case('C195556')
+@expected_failure
 @accounts
 @social
 def test_log_in_using_facebook(accounts_base_url, facebook, selenium, student):

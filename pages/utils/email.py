@@ -1,6 +1,10 @@
 """Email providers."""
 
 import re
+import smtplib
+from contextlib import contextmanager
+from email.mime.text import MIMEText
+from email.utils import formataddr as format_address
 from time import sleep
 
 import requests
@@ -458,6 +462,42 @@ class RestMail(object):
             if not send.status_code == requests.codes.ok:
                 raise EmailVerificationError('Email not confirmed. ({code})'
                                              .format(code=send.status_code))
+
+
+class SendMail(object):
+    """Send an email through Gmail."""
+
+    def __init__(self, username, password, host, port, timeout=10):
+        """Initialize an email sender."""
+        self.username = username
+        self.password = password
+        self.host = host
+        self.port = port
+        self.timeout = timeout
+
+    @contextmanager
+    def _sender(self):
+        """Start a relay for Gmail."""
+        smtp_server = smtplib.SMTP(self.host, self.port, self.timeout)
+        smtp_server.set_debuglevel(True)
+        try:
+            smtp_server.ehlo_or_helo_if_needed()
+            smtp_server.starttls()
+            smtp_server.ehlo(name='automated-qa.openstax.org')
+            smtp_server.login(self.username, self.password)
+            yield smtp_server
+        finally:
+            smtp_server.quit()
+        sleep(3.0)
+
+    def send_mail(self, recipients, sender, subject, message):
+        """Send an email through Gmail."""
+        with self._sender() as smtp:
+            msg = MIMEText(message)
+            msg['From'] = format_address(sender)
+            msg['To'] = format_address(recipients)
+            msg['Subject'] = subject
+            smtp.send_message(msg)
 
 
 class EmailVerificationError(Exception):

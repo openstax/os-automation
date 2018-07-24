@@ -44,13 +44,13 @@ def facebook(request):
 
 @pytest.fixture(scope='module')
 def google(request):
-    """Set the Facebook user information."""
+    """Set the Google user information."""
     return _data_return(request, 'google')
 
 
 @pytest.fixture(scope='module')
 def gmail(request):
-    """Set the Facebook user information."""
+    """Set the Google Gmail user information."""
     return _data_return(request, 'gmail')
 
 
