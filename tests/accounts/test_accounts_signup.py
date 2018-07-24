@@ -59,6 +59,7 @@ def test_sign_up_as_an_instructor(accounts_base_url, selenium, teacher):
 
 @test_case('C195550')
 @expected_failure
+@social
 @accounts
 def test_sign_up_as_a_nonstudent_user(accounts_base_url, selenium, teacher):
     """Test non-student user signup."""
@@ -87,6 +88,7 @@ def test_sign_up_as_a_nonstudent_user(accounts_base_url, selenium, teacher):
 
 @test_case('C200745')
 @expected_failure
+@social
 @accounts
 def test_sign_up_as_a_facebook_user(accounts_base_url, selenium, facebook):
     """Test signing up with a Facebook account."""
@@ -153,70 +155,6 @@ def test_sign_up_as_a_google_user(accounts_base_url, selenium, google):
 
     # THEN: the Google account is available for use
     assert(False), 'Test script missing'
-
-
-@test_case('')
-@accounts
-@social
-def test_student_account_signup_with_facebook(accounts_base_url, selenium,
-                                              facebook, gmail, student):
-    """Test student user signup using a Facebook login."""
-    # GIVEN: A valid Facebook account
-    # AND: At the Accounts sign up page
-    page = Signup(selenium, accounts_base_url).open()
-    user, password = facebook
-
-    # WHEN: A student attempts to sign up using a Google social account
-    page.account_signup(
-        email=user,
-        _type='Student',
-        provider='google',
-        kwargs={
-            'email_password': password,
-            'news': False,
-            'school': 'OpenStax Automation',
-            'social': 'facebook',
-        }
-    )
-
-    # THEN: An account is created using their social profile
-
-    # WHEN: The user logs out
-    # AND: Logs in using the social profile
-
-    # THEN: The user is taken to their profile
-
-
-@test_case('')
-@accounts
-@social
-def test_student_account_signup_with_google(accounts_base_url, selenium,
-                                            google, student):
-    """Test student user signup using a Google login."""
-    # GIVEN: A valid Google account
-    # AND: At the Accounts sign up page
-    page = Signup(selenium, accounts_base_url).open()
-    user, password = google
-
-    # WHEN: A student attempts to sign up using a Google social account
-    page.account_signup(
-        email=user,
-        _type='Student',
-        provider='google',
-        kwargs={
-            'email_password': password,
-            'news': False,
-            'school': 'OpenStax Automation',
-            'social': 'google',
-        }
-    )
-
-    # THEN: An account is created using their social profile
-
-    # WHEN: The user logs out
-    # AND: Logs in using the social profile
-
-    # THEN: The user is taken to their profile
 
 
 def subject_list(size=1):

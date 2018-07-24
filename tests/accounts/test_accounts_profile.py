@@ -214,16 +214,16 @@ def test_add_a_verified_email_to_profile(accounts_base_url, selenium, student):
 @test_case('C195555')
 @accounts
 @social
-def test_log_in_using_google(accounts_base_url, google, selenium, student):
+def test_log_in_using_google(accounts_base_url, gmail, selenium):
     """Test the Gmail login method."""
-    # GIVEN: a user with the Google authentication setup
+    # GIVEN: a user with the Google authentication setup using a Gmail address
     # AND: the Accounts Home page is loaded
     page = Profile(selenium, accounts_base_url).open()
 
     # WHEN: the user enters the Gmail address in the input
     # AND: clicks the "NEXT" button
     # AND: clicks the "Log in with Google" button
-    page.login.google_login(student[0], *google)
+    page.login.google_login(gmail[0], *gmail)
 
     # THEN: the user is taken to their profile
     assert (page.logged_in), 'Failed to login with google'
@@ -232,16 +232,17 @@ def test_log_in_using_google(accounts_base_url, google, selenium, student):
 @test_case('C195556')
 @accounts
 @social
-def test_log_in_using_facebook(accounts_base_url, facebook, selenium, student):
+def test_log_in_using_facebook(accounts_base_url, gmail, selenium):
     """Test the Facebook login method."""
-    # GIVEN: a user with the Facebook authentication setup
+    # GIVEN: a user with the Facebook authentication setup using a Gmail
+    #        address
     # AND: the Accounts Home page is loaded
     page = Profile(selenium, accounts_base_url).open()
 
     # WHEN: the user enters the email address in the input
     # AND: clicks the "NEXT" button
     # AND: clicks the "Log in with Facebook" button
-    page.login.facebook_login(student[0], *facebook)
+    page.login.facebook_login(gmail[0], *gmail)
 
     # THEN: the user is taken to their profile
     assert (page.logged_in), 'Failed to login with facebook'
