@@ -7,10 +7,13 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as expect
 from selenium.webdriver.support.ui import WebDriverWait
 
-from pages.utils.email import EmailVerificationError, GoogleBase, GuerrillaMail
-from pages.utils.email import RestMail  # NOQA
+from pages.utils.email import EmailVerificationError, GoogleBase  # NOQA
+from pages.utils.email import GuerrillaMail, RestMail, SendMail  # NOQA
 from tests.markers import expected_failure, nondestructive, test_case
 
+TEST_EMAIL_SUBJECT = (
+    '[OpenStax] Use PIN 999999 to confirm your email address'
+)
 TEST_EMAIL_BODY = (
     'Welcome!\n\nEnter your 6-digit PIN in your browser to confirm '
     'your email address:\n\nYour PIN: 999999\n\nIf you have any '
@@ -21,6 +24,7 @@ TEST_EMAIL_BODY = (
     'wasn\'t you, please disregard this message.\n\nRegards,\nThe '
     'OpenStax Team'
 )
+GOOGLE = ('smtp.gmail.com', 587, 10)
 
 
 @test_case('C195537')
@@ -61,8 +65,8 @@ def test_guerrilla_mail_received_pin_email(selenium):
     # AND: The user waits for the message to show in the inbox
     page = page.compose.send_message(
         to=page.header.email,
-        subject='[OpenStax] Use PIN 999999 to confirm your email address',
-        body=(TEST_EMAIL_BODY))
+        subject=TEST_EMAIL_SUBJECT,
+        body=TEST_EMAIL_BODY)
     WebDriverWait(page.selenium, 30).until(
         expect.presence_of_element_located(
             (By.XPATH, '//*[contains(text(),"999999")]')))
@@ -87,12 +91,12 @@ def test_guerrilla_mail_received_pin_email(selenium):
                 mail.get_pin
 
     # TODO: move Guerrilla Mail email manipulation tests to a separate test
-    '''assert(page.header.is_scrambled), 'E-mail is in plain text'
+    '''
+    assert(page.header.is_scrambled), 'E-mail is in plain text'
     assert(email_layout.match(page.header.email)), \
         'E-mail is not a valid format'
     assert(not page.header.scramble().is_scrambled), 'E-mail is scrambled'
-    '''
-    '''new_user = Utility.random_hex(12).lower()
+    new_user = Utility.random_hex(12).lower()
     page.header.email = new_user
     assert(new_user in page.header.email), \
         'E-mail user ID did not change'
@@ -104,18 +108,26 @@ def test_guerrilla_mail_received_pin_email(selenium):
     sleep(5.0)
     page.header.forget_address()
     assert(selenium.find_element('css selector', '#inbox-id input')
-           .text == ''), 'Username not blank' '''
+           .text == ''), 'Username not blank'
+    '''
 
 
-@test_case('')
-def test_restmail_received_pin_email():
+@test_case('C210268')
+def test_restmail_received_pin_email(gmail):
     """Test a RestMail JSON email."""
-    # GIVEN: A RestMail address
+    # GIVEN: A RestMail address with a verification PIN email
     username = 'openstax'
     email = RestMail(username)
+    email.empty()  # clear the message inbox
+
+    send = SendMail(*gmail, *GOOGLE)
+    sender = ('OpenStax QA', 'noreply@openstax.org')
+    recipient = ('OpenStax Automation', 'openstax@restmail.net')
+    send.send_mail(recipient, sender, TEST_EMAIL_SUBJECT, TEST_EMAIL_BODY)
 
     # WHEN: Access the rest API
     box = email.get_mail()
 
     # THEN: Able to retrieve a fake confirmation PIN
+    assert(box), 'No emails recovered'
     assert(box[-1].has_pin), 'PIN not found'

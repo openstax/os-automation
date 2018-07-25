@@ -212,54 +212,59 @@ def test_add_a_verified_email_to_profile(accounts_base_url, selenium, student):
 
 
 @test_case('C195555')
+@expected_failure
 @accounts
 @social
-def test_log_in_using_google(accounts_base_url, google, selenium, student):
+def test_log_in_using_google(accounts_base_url, gmail, selenium):
     """Test the Gmail login method."""
-    # GIVEN: a user with the Google authentication setup
+    # GIVEN: a user with the Google authentication setup using a Gmail address
     # AND: the Accounts Home page is loaded
     page = Profile(selenium, accounts_base_url).open()
 
     # WHEN: the user enters the Gmail address in the input
     # AND: clicks the "NEXT" button
     # AND: clicks the "Log in with Google" button
-    page.login.google_login(student[0], *google)
+    page.login.google_login(gmail[0], *gmail)
 
     # THEN: the user is taken to their profile
     assert (page.logged_in), 'Failed to login with google'
 
 
 @test_case('C195556')
+@expected_failure
 @accounts
 @social
-def test_log_in_using_facebook(accounts_base_url, facebook, selenium, student):
+def test_log_in_using_facebook(accounts_base_url, gmail, selenium):
     """Test the Facebook login method."""
-    # GIVEN: a user with the Facebook authentication setup
+    # GIVEN: a user with the Facebook authentication setup using a Gmail
+    #        address
     # AND: the Accounts Home page is loaded
     page = Profile(selenium, accounts_base_url).open()
 
     # WHEN: the user enters the email address in the input
     # AND: clicks the "NEXT" button
     # AND: clicks the "Log in with Facebook" button
-    page.login.facebook_login(student[0], *facebook)
+    page.login.facebook_login(gmail[0], *gmail)
 
     # THEN: the user is taken to their profile
     assert (page.logged_in), 'Failed to login with facebook'
 
 
 @test_case('C195557')
-@expected_failure
 @nondestructive
 @accounts
 def test_open_the_admin_pop_up_console(accounts_base_url, admin, selenium):
     """Test the pop up console."""
     # GIVEN: an admin user logged into Accounts
     # AND: the Profile page is loaded
+    page = Profile(selenium, accounts_base_url).open()
+    page.log_in(*admin)
 
     # WHEN: the user clicks the "Popup Console" link
+    page.open_popup_console()
 
     # THEN: the pop up console is displayed
-    assert(False), 'Test script missing'
+    assert page.is_popup_console_displayed, 'Failed to open the popup console.'
 
 
 @test_case('C195558')

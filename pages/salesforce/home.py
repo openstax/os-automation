@@ -1,4 +1,4 @@
-"""Salesforce placeholder."""
+"""Salesforce support page."""
 
 from time import sleep
 
