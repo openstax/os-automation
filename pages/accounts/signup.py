@@ -8,7 +8,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 
 from pages.accounts import home, profile
 from pages.accounts.base import AccountsBase
-from pages.utils.email import Google, GuerrillaMail
+from pages.utils.email import Google, GuerrillaMail, GoogleBase
 from pages.utils.utilities import Utility
 
 
@@ -135,7 +135,7 @@ class Signup(AccountsBase):
         # verify the pin
         email_password = None
         if 'google' in provider:
-            mailer = Google(self.driver)
+            mailer = GoogleBase(self.driver)
             email_password = kwargs['email_password']
         elif 'guerrilla' in provider:
             mailer = GuerrillaMail(self.driver)
@@ -144,7 +144,9 @@ class Signup(AccountsBase):
             email_password = kwargs['email_password']
         pin = self._get_pin(page=mailer,
                             provider=provider,
-                            return_url=(self.seed_url + '/verify_email'),
+                            return_url=(
+                                'http://accounts-qa.openstax.org/signup/verify_email'),#self.seed_url +
+        # '/verify_email'),
                             email=email,
                             password=email_password)
         self.pin.verify_pin = pin
@@ -198,7 +200,7 @@ class Signup(AccountsBase):
         """Retrieve a signup pin."""
         page.open()
         if 'google' in provider:
-            page.login.go(email, password)
+            page = page.login.go(email, password)
         WebDriverWait(page.driver, 60.0).until(
             lambda _: page.emails[0].has_pin)
         pin = page.emails[0].get_pin

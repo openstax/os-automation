@@ -1,5 +1,7 @@
 """Test the Accounts signup process."""
 
+from pages.accounts.home import AccountsHome as Home
+from pages.accounts.profile import AccountException, Profile
 from pages.accounts.signup import Signup
 from pages.utils.utilities import Utility
 from tests.markers import accounts, expected_failure, test_case
@@ -121,7 +123,6 @@ def test_sign_up_as_a_facebook_user(accounts_base_url, selenium, facebook):
 
 
 @test_case('C200746')
-@expected_failure
 @accounts
 def test_sign_up_as_a_google_user(accounts_base_url, selenium, google):
     """Test signing up with a Google account."""
