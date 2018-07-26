@@ -11,7 +11,7 @@ class Salesforce(Page):
 
     URL_TEMPLATE = 'http://openstax.force.com/help/'
 
-    _loader_locator = (By.CSS_SELECTOR, 'body')
+    _loader_locator = (By.CLASS_NAME, 'articleHeader')
     _title_locator = (By.CLASS_NAME, 'articleTitle')
 
     def wait_for_page_to_load(self):
@@ -27,4 +27,6 @@ class Salesforce(Page):
     @property
     def title(self):
         """Return the article title."""
+        self.wait.until(lambda _: self.find_element(*self._title_locator)
+                        .is_displayed())
         return self.find_element(*self._title_locator).text.strip()
