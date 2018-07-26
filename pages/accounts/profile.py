@@ -317,6 +317,29 @@ class Profile(AccountsHome):
                 sleep(0.25)
             return self
 
+        def add_password(self, password):
+            for options in self.view_other_options().get_other_options():
+                if options.name == 'Password':
+                    options.add
+                    self.SetPassword(self).set_password(password)
+
+        class SetPassword(Region):
+            """The page for adding password."""
+
+            _password_locator = (By.ID, 'set_password_password')
+            _confirm_locator = (By.ID, 'set_password_password_confirmation')
+            _submit_locator = (By.CSS_SELECTOR, '[type=submit]')
+            _cancel_locator = (By.PARTIAL_LINK_TEXT, 'Cancel')
+            _continue_locator = (By.CSS_SELECTOR, '[type=submit]')
+
+            def set_password(self, password):
+                self.find_element(*self._password_locator).send_keys(password)
+                self.find_element(*self._confirm_locator).send_keys(password)
+                self.find_element(*self._submit_locator).click()
+                sleep(0.3)
+                self.find_element(*self._continue_locator).click()
+                return Profile(self.driver)
+
         class Option(Region):
             """Login options."""
 
@@ -324,6 +347,7 @@ class Profile(AccountsHome):
             _edit_button_locator = (By.CLASS_NAME, 'edit')
             _delete_button_locator = (By.CLASS_NAME, 'delete')
             _add_button_locator = (By.CLASS_NAME, 'add')
+            _ok_locator = (By.CSS_SELECTOR, '.btn-danger')
 
             @property
             def name(self):
@@ -342,6 +366,7 @@ class Profile(AccountsHome):
                 """Delete an active login option."""
                 self.find_element(*self._delete_button_locator).click()
                 sleep(0.5)
+                self.find_element(*self._ok_locator).click()
                 return self
 
             @property

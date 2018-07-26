@@ -2,15 +2,13 @@
 
 from time import sleep
 
-from pypom import Region
+from pypom import Page, Region
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 
 from pages.accounts import home, profile
 from pages.accounts.base import AccountsBase
 from pages.utils.email import Google, GuerrillaMail, GoogleBase
-from pages.facebook.home import Facebook
-from pages.utils.email import Google, GuerrillaMail
 from pages.utils.utilities import Utility
 
 
@@ -147,9 +145,7 @@ class Signup(AccountsBase):
             email_password = kwargs['email_password']
         pin = self._get_pin(page=mailer,
                             provider=provider,
-                            return_url=(
-                                'http://accounts-qa.openstax.org/signup/verify_email'),#self.seed_url +
-        # '/verify_email'),
+                            return_url=(self.seed_url + '/verify_email'),
                             email=email,
                             password=email_password)
         self.pin.verify_pin = pin
@@ -162,10 +158,12 @@ class Signup(AccountsBase):
             self.next()
         elif kwargs['social'] == 'facebook':
             # use Facebook
-            self.social.use_facebook.log_in(email, email_password)
+            self.password.use_social_login().use_facebook.log_in(email,
+                                                                 email_password)
         else:
             # use Google
-            self.social.use_google.log_in(email, email_password)
+            self.password.use_social_login().use_google.log_in(email,
+                                                               email_password)
 
         # enter user details in group order
         # all users
@@ -210,7 +208,10 @@ class Signup(AccountsBase):
 
     def _get_pin(self, page, provider, return_url, email=None, password=None):
         """Retrieve a signup pin."""
-        page.open()
+        try:
+            page.open()
+        except Exception as e:
+            print(e)
         if 'google' in provider:
             page = page.login.go(email, password)
         WebDriverWait(page.driver, 60.0).until(
@@ -378,7 +379,7 @@ class Signup(AccountsBase):
             """Go to the social login setup."""
             self.find_element(*self._go_to_social_locator).click()
             sleep(1)
-            return self.SocialLogin(self)
+            return Signup.SocialLogin(self)
 
     class UserFields(Region):
         """Standard user fields."""
@@ -459,22 +460,22 @@ class Signup(AccountsBase):
         def use_facebook(self):
             """Use Facebook to log in."""
             self.find_element(*self._facebook_button_locator).click()
-            self.sleep(0.5)
+            sleep(0.5)
             return Facebook(self.driver)
 
         @property
         def use_google(self):
             """Use Google to log in."""
             self.find_element(*self._google_button_locator).click()
-            self.sleep(0.5)
+            sleep(0.5)
             return Google(self.driver)
 
         @property
         def use_a_password(self):
             """Use a non-social log in."""
             self.find_element(*self._go_to_password_setup_locator).click()
-            self.sleep(0.5)
-            return self.SetPassword(self)
+            sleep(0.5)
+            return Signup.SetPassword(self)
 
     class InstructorVerification(Region):
         """Instructor verification fields."""

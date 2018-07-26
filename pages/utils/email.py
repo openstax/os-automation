@@ -29,9 +29,15 @@ class GoogleBase(Page):
 
     def wait_for_page_to_load(self):
         """Override page load."""
+        sleep(1)
         self.wait.until(
             lambda _: self.find_element(By.TAG_NAME, 'body').is_displayed())
-        sleep(1)
+
+    def log_in(self, username, password):
+        if 'google' in self.driver.current_url:
+            return self.login.go(username, password)
+        else:
+            return Google(self.driver)
 
     @property
     def login(self):
@@ -49,16 +55,27 @@ class GoogleBase(Page):
 
         def go(self, email, password):
             """Log into Google."""
-            self.wait.until(
-                expect.visibility_of_element_located(
-                    self._email_locator)) \
-                .send_keys(email)
+            self.find_element(*self._email_locator).click()
+            sleep(0.3)
+            self.find_element(*self._email_locator).send_keys(email)
+            sleep(0.3)
             self.find_element(*self._email_next_locator).click()
-            self.wait.until(
-                expect.visibility_of_element_located(
-                    self._password_locator)) \
-                .send_keys(password)
+            sleep(0.5)
+            self.find_element(*self._password_locator).click()
+            sleep(0.3)
+            self.find_element(*self._password_locator).send_keys(password)
+            sleep(0.5)
             self.find_element(*self._password_next_locator).click()
+            #self.wait.until(
+            #    expect.visibility_of_element_located(
+            #        self._email_locator)) \
+            #    .send_keys(email)
+            #self.find_element(*self._email_next_locator).click()
+            #self.wait.until(
+            #    expect.visibility_of_element_located(
+            #        self._password_locator)) \
+            #    .send_keys(password)
+            #self.find_element(*self._password_next_locator).click()
             return Google(self.driver)
 
 
