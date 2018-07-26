@@ -2,11 +2,11 @@
 
 from pages.accounts.signup import Signup
 from pages.utils.utilities import Utility
-from tests.markers import accounts, expected_failure, social, test_case
+from tests.markers import accounts, skip_test, social, test_case
 
 
 @test_case('C195549')
-@expected_failure
+@skip_test(reason='Script not written')
 @accounts
 def test_sign_up_as_a_student_user(accounts_base_url, selenium):
     """Test student user signup."""
@@ -27,11 +27,10 @@ def test_sign_up_as_a_student_user(accounts_base_url, selenium):
     # AND: clicks the "CREATE ACCOUNT" button
 
     # THEN: the Account Profile page is loaded
-    assert(False), 'Test script missing'
 
 
 @test_case('C205362')
-@expected_failure
+@skip_test(reason='Script not written')
 @accounts
 def test_sign_up_as_an_instructor(accounts_base_url, selenium, teacher):
     """Test non-student user signup."""
@@ -54,11 +53,10 @@ def test_sign_up_as_an_instructor(accounts_base_url, selenium, teacher):
     # AND: clicks the "OK" button
 
     # THEN: the Account Profile page is loaded
-    assert(False), 'Test script missing'
 
 
 @test_case('C195550')
-@expected_failure
+@skip_test(reason='Script not written')
 @social
 @accounts
 def test_sign_up_as_a_nonstudent_user(accounts_base_url, selenium, teacher):
@@ -83,11 +81,10 @@ def test_sign_up_as_a_nonstudent_user(accounts_base_url, selenium, teacher):
     # AND: clicks the "OK" button
 
     # THEN: the Account Profile page is loaded
-    assert(False), 'Test script missing'
 
 
 @test_case('C200745')
-@expected_failure
+@skip_test(reason='Script not written')
 @social
 @accounts
 def test_sign_up_as_a_facebook_user(accounts_base_url, selenium, facebook):
@@ -119,11 +116,10 @@ def test_sign_up_as_a_facebook_user(accounts_base_url, selenium, facebook):
     # AND: the Facebook log in option is deleted
 
     # THEN: the Facebook account is available for use
-    assert(False), 'Test script missing'
 
 
 @test_case('C200746')
-@expected_failure
+@skip_test(reason='Script not written')
 @accounts
 def test_sign_up_as_a_google_user(accounts_base_url, selenium, google):
     """Test signing up with a Google account."""
@@ -154,7 +150,6 @@ def test_sign_up_as_a_google_user(accounts_base_url, selenium, google):
     # AND: the Google log in option is deleted
 
     # THEN: the Google account is available for use
-    assert(False), 'Test script missing'
 
 
 def subject_list(size=1):

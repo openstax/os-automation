@@ -1,11 +1,11 @@
 """Test of admin console catalog offerings page."""
 
-from tests.markers import expected_failure, nondestructive, test_case, tutor
+from tests.markers import skip_test, nondestructive, test_case, tutor
 
 
-@expected_failure
+@test_case('C208709')
+@skip_test(reason='Script not written')
 @nondestructive
-@test_case('')
 @tutor
 def test_add_to_catalog_offerings(tutor_base_url, selenium, admin):
     """Test admin to add to catalog offerings."""
@@ -14,15 +14,14 @@ def test_add_to_catalog_offerings(tutor_base_url, selenium, admin):
 
     # WHEN: Click the "Add Offerings" button
     # AND: Fill out the required fields
-    # AND: Click the ""Save"" button
+    # AND: Click the "Cancel" link
 
-    # THEN: A new course is added to the course catalog with the
-    # correct information.
+    # THEN: Course offerings are unchanged
 
 
-@expected_failure
+@test_case('C208710')
+@skip_test(reason='Script not written')
 @nondestructive
-@test_case('')
 @tutor
 def test_edit_catalog(tutor_base_url, selenium, admin):
     """Test admin to edit catalog in catalog offereings."""
@@ -30,6 +29,6 @@ def test_edit_catalog(tutor_base_url, selenium, admin):
     # AND: At the Catalog Offerings Page
 
     # WHEN: Change one or more of the fields
-    # AND: Click save"
+    # AND: Click the "Cancel" link
 
-    # THEN: The course is updated with the changed fields
+    # THEN: The course offering is unchanged
