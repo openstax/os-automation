@@ -191,3 +191,4 @@ class TutorNav(Region):
         self.find_element(*self._copy_this_course_locator).click()
         from pages.tutor.new_course import NewCourse
         return NewCourse(self.driver)
+
