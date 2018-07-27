@@ -312,9 +312,11 @@ class Profile(AccountsHome):
         def view_other_options(self):
             """Open the inactive option menu."""
             link = self.find_element(*self._inactive_option_expander_locator)
-            if link.is_displayed():
-                link.click()
-                sleep(0.25)
+            link.click()
+            sleep(0.25)
+            #if link.is_displayed():
+            #    link.click()
+            #    sleep(0.25)
             return self
 
         def add_password(self, password):
@@ -336,8 +338,9 @@ class Profile(AccountsHome):
                 self.find_element(*self._password_locator).send_keys(password)
                 self.find_element(*self._confirm_locator).send_keys(password)
                 self.find_element(*self._submit_locator).click()
-                sleep(0.3)
+                sleep(0.5)
                 self.find_element(*self._continue_locator).click()
+                sleep(0.5)
                 return Profile(self.driver)
 
         class Option(Region):

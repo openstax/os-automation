@@ -34,6 +34,7 @@ class GoogleBase(Page):
             lambda _: self.find_element(By.TAG_NAME, 'body').is_displayed())
 
     def log_in(self, username, password):
+        sleep(1)
         if 'google' in self.driver.current_url:
             return self.login.go(username, password)
         else:
@@ -55,27 +56,31 @@ class GoogleBase(Page):
 
         def go(self, email, password):
             """Log into Google."""
-            self.find_element(*self._email_locator).click()
             sleep(0.3)
+            self.find_element(*self._email_locator).click()
+            sleep(0.1)
             self.find_element(*self._email_locator).send_keys(email)
             sleep(0.3)
             self.find_element(*self._email_next_locator).click()
-            sleep(0.5)
+            sleep(2)
             self.find_element(*self._password_locator).click()
-            sleep(0.3)
+            sleep(0.1)
             self.find_element(*self._password_locator).send_keys(password)
-            sleep(0.5)
+            sleep(0.3)
             self.find_element(*self._password_next_locator).click()
-            #self.wait.until(
-            #    expect.visibility_of_element_located(
-            #        self._email_locator)) \
-            #    .send_keys(email)
-            #self.find_element(*self._email_next_locator).click()
-            #self.wait.until(
-            #    expect.visibility_of_element_located(
-            #        self._password_locator)) \
-            #    .send_keys(password)
-            #self.find_element(*self._password_next_locator).click()
+            sleep(1)
+            '''
+            self.wait.until(
+                expect.visibility_of_element_located(
+                    self._email_locator)) \
+                .send_keys(email)
+            self.find_element(*self._email_next_locator).click()
+            self.wait.until(
+                expect.visibility_of_element_located(
+                    self._password_locator)) \
+                .send_keys(password)
+            self.find_element(*self._password_next_locator).click()
+            '''
             return Google(self.driver)
 
 
@@ -89,8 +94,9 @@ class Google(GoogleBase):
 
     def wait_for_page_to_load(self):
         """Override page load."""
-        self.wait.until(
-            lambda _: self.find_element(*self._root_locator).is_displayed())
+        sleep(3)
+        #self.wait.until(
+        #    lambda _: self.find_element(*self._root_locator).is_displayed())
 
     @property
     def emails(self):
@@ -348,9 +354,9 @@ class RestMail(object):
 
     def wait_for_mail(self):
         """Sleep for 5 seconds."""
-        sleep(5.0)
-        self.get_mail()
-        return self
+        sleep(2.0)
+        return self.get_mail()
+
 
     @property
     def size(self):
@@ -473,12 +479,13 @@ class RestMail(object):
                 return URL_MATCHER.search(self._excerpt).group()
             raise EmailVerificationError('No confirmation link found')
 
-        def confirm_email(self):
+        def confirm_email(self, driver):
             """Access the confirmation link."""
             send = requests.get(self.confirmation_link)
             if not send.status_code == requests.codes.ok:
                 raise EmailVerificationError('Email not confirmed. ({code})'
                                              .format(code=send.status_code))
+            driver.refresh()
 
 
 class SendMail(object):
