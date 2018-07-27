@@ -1,7 +1,7 @@
 """Test the Accounts signup process."""
 
 from pages.accounts.home import AccountsHome as Home
-from pages.accounts.profile import AccountException, Profile
+# from pages.accounts.profile import AccountException, Profile
 from pages.accounts.signup import Signup
 from pages.utils.email import RestMail
 from pages.utils.utilities import Utility
@@ -164,14 +164,9 @@ def test_sign_up_as_a_google_user(accounts_base_url, selenium, google):
     page.name.confirm()
 
     # AND: a verified email is added to the profile
-    # AND: the Profile page is reloaded
-    # AND: the Gmail address is deleted
+
     username = name[1] + name[2] + str(Utility.random(100, 999))
     page.emails.add_email(username + '@restmail.net')
-    box = RestMail(username).wait_for_mail().get_mail()
-    box[0].confirm_email()
-    selenium.refresh()
-    page.emails.emails[0].delete()
 
     # AND: a password log in option is added
     password = 'staxly16'
@@ -179,6 +174,12 @@ def test_sign_up_as_a_google_user(accounts_base_url, selenium, google):
 
     # AND: the Google log in option is deleted
     page.login_method.get_active_options()[0].delete
+
+    # AND: the Profile page is reloaded
+    RestMail(username).wait_for_mail()[0].confirm_email(selenium)
+
+    # AND: the Gmail address is deleted
+    page.emails.emails[0].delete()
 
     # THEN: the Google account is available for use
 

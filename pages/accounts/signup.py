@@ -2,13 +2,13 @@
 
 from time import sleep
 
-from pypom import Page, Region
+from pypom import Region
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 
 from pages.accounts import home, profile
 from pages.accounts.base import AccountsBase
-from pages.utils.email import Google, GuerrillaMail, GoogleBase
+from pages.utils.email import Google, GoogleBase, GuerrillaMail
 from pages.utils.utilities import Utility
 
 
@@ -158,8 +158,8 @@ class Signup(AccountsBase):
             self.next()
         elif kwargs['social'] == 'facebook':
             # use Facebook
-            self.password.use_social_login().use_facebook.log_in(email,
-                                                                 email_password)
+            self.password.use_social_login().use_facebook.log_in(
+                email, email_password)
         else:
             # use Google
             self.password.use_social_login().use_google.log_in(email,
