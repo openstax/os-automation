@@ -71,7 +71,6 @@ class AccountsHome(AccountsBase):
             self.service_login(user, password)
             self.wait.until(lambda _: self.logged_in)
             from pages.accounts.profile import Profile
-            print(self.page.seed_url)
             return Profile(self.driver)
 
         def service_login(self, user, password):

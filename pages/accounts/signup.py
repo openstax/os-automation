@@ -214,7 +214,7 @@ class Signup(AccountsBase):
             print(e)
         if 'google' in provider:
             page = page.login.go(email, password)
-        WebDriverWait(page.driver, 60.0).until(
+        WebDriverWait(self.driver, 60.0).until(
             lambda _: page.emails[0].has_pin)
         pin = page.emails[0].get_pin
         page.driver.get(return_url)
