@@ -193,7 +193,6 @@ class Signup(AccountsBase):
         if not kwargs['news']:
             self.user.toggle_news()
         self.user.agree_to_terms()
-
         sleep(0.25)
         self.next()
 
@@ -202,8 +201,6 @@ class Signup(AccountsBase):
             self.notice.get_confirmation_email()
             sleep(0.5)
             self.next()
-
-        # sleep(3)
 
         return profile.Profile(self.driver)
 
