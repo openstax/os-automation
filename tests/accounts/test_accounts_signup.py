@@ -1,7 +1,7 @@
 """Test the Accounts signup process."""
 
 from pages.accounts.home import AccountsHome as Home
-# from pages.accounts.profile import AccountException, Profile
+from pages.utils.email import RestMail
 from pages.accounts.signup import Signup
 from pages.utils.email import RestMail
 from pages.utils.utilities import Utility
@@ -9,12 +9,17 @@ from tests.markers import accounts, expected_failure, social, test_case
 
 
 @test_case('C195549')
-@expected_failure
 @accounts
-def test_sign_up_as_a_student_user(accounts_base_url, selenium):
+def test_sign_up_as_a_student_user(accounts_base_url, selenium, student):
     """Test student user signup."""
     # GIVEN: a valid and accessible email address
     # AND: the Accounts Home page is loaded
+    name = Utility.random_hex()
+    email = RestMail(name)
+    email.empty()
+    address = name + '@restmail.net'
+    password = student[1]
+    page = Home(selenium, accounts_base_url).open()
 
     # WHEN: the user clicks the "Sign up here." link
     # AND: selects "Student" from the drop down menu
@@ -29,17 +34,32 @@ def test_sign_up_as_a_student_user(accounts_base_url, selenium):
     #      Privacy Policy."
     # AND: clicks the "CREATE ACCOUNT" button
 
+    page.login.go_to_signup.account_signup(
+        address,
+        password,
+        _type='Student',
+        provider='restmail',
+        name=['', name, name, ''],
+        school='staxly',
+        news=False)
+
     # THEN: the Account Profile page is loaded
-    assert(False), 'Test script missing'
+    assert(page.current_url == accounts_base_url + '/profile'), \
+        'Account profile not loaded'
 
 
 @test_case('C205362')
-@expected_failure
 @accounts
 def test_sign_up_as_an_instructor(accounts_base_url, selenium, teacher):
     """Test non-student user signup."""
     # GIVEN: a valid and accessible email address
     # AND: the Accounts Home page is loaded
+    name = Utility.random_hex()
+    email = RestMail(name)
+    email.empty()
+    address = name + '@restmail.net'
+    password = teacher[1]
+    page = Home(selenium, accounts_base_url).open()
 
     # WHEN: the user clicks the "Sign up here." link
     # AND: selects "Instructor" from the drop down menu
@@ -56,18 +76,38 @@ def test_sign_up_as_an_instructor(accounts_base_url, selenium, teacher):
     # AND: clicks the "CREATE ACCOUNT" button
     # AND: clicks the "OK" button
 
+    page.login.go_to_signup.account_signup(
+        address,
+        password,
+        _type='Instructor',
+        provider='restmail',
+        name=['', name, name, ''],
+        school='staxly',
+        news=False,
+        phone=Utility.random_phone(),
+        webpage='https://openstax.org/',
+        subjects=['accounting', 'astronomy'],
+        students=10,
+        use='Fully adopted and using it as the primary textbook')
+
     # THEN: the Account Profile page is loaded
-    assert(False), 'Test script missing'
+    assert(page.current_url == accounts_base_url + '/profile'), \
+        'Account profile not loaded'
 
 
 @test_case('C195550')
-@expected_failure
 @social
 @accounts
 def test_sign_up_as_a_nonstudent_user(accounts_base_url, selenium, teacher):
     """Test non-student user signup."""
     # GIVEN: a valid and accessible email address
     # AND: the Accounts Home page is loaded
+    name = Utility.random_hex()
+    email = RestMail(name)
+    email.empty()
+    address = name + '@restmail.net'
+    password = teacher[1]
+    page = Home(selenium, accounts_base_url).open()
 
     # WHEN: the user clicks the "Sign up here." link
     # AND: selects an option other than "Student" or "Instructor" from the drop
@@ -84,9 +124,21 @@ def test_sign_up_as_a_nonstudent_user(accounts_base_url, selenium, teacher):
     #      Privacy Policy."
     # AND: clicks the "CREATE ACCOUNT" button
     # AND: clicks the "OK" button
+    page.login.go_to_signup.account_signup(
+        address,
+        password,
+        _type='Other',
+        provider='restmail',
+        name=['', name, name, ''],
+        school='staxly',
+        news=False,
+        phone=Utility.random_phone(),
+        webpage='https://openstax.org/',
+        subjects=['accounting', 'astronomy'],)
 
     # THEN: the Account Profile page is loaded
-    assert(False), 'Test script missing'
+    assert(page.current_url == accounts_base_url + '/profile'), \
+        'Account profile not loaded'
 
 
 @test_case('C200745')
@@ -147,9 +199,15 @@ def test_sign_up_as_a_google_user(accounts_base_url, selenium, google,
     #      Privacy Policy."
     # AND: clicks the "CREATE ACCOUNT" button
     page = page.login.go_to_signup
-    page = page.account_signup(google[0], student[1], provider='google',
-                               email_password=google[1], news=True,
-                               school='Automation', social='google')
+    page = page.account_signup(
+        google[0],
+        student[1],
+        provider='google',
+        email_password=google[1],
+        news=True,
+        school='Automation',
+        social='google'
+    )
 
     # THEN: the account profile for the new student is displayed
     # AND: the name is the same as the Google user's name
