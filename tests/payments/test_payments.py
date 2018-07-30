@@ -120,8 +120,8 @@ def test_go_into_order_detail(payments_base_url, driver, admin):
 @test_case('C208911')
 def test_email_log_for_student_payments(payments_base_url, tutor_base_url,
                                         accounts_base_url, driver, admin,
-                                        student, teacher,address, city, zip,
-                                        visa, exp_date, cvv, billing):
+                                        student, teacher, address, city, visa,
+                                        zipcode, exp_date, cvv, billing):
     """Test the new email log for student payments."""
     # GIVEN: A new student's payment have just being made
     page = TutorHome(driver, tutor_base_url).open().log_in(*teacher)
@@ -150,9 +150,9 @@ def test_email_log_for_student_payments(payments_base_url, tutor_base_url,
 @payments
 @test_case('C208912')
 def test_order_item_for_student_payments(payments_base_url, tutor_base_url,
-                                        accounts_base_url, driver, admin,
-                                        student, teacher,address, city, zip,
-                                        visa, exp_date, cvv, billing):
+                                         accounts_base_url, driver, admin,
+                                         student, teacher, address, city, visa,
+                                         zipcode, exp_date, cvv, billing):
     """Test the new order item for student payments."""
     # GIVEN: A new student's payment have just being made
     page = TutorHome(driver, tutor_base_url).open().log_in(*teacher)
