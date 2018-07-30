@@ -137,7 +137,7 @@ class Signup(AccountsBase):
         # verify the pin
         email_password = None
         if 'google' in provider:
-            mailer = Google(self.driver)
+            mailer = GoogleBase(self.driver)
             email_password = kwargs['email_password']
         elif 'guerrilla' in provider:
             mailer = GuerrillaMail(self.driver)
@@ -163,10 +163,12 @@ class Signup(AccountsBase):
             self.next()
         elif kwargs['social'] == 'facebook':
             # use Facebook
-            self.social.use_facebook.log_in(email, email_password)
+            self.password.use_social_login().use_facebook.log_in(
+                email, email_password)
         else:
             # use Google
-            self.social.use_google.log_in(email, email_password)
+            self.password.use_social_login().use_google.log_in(email,
+                                                               email_password)
 
         # enter user details in group order
         # all users
@@ -388,7 +390,7 @@ class Signup(AccountsBase):
             """Go to the social login setup."""
             self.find_element(*self._go_to_social_locator).click()
             sleep(1)
-            return self.SocialLogin(self)
+            return Signup.SocialLogin(self)
 
     class UserFields(Region):
         """Standard user fields."""
@@ -469,22 +471,23 @@ class Signup(AccountsBase):
         def use_facebook(self):
             """Use Facebook to log in."""
             self.find_element(*self._facebook_button_locator).click()
-            self.sleep(0.5)
+            sleep(0.5)
+            from pages.facebook.home import Facebook
             return Facebook(self.driver)
 
         @property
         def use_google(self):
             """Use Google to log in."""
             self.find_element(*self._google_button_locator).click()
-            self.sleep(0.5)
+            sleep(0.5)
             return Google(self.driver)
 
         @property
         def use_a_password(self):
             """Use a non-social log in."""
             self.find_element(*self._go_to_password_setup_locator).click()
-            self.sleep(0.5)
-            return self.SetPassword(self)
+            sleep(0.5)
+            return Signup.SetPassword(self)
 
     class InstructorVerification(Region):
         """Instructor verification fields."""
