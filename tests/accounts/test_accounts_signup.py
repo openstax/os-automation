@@ -1,6 +1,9 @@
 """Test the Accounts signup process."""
 
+from pages.accounts.home import AccountsHome as Home
+# from pages.accounts.profile import AccountException, Profile
 from pages.accounts.signup import Signup
+from pages.utils.email import RestMail
 from pages.utils.utilities import Utility
 from tests.markers import accounts, expected_failure, social, test_case
 
@@ -123,12 +126,13 @@ def test_sign_up_as_a_facebook_user(accounts_base_url, selenium, facebook):
 
 
 @test_case('C200746')
-@expected_failure
 @accounts
-def test_sign_up_as_a_google_user(accounts_base_url, selenium, google):
+def test_sign_up_as_a_google_user(accounts_base_url, selenium, google,
+                                  student):
     """Test signing up with a Google account."""
     # GIVEN: a valid Google email that is not associated with a current account
     # AND: the Accounts Home page is loaded
+    page = Home(selenium, accounts_base_url).open()
 
     # WHEN: the user clicks the "Sign up here." link
     # AND: selects "Student" from the drop down menu
@@ -142,19 +146,42 @@ def test_sign_up_as_a_google_user(accounts_base_url, selenium, google):
     # AND: clicks the checkbox next to "I agree to the Terms of Use and the
     #      Privacy Policy."
     # AND: clicks the "CREATE ACCOUNT" button
+    page = page.login.go_to_signup
+    page = page.account_signup(google[0], student[1], provider='google',
+                               email_password=google[1], news=True,
+                               school='Automation', social='google')
 
     # THEN: the account profile for the new student is displayed
-    # AND: the name is the same as the Facebook user's name
+    # AND: the name is the same as the Google user's name
+    assert ('profile' in selenium.current_url)
+    name = page.name.get_name_parts()
+    assert (name[1].lower() in google[0] and name[2].lower() in google[0])
 
     # WHEN: the name field is changed
+    name = Utility.random_name()
+    page.name.open()
+    page.name.first_name = name[1]
+    page.name.last_name = name[2]
+    page.name.confirm()
+
     # AND: a verified email is added to the profile
-    # AND: the Profile page is reloaded
+    username = name[1] + name[2] + str(Utility.random(100, 999))
+    page.emails.add_email(username + '@restmail.net')
+
     # AND: a password log in option is added
-    # AND: the Gmail address is deleted
+    password = student[1]
+    page.login_method.add_password(password)
+
     # AND: the Google log in option is deleted
+    page.login_method.get_active_options()[0].delete
+
+    # AND: the Profile page is reloaded
+    RestMail(username).get_mail()[0].confirm_email(selenium)
+
+    # AND: the Gmail address is deleted
+    page.emails.emails[0].delete()
 
     # THEN: the Google account is available for use
-    assert(False), 'Test script missing'
 
 
 def subject_list(size=1):
