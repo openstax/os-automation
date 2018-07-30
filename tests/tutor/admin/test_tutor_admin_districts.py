@@ -1,50 +1,33 @@
 """Test of admin console districts page."""
 
-from tests.markers import expected_failure, nondestructive, test_case, tutor
+from tests.markers import skip_test, test_case, tutor
 
 
-@expected_failure
-@nondestructive
-@test_case('')
+@test_case('C208718', 'C208719', 'C208720')
+@skip_test(reason='Script not written')
 @tutor
-def test_add_district(tutor_base_url, selenium, admin):
-    """Test admin to add district."""
-    # GIVEN: logged in as admin
-    # AND: At the District Page
+def test_managing_districts(tutor_base_url, selenium, admin):
+    """Add, modify, than delete a new school district."""
+    # GIVEN: a user logged in as an administrative user
+    # AND: viewing the "Manage districts" page
 
-    # WHEN: Click the ""Add District"" button
-    # AND: Fill out the required fields
-    # AND: Click the ""Save"" button
+    # WHEN: they click the "Add District" button
+    # AND: fill out the district name
+    # AND: click the "Save" button
 
-    # THEN: The new district is added to the list of districts.
+    # THEN: the new district is added to the district list
 
+    # WHEN: they click the "edit" button under Actions
+    # AND: change the school district name
+    # AND: click the "Save" button
 
-@expected_failure
-@nondestructive
-@test_case('')
-@tutor
-def test_edit_district(tutor_base_url, selenium, admin):
-    """Test admin to edit district."""
-    # GIVEN: logged in as admin
-    # AND: At the District Page
+    # THEN: the district is renamed
 
-    # WHEN: Click the ""Edit District"" button
-    # AND: Edit the field
-    # AND: Click the ""Save"" button
+    # WHEN: they click the "delete" link under Actions of the "QA-ISD" district
 
-    # THEN: The edited district is correctly updated.
+    # THEN: an error "Cannot delete a district that has schools." is shown
+    # AND: the district is not removed from the list
 
+    # WHEN: they click the "delete" link under Actions of the new district
 
-@expected_failure
-@nondestructive
-@test_case('')
-@tutor
-def test_delete_district(tutor_base_url, selenium, admin):
-    """Test admin to delete district."""
-    # GIVEN: logged in as admin
-    # AND: At the District Page
-
-    # WHEN: Click the ""delete"" button
-
-    # THEN: District is deleted if it has no schools.
-    # If the district contains schools it is not deleted.
+    # THEN: the district is deleted and removed from the list

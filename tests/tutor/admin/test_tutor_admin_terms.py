@@ -1,109 +1,76 @@
 """Test of admin console courses page."""
 
-from tests.markers import expected_failure, nondestructive, test_case, tutor
+from tests.markers import skip_test, test_case, tutor
 
 
-@expected_failure
-@nondestructive
-@test_case('')
+@test_case('C208725', 'C208726', 'C208727')
+@skip_test(reason='Script not written')
 @tutor
-def test_create_new_contract(tutor_base_url, selenium, admin):
-    """Test admin to create a new contract."""
-    # GIVEN: logged in as admin
-    # AND: At the Terms Page
+def test_add_edit_and_delete_a_new_contract(tutor_base_url, selenium, admin):
+    """Add, edit and delete a new terms or privacy contract."""
+    # GIVEN: a user logged in as an administrative user
+    # AND: viewing the admin console Contracts page
 
-    # WHEN: At the bottom of the page click ""New Contract""
-    # AND: Fill out the required fields
-    # AND: Click ""Create Contract""
+    # WHEN: they click the "New Contract" link
+    # AND: fill out the name, title and content fields
+    # AND: click "Create contract"
 
-    # THEN: A new contract is created and appears in the contracts list
+    # THEN: the new contract is created
+    # AND: the Details view for the new contract is displayed
+
+    # WHEN: they click the "Edit" link
+    # AND: change the name, title and content fields
+    # AND: click the "Update contract" button
+
+    # THEN: the Details view for the contract is displayed
+    # AND: the edits to the contract are displayed
+    # AND: the "Contract updated." alert is displayed
+
+    # WHEN: they click the "Delete" link
+
+    # THEN: the contract is not displayed
+    # AND: the "Contract deleted." alert is displayed
 
 
-@expected_failure
-@nondestructive
-@test_case('')
+@test_case('C208728', 'C210279')
+@skip_test(reason='Script not written')
 @tutor
-def test_edit_contract(tutor_base_url, selenium, admin):
-    """Test admin to edit a contract."""
-    # GIVEN: logged in as admin
-    # AND: At the Terms page
+def test_view_a_contract_and_remove_a_signer(tutor_base_url, selenium, admin):
+    """View a contract, the signatories and remove a signature."""
+    # GIVEN: a user logged in as an administrative user
+    # AND: viewing the admin console Contracts page
 
-    # WHEN: At the bottom of the page click ""Edit""
-    # AND: Edit one or more fields
-    # AND: Click ""Update Contract""
+    # WHEN: they select a published contract
 
-    # THEN: Contract is updated
+    # THEN: the Details view for the contract is displayed
+
+    # WHEN: they click the "Signatures" link
+
+    # THEN: a list of user profiles who have accepted the contract
+
+    # WHEN: they click the "Terminate" link for a user profile
+    # AND: click the "OK" button is the alert
+
+    # THEN: the user is removed from the list of signatories
+    # AND: the "Signature deleted." alert message is displayed
 
 
-@expected_failure
-@nondestructive
-@test_case('')
+@test_case('C210276', 'C210277', 'C210278')
+@skip_test(reason='Script not written')
 @tutor
-def test_delete_contract(tutor_base_url, selenium, admin):
-    """Test admin to delete a contract."""
-    # GIVEN: logged in as admin
-    # AND: At the Terms page
+def test_add_edit_and_delete_a_new_targeted_contract(tutor_base_url,
+                                                     selenium, admin):
+    """Add, edit and delete a new targeted contract."""
+    # GIVEN: a user logged in as an administrative user
+    # AND: viewing the admin console Targeted Contracts page
 
-    # WHEN: At the bottom of the page click ""Delete""
-    # AND: Click ""Okay""
+    # WHEN: they click the "Add Targeted Contract" button
+    # AND: select a contract name and target district
+    # AND: mark the "Can Show Contents?" checkbox
+    # AND: click the "Submit" button
 
-    # THEN: The selected contract is deleted and no longer appears in the list
+    # THEN: the new contract is in the Targeted Contracts list
+    # AND: the "The targeted contract has been created." alert message is
+    #      displayed
 
-
-@expected_failure
-@nondestructive
-@test_case('')
-@tutor
-def test_view_contract(tutor_base_url, selenium, admin):
-    """Test admin to view a contract."""
-    # GIVEN: logged in as admin
-    # AND: At the Terms page
-
-    # WHEN: Click on one of the versions of one of the legal docs
-
-    # THEN: Page containing the legal doc information is loaded
-
-
-@expected_failure
-@nondestructive
-@test_case('')
-@tutor
-def test_add_targeted_contract(tutor_base_url, selenium, admin):
-    """Test admin to add targeted contract."""
-    # GIVEN: logged in as admin
-    # AND: At the Targeted Contract page
-
-    # WHEN: Click on ""Add Targeted Contract""
-    # AND: Fill in all necessary field
-    # AND: Click ""Submit""
-
-    # THEN: A new targeted contract is created.
-
-
-@expected_failure
-@nondestructive
-@test_case('')
-@tutor
-def test_edit_targeted_contract(tutor_base_url, selenium, admin):
-    """Test admin to edit targeted contract."""
-    # GIVEN: logged in as admin
-    # AND: At the Targeted Contract Page
-
-    # WHEN: In the drop down click on ""Targeted Contract""
-    # AND: Click on ""Edit"" next to a contract
-
-    # THEN: "User are unable to edit at this time. " message is loaded.
-
-
-@expected_failure
-@nondestructive
-@test_case('')
-@tutor
-def test_delete_targeted_contract(tutor_base_url, selenium, admin):
-    """Test admin to delete targeted contract."""
-    # GIVEN: logged in as admin
-    # WHEN: At the Targeted Contract Page
-
-    # WHEN: Click on ""delete""
-
-    # THEN: Contract is removed from the list of targeted contracts.
+    # WHEN: they click the "edit"

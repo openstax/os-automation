@@ -1,49 +1,35 @@
 """Test of admin console salesforce page."""
 
-from tests.markers import expected_failure, nondestructive, test_case, tutor
+from tests.markers import expected_failure, skip_test, test_case, tutor
 
 
-@expected_failure
-@nondestructive
-@test_case('')
+@test_case('C208735')
+@skip_test(reason='Not tested using automation')
 @tutor
-def test_set_salesforce_user(tutor_base_url, selenium, admin):
-    """Test admin to set salesforce user."""
-    # GIVEN: logged in as admin
-    # AND: At the Salesforce page
+def test_tutor_salesforce_settings(tutor_base_url, selenium, admin):
+    """Adjust salesforce settings."""
+    # GIVEN: a user logged in as an administrative user
+    # AND: viewing the admin console Salesforce Setup page
 
-    # WHEN: In the dropdown click on ""Setup""
-    # AND: Click on ""Set Salesforce User""
+    # WHEN: they click the "Clear Salesforce User" button
 
-    # THEN: Salesforce website login page is loaded
+    # THEN: there "is no Salesforce user" set
+
+    # WHEN: they click the "Set Salesforce User" button
+    # AND: log into Salesforce
+
+    # THEN: the Salesforce user is set
 
 
+@test_case('C210275')
+@skip_test(reason='Not applicable to the current iteration of Tutor')
 @expected_failure
-@nondestructive
-@test_case('')
 @tutor
-def test_edit_settings(tutor_base_url, selenium, admin):
-    """Test admin to edit settings."""
-    # GIVEN: logged in as admin
-    # AND: At the Salesforce page
+def test_update_salesforce_stats(tutor_base_url, selenium, admin):
+    """Update Salesforce statistics."""
+    # GIVEN: a user logged in as an administrative user
+    # AND: viewing the admin console Salesforce Actions page
 
-    # WHEN: In the drop down click on ""Settings""
-    # AND: Edit one or more fields in settings
-    # AND: Click ""Save All""
+    # WHEN: they click the "Update Salesforce" button
 
-    # THEN: Settings is successfully updated
-
-
-@expected_failure
-@nondestructive
-@test_case('')
-@tutor
-def test_update_salesforce(tutor_base_url, selenium, admin):
-    """Test admin to update salesforce."""
-    # GIVEN: logged in as admin
-    # AND: At the Salesforce page
-
-    # WHEN: In the dropdown click on ""Actions""
-    # AND: Click on ""Update Salesforce""
-
-    # THEN: Salesforce is updated.
+    # THEN: new course data is submitted to Salesforce

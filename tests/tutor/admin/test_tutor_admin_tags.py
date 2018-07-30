@@ -1,18 +1,25 @@
 """Test of admin console tags page."""
 
-from tests.markers import expected_failure, nondestructive, test_case, tutor
+from tests.markers import nondestructive, skip_test, test_case, tutor
 
 
-@expected_failure
+@test_case('C208721')
+@skip_test(reason='Script not written')
 @nondestructive
-@test_case('')
 @tutor
-def test_tag_searching(tutor_base_url, selenium, admin):
-    """Test tag searching correctly searches."""
-    # GIVEN: logged in as admin
-    # AND: At the Tags page
+def test_search_for_tags(tutor_base_url, selenium, admin):
+    """Search for a valid tag and an invalid tag."""
+    # GIVEN: a user logged in as an administrative user
+    # AND: viewing the admin console Tags page
 
-    # WHEN: In the search bar enter a random word
-    # AND: Click the ""Search"" button
+    # WHEN: they enter "aplo" in the "Search here" input
+    # AND: click the "Search" button
 
-    # THEN: Tags related to the entered word is correctly found and displayed
+    # THEN: there are search results containing "aplo"
+    # AND: each entry may have a "Name" and "Edit" button
+    # AND: the results are paginated
+
+    # WHEN: they enter eight random hex digits
+    # AND: click the "Search" button
+
+    # THEN: the "No tags found." message is displayed

@@ -1,17 +1,20 @@
 """Test of admin console courses page."""
 
-from tests.markers import expected_failure, nondestructive, test_case, tutor
+from tests.markers import nondestructive, skip_test, test_case, tutor
 
 
-@expected_failure
+@test_case('C210273')
+@skip_test(reason='Script not written')
 @nondestructive
-@test_case('')
 @tutor
-def test_extend_payment(tutor_base_url, selenium, admin):
-    """Test admin to extend payment due dates."""
-    # GIVEN: logged in as admin
-    # AND: At the payments page
+def test_extend_payment_due_dates_available(tutor_base_url, selenium, admin):
+    """Test extending payment due dates.
 
-    # WHEN: Click on ""Extend Payment Due Dates""
+    No extension is enabled - only the availability to
+    perform the action is verified."""
+    # GIVEN: a user logged in as an administrative user
+    # AND: viewing the admin console Payments page
 
-    # THEN: Payment due dates are extended.
+    # WHEN:
+
+    # THEN: the "Extend Payment Due Dates" button is available
