@@ -4,7 +4,6 @@ from pypom import Region
 from selenium.webdriver.common.by import By
 
 from pages.tutor.base import TutorBase
-from pages.tutor.course import TutorCourse
 
 
 class TutorScores(TutorBase):

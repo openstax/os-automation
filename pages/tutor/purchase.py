@@ -1,10 +1,8 @@
 """The Course purchase page object."""
 
-from pypom import Region
 from selenium.webdriver.common.by import By
 
 from pages.tutor.base import TutorBase
-from pages.tutor.course import TutorCourse
 
 
 class TutorPurchase(TutorBase):
@@ -34,26 +32,19 @@ class TutorPurchase(TutorBase):
         from regions.tutor.nav import TutorNav
         return TutorNav(self)
 
-    def payment_proceed(
-            self,
-            address,
-            city,
-            zip,
-            visa,
-            exp_date,
-            cvv,
-            billing):
+    def payment_proceed(self, address, city, zipcode,
+                        visa, exp_date, cvv, billing):
         """Successfully proceed payment."""
         self.driver.switch_to.frame(_iframe_locator)
         self.find_element(*self._address_locator).sendKeys(address)
         self.find_element(*self._city_locator).sendKeys(city)
         self.find_element(*self._state_locator).click()
         self.find_element(*self._first_state_locator).click()
-        self.find_element(*self._zip_locator).sendKeys(zip)
-        self.find_element(*self._card_locator).sendKeys(card)
-        self.find_element(*self._exp_locator).sendKeys(exp)
+        self.find_element(*self._zip_locator).sendKeys(zipcode)
+        self.find_element(*self._card_locator).sendKeys(visa)
+        self.find_element(*self._exp_locator).sendKeys(exp_date)
         self.find_element(*self._cvv_locator).sendKeys(cvv)
-        self.find_element(*self._bil_locator).sendKeys(bil)
+        self.find_element(*self._bil_locator).sendKeys(billing)
         self.find_element(*self._state_locator).click()
         self.find_element(*self.__purchase_locator).click()
         self.driver.switch_to.defaultContent()

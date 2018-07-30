@@ -4,7 +4,8 @@ from pypom import Region
 from selenium.webdriver.common.by import By
 
 from pages.tutor.base import TutorBase
-from pages.tutor.course import TutorCourse
+from pages.tutor.calendar import TutorCalendar
+from pages.tutor.student_calendar import TutorStudentCalendar
 
 
 class TutorDashboard(TutorBase):
@@ -25,10 +26,11 @@ class TutorDashboard(TutorBase):
         from regions.tutor.nav import TutorNav
         return TutorNav(self)
 
-    def go_to_first_course(self):
+    def go_to_first_course(self, user):
         """Go to the first course."""
-        self.courses_region.courses[0].go_to_course()
-        return TutorCourse(self.driver)
+        self.courses_region.courses[0].go_to_course(user)
+        return TutorStudentCalendar(self.driver) if user == 'student' \
+            else TutorCalendar(self.driver)
 
     class Courses(Region):
         """Courses sections."""
@@ -47,7 +49,8 @@ class TutorDashboard(TutorBase):
 
             _card_locator = (By.CSS_SELECTOR, '.my-courses-item-title')
 
-            def go_to_course(self):
+            def go_to_course(self, user):
                 """Go to the course page for this course."""
                 self.find_element(*self._card_locator).click()
-                return TutorCourse(self.driver)
+                return TutorStudentCalendar(self.driver) if user == 'student' \
+                    else TutorCalendar(self.driver)

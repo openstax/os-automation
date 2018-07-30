@@ -1,10 +1,8 @@
 """The Student ID page object."""
 
-from pypom import Region
 from selenium.webdriver.common.by import By
 
 from pages.tutor.base import TutorBase
-from pages.tutor.course import TutorCourse
 
 
 class TutorID(TutorBase):
@@ -20,12 +18,12 @@ class TutorID(TutorBase):
         from regions.tutor.nav import TutorNav
         return TutorNav(self)
 
-    def change_id(self):
+    def change_id(self, new_id):
         """Change the student id."""
-        self.find_element(*self._enter_id_locator).sendKeys('111111')
+        self.find_element(*self._enter_id_locator).sendKeys(new_id)
         self.find_element(*self._save_locator).click()
 
-    def cancel_id(self):
+    def cancel_id(self, new_id):
         """Cancel changing student id"""
-        self.find_element(*self._enter_id_locator).sendKeys('111111')
+        self.find_element(*self._enter_id_locator).sendKeys(new_id)
         self.find_element(*self._cancel_locator).click()

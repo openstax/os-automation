@@ -121,7 +121,7 @@ class TutorNav(Region):
         """Go to the main course page of current course."""
         self.find_element(*self._menu_dropdown_locator).click()
         self.find_element(*self._dashboard_locator).click()
-        from pages.tutor.course import TutorCourse
+        from pages.tutor.student_calendar import TutorCourse
         return TutorCourse(self.driver)
 
     def go_to_scores(self):

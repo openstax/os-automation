@@ -1,14 +1,12 @@
 """The accessiblity page object."""
 
-from pypom import Region
 from selenium.webdriver.common.by import By
 
 from pages.tutor.base import TutorBase
-from pages.tutor.course import TutorCourse
 
 
 class TutorAccessibility(TutorBase):
-    """Tutor accessiblity page."""
+    """Tutor accessibility page."""
 
     _back_locator = (By.CSS_SELECTOR, 'header > a')
 
@@ -18,7 +16,6 @@ class TutorAccessibility(TutorBase):
         from regions.tutor.nav import TutorNav
         return TutorNav(self)
 
-    def go_to_library(self):
-        """Go back to question library"""
+    def go_back(self):
+        """Click the back btn to back to question library, scores, etc."""
         self.find_element(*self._back_locator).click()
-        return self

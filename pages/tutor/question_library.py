@@ -4,7 +4,7 @@ from pypom import Region
 from selenium.webdriver.common.by import By
 
 from pages.tutor.base import TutorBase
-from pages.tutor.course import TutorCourse
+from pages.tutor.student_calendar import TutorStudentCalendar
 
 
 class TutorQuestionLibrary(TutorBase):

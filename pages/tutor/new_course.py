@@ -4,7 +4,7 @@ from pypom import Region
 from selenium.webdriver.common.by import By
 
 from pages.tutor.base import TutorBase
-from pages.tutor.course import TutorCourse
+from pages.tutor.student_calendar import TutorStudentCalendar
 
 
 class TutorNewCourse(TutorBase):
@@ -42,7 +42,7 @@ class TutorNewCourse(TutorBase):
         self.find_element(*self._continue_locator).click()
         self.find_element(*self._close_locator).click()
         self.find_element(*self._get_locator).click()
-        return TutorCalendar(self.driver)
+        return TutorStudentCalendar(self.driver)
 
     def cancel_create_course(self):
         """Cancel creating a new course"""

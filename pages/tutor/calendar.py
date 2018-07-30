@@ -1,10 +1,11 @@
 """The teacher calendar page object."""
 
-from pypom import Region
 from selenium.webdriver.common.by import By
 
 from pages.tutor.base import TutorBase
-from pages.tutor.course import TutorCourse
+from pages.tutor.question_library import TutorQuestionLibrary
+from pages.tutor.scores import TutorScores
+from pages.tutor.performance import TutorPerformance
 
 
 class TutorCalendar(TutorBase):
@@ -53,7 +54,6 @@ class TutorCalendar(TutorBase):
     def browse_the_book(self):
         """Browse the book."""
         self.find_element(*self._browse_locator).click()
-        return TutorBrowse(self.driver)
 
     def performance_forecast(self):
         """Performance forecast."""
@@ -100,7 +100,7 @@ class TutorCalendar(TutorBase):
         self.find_element(*self._reading_locator).click()
         self.find_element(*self._cancel_locator).click()
 
-    def add_hw(self.assignment_name):
+    def add_hw(self, assignment_name):
         """Add a hw."""
         self.find_element(*self._add_locator).click()
         self.find_element(*self._hw_locator).click()
@@ -128,13 +128,7 @@ class TutorCalendar(TutorBase):
         self.find_element(*self._next_locator).click()
         self.find_element(*self._draft_locator).click()
 
-    def cancel_reading(self):
-        """Cancel adding a reading"""
-        self.find_element(*self._add_locator).click()
-        self.find_element(*self._hw_locator).click()
-        self.find_element(*self._cancel_locator).click()
-
-    def add_external(self, url):
+    def add_external(self, assignment_name, url):
         """Add an external assignment."""
         self.find_element(*self._add_locator).click()
         self.find_element(*self._ex_locator).click()
@@ -144,7 +138,7 @@ class TutorCalendar(TutorBase):
         self.find_element(*self._url_locator).sendKeys(url)
         self.find_element(*self._publish_locator).click()
 
-    def draft_external(self, url):
+    def draft_external(self, assignment_name, url):
         """Save an external assignment as draft."""
         self.find_element(*self._add_locator).click()
         self.find_element(*self._ex_locator).click()

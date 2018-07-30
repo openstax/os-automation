@@ -4,7 +4,6 @@ from pypom import Region
 from selenium.webdriver.common.by import By
 
 from pages.tutor.base import TutorBase
-from pages.tutor.course import TutorCourse
 
 
 class TutorRoster(TutorBase):
@@ -18,7 +17,7 @@ class TutorRoster(TutorBase):
     @property
     def section(self):
         """The Sections Region."""
-        return self.Section(self)
+        return self.Sections(self)
 
     @property
     def nav(self):
@@ -61,11 +60,11 @@ class TutorRoster(TutorBase):
         _rename_session_locator = (By.CSS_SELECTOR,
                                    'button.control.rename-period.btn.btn-link')
 
-        def add_session(self):
+        def add_session(self, section_name):
             """Add a session"""
             self.find_element(*self._add_session_locator).click()
             self.find_element(
-                *self._enter_name_locator).sendKeys("section thera")
+                *self._enter_name_locator).sendKeys(section_name)
             self.find_element(*self._confirm_add_locator).click()
 
         def delete_session(self):
