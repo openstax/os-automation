@@ -14,14 +14,21 @@ class Profile(AccountsHome):
 
     URL_TEMPLATE = '/profile'
 
+    _title_locator = (By.CLASS_NAME, 'title')
     _log_out_locator = (By.CLASS_NAME, 'sign-out')
     _edit_clear_locator = (By.CLASS_NAME, 'editable-clear-x')
     _edit_submit_locator = (By.CLASS_NAME, 'editable-submit')
     _edit_cancel_locator = (By.CLASS_NAME, 'editable-cancel')
     _username_exists_locator = (By.CSS_SELECTOR, '#profile .row')
     _popup_console_locator = (By.CSS_SELECTOR, '#upper-corner-console a')
+    _popup_console_body_locator = (By.ID, 'admin_console_dialog')
     _full_console_locator = (By.CSS_SELECTOR,
                              '#upper-corner-console a:nth-last-child(2)')
+
+    @property
+    def title(self):
+        """Page title."""
+        return self.find_element(*self._title_locator).text
 
     @property
     def name(self):
@@ -65,6 +72,11 @@ class Profile(AccountsHome):
         sleep(1)
         from pages.accounts.admin import AccountsAdmin
         return AccountsAdmin(self.driver)
+
+    @property
+    def is_popup_console_displayed(self):
+        """Return True if the admin pop up console is open."""
+        return self.is_element_displayed(*self._popup_console_body_locator)
 
     @property
     def is_admin(self):
@@ -281,15 +293,63 @@ class Profile(AccountsHome):
     class LoginOptions(Region):
         """Login options."""
 
-        class ActiveOption(Region):
+        _active_option_locator = (
+            By.CSS_SELECTOR, '.enabled-providers .authentication')
+        _inactive_option_locator = (
+            By.CSS_SELECTOR, '.other-sign-in .authentication')
+        _inactive_option_expander_locator = (By.ID, 'enable-other-sign-in')
+
+        def get_active_options(self):
+            """Return current, active log in options."""
+            return [self.Option(self, el) for el in
+                    self.find_elements(*self._active_option_locator)]
+
+        def get_other_options(self):
+            """Return inactive log in options."""
+            return [self.Option(self, el) for el in
+                    self.find_elements(*self._inactive_option_locator)]
+
+        def view_other_options(self):
+            """Open the inactive option menu."""
+            link = self.find_element(*self._inactive_option_expander_locator)
+            if link.is_displayed():
+                link.click()
+                sleep(0.25)
+            return self
+
+        class Option(Region):
             """Login options."""
 
-            _root_locator = (By.CSS_SELECTOR, '.enabled-providers')
+            _name_locator = (By.CLASS_NAME, 'name')
+            _edit_button_locator = (By.CLASS_NAME, 'edit')
+            _delete_button_locator = (By.CLASS_NAME, 'delete')
+            _add_button_locator = (By.CLASS_NAME, 'add')
 
-        class InactiveOption(Region):
-            """Additional login options requiring setup."""
+            @property
+            def name(self):
+                """Return the option name."""
+                return self.find_element(*self._name_locator).text
 
-            _root_locator = (By.CSS_SELECTOR, '.other-sign-in')
+            @property
+            def edit(self):
+                """Edit the login option."""
+                self.find_element(*self._edit_button_locator).click()
+                sleep(0.5)
+                return self
+
+            @property
+            def delete(self):
+                """Delete an active login option."""
+                self.find_element(*self._delete_button_locator).click()
+                sleep(0.5)
+                return self
+
+            @property
+            def add(self):
+                """Add an inactive login option."""
+                self.find_element(*self._add_button_locator).click()
+                sleep(0.5)
+                return self
 
     class PopupConsole(Region):
         """Popup console interaction."""

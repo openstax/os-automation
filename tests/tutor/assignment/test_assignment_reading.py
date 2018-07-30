@@ -43,6 +43,7 @@ def test_edit_published_reading(tutor_base_url, selenium, teacher):
     # AND: Has a published reading
 
     # WHEN: Click on the published reading
+
     # AND: Edit one of the required fields
     # AND: Click "Publish"
 
