@@ -1,17 +1,24 @@
 """Test the Accounts signup process."""
 
+from pages.accounts.home import AccountsHome as Home
+from pages.utils.email import RestMail
 from pages.accounts.signup import Signup
 from pages.utils.utilities import Utility
 from tests.markers import accounts, expected_failure, social, test_case
 
 
 @test_case('C195549')
-@expected_failure
 @accounts
 def test_sign_up_as_a_student_user(accounts_base_url, selenium):
     """Test student user signup."""
     # GIVEN: a valid and accessible email address
     # AND: the Accounts Home page is loaded
+    name = Utility.random_hex()
+    email = RestMail(name)
+    email.empty()
+    address = name + '@restmail.net'
+    password = 'staxly16'
+    page = Home(selenium, accounts_base_url).open()
 
     # WHEN: the user clicks the "Sign up here." link
     # AND: selects "Student" from the drop down menu
@@ -26,8 +33,14 @@ def test_sign_up_as_a_student_user(accounts_base_url, selenium):
     #      Privacy Policy."
     # AND: clicks the "CREATE ACCOUNT" button
 
+    page.login.go_to_signup.account_signup(
+        address, password, _type='Student', 
+        provider='restmail', name=['', name, name, ''],
+        school='staxly', news=False)
+
     # THEN: the Account Profile page is loaded
-    assert(False), 'Test script missing'
+    assert(page.current_url == accounts_base_url + '/profile'),\
+        'Account profile not loaded'
 
 
 @test_case('C205362')
