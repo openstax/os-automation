@@ -4,11 +4,11 @@ from pypom import Region
 from selenium.webdriver.common.by import By
 
 from pages.tutor.base import TutorBase
-from pages.tutor.student_calendar import TutorStudentCalendar
+from pages.tutor.tutor_calendar import TutorCalendar
 
 
 class TutorNewCourse(TutorBase):
-    """Tutor newcourse page object."""
+    """Tutor create new course page object."""
 
     _continue_locator = (By.CSS_SELECTOR, 'button.next.btn.btn-primary')
     _select_course_locator = (
@@ -22,7 +22,6 @@ class TutorNewCourse(TutorBase):
     _cancel_locator = (By.CSS_SELECTOR, 'button.cancel.btn.btn-default')
     _close_locator = (By.PARTIAL_LINK_TEXT, "I'll get them later")
     _get_locator = (By.PARTIAL_LINK_TEXT, "Got It")
-
 
     @property
     def nav(self):
@@ -42,7 +41,7 @@ class TutorNewCourse(TutorBase):
         self.find_element(*self._continue_locator).click()
         self.find_element(*self._close_locator).click()
         self.find_element(*self._get_locator).click()
-        return TutorStudentCalendar(self.driver)
+        return TutorCalendar(self.driver)
 
     def cancel_create_course(self):
         """Cancel creating a new course"""

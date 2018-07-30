@@ -33,9 +33,9 @@ class TutorScores(TutorBase):
 
     def set_weight(self):
         """Set weight for scores"""
-        return self.Set_weight(self)
+        return self.SetWeight(self)
 
-    class Set_weight(Region):
+    class SetWeight(Region):
         """The Set Weight Region."""
 
         _set_weight_locator = (

@@ -25,19 +25,19 @@ class TutorSettings(TutorBase):
         return TutorNav(self)
 
     def edit_time(self):
-        """Edit the time zone"""
+        """Edit the time zone."""
         self.find_element(*self._edit_time_locator).click()
         self.find_element(*self._hawaii_time_locator).click()
         self.find_element(*self._confirm_time_locator).click()
 
     def edit_course_name(self):
-        """Edit Course Name"""
+        """Edit course name."""
         self.find_element(*self._edit_name_locator).click()
         self.find_element(*self. _text_enter_locator).sendKeys("1")
         self.find_element(*self._confirm_name_locator).click()
 
     def get_access_url(self):
-        """Get the student access url"""
+        """Get the student access url."""
         return self.find_element(*self._url_locator).get_attribute('value')
 
 

@@ -35,7 +35,7 @@ class TutorPurchase(TutorBase):
     def payment_proceed(self, address, city, zipcode,
                         visa, exp_date, cvv, billing):
         """Successfully proceed payment."""
-        self.driver.switch_to.frame(_iframe_locator)
+        self.driver.switch_to.frame(*self._iframe_locator)
         self.find_element(*self._address_locator).sendKeys(address)
         self.find_element(*self._city_locator).sendKeys(city)
         self.find_element(*self._state_locator).click()
@@ -46,17 +46,17 @@ class TutorPurchase(TutorBase):
         self.find_element(*self._cvv_locator).sendKeys(cvv)
         self.find_element(*self._bil_locator).sendKeys(billing)
         self.find_element(*self._state_locator).click()
-        self.find_element(*self.__purchase_locator).click()
+        self.find_element(*self._purchase_locator).click()
         self.driver.switch_to.defaultContent()
 
     def attempt_payment_with_blank(self):
         """Attempt to pay with required fields blank"""
-        self.driver.switch_to.frame(_iframe_locator)
-        self.find_element(*self.__purchase_locator).click()
+        self.driver.switch_to.frame(*self._iframe_locator)
+        self.find_element(*self._purchase_locator).click()
         self.driver.switch_to.defaultContent()
 
     def cancel_purchase(self):
         """Cancel purchase."""
-        self.driver.switch_to.frame(_iframe_locator)
-        self.find_element(*self.__cancel_locator).click()
+        self.driver.switch_to.frame(*self._iframe_locator)
+        self.find_element(*self._cancel_locator).click()
         self.driver.switch_to.defaultContent()

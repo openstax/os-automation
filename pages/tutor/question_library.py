@@ -4,7 +4,6 @@ from pypom import Region
 from selenium.webdriver.common.by import By
 
 from pages.tutor.base import TutorBase
-from pages.tutor.student_calendar import TutorStudentCalendar
 
 
 class TutorQuestionLibrary(TutorBase):
@@ -21,7 +20,7 @@ class TutorQuestionLibrary(TutorBase):
 
     def show_questions(self):
         """Show questions for question library"""
-        return self.Show_questions(self)
+        return self.ShowQuestions(self)
 
     def browse_chapter(self):
         """Browse the entire chapter"""
@@ -38,7 +37,7 @@ class TutorQuestionLibrary(TutorBase):
         _chapter_locator = (By.CSS_SELECTOR, 'span > i')
         self.find_element(*self._chapter_locator).click()
 
-    class Show_questions(Region):
+    class ShowQuestions(Region):
         """Show questions for the question library"""
 
         _show_locator = (By.CSS_SELECTOR, 'div > button.btn.btn-primary')
