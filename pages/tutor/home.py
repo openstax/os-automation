@@ -1,4 +1,4 @@
-"""Home page objects."""
+"""Tutor Home page objects."""
 
 from selenium.webdriver.common.by import By
 

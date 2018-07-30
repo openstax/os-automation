@@ -44,6 +44,8 @@ class AccountsHome(AccountsBase):
         _login_help_locator = (By.CSS_SELECTOR, '.login-help')
         _salesforce_link_locator = (By.CSS_SELECTOR, '.login-help a')
         _salesforce_loader = (By.CSS_SELECTOR, 'div.body-and-support-buttons')
+        _input_field_locator = (By.CLASS_NAME, 'form-group')
+        _form_box_locator = (By.TAG_NAME, 'input')
         _error_locator = (By.CSS_SELECTOR, '.alert')
         _signup_locator = (By.CSS_SELECTOR, '.extra-info a')
 
@@ -158,6 +160,24 @@ class AccountsHome(AccountsBase):
         def get_login_error(self):
             """Return Account log in error message."""
             return self.find_element(*self._error_locator).text
+
+        def get_error_color(self):
+            """Return the background color for missing or illegal fields."""
+            print(self.driver.page_source)
+            fields = self.find_elements(*self._input_field_locator)
+            issues = list(filter(
+                lambda element: 'has-error' in element.get_attribute('class'),
+                fields
+            ))
+            if not isinstance(issues, list):
+                issues = [issues]
+            if issues:
+                return (
+                    issues[0]
+                    .find_element(*self._form_box_locator)
+                    .value_of_css_property('background-color')
+                )
+            return None
 
         @property
         def go_to_signup(self):
