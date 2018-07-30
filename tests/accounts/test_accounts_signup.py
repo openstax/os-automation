@@ -127,7 +127,8 @@ def test_sign_up_as_a_facebook_user(accounts_base_url, selenium, facebook):
 
 @test_case('C200746')
 @accounts
-def test_sign_up_as_a_google_user(accounts_base_url, selenium, google):
+def test_sign_up_as_a_google_user(accounts_base_url, selenium, google,
+                                  student):
     """Test signing up with a Google account."""
     # GIVEN: a valid Google email that is not associated with a current account
     # AND: the Accounts Home page is loaded
@@ -146,13 +147,13 @@ def test_sign_up_as_a_google_user(accounts_base_url, selenium, google):
     #      Privacy Policy."
     # AND: clicks the "CREATE ACCOUNT" button
     page = page.login.go_to_signup
-    page = page.account_signup(google[0], 'staxly16', provider='google',
+    page = page.account_signup(google[0], student[1], provider='google',
                                email_password=google[1], news=True,
-                               school='test-college', social='google')
+                               school='Automation', social='google')
 
     # THEN: the account profile for the new student is displayed
-    assert ('profile' in selenium.current_url)
     # AND: the name is the same as the Google user's name
+    assert ('profile' in selenium.current_url)
     name = page.name.get_name_parts()
     assert (name[1].lower() in google[0] and name[2].lower() in google[0])
 
@@ -164,12 +165,11 @@ def test_sign_up_as_a_google_user(accounts_base_url, selenium, google):
     page.name.confirm()
 
     # AND: a verified email is added to the profile
-
     username = name[1] + name[2] + str(Utility.random(100, 999))
     page.emails.add_email(username + '@restmail.net')
 
     # AND: a password log in option is added
-    password = 'staxly16'
+    password = student[1]
     page.login_method.add_password(password)
 
     # AND: the Google log in option is deleted

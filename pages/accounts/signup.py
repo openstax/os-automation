@@ -458,6 +458,7 @@ class Signup(AccountsBase):
             """Use Facebook to log in."""
             self.find_element(*self._facebook_button_locator).click()
             sleep(0.5)
+            from pages.facebook.home import Facebook
             return Facebook(self.driver)
 
         @property
