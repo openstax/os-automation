@@ -208,10 +208,7 @@ class Signup(AccountsBase):
 
     def _get_pin(self, page, provider, return_url, email=None, password=None):
         """Retrieve a signup pin."""
-        try:
-            page.open()
-        except Exception as e:
-            print(e)
+        page.open()
         if 'google' in provider:
             page = page.login.go(email, password)
         WebDriverWait(self.driver, 60.0).until(

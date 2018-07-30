@@ -176,7 +176,7 @@ def test_sign_up_as_a_google_user(accounts_base_url, selenium, google):
     page.login_method.get_active_options()[0].delete
 
     # AND: the Profile page is reloaded
-    RestMail(username).wait_for_mail()[0].confirm_email(selenium)
+    RestMail(username).get_mail()[0].confirm_email(selenium)
 
     # AND: the Gmail address is deleted
     page.emails.emails[0].delete()

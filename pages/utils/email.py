@@ -10,6 +10,7 @@ from time import sleep
 import requests
 from pypom import Page, Region
 from selenium.webdriver.common.by import By
+from selenium.webdriver.support import expected_conditions as expect
 
 from pages.utils.utilities import Utility
 
@@ -28,9 +29,8 @@ class GoogleBase(Page):
 
     def wait_for_page_to_load(self):
         """Override page load."""
-        sleep(1)
         self.wait.until(
-            lambda _: self.find_element(By.TAG_NAME, 'body').is_displayed())
+            expect.presence_of_element_located((By.TAG_NAME, 'body')))
 
     def log_in(self, username, password):
         """Log into google account."""
@@ -56,27 +56,15 @@ class GoogleBase(Page):
 
         def go(self, email, password):
             """Log into Google."""
-            self.find_element(*self._email_locator).click()
-            sleep(0.3)
-            self.find_element(*self._email_locator).send_keys(email)
-            sleep(0.3)
+            self.wait.until(
+               expect.presence_of_element_located(
+                   self._email_locator))\
+                .send_keys(email)
             self.find_element(*self._email_next_locator).click()
-            sleep(2)
-            self.find_element(*self._password_locator).click()
-            sleep(0.3)
+            sleep(1)
             self.find_element(*self._password_locator).send_keys(password)
-            sleep(0.5)
             self.find_element(*self._password_next_locator).click()
-            # self.wait.until(
-            #    expect.visibility_of_element_located(
-            #        self._email_locator)) \
-            #    .send_keys(email)
-            # self.find_element(*self._email_next_locator).click()
-            # self.wait.until(
-            #    expect.visibility_of_element_located(
-            #        self._password_locator)) \
-            #    .send_keys(password)
-            # self.find_element(*self._password_next_locator).click()
+
             return Google(self.driver)
 
 
@@ -90,9 +78,8 @@ class Google(GoogleBase):
 
     def wait_for_page_to_load(self):
         """Override page load."""
-        sleep(3)
-        # self.wait.until(
-        #    lambda _: self.find_element(*self._root_locator).is_displayed())
+        self.wait.until(
+            expect.presence_of_element_located(self._root_locator))
 
     @property
     def emails(self):
