@@ -179,7 +179,12 @@ class Signup(AccountsBase):
         if non_student_role:
             self.instructor.phone = kwargs['phone']
             self.instructor.webpage = kwargs['webpage']
-            self.instructor.subjects = kwargs['subjects']
+            subjects_to_select = []
+            for i in Signup.SUBJECTS:
+                for j in kwargs['subjects']:
+                    if i[0] == j:
+                        subjects_to_select.append(i[1])
+            self.instructor.subjects = subjects_to_select
         # instructor-only
         if instructor:
             self.instructor.students = kwargs['students']
@@ -188,6 +193,7 @@ class Signup(AccountsBase):
         if not kwargs['news']:
             self.user.toggle_news()
         self.user.agree_to_terms()
+
         sleep(0.25)
         self.next()
 
@@ -196,6 +202,8 @@ class Signup(AccountsBase):
             self.notice.get_confirmation_email()
             sleep(0.5)
             self.next()
+
+        # sleep(3)
 
         return profile.Profile(self.driver)
 

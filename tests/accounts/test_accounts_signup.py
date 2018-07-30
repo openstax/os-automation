@@ -34,9 +34,12 @@ def test_sign_up_as_a_student_user(accounts_base_url, selenium):
     # AND: clicks the "CREATE ACCOUNT" button
 
     page.login.go_to_signup.account_signup(
-        address, password, _type='Student', 
-        provider='restmail', name=['', name, name, ''],
-        school='staxly', news=False)
+        address, password,
+        _type='Student', 
+        provider='restmail',
+        name=['', name, name, ''],
+        school='staxly',
+        news=False)
 
     # THEN: the Account Profile page is loaded
     assert(page.current_url == accounts_base_url + '/profile'),\
@@ -44,12 +47,18 @@ def test_sign_up_as_a_student_user(accounts_base_url, selenium):
 
 
 @test_case('C205362')
-@expected_failure
+# @expected_failure
 @accounts
 def test_sign_up_as_an_instructor(accounts_base_url, selenium, teacher):
     """Test non-student user signup."""
     # GIVEN: a valid and accessible email address
     # AND: the Accounts Home page is loaded
+    name = Utility.random_hex()
+    email = RestMail(name)
+    email.empty()
+    address = name + '@restmail.net'
+    password = 'staxly16'
+    page = Home(selenium, accounts_base_url).open()
 
     # WHEN: the user clicks the "Sign up here." link
     # AND: selects "Instructor" from the drop down menu
@@ -66,8 +75,22 @@ def test_sign_up_as_an_instructor(accounts_base_url, selenium, teacher):
     # AND: clicks the "CREATE ACCOUNT" button
     # AND: clicks the "OK" button
 
+    page.login.go_to_signup.account_signup(
+        address, password,
+        _type='Instructor', 
+        provider='restmail',
+        name=['', name, name, ''],
+        school='staxly',
+        news=False,
+        phone=Utility.random_phone(),
+        webpage='https://openstax.org/',
+        subjects=['accounting', 'astronomy'],
+        students=10,
+        use='Fully adopted and using it as the primary textbook')
+
     # THEN: the Account Profile page is loaded
-    assert(False), 'Test script missing'
+    assert(page.current_url == accounts_base_url + '/profile'),\
+        'Account profile not loaded'
 
 
 @test_case('C195550')
