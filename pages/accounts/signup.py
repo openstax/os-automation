@@ -9,7 +9,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 from pages.accounts import home, profile
 from pages.accounts.base import AccountsBase
 from pages.facebook.home import Facebook
-from pages.utils.email import Google, GuerrillaMail
+from pages.utils.email import Google, GuerrillaMail, RestMail
 from pages.utils.utilities import Utility
 
 
@@ -137,10 +137,14 @@ class Signup(AccountsBase):
         # verify the pin
         email_password = None
         if 'google' in provider:
-            mailer = Google(self.driver)
+            mailer = GoogleBase(self.driver)
             email_password = kwargs['email_password']
         elif 'guerrilla' in provider:
             mailer = GuerrillaMail(self.driver)
+
+        elif 'restmail' in provider:
+            account_name = email[:email.rfind("@")]
+            mailer = RestMail(account_name)
         else:
             mailer = _type(self.driver)
             email_password = kwargs['email_password']
@@ -159,10 +163,12 @@ class Signup(AccountsBase):
             self.next()
         elif kwargs['social'] == 'facebook':
             # use Facebook
-            self.social.use_facebook.log_in(email, email_password)
+            self.password.use_social_login().use_facebook.log_in(
+                email, email_password)
         else:
             # use Google
-            self.social.use_google.log_in(email, email_password)
+            self.password.use_social_login().use_google.log_in(email,
+                                                               email_password)
 
         # enter user details in group order
         # all users
@@ -175,7 +181,12 @@ class Signup(AccountsBase):
         if non_student_role:
             self.instructor.phone = kwargs['phone']
             self.instructor.webpage = kwargs['webpage']
-            self.instructor.subjects = kwargs['subjects']
+            subjects_to_select = []
+            for i in Signup.SUBJECTS:
+                for j in kwargs['subjects']:
+                    if i[0] == j:
+                        subjects_to_select.append(i[1])
+            self.instructor.subjects = subjects_to_select
         # instructor-only
         if instructor:
             self.instructor.students = kwargs['students']
@@ -207,14 +218,18 @@ class Signup(AccountsBase):
 
     def _get_pin(self, page, provider, return_url, email=None, password=None):
         """Retrieve a signup pin."""
-        page.open()
-        if 'google' in provider:
-            page.login.go(email, password)
-        WebDriverWait(page.driver, 60.0).until(
-            lambda _: page.emails[0].has_pin)
-        pin = page.emails[0].get_pin
-        page.driver.get(return_url)
-        sleep(1.0)
+        if 'restmail' in provider:
+            box = page.wait_for_mail().get_mail()
+            return box[-1].pin
+        else:
+            page.open()
+            if 'google' in provider:
+                page.login.go(email, password)
+            WebDriverWait(page.driver, 60.0).until(
+                lambda _: page.emails[0].has_pin)
+            pin = page.emails[0].get_pin
+            page.driver.get(return_url)
+            sleep(1.0)
         return pin
 
     @property
@@ -375,7 +390,7 @@ class Signup(AccountsBase):
             """Go to the social login setup."""
             self.find_element(*self._go_to_social_locator).click()
             sleep(1)
-            return self.SocialLogin(self)
+            return Signup.SocialLogin(self)
 
     class UserFields(Region):
         """Standard user fields."""
@@ -456,22 +471,23 @@ class Signup(AccountsBase):
         def use_facebook(self):
             """Use Facebook to log in."""
             self.find_element(*self._facebook_button_locator).click()
-            self.sleep(0.5)
+            sleep(0.5)
+            from pages.facebook.home import Facebook
             return Facebook(self.driver)
 
         @property
         def use_google(self):
             """Use Google to log in."""
             self.find_element(*self._google_button_locator).click()
-            self.sleep(0.5)
+            sleep(0.5)
             return Google(self.driver)
 
         @property
         def use_a_password(self):
             """Use a non-social log in."""
             self.find_element(*self._go_to_password_setup_locator).click()
-            self.sleep(0.5)
-            return self.SetPassword(self)
+            sleep(0.5)
+            return Signup.SetPassword(self)
 
     class InstructorVerification(Region):
         """Instructor verification fields."""
