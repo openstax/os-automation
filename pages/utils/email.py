@@ -335,10 +335,19 @@ class RestMail(object):
         self._inbox = [self.Email(message) for message in messages.json()]
         return self._inbox
 
-    def wait_for_mail(self):
-        """Sleep for 5 seconds."""
-        sleep(2.0)
-        return self.get_mail()
+    def wait_for_mail(self, max_time=10):
+        """Poll until mail is received but doesn't exceed max_time seconds."""
+        timer = 0
+        pause_time = 0.25
+        while timer <= (max_time / pause_time):
+            self.get_mail()
+            if len(self._inbox) > 0:
+                return self._inbox
+            timer = timer + pause_time
+            sleep(pause_time)
+        raise requests.exceptions.Timeout(
+            'Mail not received in {time} seconds'.format(time=max_time)
+        )
 
     @property
     def size(self):
