@@ -326,22 +326,46 @@ class RestMail(object):
 
     @property
     def inbox(self):
-        """Return the e-mail messages."""
+        """Return the e-mail messages.
+
+        Args:
+
+        Returns:
+            The object list representing the inbox that may
+            be empty if get_mail or wait_for_mail has not
+            been called.
+        """
         return self._inbox
 
     def get_mail(self):
-        """Get email for a dynamic user."""
+        """Get email for a dynamic user.
+
+        Args:
+
+        Returns:
+            A list of Emails received for a particular user
+        """
         messages = requests.get(self.MAIL_URL.format(username=self.username))
         self._inbox = [self.Email(message) for message in messages.json()]
         return self._inbox
 
-    def wait_for_mail(self, max_time=10):
-        """Poll until mail is received but doesn't exceed max_time seconds."""
+    def wait_for_mail(self, max_time=10.0, pause_time=0.25):
+        """Poll until mail is received but doesn't exceed max_time seconds.
+
+        Args:
+            max_time: maximum time to wait for emails
+            pause_time: time between polling requests
+
+        Returns:
+            A list of Emails received for a particular user
+
+        Raises:
+            Timeout: after waiting the max time, no emails were received
+        """
         timer = 0
-        pause_time = 0.25
         while timer <= (max_time / pause_time):
             self.get_mail()
-            if len(self._inbox) > 0:
+            if self._inbox:
                 return self._inbox
             timer = timer + pause_time
             sleep(pause_time)
@@ -351,15 +375,44 @@ class RestMail(object):
 
     @property
     def size(self):
-        """Return the number of messages in the inbox."""
+        """Return the number of messages in the inbox.
+
+        Args:
+
+        Returns:
+            The number of Emails found in the inbox.
+        """
         return self._inbox.__len__
 
     def empty(self):
-        """Delete all message in the inbox."""
+        """Delete all message in the inbox.
+
+        Args:
+
+        Returns:
+
+        """
         requests.delete(self.MAIL_URL.format(username=self.username))
 
     class Email(object):
-        """E-mail message structure."""
+        """E-mail message structure.
+
+        Attributes:
+            _html: HTML-formatted message body
+            _text: plain text message body
+            _headers: dict of email message headers
+            _subject: email message subject
+            _references: a list of additional message references
+            _id: an internal message ID code
+            _reply: a list of expected reply to email addresses
+            _priority: message priority as indicated by the sender
+            _from: a list of email message senders
+            _to: a list of email message recipients
+            _date: string-formed date and time when sent
+            _received: string-formed date and time when received
+            _received_at: string-formed date and time when received
+            _excerpt: a blurb using the message body or the subject
+        """
 
         def __init__(self, package):
             """Read possible RestMail fields."""
