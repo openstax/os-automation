@@ -335,10 +335,29 @@ class RestMail(object):
         self._inbox = [self.Email(message) for message in messages.json()]
         return self._inbox
 
-    def wait_for_mail(self):
-        """Sleep for 5 seconds."""
-        sleep(2.0)
-        return self.get_mail()
+    def wait_for_mail(self, max_time=10.0, pause_time=0.25):
+        """Poll until mail is received but doesn't exceed max_time seconds.
+
+        Args:
+            max_time: maximum time to wait for emails
+            pause_time: time between polling requests
+
+        Returns:
+            A list of Emails received for a particular user
+
+        Raises:
+            Timeout: after waiting the max time, no emails were received
+        """
+        timer = 0
+        while timer <= (max_time / pause_time):
+            self.get_mail()
+            if self._inbox:
+                return self._inbox
+            timer = timer + pause_time
+            sleep(pause_time)
+        raise requests.exceptions.Timeout(
+            'Mail not received in {time} seconds'.format(time=max_time)
+        )
 
     @property
     def size(self):
@@ -461,13 +480,12 @@ class RestMail(object):
                 return URL_MATCHER.search(self._excerpt).group()
             raise EmailVerificationError('No confirmation link found')
 
-        def confirm_email(self, driver):
+        def confirm_email(self):
             """Access the confirmation link."""
             send = requests.get(self.confirmation_link)
             if not send.status_code == requests.codes.ok:
                 raise EmailVerificationError('Email not confirmed. ({code})'
                                              .format(code=send.status_code))
-            driver.refresh()
 
 
 class SendMail(object):
