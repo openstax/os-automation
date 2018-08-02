@@ -37,8 +37,16 @@ class PaymentOrdersDetail(PaymentsBase):
             """The section of order items."""
 
             _status_locator = (By.CSS_SELECTOR, 'select option[selected]')
+            _type_locator = (By.CSS_SELECTOR, '.field-type option[selected]')
 
             @property
             def get_status(self):
-                """Return the status of an order."""
+                """Return the status of the transaction."""
                 return self.find_element(*self._status_locator).text
+
+            @property
+            def get_type(self):
+                """Return the status of the transaction."""
+                return self.find_element(*self._type_locator).text
+
+

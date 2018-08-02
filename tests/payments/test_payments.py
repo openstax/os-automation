@@ -178,6 +178,7 @@ def test_order_item_for_student_payments(payments_base_url, tutor_base_url,
     # THEN: The new payment should show up as success
     transaction = page.transactions_list.lastest_item.get_status
     assert number == page.get_identifier
+    assert transaction.get_type == 'Payment'
     assert transaction == 'Success'
 
 
@@ -199,9 +200,19 @@ def test_order_item_for_student_refund(payments_base_url, tutor_base_url,
         .open().logged_in_enroll_pay_now()
     page, number = page.make_purchase(address, city, zipcode,
                                       visa, exp_date, cvv, billing_zip)
+    page = page.nav.go_to_manage_payments()
+    page.get_latest_order.request_refund()
     page.nav.log_out()
+
     # WHEN: Go to payments and sign up as an admin
+    page = PaymentsLogin(selenium, payments_base_url).open()
+    page = page.login_with_osa(*admin)
+
     # AND: Go to the orders page
+    page = page.go_to_orders().orders_list.lastest_item.click_item()
 
     # THEN: The new refund should show up
-    pass
+    transaction = page.transactions_list.items[1]
+    assert number == page.get_identifier
+    assert transaction.get_type == 'Refund'
+    assert transaction.get_status == 'Success'
