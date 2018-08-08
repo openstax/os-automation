@@ -9,7 +9,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 
 from pages.utils.email import EmailVerificationError, GoogleBase  # NOQA
 from pages.utils.email import GuerrillaMail, RestMail, SendMail  # NOQA
-from tests.markers import expected_failure, nondestructive, test_case
+from tests.markers import nondestructive, test_case
 
 TEST_EMAIL_SUBJECT = (
     '[OpenStax] Use PIN 999999 to confirm your email address'
@@ -28,7 +28,6 @@ GOOGLE = ('smtp.gmail.com', 587, 10)
 
 
 @test_case('C195537')
-@expected_failure
 @nondestructive
 def test_google_mail_user_has_pin_emails(gmail, selenium):
     """Test a Google Gmail user."""
@@ -89,27 +88,6 @@ def test_guerrilla_mail_received_pin_email(selenium):
             assert(mail.excerpt), 'Excerpt not shown'
             with pytest.raises(EmailVerificationError):
                 mail.get_pin
-
-    # TODO: move Guerrilla Mail email manipulation tests to a separate test
-    '''
-    assert(page.header.is_scrambled), 'E-mail is in plain text'
-    assert(email_layout.match(page.header.email)), \
-        'E-mail is not a valid format'
-    assert(not page.header.scramble().is_scrambled), 'E-mail is scrambled'
-    new_user = Utility.random_hex(12).lower()
-    page.header.email = new_user
-    assert(new_user in page.header.email), \
-        'E-mail user ID did not change'
-    assert(page.header.host == 'sharklasers.com'), \
-        'Incorrect default host name'
-    page.header.host = 'guerrillamail.com'
-    assert(page.header.host == 'guerrillamail.com'), 'Host name unchanged'
-    # wait for the flash headers to disappear
-    sleep(5.0)
-    page.header.forget_address()
-    assert(selenium.find_element('css selector', '#inbox-id input')
-           .text == ''), 'Username not blank'
-    '''
 
 
 @test_case('C210268')

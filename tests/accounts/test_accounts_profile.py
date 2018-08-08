@@ -4,8 +4,8 @@ import pytest
 
 from pages.accounts.profile import AccountException, Profile
 from pages.utils.utilities import Utility
-from tests.markers import accounts, expected_failure, nondestructive  # noqa
-from tests.markers import social, test_case  # noqa
+from tests.markers import accounts, nondestructive  # noqa
+from tests.markers import skip_test, social, test_case  # noqa
 
 
 @test_case('C195545')
@@ -167,7 +167,7 @@ def test_get_current_emails_and_status(accounts_base_url, selenium, student):
 
 
 @test_case('C195554')
-@expected_failure
+@skip_test(reason='Script not written')
 @accounts
 def test_verify_an_email(
         accounts_base_url, selenium, student):
@@ -187,11 +187,10 @@ def test_verify_an_email(
     # WHEN: delete the new email
 
     # THEN: the email list is restored
-    assert(False), 'Test script missing'
 
 
 @test_case('C195553')
-@expected_failure
+@skip_test(reason='Script not written')
 @accounts
 def test_add_a_verified_email_to_profile(accounts_base_url, selenium, student):
     """Test the ability to add an e-mail address to an existing user."""
@@ -208,11 +207,9 @@ def test_add_a_verified_email_to_profile(accounts_base_url, selenium, student):
     # WHEN: delete the new email
 
     # THEN: the email list is restored
-    assert(False), 'Test script missing'
 
 
 @test_case('C195555')
-@expected_failure
 @accounts
 @social
 def test_log_in_using_google(accounts_base_url, gmail, selenium):
@@ -231,7 +228,6 @@ def test_log_in_using_google(accounts_base_url, gmail, selenium):
 
 
 @test_case('C195556')
-@expected_failure
 @accounts
 @social
 def test_log_in_using_facebook(accounts_base_url, gmail, selenium):
