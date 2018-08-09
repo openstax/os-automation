@@ -1,13 +1,18 @@
 """Email providers."""
 
+import base64
 import re
 import smtplib
 from contextlib import contextmanager
+from datetime import datetime, timezone
 from email.mime.text import MIMEText
 from email.utils import formataddr as format_address
 from time import sleep
 
 import requests
+from apiclient.discovery import build
+from httplib2 import Http
+from oauth2client import client, file, tools
 from pypom import Page, Region
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as expect
@@ -61,10 +66,9 @@ class GoogleBase(Page):
                    self._email_locator))\
                 .send_keys(email)
             self.find_element(*self._email_next_locator).click()
-            sleep(1)
+            sleep(0.5)
             self.find_element(*self._password_locator).send_keys(password)
             self.find_element(*self._password_next_locator).click()
-
             return Google(self.driver)
 
 
@@ -122,6 +126,198 @@ class Google(GoogleBase):
             if self.has_pin:
                 return (PIN_MATCHER.search(self.excerpt).group())[-6:]
             raise EmailVerificationError('No pin found')
+
+
+class GmailReader(object):
+    """Read the user's inbox."""
+
+    def __init__(self):
+        """Initialize the reader."""
+        # If modifying the scope(s), delete the file token.json.
+        self._scopes = 'https://www.googleapis.com/auth/gmail.readonly'
+        self._inbox = []
+
+    def add_email(self, request_id, response, exception):
+        """Do something with the batch response.
+
+        Args:
+            request_id: a unique identifier for each request
+            response: the deserialized response object from the request
+            exception: a googleapiclient.errors.HttpError exception if
+                       an error occurred or None
+        Raises:
+            googleapiclient.errors.HttpError
+        """
+        if exception:
+            print('{id} blew up! {ex}'.format(request_id, exception))
+            raise exception
+        else:
+            self._inbox.append(self.Email(response))
+
+    def read_mail(self, user='me', labels=['INBOX']):
+        """Query Gmail and download the the inbox mail.
+
+        Args:
+            user: the Gmail user to query for
+                  default uses 'me' from the token file if it exists
+            labels: a list of labels to match
+                    default to just the inbox
+
+        """
+        store = file.Storage('token.json')
+        creds = store.get()
+        if not creds or creds.invalid:
+            flow = client.flow_from_clientsecrets('client_secret.json',
+                                                  self._scopes)
+            creds = tools.run_flow(flow, store)
+        service = build('gmail', 'v1', http=creds.authorize(Http()))
+        data_line = []
+        request = (service
+                   .users()
+                   .messages()
+                   .list(userId=user, labelIds=labels))
+
+        # For each page of emails, download the email IDs for use later
+        # Google returns the lists in pre-selected batches of up to 100 items
+        while request is not None:
+            data = request.execute()
+            data_line.append(data.get('messages'))
+            request = service.users().messages().list_next(request, data)
+
+        # For each list of email IDs, download the emails as batches to
+        # minimize the number of HTTP requests
+        for batch in data_line:
+            request = service.new_batch_http_request()
+            for email in batch:
+                request.add(
+                    service
+                    .users()
+                    .messages()
+                    .get(userId='me', id=email.get('id')),
+                    callback=self.add_email
+                )
+            request.execute()
+        return self
+
+    def sort_mail(self, newest_first=True):
+        """Sort the inbox.
+
+        Args:
+            newest_first: sort the box in the reverse order to have the
+                          most recent mail first
+
+        """
+        self._inbox.sort(reverse=newest_first)
+        return self
+
+    @property
+    def size(self):
+        """Return the number of messages in the inbox."""
+        return len(self._inbox)
+
+    def __getitem__(self, key):
+        """Enable the bracket operator for the inbox list."""
+        if not self._inbox:
+            raise EmptyInboxError('Inbox is empty')
+        return self._inbox[key]
+
+    class Email(object):
+        """A Gmail email from an API call."""
+
+        def __init__(self, email):
+            """Construct a new email.
+
+            Args:
+                email: a Gmail message dictionary
+
+            """
+            self._id = email.get('id', '')
+            self._thread = email.get('threadId', '')
+            self._labels = email.get('labelIds', [])
+            self._excerpt = email.get('snippet', '')
+            self._history = email.get('historyId')
+            epoch = int(email.get('internalDate'))
+            self._created_at = datetime.fromtimestamp(
+                epoch / 1000,
+                timezone.utc
+            )
+            self._since_epoch = epoch
+            self._payload = email.get('payload')
+            self._body = ''
+            self._recipients = ''
+            self._sender = ''
+            self._subject = ''
+            for part in self._payload.get('parts'):
+                for header in part.get('headers'):
+                    name = header.get('name')
+                    value = header.get('value')
+                    if (name == 'Content-Transfer-Encoding'
+                            and value == 'base64'):
+                        self._body = (base64.urlsafe_b64decode(
+                            bytes(part.get('body').get('data'), 'UTF-8'))
+                        ).decode('UTF-8')
+                        break
+            for header in self._payload.get('headers'):
+                name = header.get('name')
+                if name == 'To':
+                    self._recipients = header.get('value')
+                elif name == 'From':
+                    self._sender = header.get('value')
+                elif name == 'Subject':
+                    self._subject = header.get('value')
+            self._size = int(email.get('sizeEstimate'))
+            self._raw = email.get('raw')
+
+        def __lt__(self, rhs):
+            """Override less than for sorting the inbox."""
+            if not isinstance(rhs, type(self)):
+                return NotImplemented
+            return self._since_epoch < rhs.epoch
+
+        def __str__(self):
+            """Print the email."""
+            return self.__unicode__()
+
+        def __unicode__(self):
+            """Print the email."""
+            return (
+                'From:    {sender}\n'
+                'To:      {recipients}\n'
+                'Subject: {subject}\n'
+                'Excerpt: {excerpt}\n'
+                'Body:\n{body}\n'
+            ).format(
+                sender=self._sender if self._sender else '',
+                recipients=self._recipients if self._recipients else '',
+                subject=self._subject if self._subject else '',
+                excerpt=self._excerpt if self._excerpt else '',
+                body=self._body if self._body else '')
+
+        @property
+        def epoch(self):
+            """Return the milliseconds since 1970.
+
+            Standard Epoch is the seconds since 1970 so divide by 1000
+            """
+            return self._since_epoch
+
+        @property
+        def excerpt(self):
+            """Return the short text snippet as displayed by Gmail."""
+            return self._snippet
+
+        @property
+        def body(self):
+            """Return the body text as displayed by selecting the email."""
+            return self._body
+
+
+class EmptyInboxError(IndexError):
+    """The inbox is empty."""
+
+    def __init__(self, *args, **kwargs):
+        """Initialize for an empty inbox error."""
+        IndexError.__init__(self, *args, **kwargs)
 
 
 class GuerrillaMail(Page):
@@ -326,11 +522,23 @@ class RestMail(object):
 
     @property
     def inbox(self):
-        """Return the e-mail messages."""
+        """Return the e-mail messages.
+
+        Returns:
+            The object list representing the inbox that may
+            be empty if get_mail or wait_for_mail has not
+            been called.
+
+        """
         return self._inbox
 
     def get_mail(self):
-        """Get email for a dynamic user."""
+        """Get email for a dynamic user.
+
+        Returns:
+            A list of Emails received for a particular user
+
+        """
         messages = requests.get(self.MAIL_URL.format(username=self.username))
         self._inbox = [self.Email(message) for message in messages.json()]
         return self._inbox
@@ -347,6 +555,7 @@ class RestMail(object):
 
         Raises:
             Timeout: after waiting the max time, no emails were received
+
         """
         timer = 0
         while timer <= (max_time / pause_time):
@@ -369,7 +578,25 @@ class RestMail(object):
         requests.delete(self.MAIL_URL.format(username=self.username))
 
     class Email(object):
-        """E-mail message structure."""
+        """E-mail message structure.
+
+        Attributes:
+            _html: HTML-formatted message body
+            _text: plain text message body
+            _headers: dict of email message headers
+            _subject: email message subject
+            _references: a list of additional message references
+            _id: an internal message ID code
+            _reply: a list of expected reply to email addresses
+            _priority: message priority as indicated by the sender
+            _from: a list of email message senders
+            _to: a list of email message recipients
+            _date: string-formed date and time when sent
+            _received: string-formed date and time when received
+            _received_at: string-formed date and time when received
+            _excerpt: a blurb using the message body or the subject
+
+        """
 
         def __init__(self, package):
             """Read possible RestMail fields."""

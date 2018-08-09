@@ -1,7 +1,6 @@
 """Test the Accounts signup process."""
 
 from pages.accounts.home import AccountsHome as Home
-from pages.utils.email import RestMail
 from pages.accounts.signup import Signup
 from pages.utils.email import RestMail
 from pages.utils.utilities import Utility
