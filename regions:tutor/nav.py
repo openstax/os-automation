@@ -122,8 +122,7 @@ class TutorNav(Region):
         self.find_element(*self._menu_dropdown_locator).click()
         self.find_element(*self._dashboard_locator).click()
         from pages.tutor.student_calendar import TutorCourse
-        return TutorStudentCalendar(self.driver) if user == 'student' \
-            else TutorTeacherCalendar(self.driver)
+        return TutorCourse(self.driver)
 
     def go_to_scores(self):
         """Go to scores  page of current course."""
@@ -192,4 +191,3 @@ class TutorNav(Region):
         self.find_element(*self._copy_this_course_locator).click()
         from pages.tutor.new_course import NewCourse
         return NewCourse(self.driver)
-

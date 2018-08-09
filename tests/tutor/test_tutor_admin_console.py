@@ -12,7 +12,7 @@ def test_navbar_elements_present(tutor_base_url, selenium, admin):
     # GIVEN: Logged in as admin
     # AND: At the Tutor admin console
 
-    # WHEN:
+    # WHEN: Go to admin console
 
     # THEN: User is able to see the navbar with the following elements:
     # "Tutor Admin Console", "Course Organization", "Content",
@@ -26,10 +26,11 @@ def test_navbar_elements_present(tutor_base_url, selenium, admin):
 @tutor
 def test_view_student(tutor_base_url, selenium, admin):
     """Test to view students in a course."""
-    # GIVEN: at Tutor admin console
-    # AND: Click on "Course Organization"
-    # AND: In the drop down click on "Courses"
+    # GIVEN: logged in as admin
+  
+    # AND: At the Course Organization Page
 
-    # WHEN: Click the ""List Students"" button next to one of the courses
+    # WHEN: In the drop down click on ""Courses""
+    # AND: Click the ""List Students"" button next to one of the courses
 
     # THEN: A list of students in the course is displayed
