@@ -219,7 +219,7 @@ class Signup(AccountsBase):
     def _get_pin(self, page, provider, return_url, email=None, password=None):
         """Retrieve a signup pin."""
         if 'restmail' in provider:
-            box = page.wait_for_mail().get_mail()
+            box = page.wait_for_mail()
             return box[-1].pin
         else:
             page.open()
