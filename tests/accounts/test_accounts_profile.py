@@ -3,6 +3,7 @@
 import pytest
 
 from pages.accounts.profile import AccountException, Profile
+from pages.utils.email import RestMail
 from pages.utils.utilities import Utility
 from tests.markers import accounts, nondestructive  # noqa
 from tests.markers import skip_test, social, test_case  # noqa
@@ -172,6 +173,9 @@ def test_get_current_emails_and_status(accounts_base_url, selenium, student):
 def test_verify_an_email(accounts_base_url, selenium, student):
     """Test the user email verification process."""
     # GIVEN: a student viewing their Accounts profile
+    page = Profile(selenium, accounts_base_url).open()
+    page.log_in(*student)
+    initial_email_count = len(page.emails.emails)
 
     # WHEN: add an email without verifying the email
     # AND: clicks the email address
@@ -180,32 +184,57 @@ def test_verify_an_email(accounts_base_url, selenium, student):
     # AND: close the new tab showing "Thank you for confirming your email
     #      address."
     # AND: reload the profile page
+    name = Utility.random_hex()
+    restmail = RestMail(name)
+    restmail.empty()
+    address = name + '@restmail.net'
+    page.emails.add_email(address)
+    page.emails.emails[-1].resend_confirmation()
+    restmail.wait_for_mail()[-1].confirm_email()
+    page.open()
 
     # THEN: the new email does not have "unconfirmed" to the right of it
+    assert(page.emails.emails[-1].is_confirmed), 'Email unconfirmed'
 
     # WHEN: delete the new email
+    page.emails.emails[-1].delete()
 
     # THEN: the email list is restored
+    assert(len(page.emails.emails) == initial_email_count), \
+        'Email has not been removed'
 
 
 @test_case('C195553')
-@skip_test(reason='Script not written')
 @accounts
 def test_add_a_verified_email_to_profile(accounts_base_url, selenium, student):
     """Test the ability to add an e-mail address to an existing user."""
     # GIVEN: a student viewing their Accounts profile
+    page = Profile(selenium, accounts_base_url).open()
+    page.log_in(*student)
+    initial_email_count = len(page.emails.emails)
 
     # WHEN: add an email
     # AND: opens the verification email and clicks the confirmation link
     # AND: closes the new tab showing "Thank you for confirming your email
     #      address."
     # AND: reload the profile page
+    name = Utility.random_hex()
+    restmail = RestMail(name)
+    restmail.empty()
+    address = name + '@restmail.net'
+    page.emails.add_email(address)
+    restmail.wait_for_mail()[-1].confirm_email()
+    page.open()
 
     # THEN: the new email does not have "unconfirmed" to the right of it
+    assert(page.emails.emails[-1].is_confirmed), 'Email unconfirmed'
 
     # WHEN: delete the new email
+    page.emails.emails[-1].delete()
 
     # THEN: the email list is restored
+    assert(len(page.emails.emails) == initial_email_count), \
+        'Email has not been removed'
 
 
 @test_case('C195555')

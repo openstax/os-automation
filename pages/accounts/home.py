@@ -185,4 +185,4 @@ class AccountsHome(AccountsBase):
             self.find_element(*self._signup_locator).click()
             sleep(1)
             from pages.accounts.signup import Signup
-            return Signup(self.driver)
+            return Signup(self.driver, self.page.seed_url)
