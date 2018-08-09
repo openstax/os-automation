@@ -707,13 +707,12 @@ class RestMail(object):
                 return URL_MATCHER.search(self._excerpt).group()
             raise EmailVerificationError('No confirmation link found')
 
-        def confirm_email(self, driver):
+        def confirm_email(self):
             """Access the confirmation link."""
             send = requests.get(self.confirmation_link)
             if not send.status_code == requests.codes.ok:
                 raise EmailVerificationError('Email not confirmed. ({code})'
                                              .format(code=send.status_code))
-            driver.refresh()
 
 
 class SendMail(object):
