@@ -23,13 +23,13 @@ class TutorPayment(TutorBase):
         return TutorNav(self)
 
     def invoice(self):
-        """Go to invoice"""
+        """Go to invoice."""
         self.find_element(*self._invoice_locator).click()
 
     def contact_support(self):
-        """Go to support page"""
+        """Go to support page."""
         self.find_element(*self._support_locator).click()
 
     def refund_policy(self):
-        """Go to refund policies"""
+        """Go to refund policies."""
         self.find_element(*self._refund_locator).click()

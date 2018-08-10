@@ -1,7 +1,7 @@
 """Test the Tutor teacher course calendar functions."""
 
-from tests.markers import expected_failure, nondestructive, skip_test
-from tests.markers import test_case, tutor
+from tests.markers import expected_failure, nondestructive, skip_test  # NOQA
+from tests.markers import test_case, tutor  # NOQA
 
 
 @test_case('C208664')

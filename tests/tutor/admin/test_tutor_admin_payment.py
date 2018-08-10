@@ -11,7 +11,8 @@ def test_extend_payment_due_dates_available(tutor_base_url, selenium, admin):
     """Test extending payment due dates.
 
     No extension is enabled - only the availability to
-    perform the action is verified."""
+    perform the action is verified.
+    """
     # GIVEN: a user logged in as an administrative user
     # AND: viewing the admin console Payments page
 

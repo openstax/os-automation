@@ -7,6 +7,7 @@ from pages.tutor.base import TutorBase
 
 class TutorPurchase(TutorBase):
     """Tutor purchase page object."""
+
     _iframe_locator = (By.CSS_SELECTOR, '#iFrameResizer2')
     _address_locator = (
         By.CSS_SELECTOR,
@@ -46,12 +47,6 @@ class TutorPurchase(TutorBase):
         self.find_element(*self._cvv_locator).sendKeys(cvv)
         self.find_element(*self._bil_locator).sendKeys(billing)
         self.find_element(*self._state_locator).click()
-        self.find_element(*self._purchase_locator).click()
-        self.driver.switch_to.defaultContent()
-
-    def attempt_payment_with_blank(self):
-        """Attempt to pay with required fields blank"""
-        self.driver.switch_to.frame(*self._iframe_locator)
         self.find_element(*self._purchase_locator).click()
         self.driver.switch_to.defaultContent()
 

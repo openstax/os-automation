@@ -11,7 +11,7 @@ from regions.web.web_nav import WebNav
 class WebBase(Page):
     """Base class."""
 
-    _root_locator = (By.ID, 'home')
+    _root_locator = (By.CLASS_NAME, 'home-page')
 
     def wait_for_page_to_load(self):
         """Override page load."""
@@ -34,7 +34,7 @@ class WebBase(Page):
         _root_locator = (By.CLASS_NAME, 'page-header')
 
         @property
-        def is_header_displayed(self):
+        def is_displayed(self):
             """Header display boolean."""
             return self.loaded
 

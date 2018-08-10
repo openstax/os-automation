@@ -1,10 +1,10 @@
 """Tests the book webpage."""
 
-from tests.markers import expected_failure, nondestructive, test_case, web
+from tests.markers import nondestructive, skip_test, test_case, web
 
 
 @test_case('')
-@expected_failure
+@skip_test(reason='Script not written')
 @nondestructive
 @web
 def test_get_book_links(web_base_url, selenium):
@@ -17,7 +17,7 @@ def test_get_book_links(web_base_url, selenium):
 
 
 @test_case('')
-@expected_failure
+@skip_test(reason='Script not written')
 @nondestructive
 @web
 def test_textbook_table_of_contents(web_base_url, selenium):
@@ -29,7 +29,7 @@ def test_textbook_table_of_contents(web_base_url, selenium):
 
 
 @test_case('')
-@expected_failure
+@skip_test(reason='Script not written')
 @nondestructive
 @web
 def test_view_textbook_online(web_base_url, selenium):
@@ -41,7 +41,7 @@ def test_view_textbook_online(web_base_url, selenium):
 
 
 @test_case('')
-@expected_failure
+@skip_test(reason='Script not written')
 @nondestructive
 @web
 def test_textbook_pdf_download(web_base_url, selenium):
@@ -52,7 +52,7 @@ def test_textbook_pdf_download(web_base_url, selenium):
 
 
 @test_case('')
-@expected_failure
+@skip_test(reason='Script not written')
 @nondestructive
 @web
 def test_order_print(web_base_url, selenium):
@@ -64,7 +64,7 @@ def test_order_print(web_base_url, selenium):
 
 
 @test_case('')
-@expected_failure
+@skip_test(reason='Script not written')
 @nondestructive
 @web
 def test_kindle_download(web_base_url, selenium):
@@ -75,7 +75,7 @@ def test_kindle_download(web_base_url, selenium):
 
 
 @test_case('')
-@expected_failure
+@skip_test(reason='Script not written')
 @nondestructive
 @web
 def test_bookshare_download(web_base_url, selenium):
@@ -86,7 +86,7 @@ def test_bookshare_download(web_base_url, selenium):
 
 
 @test_case('')
-@expected_failure
+@skip_test(reason='Script not written')
 @nondestructive
 @web
 def test_ibook_download(web_base_url, selenium):
@@ -97,7 +97,7 @@ def test_ibook_download(web_base_url, selenium):
 
 
 @test_case('')
-@expected_failure
+@skip_test(reason='Script not written')
 @nondestructive
 @web
 def test_textbook_summary_visible(web_base_url, selenium):
@@ -108,7 +108,7 @@ def test_textbook_summary_visible(web_base_url, selenium):
 
 
 @test_case('')
-@expected_failure
+@skip_test(reason='Script not written')
 @nondestructive
 @web
 def test_textbook_author_visible(web_base_url, selenium):
@@ -119,7 +119,7 @@ def test_textbook_author_visible(web_base_url, selenium):
 
 
 @test_case('')
-@expected_failure
+@skip_test(reason='Script not written')
 @nondestructive
 @web
 def test_textbook_errata_visible(web_base_url, selenium):
@@ -130,7 +130,7 @@ def test_textbook_errata_visible(web_base_url, selenium):
 
 
 @test_case('')
-@expected_failure
+@skip_test(reason='Script not written')
 @nondestructive
 @web
 def test_textbook_isbn_visible(web_base_url, selenium):
@@ -141,7 +141,7 @@ def test_textbook_isbn_visible(web_base_url, selenium):
 
 
 @test_case('')
-@expected_failure
+@skip_test(reason='Script not written')
 @nondestructive
 @web
 def test_textbook_license_visible(web_base_url, selenium):
@@ -152,7 +152,7 @@ def test_textbook_license_visible(web_base_url, selenium):
 
 
 @test_case('')
-@expected_failure
+@skip_test(reason='Script not written')
 @nondestructive
 @web
 def test_textbook_signup(web_base_url, selenium):
@@ -164,7 +164,7 @@ def test_textbook_signup(web_base_url, selenium):
 
 
 @test_case('')
-@expected_failure
+@skip_test(reason='Script not written')
 @nondestructive
 @web
 def test_instructor_resources(web_base_url, selenium):
@@ -179,7 +179,7 @@ def test_instructor_resources(web_base_url, selenium):
 
 
 @test_case('')
-@expected_failure
+@skip_test(reason='Script not written')
 @nondestructive
 @web
 def test_student_resources(web_base_url, selenium):

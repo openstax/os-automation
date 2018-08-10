@@ -1,10 +1,10 @@
 """Tests the book webpage."""
 
-from tests.markers import expected_failure, nondestructive, test_case, web
+from tests.markers import nondestructive, skip_test, test_case, web
 
 
 @test_case('')
-@expected_failure
+@skip_test(reason='Script not written')
 @nondestructive
 @web
 def test_all_subjects(web_base_url, selenium):
@@ -15,7 +15,7 @@ def test_all_subjects(web_base_url, selenium):
 
 
 @test_case('')
-@expected_failure
+@skip_test(reason='Script not written')
 @nondestructive
 @web
 def test_science(web_base_url, selenium):
@@ -26,7 +26,7 @@ def test_science(web_base_url, selenium):
 
 
 @test_case('')
-@expected_failure
+@skip_test(reason='Script not written')
 @nondestructive
 @web
 def test_math(web_base_url, selenium):
@@ -37,7 +37,7 @@ def test_math(web_base_url, selenium):
 
 
 @test_case('')
-@expected_failure
+@skip_test(reason='Script not written')
 @nondestructive
 @web
 def test_humanities(web_base_url, selenium):
@@ -48,7 +48,7 @@ def test_humanities(web_base_url, selenium):
 
 
 @test_case('')
-@expected_failure
+@skip_test(reason='Script not written')
 @nondestructive
 @web
 def test_social_sciences(web_base_url, selenium):
@@ -59,7 +59,7 @@ def test_social_sciences(web_base_url, selenium):
 
 
 @test_case('')
-@expected_failure
+@skip_test(reason='Script not written')
 @nondestructive
 @web
 def test_ap(web_base_url, selenium):

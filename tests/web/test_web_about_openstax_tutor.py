@@ -1,10 +1,10 @@
 """Tests the about OpenStax Tutor webpage."""
 
-from tests.markers import expected_failure, nondestructive, test_case, web
+from tests.markers import nondestructive, skip_test, test_case, web
 
 
 @test_case('')
-@expected_failure
+@skip_test(reason='Script not written')
 @nondestructive
 @web
 def test_view_about_tutor(web_base_url, selenium):
@@ -18,7 +18,7 @@ def test_view_about_tutor(web_base_url, selenium):
 
 
 @test_case('')
-@expected_failure
+@skip_test(reason='Script not written')
 @nondestructive
 @web
 def test_scaling_about_tutor(web_base_url, selenium):
@@ -30,7 +30,7 @@ def test_scaling_about_tutor(web_base_url, selenium):
 
 
 @test_case('')
-@expected_failure
+@skip_test(reason='Script not written')
 @nondestructive
 @web
 def test_access_your_course(web_base_url, selenium):
@@ -42,7 +42,7 @@ def test_access_your_course(web_base_url, selenium):
 
 
 @test_case('')
-@expected_failure
+@skip_test(reason='Script not written')
 @nondestructive
 @web
 def test_about_tutor_learn_more(web_base_url, selenium):
@@ -56,7 +56,7 @@ def test_about_tutor_learn_more(web_base_url, selenium):
 
 
 @test_case('')
-@expected_failure
+@skip_test(reason='Script not written')
 @nondestructive
 @web
 def test_view_openstax_beta(web_base_url, selenium):
@@ -69,7 +69,7 @@ def test_view_openstax_beta(web_base_url, selenium):
 
 
 @test_case('')
-@expected_failure
+@skip_test(reason='Script not written')
 @nondestructive
 @web
 def test_view_what_students_see(web_base_url, selenium):
@@ -83,7 +83,7 @@ def test_view_what_students_see(web_base_url, selenium):
 
 
 @test_case('')
-@expected_failure
+@skip_test(reason='Script not written')
 @nondestructive
 @web
 def test_view_current_future(web_base_url, selenium):
@@ -94,7 +94,7 @@ def test_view_current_future(web_base_url, selenium):
 
 
 @test_case('')
-@expected_failure
+@skip_test(reason='Script not written')
 @nondestructive
 @web
 def test_view_10dollars_toward(web_base_url, selenium):
@@ -105,7 +105,7 @@ def test_view_10dollars_toward(web_base_url, selenium):
 
 
 @test_case('')
-@expected_failure
+@skip_test(reason='Script not written')
 @nondestructive
 @web
 def test_view_faq_questions(web_base_url, selenium):

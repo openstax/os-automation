@@ -5,7 +5,7 @@ from selenium.common.exceptions import NoSuchElementException, TimeoutException
 
 from pages.accounts.home import AccountsHome as Home
 from pages.utils.utilities import Utility
-from tests.markers import accounts, skip_test, nondestructive, test_case
+from tests.markers import accounts, nondestructive, skip_test, test_case
 
 
 @test_case('C195135')

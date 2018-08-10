@@ -1,6 +1,6 @@
 """Test of admin console catalog offerings page."""
 
-from tests.markers import skip_test, nondestructive, test_case, tutor
+from tests.markers import nondestructive, skip_test, test_case, tutor
 
 
 @test_case('C208709')

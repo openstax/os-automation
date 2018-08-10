@@ -51,4 +51,3 @@ class TutorDashboard(TutorBase):
                 """Go to the course page for this course."""
                 self.find_element(*self._card_locator).click()
                 return TutorCalendar(self.driver)
-
