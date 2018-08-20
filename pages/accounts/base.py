@@ -11,16 +11,17 @@ from pages.rice.home import Rice
 class AccountsBase(Page):
     """Base class."""
 
-    _root_locator = (By.CSS_SELECTOR, '.start')
+    _root_locator = (By.CSS_SELECTOR, 'body')
     _root_locator_logged_in = (By.ID, 'application-header')
 
     def wait_for_page_to_load(self):
         """Override page load."""
-        '''This is a placeholder'''
-        return True
-        '''This is the code that was suppose to be here'''
         self.wait.until(
-            lambda _: (self.find_element(*self._root_locator).is_displayed())
+            lambda _: (
+                bool(self.find_element(*self._root_locator)
+                     .get_attribute('class'))
+                and 'accounts' in self.driver.current_url
+                )
         )
 
     @property
@@ -37,6 +38,11 @@ class AccountsBase(Page):
     def current_url(self):
         """Return the current page URL."""
         return self.driver.current_url
+
+    def reload(self):
+        """Reload the current page."""
+        self.driver.refresh()
+        self.wait_for_page_to_load()
 
     class Header(Region):
         """Accounts header."""

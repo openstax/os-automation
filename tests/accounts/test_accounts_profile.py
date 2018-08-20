@@ -7,7 +7,7 @@ import pytest
 from pages.accounts.profile import AccountException, Profile
 from pages.utils.email import RestMail
 from pages.utils.utilities import Utility
-from tests.markers import accounts, nondestructive  # noqa
+from tests.markers import accounts, expected_failure, nondestructive  # noqa
 from tests.markers import skip_test, social, test_case  # noqa
 
 
@@ -270,6 +270,7 @@ def test_log_in_using_google(accounts_base_url, gmail, selenium):
 
 
 @test_case('C195556')
+@expected_failure
 @accounts
 @social
 def test_log_in_using_facebook(accounts_base_url, gmail, selenium):

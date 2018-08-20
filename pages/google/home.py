@@ -5,8 +5,6 @@ from time import sleep
 from pypom import Page
 from selenium.webdriver.common.by import By
 
-from pages.accounts import signup
-
 
 class Google(Page):
     """Google homepage."""
@@ -32,10 +30,13 @@ class Google(Page):
 
     def log_in(self, user, password):
         """Log into Google."""
+        from pages.accounts.signup import Signup
+        if not self.at_google:
+            return Signup(self.driver)
         self.find_element(*self._identifier_locator).send_keys(user)
         self.find_element(*self._identifier_next_button_locator).click()
         sleep(0.5)
         self.find_element(*self._password_locator).send_keys(password)
         self.find_element(*self._password_next_button_locator).click()
         sleep(0.5)
-        return signup.Signup(self)
+        return Signup(self.driver)
