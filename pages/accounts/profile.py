@@ -244,6 +244,11 @@ class Profile(AccountsHome):
             return [self.Email(self, element)
                     for element in self.find_elements(*self._email_locator)]
 
+        @property
+        def email_texts(self):
+            """Return a list of email addresses."""
+            return [email.email_text for email in self.emails]
+
         def add_email(self, email):
             """Add a email to the account's email list."""
             sleep(0.1)
@@ -267,6 +272,11 @@ class Profile(AccountsHome):
                 By.CSS_SELECTOR, '.unconfirmed-warning > *')
             _confirmation_btn_locator = (
                 By.CSS_SELECTOR, '.button_to>[type="submit"]')
+
+            @property
+            def email_text(self):
+                """Return the email address."""
+                return self.find_element(*self._email_locator).text
 
             def delete(self):
                 """Delete an individual email section."""

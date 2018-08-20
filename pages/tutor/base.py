@@ -16,7 +16,7 @@ from pages.web.tutor_marketing import TutorMarketing
 class TutorBase(Page):
     """Base class."""
 
-    _root_locator = (By.ID, 'home')
+    _root_locator = (By.TAG_NAME, 'body')
 
     def wait_for_page_to_load(self):
         """Override page load."""

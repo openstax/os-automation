@@ -49,7 +49,6 @@ def test_supporter_button(web_base_url, selenium):
     page.header.click_supporter()
 
     # THEN: User is taken to the Supporters page
-    #       method for click supporter button goes in web_base model for header
     assert('foundation' in page.current_url), 'Header does not work properly'
 
 
@@ -132,7 +131,6 @@ def test_nav_components(web_base_url, selenium):
     # THEN: Page with white navigation bar with Openstax logo with statement
     #       "Access. The future of education.", Subjects,
     #       Technology, Our Impact, Login is loaded
-    # method for check 'Our Impact' goes in web_base model
     assert(page.is_impact_displayed()), 'Nav components is not displayed'
 
 
@@ -199,7 +197,7 @@ def test_footer_displayed(web_base_url, selenium):
     # AND: Below, short introduction and information
     #      about Rice and AP is visible.
     # AND: Below, Facebook, Twitter, and Linkedin's logos are visible.
-    assert(page.footer.is_footer_displayed), 'footer is not displayed'
+    assert (page.footer.is_footer_displayed), 'footer is not displayed'
 
 
 @test_case('')
@@ -449,7 +447,6 @@ def test_renewal(web_base_url, selenium):
 
     # THEN: Faculty is able to access the renewal form from the homepage.
     # AND: Clicking on Let Us Know takes them to the renewal form
-    # method for clicking let us know goes into web.base model
     assert('adopt' in page.current_url), 'renewal is not displayed'
 
 
@@ -507,7 +504,6 @@ def test_info_send_when_not_filled(web_base_url, selenium):
     # THEN: The message should not send
     # AND: String "Please fill out this field" should be displayed where the
     #      clicking send goes in web.base
-    # please fill out this page's display method is on web.base
     assert(page.fill_out_prompt), "the prompt does not show"
 
 

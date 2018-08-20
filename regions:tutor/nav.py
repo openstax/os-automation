@@ -52,7 +52,7 @@ class TutorNav(Region):
     def go_to_my_account(self):
         """Go to account profile for current user."""
         self.find_element(*self._account_icon_locator).click()
-        Utility.switch_to(self.driver, self._my_account_locator)
+        Utility.switch_to(self.driver, *self._my_account_locator)
         from pages.accounts.profile import Profile
         return Profile(self.driver)
 
@@ -86,8 +86,8 @@ class TutorNav(Region):
         """Go to tutor accessibility statement page."""
         self.find_element(*self._help_dropdown_locator).click()
         self.find_element(*self._accessibility_statement_locator).click()
-        from pages.tutor.accessibility import TutorAccessibility
-        return TutorAccessibility(self.driver)
+        from pages.tutor.accessibility import Accessibility
+        return Accessibility(self.driver)
 
     def go_to_chat(self):
         """Open tutor chat support in a new tab."""
@@ -121,18 +121,15 @@ class TutorNav(Region):
         """Go to the main course page of current course."""
         self.find_element(*self._menu_dropdown_locator).click()
         self.find_element(*self._dashboard_locator).click()
-        return NotImplemented
-        # from pages.tutor.tutor_calendar import TutorCalendar
-        # from pages.tutor.tutor_course import TutorCourse
-        # return TutorCourse(self.driver) if 'user' == 'student' \
-        #     else TutorCalendar(self.driver)
+        from pages.tutor.student_calendar import TutorCourse
+        return TutorCourse(self.driver)
 
     def go_to_scores(self):
         """Go to scores  page of current course."""
         self.find_element(*self._menu_dropdown_locator).click()
         self.find_element(*self._scores_locator).click()
-        from pages.tutor.scores import TutorScores
-        return TutorScores(self.driver)
+        from pages.tutor.scores import Scores
+        return Scores(self.driver)
 
     def click_browse_book(self):
         """Open the book of current course in a new tab."""
@@ -143,54 +140,54 @@ class TutorNav(Region):
         """Go to performance forecast page of current course."""
         self.find_element(*self._menu_dropdown_locator).click()
         self.find_element(*self._performance_forecast_locator).click()
-        from pages.tutor.performance import TutorPerformance
-        return TutorPerformance(self.driver)
+        from pages.tutor.performance import Performance
+        return Performance(self.driver)
 
     def go_to_manage_payments(self):
         """Go to manage payments page as student."""
         self.find_element(*self._menu_dropdown_locator).click()
         self.find_element(*self._manage_payments_locator).click()
-        from pages.tutor.payments import TutorPayment
-        return TutorPayment(self.driver)
+        from pages.tutor.payments import TutorPayments
+        return TutorPayments(self.driver)
 
     def go_to_change_student_id(self):
         """Go to change id page of current course as student."""
         self.find_element(*self._menu_dropdown_locator).click()
         self.find_element(*self._change_student_id_locator).click()
-        from pages.tutor.student_id import TutorID
-        return TutorID(self.driver)
+        from pages.tutor.student_id import StudentID
+        return StudentID(self.driver)
 
     def go_to_question_library(self):
         """Go to question library of current course as teacher."""
         self.find_element(*self._menu_dropdown_locator).click()
         self.find_element(*self._question_library_locator).click()
-        from pages.tutor.question_library import TutorQuestionLibrary
-        return TutorQuestionLibrary(self.driver)
+        from pages.tutor.question_library import QuestionLibrary
+        return QuestionLibrary(self.driver)
 
     def go_to_course_settings(self):
         """Go to course settings of current course as teacher."""
         self.find_element(*self._menu_dropdown_locator).click()
         self.find_element(*self._course_settings_locator).click()
-        from pages.tutor.settings import TutorSettings
-        return TutorSettings(self.driver)
+        from pages.tutor.settings import Settings
+        return Settings(self.driver)
 
     def go_to_course_roster(self):
         """Go to course roster of current course as teacher."""
         self.find_element(*self._menu_dropdown_locator).click()
         self.find_element(*self._course_roster_locator).click()
-        from pages.tutor.roster import TutorRoster
-        return TutorRoster(self.driver)
+        from pages.tutor.roster import Roster
+        return Roster(self.driver)
 
     def go_to_create_course(self):
         """Go to create a new course page as teacher."""
         self.find_element(*self._menu_dropdown_locator).click()
         self.find_element(*self._create_course_locator_).click()
-        from pages.tutor.new_course import TutorNewCourse
-        return TutorNewCourse(self.driver)
+        from pages.tutor.new_course import NewCourse
+        return NewCourse(self.driver)
 
     def go_to_copy_course(self):
         """Go to copy the current course page as teacher."""
         self.find_element(*self._menu_dropdown_locator).click()
         self.find_element(*self._copy_this_course_locator).click()
-        from pages.tutor.new_course import TutorNewCourse
-        return TutorNewCourse(self.driver)
+        from pages.tutor.new_course import NewCourse
+        return NewCourse(self.driver)

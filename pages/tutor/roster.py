@@ -1,4 +1,4 @@
-"""The roster page object."""
+"""Tutor class roster."""
 
 from pypom import Region
 from selenium.webdriver.common.by import By
