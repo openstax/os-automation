@@ -1,8 +1,7 @@
 """Test the Tutor home page."""
 
 from pages.tutor.home import TutorHome as Home
-from tests.markers import expected_failure, nondestructive  # NOQA
-from tests.markers import skip_test, test_case, tutor
+from tests.markers import nondestructive, skip_test, test_case, tutor
 
 
 @test_case('')

@@ -3,7 +3,6 @@
 from pages.payments.login import PaymentsLogin
 from pages.tutor.home import TutorHome
 from pages.tutor.student_enrolling import StudentEnroll
-from pages.accounts.profile import Profile
 from tests.markers import expected_failure, nondestructive, payments, test_case
 
 

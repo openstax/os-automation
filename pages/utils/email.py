@@ -66,7 +66,8 @@ class GoogleBase(Page):
                    self._email_locator))\
                 .send_keys(email)
             self.find_element(*self._email_next_locator).click()
-            sleep(0.5)
+            sleep(1.0)
+            Utility.scroll_to(self.driver, self._password_locator)
             self.find_element(*self._password_locator).send_keys(password)
             self.find_element(*self._password_next_locator).click()
             return Google(self.driver)
@@ -97,34 +98,44 @@ class Google(GoogleBase):
 
         _from_locator = (By.CSS_SELECTOR, '.yW span[email]')
         _subject_locator = (By.CLASS_NAME, 'bog')
-        _excerpt_locator = (By.CSS_SELECTOR, '.y6 .y2')
+        _excerpt_locator = (By.CSS_SELECTOR, '.y6 + .y2')
 
         @property
         def sender(self):
             """Return the e-mail sender."""
-            return self.find_element(*self._from_locator) \
+            send = self.find_element(*self._from_locator) \
                 .get_attribute('email')
+            print(send)
+            return send
 
         @property
         def subject(self):
             """Return the e-mail subject."""
-            return self.find_element(*self._subject_locator).text
+            sub = self.find_element(*self._subject_locator).text
+            print(sub)
+            return sub
 
         @property
         def excerpt(self):
             """Return the e-mail body excerpt."""
-            return self.find_element(*self._excerpt_locator).text
+            ex = self.find_element(*self._excerpt_locator).text
+            print(ex)
+            return ex
 
         @property
         def has_pin(self):
             """Return True if a pin string is in the body excerpt."""
-            return PIN_MATCHER.search(self.excerpt)
+            pin = PIN_MATCHER.search(self.excerpt)
+            print(pin)
+            return pin
 
         @property
         def get_pin(self):
             """Return the numeric pin."""
             if self.has_pin:
-                return (PIN_MATCHER.search(self.excerpt).group())[-6:]
+                pin = (PIN_MATCHER.search(self.excerpt).group())[-6:]
+                print(pin)
+                return pin
             raise EmailVerificationError('No pin found')
 
 
@@ -462,6 +473,11 @@ class GuerrillaMail(Page):
             self.find_element(*self._subject_locator).click()
             sleep(0.5)
             self.driver.refresh()
+
+        def __unicode__(self):
+            """Print out an email."""
+            return ('Subject: {subject}\nExcerpt: {excerpt}'
+                    ).format(self.subject, self.excerpt)
 
     class OpenedMail(Region):
         """The email page after it's opened."""

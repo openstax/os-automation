@@ -17,7 +17,7 @@ class PaymentsListSection(Region):
 
     @property
     def lastest_item(self):
-        """Return the top item of the list"""
+        """Return the top item of the list."""
         return self.items[0]
 
     class Item(Region):

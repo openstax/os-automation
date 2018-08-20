@@ -21,26 +21,27 @@ class TutorPayment(TutorBase):
         return TutorNav(self)
 
     def contact_support(self):
-        """Go to support page"""
+        """Go to the support page."""
         self.find_element(*self._support_locator).click()
 
     def refund_policy(self):
-        """Go to refund policies"""
+        """Go to the refund policies."""
         self.find_element(*self._refund_policy_locator).click()
 
     @property
     def items(self):
+        """Return payments."""
         Utility.scroll_to(self.driver, self._item_locator)
         return [self.Item(self, element) for element in
                 self.find_elements(*self._item_locator)]
 
     @property
     def get_latest_order(self):
-        print(self.items)
-        print(len(self.items))
+        """Return the last order."""
         return self.items[-1]
 
     class Item(Region):
+        """Orders."""
 
         _invoice_locator = (By.CSS_SELECTOR, '.btn-link')
         _refund_locator = (By.CSS_SELECTOR, '.refund button')
@@ -48,9 +49,11 @@ class TutorPayment(TutorBase):
         _skip_locator = (By.CSS_SELECTOR, '.modal-footer .btn-default')
 
         def view_invoice(self):
+            """Display the order invoice."""
             self.find_element(*self._invoice_locator).click()
 
         def request_refund(self):
+            """Request a payment refund."""
             self.find_element(*self._refund_locator).click()
             self.find_element(*self._continue_locator).click()
             self.find_element(*self._skip_locator).click()

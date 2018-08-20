@@ -1,5 +1,5 @@
 """OpenStax payment login page object."""
-from time import sleep
+
 from selenium.webdriver.common.by import By
 
 from pages.accounts.home import AccountsHome

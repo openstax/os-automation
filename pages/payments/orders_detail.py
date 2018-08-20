@@ -48,5 +48,3 @@ class PaymentOrdersDetail(PaymentsBase):
             def get_type(self):
                 """Return the status of the transaction."""
                 return self.find_element(*self._type_locator).text
-
-
