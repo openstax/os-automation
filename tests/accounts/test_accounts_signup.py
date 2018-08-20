@@ -32,7 +32,6 @@ def test_sign_up_as_a_student_user(accounts_base_url, selenium, student):
     # AND: clicks the checkbox next to "I agree to the Terms of Use and the
     #      Privacy Policy."
     # AND: clicks the "CREATE ACCOUNT" button
-
     page.login.go_to_signup.account_signup(
         address,
         password,

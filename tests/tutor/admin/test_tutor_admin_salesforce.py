@@ -1,6 +1,6 @@
 """Test of admin console salesforce page."""
 
-from tests.markers import expected_failure, skip_test, test_case, tutor
+from tests.markers import skip_test, test_case, tutor
 
 
 @test_case('C208735')
@@ -23,7 +23,6 @@ def test_tutor_salesforce_settings(tutor_base_url, selenium, admin):
 
 @test_case('C210275')
 @skip_test(reason='Not applicable to the current iteration of Tutor')
-@expected_failure
 @tutor
 def test_update_salesforce_stats(tutor_base_url, selenium, admin):
     """Update Salesforce statistics."""

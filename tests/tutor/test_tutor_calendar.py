@@ -1,7 +1,6 @@
 """Test the Tutor teacher course calendar functions."""
 
-from tests.markers import expected_failure, nondestructive, skip_test  # NOQA
-from tests.markers import test_case, tutor  # NOQA
+from tests.markers import nondestructive, skip_test, test_case, tutor
 
 
 @test_case('C208664')
@@ -151,7 +150,6 @@ def test_return_to_the_course_picker(tutor_base_url, selenium, teacher):
 
 
 @test_case('C208673')
-@expected_failure
 @skip_test(reason='Webdriver cannot drag and drop Tutor assignments')
 @tutor
 def test_add_assignments_by_drag_and_drop(tutor_base_url, selenium, teacher):
@@ -199,8 +197,7 @@ def test_question_library_loads(tutor_base_url, selenium, teacher):
 
 
 @test_case('C208694')
-@skip_test(reason='Script not written')
-@nondestructive
+@skip_test(reason='GWT incomplete; script not written')
 @tutor
 def test_nag_teachers_each_time_they_create_a_new_course(tutor_base_url,
                                                          selenium, teacher):
@@ -208,8 +205,7 @@ def test_nag_teachers_each_time_they_create_a_new_course(tutor_base_url,
 
 
 @test_case('C208695')
-@skip_test(reason='Script not written')
-@nondestructive
+@skip_test(reason='GWT incomplete; script not written')
 @tutor
 def test_nag_teachers_upon_their_second_login_or_session(tutor_base_url,
                                                          selenium, teacher):
@@ -217,8 +213,7 @@ def test_nag_teachers_upon_their_second_login_or_session(tutor_base_url,
 
 
 @test_case('C208696')
-@skip_test(reason='Script not written')
-@nondestructive
+@skip_test(reason='GWT incomplete; script not written')
 @tutor
 def test_nag_reappears_if_user_select_i_dont_know_yet_option(tutor_base_url,
                                                              selenium,
@@ -227,8 +222,7 @@ def test_nag_reappears_if_user_select_i_dont_know_yet_option(tutor_base_url,
 
 
 @test_case('C208699')
-@skip_test(reason='Script not written')
-@nondestructive
+@skip_test(reason='GWT incomplete; script not written')
 @tutor
 def test_nag_in_preview_course_every_2nd_assignment(tutor_base_url,
                                                     selenium, teacher):
@@ -236,8 +230,7 @@ def test_nag_in_preview_course_every_2nd_assignment(tutor_base_url,
 
 
 @test_case('C208700')
-@skip_test(reason='Script not written')
-@nondestructive
+@skip_test(reason='GWT incomplete; script not written')
 @tutor
 def test_nag_in_preview_course_preview_expires(tutor_base_url,
                                                selenium, teacher):
@@ -245,8 +238,7 @@ def test_nag_in_preview_course_preview_expires(tutor_base_url,
 
 
 @test_case('C208702')
-@skip_test(reason='Script not written')
-@nondestructive
+@skip_test(reason='GWT incomplete; script not written')
 @tutor
 def test_nag_in_preview_course_create_a_course_button(tutor_base_url,
                                                       selenium, teacher):
@@ -254,8 +246,7 @@ def test_nag_in_preview_course_create_a_course_button(tutor_base_url,
 
 
 @test_case('C208703')
-@skip_test(reason='Script not written')
-@nondestructive
+@skip_test(reason='GWT incomplete; script not written')
 @tutor
 def test_setup_now_nag_appearing_on_first_initialization_of_preview_course(
         tutor_base_url, selenium, teacher):
@@ -263,7 +254,7 @@ def test_setup_now_nag_appearing_on_first_initialization_of_preview_course(
 
 
 @test_case('')
-@skip_test(reason='Script not written, not matched to TestRail case')
+@skip_test(reason='Script not written')
 @nondestructive
 @tutor
 def test_view_instructor_training_wheels_for_the_dashboard(
@@ -272,34 +263,32 @@ def test_view_instructor_training_wheels_for_the_dashboard(
     # GIVEN: A logged in teacher user
 
     # WHEN: Click on a current course to navigate to Dashboard
-    # AND: Activate Spy Mode
+    # AND: Activate Debug Mode
     # AND: Pop-up should show with the options
-    # ""View Tips Now"" and ""View Later""
-    # AND:Click ""View Tips Now""
+    #      "View Tips Now" and "View Later"
+    # AND: Click "View Tips Now"
 
     # THEN: User should be taken through a training wheels tour
-    # detailing the creation of assignments,
-    # the options at the top, the user dropdown options, and the navbar
+    #       detailing the creation of assignments, the options
+    #       at the top, the user dropdown options, and the navbar
 
 
 @test_case('C208706')
 @skip_test(reason='Script not written')
-@nondestructive
 @tutor
 def test_term_appearance_new(tutor_base_url, selenium, teacher):
-    """Test terms/PP appearance for onboarding | new instructor."""
+    """Test terms/PP appearance for onboarding new instructor."""
     # GIVEN:  Be at the Tutor page
 
     # WHEN: Log into verified teacher account
     # AND: Pick a course
 
     # THEN: In that course, the instructor is shown terms
-    # AND:Once agreed, the instructor is taken to the course dashboard.
+    # AND: Once agreed, the instructor is taken to the course dashboard.
 
 
 @test_case('C208707')
 @skip_test(reason='Script not written')
-@nondestructive
 @tutor
 def test_term_appearance_exist(tutor_base_url, selenium, teacher):
     """Test terms/PP appearance for onboarding | existing instructor."""
