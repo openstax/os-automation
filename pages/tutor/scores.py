@@ -20,23 +20,23 @@ class TutorScores(TutorBase):
         return TutorNav(self)
 
     def change_display(self):
-        """Change way of display"""
+        """Change display."""
         self.find_element(*self._change_display_locator).click()
 
     def export_scores(self):
-        """Export Scores as spreadsheet"""
+        """Export student scores as a spreadsheet."""
         self.find_element(*self._export_locator).click()
 
     def review_assignment(self):
-        """Review assignment"""
+        """Review an assignment."""
         self.find_element(*self._review_locator).click()
 
     def set_weight(self):
-        """Set weight for scores"""
+        """Set score weights."""
         return self.SetWeight(self)
 
     class SetWeight(Region):
-        """The Set Weight Region."""
+        """Set weights."""
 
         _set_weight_locator = (
             By.CSS_SELECTOR,
@@ -55,14 +55,10 @@ class TutorScores(TutorBase):
             'div.page-loading.loadable.is-loading.modal-body > a')
 
         def modify_weight(self):
-            """Modify weights"""
-            self.find_element(*self._set_weight_locator).click()
-            self.find_element(*self._first_locator).clear()
-            self.find_element(*self._first_locator).sendKeys('90')
-            self.find_element(*self._second_locator).sendKeys('10')
-            self.find_element(*self._confirm_locator).click()
+            """Modify weights."""
+            return NotImplemented
 
         def see_why(self):
-            """Go to the see why link"""
+            """Click the See why link."""
             self.find_element(*self._set_weight_locator).click()
             self.find_element(*self._why_locator).click()

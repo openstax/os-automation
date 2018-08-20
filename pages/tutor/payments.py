@@ -30,10 +30,6 @@ class TutorPayment(TutorBase):
 
     @property
     def items(self):
-        print(self.find_elements(*self._support_locator))
-        print(self.find_elements(*self._refund_policy_locator))
-        print(self.find_element(*self._item_locator).get_attribute(
-            'innerHTML'))
         Utility.scroll_to(self.driver, self._item_locator)
         return [self.Item(self, element) for element in
                 self.find_elements(*self._item_locator)]
@@ -60,5 +56,3 @@ class TutorPayment(TutorBase):
             self.find_element(*self._skip_locator).click()
             self.find_element(*self._continue_locator).click()
             return self
-
-

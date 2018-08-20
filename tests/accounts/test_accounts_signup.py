@@ -1,11 +1,10 @@
 """Test the Accounts signup process."""
 
 from pages.accounts.home import AccountsHome as Home
-from pages.utils.email import RestMail
 from pages.accounts.signup import Signup
 from pages.utils.email import RestMail
 from pages.utils.utilities import Utility
-from tests.markers import accounts, expected_failure, social, test_case
+from tests.markers import accounts, skip_test, social, test_case
 
 
 @test_case('C195549')
@@ -33,7 +32,6 @@ def test_sign_up_as_a_student_user(accounts_base_url, selenium, student):
     # AND: clicks the checkbox next to "I agree to the Terms of Use and the
     #      Privacy Policy."
     # AND: clicks the "CREATE ACCOUNT" button
-
     page.login.go_to_signup.account_signup(
         address,
         password,
@@ -96,7 +94,6 @@ def test_sign_up_as_an_instructor(accounts_base_url, selenium, teacher):
 
 
 @test_case('C195550')
-@social
 @accounts
 def test_sign_up_as_a_nonstudent_user(accounts_base_url, selenium, teacher):
     """Test non-student user signup."""
@@ -142,7 +139,7 @@ def test_sign_up_as_a_nonstudent_user(accounts_base_url, selenium, teacher):
 
 
 @test_case('C200745')
-@expected_failure
+@skip_test(reason='Script not written')
 @social
 @accounts
 def test_sign_up_as_a_facebook_user(accounts_base_url, selenium, facebook):
@@ -174,10 +171,10 @@ def test_sign_up_as_a_facebook_user(accounts_base_url, selenium, facebook):
     # AND: the Facebook log in option is deleted
 
     # THEN: the Facebook account is available for use
-    assert(False), 'Test script missing'
 
 
 @test_case('C200746')
+@social
 @accounts
 def test_sign_up_as_a_google_user(accounts_base_url, selenium, google,
                                   student):

@@ -25,7 +25,7 @@ class TutorDashboard(TutorBase):
         from regions.tutor.nav import TutorNav
         return TutorNav(self)
 
-    def go_to_first_course(self):
+    def go_to_first_course(self, user):
         """Go to the first course."""
         self.courses_region.courses[0].go_to_course()
         return TutorCalendar(self.driver)
@@ -51,4 +51,3 @@ class TutorDashboard(TutorBase):
                 """Go to the course page for this course."""
                 self.find_element(*self._card_locator).click()
                 return TutorCalendar(self.driver)
-

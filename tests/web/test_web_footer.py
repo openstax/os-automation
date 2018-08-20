@@ -1,10 +1,10 @@
 """Tests for the OpenStax footer."""
 
-from tests.markers import expected_failure, nondestructive, test_case, web
+from tests.markers import nondestructive, skip_test, test_case, web
 
 
 @test_case('')
-@expected_failure
+@skip_test(reason='Script not written')
 @nondestructive
 @web
 def test_opensource_link(web_base_url, selenium):
@@ -18,7 +18,7 @@ def test_opensource_link(web_base_url, selenium):
 
 
 @test_case('')
-@expected_failure
+@skip_test(reason='Script not written')
 @nondestructive
 @web
 def test_presskit_link(web_base_url, selenium):
@@ -32,7 +32,7 @@ def test_presskit_link(web_base_url, selenium):
 
 
 @test_case('')
-@expected_failure
+@skip_test(reason='Script not written')
 @nondestructive
 @web
 def test_newsletter_link(web_base_url, selenium):
@@ -46,7 +46,7 @@ def test_newsletter_link(web_base_url, selenium):
 
 
 @test_case('')
-@expected_failure
+@skip_test(reason='Script not written')
 @nondestructive
 @web
 def test_contact_link(web_base_url, selenium):
@@ -60,7 +60,7 @@ def test_contact_link(web_base_url, selenium):
 
 
 @test_case('')
-@expected_failure
+@skip_test(reason='Script not written')
 @nondestructive
 @web
 def test_facebook_link(web_base_url, selenium):
@@ -74,7 +74,7 @@ def test_facebook_link(web_base_url, selenium):
 
 
 @test_case('')
-@expected_failure
+@skip_test(reason='Script not written')
 @nondestructive
 @web
 def test_linkedin_link(web_base_url, selenium):
@@ -88,7 +88,7 @@ def test_linkedin_link(web_base_url, selenium):
 
 
 @test_case('')
-@expected_failure
+@skip_test(reason='Script not written')
 @nondestructive
 @web
 def test_twitter_link(web_base_url, selenium):

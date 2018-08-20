@@ -1,8 +1,6 @@
 """Basic page parent for the tutor admin page."""
 
-from time import sleep
-
-from pypom import Page, Region
+from pypom import Page
 from selenium.webdriver.common.by import By
 
 
@@ -20,4 +18,4 @@ class TutorAdminBase(Page):
     def nav(self):
         """Return the nav region."""
         from regions.tutor.adminnav import TutorAdminNav
-        return TutorNav(self)
+        return TutorAdminNav(self)

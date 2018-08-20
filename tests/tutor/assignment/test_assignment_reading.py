@@ -1,12 +1,12 @@
 """Tests for instructors creating, modifying and deleting readings."""
 
-from tests.markers import expected_failure, test_case, tutor
+from tests.markers import skip_test, test_case, tutor
 
 
-@test_case('')
-@expected_failure
+@test_case('C208558')
+@skip_test(reason='Script not written')
 @tutor
-def test_add_reading(tutor_base_url, selenium, teacher):
+def test_publish_a_new_reading(tutor_base_url, selenium, teacher):
     """Test the adding reading assignment."""
     # GIVEN: Logged into Tutor as a teacher
     # AND: Is on a course dashboard
@@ -18,10 +18,10 @@ def test_add_reading(tutor_base_url, selenium, teacher):
     # assignment is visible on the calendar
 
 
-@test_case('')
-@expected_failure
+@test_case('C208559')
+@skip_test(reason='Script not written')
 @tutor
-def test_adding_reading_draft(tutor_base_url, selenium, teacher):
+def test_save_a_reading_draft(tutor_base_url, selenium, teacher):
     """Test adding the reading draft to dashboard."""
     # GIVEN: Logged into Tutor as a teacher
     # AND: Is on a course dashboard
@@ -33,10 +33,10 @@ def test_adding_reading_draft(tutor_base_url, selenium, teacher):
     # assignment draft is visible on the calendar
 
 
-@test_case('')
-@expected_failure
+@test_case('C208560')
+@skip_test(reason='Script not written')
 @tutor
-def test_edit_published_reading(tutor_base_url, selenium, teacher):
+def test_edit_a_published_reading(tutor_base_url, selenium, teacher):
     """Test editing the published reading."""
     # GIVEN: Logged into Tutor as a teacher
     # AND: Has an existing course
@@ -51,10 +51,10 @@ def test_edit_published_reading(tutor_base_url, selenium, teacher):
     # assignment with edits is visible on the calendar
 
 
-@test_case('')
-@expected_failure
+@test_case('C208561')
+@skip_test(reason='Script not written')
 @tutor
-def test_publish_reading_draft(tutor_base_url, selenium, teacher):
+def test_edit_a_reading_draft(tutor_base_url, selenium, teacher):
     """Test editing the reading draft and publish."""
     # GIVEN: Logged into Tutor as a teacher
     # AND: Has an existing course
@@ -68,10 +68,10 @@ def test_publish_reading_draft(tutor_base_url, selenium, teacher):
     # assignment with edits is visible on the calendar
 
 
-@test_case('')
-@expected_failure
+@test_case('C208562')
+@skip_test(reason='Script not written')
 @tutor
-def test_cancel_reading_edits(tutor_base_url, selenium, teacher):
+def test_cancel_editing_a_published_reading(tutor_base_url, selenium, teacher):
     """Test cancelling reading assignments edits."""
     # GIVEN: Logged into Tutor as a teacher
     # AND: Has an existing course
@@ -85,10 +85,10 @@ def test_cancel_reading_edits(tutor_base_url, selenium, teacher):
     # THEN: The changes made on the reading assignment is not saved
 
 
-@test_case('')
-@expected_failure
+@test_case('C208563')
+@skip_test(reason='Script not written')
 @tutor
-def test_cancel_reading_draft(tutor_base_url, selenium, teacher):
+def test_cancel_editing_a_reading_draft(tutor_base_url, selenium, teacher):
     """Test cancelling reading draft edits."""
     # GIVEN: Logged into Tutor as a teacher
     # AND: Has an existing course
@@ -102,10 +102,10 @@ def test_cancel_reading_draft(tutor_base_url, selenium, teacher):
     # THEN: The changes made on the reading draft is not saved
 
 
-@test_case('')
-@expected_failure
+@test_case('C208564')
+@skip_test(reason='Script not written')
 @tutor
-def test_delete_published_reading(tutor_base_url, selenium, teacher):
+def test_delete_a_published_reading(tutor_base_url, selenium, teacher):
     """Test the deleting the published reading."""
     # GIVEN: Logged into Tutor as a teacher
     # AND: Has an existing course
@@ -118,10 +118,10 @@ def test_delete_published_reading(tutor_base_url, selenium, teacher):
     # THEN: The reading is deleted.
 
 
-@test_case('')
-@expected_failure
+@test_case('C208565')
+@skip_test(reason='Script not written')
 @tutor
-def test_delete_reading_draft(tutor_base_url, selenium, teacher):
+def test_delete_a_reading_draft(tutor_base_url, selenium, teacher):
     """Test deleting the reading draft."""
     # GIVEN: Logged into Tutor as a teacher
     # AND: Has an existing course
@@ -134,8 +134,8 @@ def test_delete_reading_draft(tutor_base_url, selenium, teacher):
     # THEN: The reading draft is deleted.
 
 
-@test_case('')
-@expected_failure
+@test_case('C208566')
+@skip_test(reason='Script not written')
 @tutor
 def test_see_what_student_see(tutor_base_url, selenium, teacher):
     """Test the see what student see button."""

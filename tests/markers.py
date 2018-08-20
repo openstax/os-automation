@@ -13,4 +13,5 @@ web = pytest.mark.web
 test_case = pytestrail.case
 
 expected_failure = pytest.mark.xfail
+skip_test = pytest.mark.skip
 social = pytest.mark.social

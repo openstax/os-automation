@@ -8,8 +8,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 
 from pages.accounts import home, profile
 from pages.accounts.base import AccountsBase
-from pages.facebook.home import Facebook
-from pages.utils.email import Google, GuerrillaMail, RestMail
+from pages.utils.email import GoogleBase, GuerrillaMail, RestMail
 from pages.utils.utilities import Utility
 
 
@@ -219,12 +218,12 @@ class Signup(AccountsBase):
     def _get_pin(self, page, provider, return_url, email=None, password=None):
         """Retrieve a signup pin."""
         if 'restmail' in provider:
-            box = page.wait_for_mail().get_mail()
+            box = page.wait_for_mail()
             return box[-1].pin
         else:
             page.open()
             if 'google' in provider:
-                page.login.go(email, password)
+                page = page.login.go(email, password)
             WebDriverWait(page.driver, 60.0).until(
                 lambda _: page.emails[0].has_pin)
             pin = page.emails[0].get_pin
@@ -480,6 +479,7 @@ class Signup(AccountsBase):
             """Use Google to log in."""
             self.find_element(*self._google_button_locator).click()
             sleep(0.5)
+            from pages.google.home import Google
             return Google(self.driver)
 
         @property
