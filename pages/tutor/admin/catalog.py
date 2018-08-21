@@ -1,6 +1,5 @@
 """The admin catalog page object."""
 
-from pypom import Region
 from selenium.webdriver.common.by import By
 
 from pages.tutor.admin.base import TutorAdminBase
@@ -22,17 +21,8 @@ class TutorAdminCatalog(TutorAdminBase):
 
     def add_catalog(self):
         """Add a catalog."""
-        self.find_element(*self._add_locator).click()
-        self.find_element(*self._title_locator).sendKeys('a')
-        self.find_element(*self._description_locator).sendKeys('a')
-        self.find_element(*self._sales_locator).sendKeys('a')
-        self.find_element(*self._url_locator).sendKeys('www.baidu.com')
-        select = Select(*self._eco_locator)
-        select.select_by_value('1')
-        self.find_element(*self._save_locator).click()
+        return NotImplemented
 
     def edit_catalog(self):
         """Edit a catalog."""
-        self.find_element(*self._edit_locator).click()
-        self.find_element(*self._title_locator).sendKeys('a')
-        self.find_element(*self._save_locator).click()
+        return NotImplemented

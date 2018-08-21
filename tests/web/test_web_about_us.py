@@ -1,10 +1,10 @@
 """Tests the about us webpage."""
 
-from tests.markers import expected_failure, nondestructive, test_case, web
+from tests.markers import nondestructive, skip_test, test_case, web
 
 
 @test_case('')
-@expected_failure
+@skip_test(reason='Script not written')
 @nondestructive
 @web
 def test_view_about_us(web_base_url, selenium):
@@ -17,7 +17,7 @@ def test_view_about_us(web_base_url, selenium):
 
 
 @test_case('')
-@expected_failure
+@skip_test(reason='Script not written')
 @nondestructive
 @web
 def test_view_about_us_hyperlinks(web_base_url, selenium):
@@ -28,7 +28,7 @@ def test_view_about_us_hyperlinks(web_base_url, selenium):
 
 
 @test_case('')
-@expected_failure
+@skip_test(reason='Script not written')
 @nondestructive
 @web
 def test_view_team_members(web_base_url, selenium):
@@ -42,7 +42,7 @@ def test_view_team_members(web_base_url, selenium):
 
 
 @test_case('')
-@expected_failure
+@skip_test(reason='Script not written')
 @nondestructive
 @web
 def test_view_homepage(web_base_url, selenium):

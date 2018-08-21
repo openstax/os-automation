@@ -1,10 +1,10 @@
 """Test the Tutor teacher creating new course functions."""
 
-from tests.markers import expected_failure, nondestructive, test_case, tutor
+from tests.markers import nondestructive, skip_test, test_case, tutor
 
 
-@expected_failure
 @test_case('')
+@skip_test(reason='Script not written')
 @tutor
 def test_create_a_new_course(tutor_base_url, selenium, teacher):
     """Create a new course."""
@@ -17,8 +17,8 @@ def test_create_a_new_course(tutor_base_url, selenium, teacher):
     # AND: User is taken to the course dashboard
 
 
-@expected_failure
 @test_case('')
+@skip_test(reason='Script not written')
 @tutor
 def test_copy_a_course_from_past_courses(tutor_base_url, selenium, teacher):
     """Copy a new course from a existing course."""
@@ -32,9 +32,9 @@ def test_copy_a_course_from_past_courses(tutor_base_url, selenium, teacher):
     # AND: User is taken to the course dashboard, old assignments are present
 
 
-@expected_failure
-@nondestructive
 @test_case('')
+@skip_test(reason='Script not written')
+@nondestructive
 @tutor
 def test_cancel_creating_a_new_course(tutor_base_url, selenium, teacher):
     """Cancel creating a new course."""
@@ -48,9 +48,9 @@ def test_cancel_creating_a_new_course(tutor_base_url, selenium, teacher):
     # AND: No course is created
 
 
-@expected_failure
-@nondestructive
 @test_case('')
+@skip_test(reason='Script not written')
+@nondestructive
 @tutor
 def test_cancel_copying_a_new_course(tutor_base_url, selenium, teacher):
     """Cancel copying a new course."""
@@ -64,8 +64,8 @@ def test_cancel_copying_a_new_course(tutor_base_url, selenium, teacher):
     # AND: No course is created
 
 
-@expected_failure
 @test_case('')
+@skip_test(reason='Script not written')
 @tutor
 def test_create_new_course_with_empty_fields(
         tutor_base_url, selenium, teacher):
@@ -79,9 +79,9 @@ def test_create_new_course_with_empty_fields(
     # AND: User is prompted to fill out the required fields
 
 
-@expected_failure
-@nondestructive
 @test_case('')
+@skip_test(reason='Script not written')
+@nondestructive
 @tutor
 def test_copy_course_with_empty_fields(tutor_base_url, selenium, teacher):
     """Attempt to copy a course without filling in required fields."""
@@ -95,9 +95,9 @@ def test_copy_course_with_empty_fields(tutor_base_url, selenium, teacher):
     # AND: User is prompted to fill in the required fields
 
 
-@expected_failure
-@nondestructive
 @test_case('')
+@skip_test(reason='Script not written')
+@nondestructive
 @tutor
 def test_copy_course_with_old_version_textbook(tutor_base_url, selenium,
                                                teacher):

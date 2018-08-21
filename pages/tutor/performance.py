@@ -18,10 +18,10 @@ class TutorPerformance(TutorBase):
         return TutorNav(self)
 
     def get_info(self):
-        """Hover over info icon"""
+        """Hover over info icon."""
         self.find_element(*self._info_icon_locator).click()
 
     def back_to_dashboard(self):
-        """Go back to dashboard"""
+        """Go back to dashboard."""
         self.find_element(*self._back_locator).click()
         return self

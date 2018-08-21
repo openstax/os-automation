@@ -1,10 +1,10 @@
 """Tests the admin page."""
 
-from tests.markers import expected_failure, test_case, web
+from tests.markers import skip_test, test_case, web
 
 
 @test_case('')
-@expected_failure
+@skip_test(reason='Script not written')
 @web
 def test_edit_higher_ed_page(web_base_url, seleniumm, admin):
     """Tests ability to edit higher education page."""
@@ -17,7 +17,7 @@ def test_edit_higher_ed_page(web_base_url, seleniumm, admin):
 
 
 @test_case('')
-@expected_failure
+@skip_test(reason='Script not written')
 @web
 def test_edit_partner_page(web_base_url, seleniumm, admin):
     """Tests ability to edit partner page."""
@@ -29,7 +29,7 @@ def test_edit_partner_page(web_base_url, seleniumm, admin):
 
 
 @test_case('')
-@expected_failure
+@skip_test(reason='Script not written')
 @web
 def test_edit_support_page(web_base_url, seleniumm, admin):
     """Tests ability to edit support page."""
@@ -41,7 +41,7 @@ def test_edit_support_page(web_base_url, seleniumm, admin):
 
 
 @test_case('')
-@expected_failure
+@skip_test(reason='Script not written')
 @web
 def test_edit_publish_date(web_base_url, seleniumm, admin):
     """Tests ability to edit support page."""
@@ -53,7 +53,7 @@ def test_edit_publish_date(web_base_url, seleniumm, admin):
 
 
 @test_case('')
-@expected_failure
+@skip_test(reason='Script not written')
 @web
 def test_edit_book_name(web_base_url, seleniumm, admin):
     """Tests ability to edit book name."""

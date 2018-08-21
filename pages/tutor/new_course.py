@@ -1,10 +1,8 @@
 """The New Course page object."""
 
-from pypom import Region
 from selenium.webdriver.common.by import By
 
 from pages.tutor.base import TutorBase
-from pages.tutor.tutor_calendar import TutorCalendar
 
 
 class TutorNewCourse(TutorBase):
@@ -30,31 +28,5 @@ class TutorNewCourse(TutorBase):
         return TutorNav(self)
 
     def create_new_course(self):
-        """Create a new course"""
-        self.find_element(*self._select_course_locator).click()
-        self.find_element(*self._continue_locator).click()
-        self.find_element(*self._select_semester_locator).click()
-        self.find_element(*self._continue_locator).click()
-        self.find_element(*self._continue_locator).click()
-        self.find_element(*self._continue_locator).click()
-        self.find_element(*self._estimated_number_locator).sendKeys("1")
-        self.find_element(*self._continue_locator).click()
-        self.find_element(*self._close_locator).click()
-        self.find_element(*self._get_locator).click()
-        return TutorCalendar(self.driver)
-
-    def cancel_create_course(self):
-        """Cancel creating a new course"""
-        self.find_element(*self._select_course_locator).click()
-        self.find_element(*self._cancel_locator).click()
-
-    def create_course_without_student_amount(self):
-        """Attempt to create course without entering student amount"""
-        self.find_element(*self._select_course_locator).click()
-        self.find_element(*self._continue_locator).click()
-        self.find_element(*self._select_semester_locator).click()
-        self.find_element(*self._continue_locator).click()
-        self.find_element(*self._continue_locator).click()
-        self.find_element(*self._continue_locator).click()
-        self.find_element(*self._continue_locator).click()
-
+        """Create a new course."""
+        return NotImplemented

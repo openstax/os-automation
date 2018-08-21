@@ -1,11 +1,11 @@
 """Tests for the OpenStax contact us web form."""
 
-from tests.markers import expected_failure, test_case, web
+from tests.markers import skip_test, test_case, web
 
 
 @test_case()
 @web
-@expected_failure
+@skip_test(reason='Script not written')
 def test_info_send_when_not_filled(web_base_url, selenium):
     """Test if info is sent when not all info is filled."""
     # GIVEN: On the Contact-us page
@@ -17,7 +17,7 @@ def test_info_send_when_not_filled(web_base_url, selenium):
 
 @test_case()
 @web
-@expected_failure
+@skip_test(reason='Script not written')
 def test_info_send_when_filled(web_base_url, selenium):
     """Test if info is sent when all info is filled."""
     # GIVEN: On the Contact-us page
@@ -28,7 +28,7 @@ def test_info_send_when_filled(web_base_url, selenium):
 
 @test_case()
 @web
-@expected_failure
+@skip_test(reason='Script not written')
 def test_info_send_when_invalid_email(web_base_url, selenium):
     """Test if info is sent when an invalid email is provided."""
     # GIVEN: On the Contact-us page
@@ -41,7 +41,7 @@ def test_info_send_when_invalid_email(web_base_url, selenium):
 
 @test_case()
 @web
-@expected_failure
+@skip_test(reason='Script not written')
 def test_support_center(web_base_url, selenium):
     """Test if support center link works properly."""
     # GIVEN: On the Contact-us page
@@ -51,7 +51,7 @@ def test_support_center(web_base_url, selenium):
 
 @test_case()
 @web
-@expected_failure
+@skip_test(reason='Script not written')
 def test_box(web_base_url, selenium):
     """Test if box is visible on contact us page."""
     # GIVEN: On the Contact-us page
@@ -61,7 +61,7 @@ def test_box(web_base_url, selenium):
 
 @test_case()
 @web
-@expected_failure
+@skip_test(reason='Script not written')
 def test_mailing_address(web_base_url, selenium):
     """Test if mailing address is visible on contact us page."""
     # GIVEN: On the Contact-us page

@@ -19,11 +19,9 @@ class TutorID(TutorBase):
         return TutorNav(self)
 
     def change_id(self, new_id):
-        """Change the student id."""
-        self.find_element(*self._enter_id_locator).sendKeys(new_id)
-        self.find_element(*self._save_locator).click()
+        """Change the student ID."""
+        return NotImplemented
 
     def cancel_id(self, new_id):
-        """Cancel changing student id"""
-        self.find_element(*self._enter_id_locator).sendKeys(new_id)
-        self.find_element(*self._cancel_locator).click()
+        """Cancel changing student ID."""
+        return NotImplemented

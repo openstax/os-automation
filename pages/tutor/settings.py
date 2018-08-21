@@ -39,5 +39,3 @@ class TutorSettings(TutorBase):
     def get_access_url(self):
         """Get the student access url."""
         return self.find_element(*self._url_locator).get_attribute('value')
-
-

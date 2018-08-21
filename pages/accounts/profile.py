@@ -244,14 +244,19 @@ class Profile(AccountsHome):
             return [self.Email(self, element)
                     for element in self.find_elements(*self._email_locator)]
 
+        @property
+        def email_texts(self):
+            """Return a list of email addresses."""
+            return [email.email_text for email in self.emails]
+
         def add_email(self, email):
             """Add a email to the account's email list."""
-            sleep(0.1)
+            sleep(0.2)
             self.find_element(*self._add_email_locator).click()
             sleep(0.3)
             self.find_element(*self._email_form_locator).send_keys(email)
             self.find_element(*self._email_submit_locator).click()
-            sleep(0.1)
+            sleep(0.2)
             self.driver.refresh()
             return Profile(self.driver)
 
@@ -267,6 +272,11 @@ class Profile(AccountsHome):
                 By.CSS_SELECTOR, '.unconfirmed-warning > *')
             _confirmation_btn_locator = (
                 By.CSS_SELECTOR, '.button_to>[type="submit"]')
+
+            @property
+            def email_text(self):
+                """Return the email address."""
+                return self.find_element(*self._email_locator).text
 
             def delete(self):
                 """Delete an individual email section."""
@@ -289,6 +299,18 @@ class Profile(AccountsHome):
             def is_confirmed(self):
                 """Check if the email is already verified."""
                 return 'verified' in self._root.get_attribute('class')
+
+            def __unicode__(self):
+                """Print out an email."""
+                return ('Email: {email} ({confirmed})').format(
+                    email=self.email_text,
+                    confirmed=('Is confirmed' if self.is_confirmed
+                               else 'Not confirmed')
+                )
+
+            def __str__(self):
+                """Print out an email."""
+                return self.__unicode__()
 
     class LoginOptions(Region):
         """Login options."""

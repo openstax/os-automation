@@ -1,4 +1,4 @@
-"""The roster page object."""
+"""Tutor class roster."""
 
 from pypom import Region
 from selenium.webdriver.common.by import By
@@ -11,12 +11,12 @@ class TutorRoster(TutorBase):
 
     @property
     def instructors(self):
-        """The Instructors Region."""
+        """Access instructors."""
         return self.Instructors(self)
 
     @property
-    def section(self):
-        """The Sections Region."""
+    def sections(self):
+        """Access sections."""
         return self.Sections(self)
 
     @property
@@ -27,6 +27,7 @@ class TutorRoster(TutorBase):
 
     class Instructors(Region):
         """The Instructors Region."""
+
         _add_locator = (
             By.CSS_SELECTOR,
             'div.settings-section.teachers > div > div > button')
@@ -46,6 +47,7 @@ class TutorRoster(TutorBase):
 
     class Sections(Region):
         """The Sections Region."""
+
         _add_session_locator = (
             By.CSS_SELECTOR,
             'div.roster > div > nav > button')
@@ -60,19 +62,21 @@ class TutorRoster(TutorBase):
         _rename_session_locator = (By.CSS_SELECTOR,
                                    'button.control.rename-period.btn.btn-link')
 
-        def add_session(self, section_name):
-            """Add a session"""
+        def add_a_section(self, section_name):
+            """Add a section."""
             self.find_element(*self._add_session_locator).click()
             self.find_element(
                 *self._enter_name_locator).sendKeys(section_name)
             self.find_element(*self._confirm_add_locator).click()
 
-        def delete_session(self):
-            """Delete a session."""
+        def delete_a_section(self, section_name):
+            """Delete a section."""
             self.find_element(*self._remove_session_locator).click()
             self.find_element(*self._confirm_delete_session_locator).click()
+            return NotImplemented
 
-        def rename_session(self):
-            """Rename a session"""
+        def rename_a_section(self, section_name, new_name):
+            """Rename a section."""
             self.find_element(*self._rename_session_locator).click()
             self.find_element(*self._confirm_rename_session_locator).click()
+            return NotImplemented

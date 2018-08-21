@@ -4,7 +4,7 @@ from pages.accounts.home import AccountsHome as Home
 from pages.accounts.signup import Signup
 from pages.utils.email import RestMail
 from pages.utils.utilities import Utility
-from tests.markers import accounts, expected_failure, social, test_case
+from tests.markers import accounts, skip_test, social, test_case
 
 
 @test_case('C195549')
@@ -32,7 +32,6 @@ def test_sign_up_as_a_student_user(accounts_base_url, selenium, student):
     # AND: clicks the checkbox next to "I agree to the Terms of Use and the
     #      Privacy Policy."
     # AND: clicks the "CREATE ACCOUNT" button
-
     page.login.go_to_signup.account_signup(
         address,
         password,
@@ -95,7 +94,6 @@ def test_sign_up_as_an_instructor(accounts_base_url, selenium, teacher):
 
 
 @test_case('C195550')
-@social
 @accounts
 def test_sign_up_as_a_nonstudent_user(accounts_base_url, selenium, teacher):
     """Test non-student user signup."""
@@ -141,7 +139,7 @@ def test_sign_up_as_a_nonstudent_user(accounts_base_url, selenium, teacher):
 
 
 @test_case('C200745')
-@expected_failure
+@skip_test(reason='Script not written')
 @social
 @accounts
 def test_sign_up_as_a_facebook_user(accounts_base_url, selenium, facebook):
@@ -173,10 +171,10 @@ def test_sign_up_as_a_facebook_user(accounts_base_url, selenium, facebook):
     # AND: the Facebook log in option is deleted
 
     # THEN: the Facebook account is available for use
-    assert(False), 'Test script missing'
 
 
 @test_case('C200746')
+@social
 @accounts
 def test_sign_up_as_a_google_user(accounts_base_url, selenium, google,
                                   student):
@@ -215,28 +213,29 @@ def test_sign_up_as_a_google_user(accounts_base_url, selenium, google,
     assert (name[1].lower() in google[0] and name[2].lower() in google[0])
 
     # WHEN: the name field is changed
+    # AND: a verified email is added to the profile
+    # AND: a password log in option is added
+    # AND: the Google log in option is deleted
+    # AND: the Profile page is reloaded
+    # AND: the Gmail address is deleted
     name = Utility.random_name()
     page.name.open()
     page.name.first_name = name[1]
     page.name.last_name = name[2]
     page.name.confirm()
-
-    # AND: a verified email is added to the profile
     username = name[1] + name[2] + str(Utility.random(100, 999))
     page.emails.add_email(username + '@restmail.net')
-
-    # AND: a password log in option is added
     password = student[1]
     page.login_method.add_password(password)
-
-    # AND: the Google log in option is deleted
     page.login_method.get_active_options()[0].delete
-
-    # AND: the Profile page is reloaded
-    RestMail(username).get_mail()[0].confirm_email(selenium)
-
-    # AND: the Gmail address is deleted
-    page.emails.emails[0].delete()
+    email = RestMail(username)
+    email.get_mail()
+    email.inbox[-1].confirm_email()
+    page.reload()
+    for email in page.emails.emails:
+        if email.email_text == google[0]:
+            email.delete()
+            break
 
     # THEN: the Google account is available for use
 

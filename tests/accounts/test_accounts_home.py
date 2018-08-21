@@ -5,7 +5,7 @@ from selenium.common.exceptions import NoSuchElementException, TimeoutException
 
 from pages.accounts.home import AccountsHome as Home
 from pages.utils.utilities import Utility
-from tests.markers import accounts, expected_failure, nondestructive, test_case
+from tests.markers import accounts, nondestructive, skip_test, test_case
 
 
 @test_case('C195135')
@@ -155,7 +155,7 @@ def test_attempt_to_log_in_with_an_invalid_password(
 
 
 @test_case('C195542')
-@expected_failure
+@skip_test(reason='Script not written')
 @accounts
 def test_reset_a_users_password(accounts_base_url, selenium):
     """Reset a user's password."""
@@ -175,7 +175,6 @@ def test_reset_a_users_password(accounts_base_url, selenium):
     # AND: click the "CONTINUE" button
 
     # THEN: the user's profile is displayed
-    assert(False), 'Test script missing'
 
 
 @test_case('C195140')

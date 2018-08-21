@@ -1,11 +1,10 @@
 """Test the Tutor home page."""
 
 from pages.tutor.home import TutorHome as Home
-from tests.markers import expected_failure, nondestructive, test_case, tutor
+from tests.markers import nondestructive, skip_test, test_case, tutor
 
 
 @test_case('')
-@expected_failure
 @nondestructive
 @tutor
 def test_open_home_page(tutor_base_url, selenium):
@@ -15,7 +14,7 @@ def test_open_home_page(tutor_base_url, selenium):
 
 
 @test_case('')
-@expected_failure
+@skip_test(reason='Script not written')
 @nondestructive
 @tutor
 def test_tutor_home_page(tutor_base_url, selenium):
@@ -28,7 +27,7 @@ def test_tutor_home_page(tutor_base_url, selenium):
 
 
 @test_case('')
-@expected_failure
+@skip_test(reason='Script not written')
 @nondestructive
 @tutor
 def test_sales_force_support_page(tutor_base_url, selenium):
@@ -41,7 +40,7 @@ def test_sales_force_support_page(tutor_base_url, selenium):
 
 
 @test_case('')
-@expected_failure
+@skip_test(reason='Script not written')
 @nondestructive
 @tutor
 def test_accounts_log_in_page(tutor_base_url, selenium):
@@ -51,12 +50,11 @@ def test_accounts_log_in_page(tutor_base_url, selenium):
     # WHEN: The user clicks "LOG IN" button
 
     # THEN: The Accounts log in page loads
-
     # AND: "tutor" is in the URL
 
 
 @test_case('')
-@expected_failure
+@skip_test(reason='Script not written')
 @nondestructive
 @tutor
 def test_crest_rice_home_page(tutor_base_url, selenium):
@@ -69,7 +67,7 @@ def test_crest_rice_home_page(tutor_base_url, selenium):
 
 
 @test_case('')
-@expected_failure
+@skip_test(reason='Script not written')
 @nondestructive
 @tutor
 def test_footer_rice_home_page(tutor_base_url, selenium):
@@ -82,7 +80,7 @@ def test_footer_rice_home_page(tutor_base_url, selenium):
 
 
 @test_case('')
-@expected_failure
+@skip_test(reason='Script not written')
 @nondestructive
 @tutor
 def test_tutor_term_page(tutor_base_url, selenium):

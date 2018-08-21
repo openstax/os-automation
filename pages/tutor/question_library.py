@@ -11,6 +11,7 @@ class TutorQuestionLibrary(TutorBase):
 
     _back_locator = (By.CSS_SELECTOR, 'div.header > div > a')
     _browse_locator = (By.CSS_SELECTOR, 'div.panel-heading > div > a > div')
+    _chapter_locator = (By.CSS_SELECTOR, 'span > i')
 
     @property
     def nav(self):
@@ -19,26 +20,25 @@ class TutorQuestionLibrary(TutorBase):
         return TutorNav(self)
 
     def show_questions(self):
-        """Show questions for question library"""
+        """Show questions for question library."""
         return self.ShowQuestions(self)
 
     def browse_chapter(self):
-        """Browse the entire chapter"""
+        """Browse the entire chapter."""
         self.find_element(*self._browse_locator).click()
         return self
 
     def back_to_dashboard(self):
-        """Go back to dashboard"""
+        """Go back to dashboard."""
         self.find_element(*self._back_locator).click()
         return self
 
     def select_a_chapter(self):
-        """Select a chapter"""
-        _chapter_locator = (By.CSS_SELECTOR, 'span > i')
+        """Select a chapter."""
         self.find_element(*self._chapter_locator).click()
 
     class ShowQuestions(Region):
-        """Show questions for the question library"""
+        """Show questions for the question library."""
 
         _show_locator = (By.CSS_SELECTOR, 'div > button.btn.btn-primary')
         _select_locator = (By.CSS_SELECTOR, 'div.pinned-header > div > button')
@@ -46,13 +46,13 @@ class TutorQuestionLibrary(TutorBase):
         _exclude_locator = (By.CSS_SELECTOR, 'div.action.exclude > span')
 
         def select_more_questions(self):
-            """Select more questions"""
+            """Select more questions."""
             self.find_element(*self._select_locator).click()
 
         def show_question_details(self):
-            """Show question details"""
+            """Show question details."""
             self.find_element(*self._detail_locator).click()
 
         def exclude_questions(self):
-            """Exclude Questions"""
+            """Exclude Questions."""
             self.find_element(*self._exclude_locator).click()

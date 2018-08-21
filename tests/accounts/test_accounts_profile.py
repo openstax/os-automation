@@ -1,11 +1,13 @@
 """Test the Accounts logged in profile page."""
 
+from functools import reduce
+
 import pytest
 
 from pages.accounts.profile import AccountException, Profile
 from pages.utils.email import RestMail
 from pages.utils.utilities import Utility
-from tests.markers import accounts, nondestructive  # noqa
+from tests.markers import accounts, expected_failure, nondestructive  # noqa
 from tests.markers import skip_test, social, test_case  # noqa
 
 
@@ -137,40 +139,43 @@ def test_get_and_set_a_username(accounts_base_url, selenium, student):
 
 
 @test_case('C195552')
-@nondestructive
 @accounts
 def test_get_current_emails_and_status(accounts_base_url, selenium, student):
     """Test the user's email fields."""
-    # GIVEN: A logged in student
+    # GIVEN: a logged in student
     page = Profile(selenium, accounts_base_url).open()
     page.log_in(*student)
 
-    # WHEN: The student adds a new email to the account
-    initial_email_count = len(page.emails.emails)
+    # WHEN: the student adds a new email to the account
     name = page.name.get_name_parts()
     fake_email = Utility.fake_email(name[page.name.FIRST],
                                     name[page.name.LAST])
     page.emails.add_email(fake_email)
 
     # THEN: The new email is attached to the account
-    emails_after_add = len(page.emails.emails)
-    assert(emails_after_add == initial_email_count + 1), \
+    assert(reduce(lambda x, y:
+                  x or y.email_text == fake_email,
+                  page.emails.emails,
+                  False)), \
         'Email was not added'
 
     # WHEN: The new email is deleted
-    email = page.emails.emails[-1]
-    email.delete()
+    for email in page.emails.emails:
+        if email.email_text == fake_email:
+            email.delete()
+            break
 
     # THEN: The email is removed from the account
-    final_email_count = len(page.emails.emails)
-    assert(final_email_count == initial_email_count), \
+    assert(not reduce(lambda x, y: x or y.email_text == fake_email,
+                      page.emails.emails,
+                      False)), \
         'Email did not deleted properly'
 
 
 @test_case('C195554')
+@skip_test(reason='Script not written')
 @accounts
-def test_verify_an_email(
-        accounts_base_url, selenium, student):
+def test_verify_an_email(accounts_base_url, selenium, student):
     """Test the user email verification process."""
     # GIVEN: a student viewing their Accounts profile
     page = Profile(selenium, accounts_base_url).open()
@@ -211,7 +216,6 @@ def test_add_a_verified_email_to_profile(accounts_base_url, selenium, student):
     # GIVEN: a student viewing their Accounts profile
     page = Profile(selenium, accounts_base_url).open()
     page.log_in(*student)
-    initial_email_count = len(page.emails.emails)
 
     # WHEN: add an email
     # AND: opens the verification email and clicks the confirmation link
@@ -227,14 +231,24 @@ def test_add_a_verified_email_to_profile(accounts_base_url, selenium, student):
     page.open()
 
     # THEN: the new email does not have "unconfirmed" to the right of it
-    assert(page.emails.emails[-1].is_confirmed), 'Email unconfirmed'
+    exists = False
+    for email in page.emails.emails:
+        if email.email_text == address:
+            exists = True
+            assert(email.is_confirmed), 'Email unconfirmed'
+            break
+    assert(exists), 'Email was not added'
 
     # WHEN: delete the new email
-    page.emails.emails[-1].delete()
+    for email in page.emails.emails:
+        if email.email_text == address:
+            email.delete()
 
     # THEN: the email list is restored
-    assert(len(page.emails.emails) == initial_email_count), \
-        'Email has not been removed'
+    assert(not reduce(lambda x, y: x or y.email_text == address,
+                      page.emails.emails,
+                      False)), \
+        'Email did not deleted properly'
 
 
 @test_case('C195555')
@@ -256,6 +270,7 @@ def test_log_in_using_google(accounts_base_url, gmail, selenium):
 
 
 @test_case('C195556')
+@expected_failure
 @accounts
 @social
 def test_log_in_using_facebook(accounts_base_url, gmail, selenium):

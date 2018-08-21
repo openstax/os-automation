@@ -1,11 +1,11 @@
 """Tests for the OpenStax give webpage."""
 
-from tests.markers import expected_failure, test_case, web
+from tests.markers import skip_test, test_case, web
 
 
 @test_case()
+@skip_test(reason='Script not written')
 @web
-@expected_failure
 def test_other_ways_to_give(web_base_url, selenium):
     """Test to ensure that other ways to give section is present."""
     # GIVEN: On the Give page
@@ -15,8 +15,8 @@ def test_other_ways_to_give(web_base_url, selenium):
 
 
 @test_case()
+@skip_test(reason='Script not written')
 @web
-@expected_failure
 def test_donation_question(web_base_url, selenium):
     """Tests the ability to submit a donation question."""
     # GIVEN: On the Give page
@@ -28,8 +28,8 @@ def test_donation_question(web_base_url, selenium):
 
 
 @test_case()
+@skip_test(reason='Script not written')
 @web
-@expected_failure
 def test_alpha(web_base_url, selenium):
     """Test entering an alpha character takes user to the first item."""
     # GIVEN: On the web give form
@@ -39,8 +39,8 @@ def test_alpha(web_base_url, selenium):
 
 
 @test_case()
+@skip_test(reason='Script not written')
 @web
-@expected_failure
 def test_donation_fields(web_base_url, selenium):
     """Test all required fields."""
     # GIVEN: On the web give form
@@ -51,8 +51,8 @@ def test_donation_fields(web_base_url, selenium):
 
 
 @test_case()
+@skip_test(reason='Script not written')
 @web
-@expected_failure
 def test_view_social_media(web_base_url, selenium):
     """Test if social media option is avaible upon donating."""
     # GIVEN: On the web give form

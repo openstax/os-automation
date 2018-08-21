@@ -1,10 +1,10 @@
 """Tests the adopters webpage."""
 
-from tests.markers import expected_failure, nondestructive, test_case, web
+from tests.markers import nondestructive, skip_test, test_case, web
 
 
 @test_case('')
-@expected_failure
+@skip_test(reason='Script not written')
 @nondestructive
 @web
 def test_view_our_impact(web_base_url, selenium):
