@@ -46,10 +46,11 @@ class Utility(object):
                               driver.find_element(*element_locator))
 
     @classmethod
-    def random_hex(cls, length=20):
+    def random_hex(cls, length=20, lower=False):
         """Return a random hex number of size length."""
-        return ''.join([Utility.HEX_DIGITS[randint(0, 0xF)]
+        line = ''.join([Utility.HEX_DIGITS[randint(0, 0xF)]
                        for _ in range(length)])
+        return line if not lower else line.lower()
 
     @classmethod
     def random(cls, start=0, end=100000):
@@ -92,9 +93,11 @@ class Utility(object):
     def fake_email(cls, first_name, surname, id=False):
         """Return a name-based fake email."""
         template = ('{first}.{second}.{random}@os.fake.org')
-        return template.format(first=first_name,
-                               second=surname,
-                               random=id if id else Utility.random(100, 999))
+        return template.format(
+            first=first_name,
+            second=surname,
+            random=id if id else Utility.random(100, 999)
+        ).lower()
 
     @classmethod
     def new_tab(cls, driver):
