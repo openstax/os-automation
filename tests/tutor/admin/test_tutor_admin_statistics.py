@@ -3,7 +3,7 @@
 from tests.markers import nondestructive, skip_test, test_case, tutor
 
 
-@test_case('')
+@test_case('C208737')
 @skip_test(reason='Script not written')
 @nondestructive
 @tutor
