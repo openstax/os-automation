@@ -3,147 +3,150 @@
 from tests.markers import skip_test, test_case, tutor
 
 
-@test_case('C208558')
+@test_case('C208558', 'C208560', 'C208562', 'C208564')
 @skip_test(reason='Script not written')
 @tutor
-def test_publish_a_new_reading(tutor_base_url, selenium, teacher):
+def test_publish_edit_and_delete_a_new_reading(
+        tutor_base_url, selenium, teacher):
     """Test the adding reading assignment."""
-    # GIVEN: Logged into Tutor as a teacher
-    # AND: Is on a course dashboard
+    # GIVEN: a user logged into Tutor as a teacher
+    # AND: is viewing the calendar
 
-    # WHEN: Click on a date on the dashboard
-    # AND: Publish "add reading" with everything filled
+    # WHEN: they click on a date on the dashboard
+    # AND: click the "Add Reading" button
+    # AND: fill out all of the form fields
+    # AND: click the "Publish" button
 
-    # THEN: Dashboard of that course is successfully loaded and the reading
-    # assignment is visible on the calendar
+    # THEN: the user is returned to the calendar
+    # AND: the reading assignment is displayed
+    # AND: the reading assignment is published
+
+    # WHEN: the user clicks on the published reading
+    # AND: clicks the "View Assignment" button
+    # AND: edits one or more of the available fields
+    # AND: clicks the "Save" button
+
+    # THEN: the user is returned to the calendar
+    # AND: the reading assignment is displayed
+    # AND: the reading assignment is published
+    # AND: the changes are saved
+
+    # WHEN: the user clicks on the published reading
+    # AND: clicks the "View Assignment" button
+    # AND: edits one or more of the available fields
+    # AND: clicks the "Cancel" button
+    # AND: clicks the "Yes" button
+
+    # THEN: the user is returned to the calendar
+    # AND: the reading assignment is displayed
+    # AND: the reading assignment is published
+    # AND: the changes are not saved
+
+    # WHEN: the user clicks on the published reading
+    # AND: edits one or more of the available fields
+    # AND: clicks the "x" button
+    # AND: clicks the "Yes" button
+
+    # THEN: the user is returned to the calendar
+    # AND: the reading assignment is displayed
+    # AND: the reading assignment is published
+    # AND: the changes are not saved
+
+    # WHEN: the user clicks on the published reading
+    # AND: clicks the "View Assignment" button
+    # AND: clicks the "Delete" button
+    # AND: clicks the red "Delete" button
+
+    # THEN: the user is returned to the calendar
+    # AND: the reading assignment is removed from the calendar
 
 
-@test_case('C208559')
+@test_case('C208559', 'C208561', 'C208563', 'C208565')
 @skip_test(reason='Script not written')
 @tutor
-def test_save_a_reading_draft(tutor_base_url, selenium, teacher):
-    """Test adding the reading draft to dashboard."""
-    # GIVEN: Logged into Tutor as a teacher
-    # AND: Is on a course dashboard
+def test_save_edit_and_delete_a_reading_draft(
+        tutor_base_url, selenium, teacher):
+    """Test adding, editing and deleting a reading assignment draft."""
+    # GIVEN: a user logged into Tutor as a teacher
+    # AND: is viewing the calendar
 
-    # WHEN: Click on a date on the dashboard
-    # AND: Click "add reading" and "Save as draft" with everything filled
+    # WHEN: they click on a date on the dashboard
+    # AND: click the "Add Reading" button
+    # AND: fill out all of the form fields
+    # AND: click the "Save as Draft" button
 
-    # THEN: Dashboard of that course is successfully loaded and the reading
-    # assignment draft is visible on the calendar
+    # THEN: the user is returned to the calendar
+    # AND: the reading assignment is displayed
+    # AND: the reading assignment name on the calendar is prefixed with "draft"
+
+    # WHEN: the user clicks on the draft reading
+    # AND: edits one or more of the available fields
+    # AND: clicks the "Save as Draft" button
+
+    # THEN: the user is returned to the calendar
+    # AND: the reading assignment is displayed
+    # AND: the reading assignment name on the calendar is prefixed with "draft"
+    # AND: the changes are saved
+
+    # WHEN: the user clicks on the draft reading
+    # AND: edits one or more of the available fields
+    # AND: clicks the "Cancel" button
+    # AND: clicks the "Yes" button
+
+    # THEN: the user is returned to the calendar
+    # AND: the reading assignment is displayed
+    # AND: the reading assignment name on the calendar is prefixed with "draft"
+    # AND: the changes are not saved
+
+    # WHEN: the user clicks on the draft reading
+    # AND: clicks the "Cancel" button
+
+    # THEN: the user is returned to the calendar
+    # AND: the reading assignment is displayed
+    # AND: the reading assignment name on the calendar is prefixed with "draft"
+    # AND: the changes are not saved
+
+    # WHEN: the user clicks on the draft reading
+    # AND: edits one or more of the available fields
+    # AND: clicks the "x" button
+    # AND: clicks the "Yes" button
+
+    # THEN: the user is returned to the calendar
+    # AND: the reading assignment is displayed
+    # AND: the reading assignment name on the calendar is prefixed with "draft"
+    # AND: the changes are not saved
+
+    # WHEN: the user clicks on the draft reading
+    # AND: clicks the "x" button
+
+    # THEN: the user is returned to the calendar
+    # AND: the reading assignment is displayed
+    # AND: the reading assignment name on the calendar is prefixed with "draft"
+    # AND: the changes are not saved
+
+    # WHEN: the user clicks on the draft reading
+    # AND: clicks the "Delete" button
+    # AND: clicks the red "Delete" button
+
+    # THEN: the user is returned to the calendar
+    # AND: the reading assignment is removed from the calendar
 
 
-@test_case('C208560')
+@test_case('C210289')
 @skip_test(reason='Script not written')
 @tutor
-def test_edit_a_published_reading(tutor_base_url, selenium, teacher):
-    """Test editing the published reading."""
-    # GIVEN: Logged into Tutor as a teacher
-    # AND: Has an existing course
-    # AND: Has a published reading
+def test_required_fields_for_reading_assignments(
+        tutor_base_url, selenium, teacher):
+    """Test fields required to save or publish a reading assignment."""
+    # GIVEN: a user logged in as a teacher
+    # AND: viewing the calendar dashboard for a course
 
-    # WHEN: Click on the published reading
+    # WHEN: they open the "Add Assignment" pane
+    # AND: click the "Add Reading" link
+    # AND: click the "Publish" button
 
-    # AND: Edit one of the required fields
-    # AND: Click "Publish"
-
-    # THEN: Dashboard of that course is successfully loaded and the reading
-    # assignment with edits is visible on the calendar
-
-
-@test_case('C208561')
-@skip_test(reason='Script not written')
-@tutor
-def test_edit_a_reading_draft(tutor_base_url, selenium, teacher):
-    """Test editing the reading draft and publish."""
-    # GIVEN: Logged into Tutor as a teacher
-    # AND: Has an existing course
-    # AND: Has a reading draft
-
-    # WHEN: Click on the reading draft on calendar
-    # AND: Edit one of the required fields
-    # AND: Click "Publish"
-
-    # THEN: Dashboard of that course is successfully loaded and the reading
-    # assignment with edits is visible on the calendar
-
-
-@test_case('C208562')
-@skip_test(reason='Script not written')
-@tutor
-def test_cancel_editing_a_published_reading(tutor_base_url, selenium, teacher):
-    """Test cancelling reading assignments edits."""
-    # GIVEN: Logged into Tutor as a teacher
-    # AND: Has an existing course
-    # AND: Has a publish reading
-
-    # WHEN: The user clicks on the course
-    # AND: Click on the published reading on calendar
-    # AND: Edit the required fields
-    # AND: Click "Cancel"
-
-    # THEN: The changes made on the reading assignment is not saved
-
-
-@test_case('C208563')
-@skip_test(reason='Script not written')
-@tutor
-def test_cancel_editing_a_reading_draft(tutor_base_url, selenium, teacher):
-    """Test cancelling reading draft edits."""
-    # GIVEN: Logged into Tutor as a teacher
-    # AND: Has an existing course
-    # AND: Has a reading draft
-
-    # WHEN:  The user clicks on the course
-    # AND: Click on the reading draft
-    # AND: Edit the required fields
-    # AND: Click "Cancel"
-
-    # THEN: The changes made on the reading draft is not saved
-
-
-@test_case('C208564')
-@skip_test(reason='Script not written')
-@tutor
-def test_delete_a_published_reading(tutor_base_url, selenium, teacher):
-    """Test the deleting the published reading."""
-    # GIVEN: Logged into Tutor as a teacher
-    # AND: Has an existing course
-    # AND: Has a publish reading
-
-    # WHEN: The user clicks on the course
-    # AND: Click on the reading
-    # AND: Click "Delete"
-
-    # THEN: The reading is deleted.
-
-
-@test_case('C208565')
-@skip_test(reason='Script not written')
-@tutor
-def test_delete_a_reading_draft(tutor_base_url, selenium, teacher):
-    """Test deleting the reading draft."""
-    # GIVEN: Logged into Tutor as a teacher
-    # AND: Has an existing course
-    # AND: Has a reading draft
-
-    # WHEN:  The user clicks on the course
-    # AND: Click on the reading draft
-    # AND: Click "Delete"
-
-    # THEN: The reading draft is deleted.
-
-
-@test_case('C208566')
-@skip_test(reason='Script not written')
-@tutor
-def test_see_what_student_see(tutor_base_url, selenium, teacher):
-    """Test the see what student see button."""
-    # GIVEN: Logged into Tutor as a teacher
-    # AND: Has an existing course
-    # AND: Has a reading or homework assignment
-
-    # WHEN: Go to a homework/reading assignment
-    # AND: Edit it
-
-    # THEN: "see what students see" button should be available
+    # THEN: the "Assignment name", "Due date" and "Add Readings" field text
+    #       are red
+    # AND: "Required field" is displayed below the assignment name and due date
+    #      fields and "Please add readings to this assignment." is below the
+    #      add readings button
