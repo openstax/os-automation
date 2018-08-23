@@ -28,6 +28,7 @@ def pytest_addoption(parser):
     selenium_options = parser.getgroup('selenium', 'Selenium controls')
     url_options = parser.getgroup('url', 'Base test URLs')
     user_options = parser.getgroup('users', 'User accounts for testing')
+    product_options = parser.getgroup('products', 'Products to test')
 
     # Runtime options
     selenium_options.addoption('--headless',
@@ -134,6 +135,21 @@ def pytest_addoption(parser):
                                     os.getenv('GMAIL_PASSWORD')],
                            help='OpenStax test content manager account')
 
+    # Product options
+    product_options.addoption('--systems',
+                              action='store',
+                              nargs='+',
+                              default=['accounts',
+                                       'biglearn',
+                                       'exercises',
+                                       'hypothesis',
+                                       'payments',
+                                       'tutor',
+                                       'web'],
+                              help='Systems under test\n' +
+                                   'Options: accounts, biglearn, exercises' +
+                                   '         hypothesis, payments, tutor, web')
+
 
 def pytest_collection_modifyitems(config, items):
     """Runtime test options."""
@@ -142,6 +158,15 @@ def pytest_collection_modifyitems(config, items):
     mark_run_social = pytest.mark.skip(reason='Skipping non-social tests.')
     skip_social = config.getoption('--skip-social')
     mark_skip_social = pytest.mark.skip(reason='Skipping social login tests.')
+    run_systems = config.getoption('--systems')
+    mark_skip_accounts = pytest.mark.skip(reason='Skipping Accounts tests.')
+    mark_skip_biglearn = pytest.mark.skip(reason='Skipping BigLearn tests.')
+    mark_skip_exercises = pytest.mark.skip(reason='Skipping Exercises tests.')
+    mark_skip_hypothesis = pytest.mark.skip(
+                                        reason='Skipping Hypothesis tests.')
+    mark_skip_payments = pytest.mark.skip(reason='Skipping Payments tests.')
+    mark_skip_tutor = pytest.mark.skip(reason='Skipping Tutor tests.')
+    mark_skip_web = pytest.mark.skip(reason='Skipping Web tests.')
 
     # Apply runtime markers
     for item in items:
@@ -149,6 +174,22 @@ def pytest_collection_modifyitems(config, items):
             item.add_marker(mark_skip_social)
         if run_social and 'social' not in item.keywords:
             item.add_marker(mark_run_social)
+        if run_systems:
+            if 'accounts' not in run_systems and 'accounts' in item.keywords:
+                item.add_marker(mark_skip_accounts)
+            if 'biglearn' not in run_systems and 'biglearn' in item.keywords:
+                item.add_marker(mark_skip_biglearn)
+            if 'exercises' not in run_systems and 'exercises' in item.keywords:
+                item.add_marker(mark_skip_exercises)
+            if ('hypothesis' not in run_systems
+                    and 'hypothesis' in item.keywords):
+                item.add_marker(mark_skip_hypothesis)
+            if 'payments' not in run_systems and 'payments' in item.keywords:
+                item.add_marker(mark_skip_payments)
+            if 'tutor' not in run_systems and 'tutor' in item.keywords:
+                item.add_marker(mark_skip_tutor)
+            if 'web' not in run_systems and 'web' in item.keywords:
+                item.add_marker(mark_skip_web)
 
 
 def pytest_collectreport(report):

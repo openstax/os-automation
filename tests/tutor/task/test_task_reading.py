@@ -2,6 +2,8 @@
 
 from tests.markers import nondestructive, skip_test, test_case, tutor
 
+# TODO: fix reading assignments to include multipart and two-step answering
+
 
 @test_case('')
 @skip_test(reason='Script not written')

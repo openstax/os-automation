@@ -3,7 +3,7 @@
 from tests.markers import skip_test, test_case, tutor
 
 
-@test_case('')
+@test_case('C208517')
 @skip_test(reason='Script not written')
 @tutor
 def test_external_assignment_page(tutor_base_url, selenium, student):
@@ -17,7 +17,7 @@ def test_external_assignment_page(tutor_base_url, selenium, student):
     # THEN: User should be presented with details of the external assignment
 
 
-@test_case('')
+@test_case('C208518')
 @skip_test(reason='Script not written')
 @tutor
 def test_external_assignment_direction(tutor_base_url, selenium, student):
@@ -32,7 +32,7 @@ def test_external_assignment_direction(tutor_base_url, selenium, student):
     # THEN: User is presented with the directions for the assignment
 
 
-@test_case('')
+@test_case('C208519')
 @skip_test(reason='Script not written')
 @tutor
 def test_external_assignment_under_tab(tutor_base_url, selenium, student):
@@ -48,7 +48,7 @@ def test_external_assignment_under_tab(tutor_base_url, selenium, student):
     # THEN: External assignment page loads
 
 
-@test_case('')
+@test_case('C208520')
 @skip_test(reason='Script not written')
 @tutor
 def test_external_assignment_instruction(tutor_base_url, selenium, student):
@@ -62,30 +62,14 @@ def test_external_assignment_instruction(tutor_base_url, selenium, student):
     # THEN: The external assignment link and instructions are shown
 
 
-@test_case('')
-@skip_test(reason='Script not written')
-@tutor
-def test_external_assignment_to_dashboard(tutor_base_url, selenium, student):
-    """Test the external assignment to dashboard button."""
-    # GIVEN: Logged into Tutor as a student
-    # AND: Has enrolled in a course
-    # AND:  Has an external assignement
-
-    # WHEN: The user clicks on the link to the external assignment
-    # AND: The user closes the assignement tab
-    # AND: The user clicks "Back to Dashboard"
-
-    # THEN: User is presented with the dashboard"
-
-
-@test_case('')
+@test_case('C208521')
 @skip_test(reason='Script not written')
 @tutor
 def test_clicked_external_assignment(tutor_base_url, selenium, student):
     """Test the link of external assignment."""
     # GIVEN: Logged into Tutor as a student
     # AND: Has enrolled in a course
-    # AND:  Has an external assignement
+    # AND: Has an external assignement
 
     # WHEN: The user clicks on the link to the external assignment
     # AND: The user closes the assignement tab

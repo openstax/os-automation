@@ -55,7 +55,7 @@ def test_add_a_new_course(tutor_base_url, selenium, admin):
     # AND: the course is listed on the last Courses page
 
 
-@test_case('')
+@test_case('C208714')
 @skip_test(reason='Script not written')
 @tutor
 def test_view_the_other_courses_tabs(tutor_base_url, selenium, admin):

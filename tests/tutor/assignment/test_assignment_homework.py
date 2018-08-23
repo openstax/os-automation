@@ -148,16 +148,21 @@ def test_edit_a_draft_homework(tutor_base_url, selenium, teacher):
     # AND: Edited draft with all info changed is published
 
 
-@test_case('C208567')
+@test_case('C210290')
 @skip_test(reason='Script not written')
 @tutor
-def test_see_what_the_student_sees(tutor_base_url, selenium, teacher):
-    """View the student view videos."""
-    # GIVEN: Logged into Tutor as a teacher
-    # AND: Has an existing course
-    # AND: Has a homework assignment
+def test_required_fields_for_homework_assignments(
+        tutor_base_url, selenium, teacher):
+    """Test fields required to save or publish a homework assignment."""
+    # GIVEN: a user logged in as a teacher
+    # AND: viewing the calendar dashboard for a course
 
-    # WHEN: Go to a homework assignment
-    # AND: Edit it
+    # WHEN: they open the "Add Assignment" pane
+    # AND: click the "Add Homework" link
+    # AND: click the "Publish" button
 
-    # THEN: "see what students see" button should be available
+    # THEN: the "Assignment name", "Due date" and "Select Problems" field text
+    #       are red
+    # AND: "Required field" is displayed below the assignment name and due date
+    #       fields and "Please select problems for this assignment." is below
+    #       the select problems button
