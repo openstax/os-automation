@@ -1,4 +1,4 @@
-# ospages
+# os-automation
 
 Automated test framework for the OpenStax Tutor and Web projects
 
@@ -19,13 +19,13 @@ If you have cloned this project already then you can skip this, otherwise you'll
 $ cp .env.template .env
 ```
 
-Enter valid account and server data for use on your system.
+Enter valid account and server data for use on your system into the environment file. _Make sure to prefix the server URLs with the protocol (eg `https://`)_
 
 ### Run the tests
 
 Tests are run using the command line using the `tox` command. By default this will run all of the environments configured, including checking your tests against recommended style conventions using [flake8][flake8].
 
-To run against a different instance set, pass in a value for a specific system`--<systen>_base_url`:
+To run against a different instance set, pass in a value for a specific system `--<systen>_base_url`:
 
 ```bash
 $ tox -- --driver chrome --accounts_base_url=https://accounts.openstax.org
@@ -91,6 +91,7 @@ from tests.markers import accounts, nondestructive, test_case
 
 from pages.accounts.home import AccountsHome as Home
 
+
 @test_case('C000000')
 @nondestructive
 @accounts
@@ -100,15 +101,15 @@ def test_open_home_page(accounts_base_url, selenium):
     page = Home(selenium, accounts_base_url).open()
 
     # WHEN The main website URL is fully loaded
-    assert(page.header.is_header_displayed), 'Accounts header is not shown'
-    assert(page.footer.is_footer_displayed), 'Accounts footer is not shown'
     page.header.go_to_accounts_home()
 
     # THEN The login page is displayed
     assert(page.current_url == accounts_base_url + '/login')
+    assert(page.header.is_header_displayed), 'Accounts header is not shown'
+    assert(page.footer.is_footer_displayed), 'Accounts footer is not shown'
 ```
 
-`@test_case('C000000')` is the TestRail case ID number
+`@test_case('C000000')` is the TestRail case ID number _Note: case IDs are prefixed with 'C' while test run IDs are prefixed with a 'T'._
 
 The inspiration for this framework is based on the [Mozilla Addons Server Project][mozilla]
 and plenty of examples can be gleamed from their fantastic usage of the
