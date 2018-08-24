@@ -25,6 +25,7 @@ def test_log_into_payments_with_admin_account(payments_base_url,
 
 
 @test_case('C208907')
+@expected_failure
 @nondestructive
 @payments
 def test_log_out_from_nav_bar(payments_base_url, selenium, admin):
@@ -41,6 +42,7 @@ def test_log_out_from_nav_bar(payments_base_url, selenium, admin):
 
 
 @test_case('C208908')
+@expected_failure
 @nondestructive
 @payments
 def test_click_logo(payments_base_url, selenium, admin):
@@ -60,6 +62,7 @@ def test_click_logo(payments_base_url, selenium, admin):
 
 
 @test_case('C208909')
+@expected_failure
 @nondestructive
 @payments
 def test_go_to_email_logs(payments_base_url, selenium, admin):
@@ -84,6 +87,7 @@ def test_go_to_email_logs(payments_base_url, selenium, admin):
 
 
 @test_case('C208910')
+@expected_failure
 @nondestructive
 @payments
 def test_go_to_orders(payments_base_url, selenium, admin):
@@ -109,6 +113,7 @@ def test_go_to_orders(payments_base_url, selenium, admin):
 
 
 @test_case('C210266')
+@expected_failure
 @nondestructive
 @payments
 def test_view_the_details_for_an_order(payments_base_url, selenium, admin):

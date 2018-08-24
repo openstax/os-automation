@@ -534,7 +534,18 @@ class RestMail(object):
     def __init__(self, username):
         """Initialize a mailbox."""
         self._inbox = []
-        self.username = username
+        self._username = username
+        self._address = username + '@restmail.net'
+
+    @property
+    def user(self):
+        """Return the box username."""
+        return self._username
+
+    @property
+    def address(self):
+        """Return the full email address."""
+        return self._address
 
     @property
     def inbox(self):
@@ -555,7 +566,7 @@ class RestMail(object):
             A list of Emails received for a particular user
 
         """
-        messages = requests.get(self.MAIL_URL.format(username=self.username))
+        messages = requests.get(self.MAIL_URL.format(username=self._username))
         self._inbox = [self.Email(message) for message in messages.json()]
         return self._inbox
 
@@ -591,7 +602,7 @@ class RestMail(object):
 
     def empty(self):
         """Delete all message in the inbox."""
-        requests.delete(self.MAIL_URL.format(username=self.username))
+        requests.delete(self.MAIL_URL.format(username=self._username))
 
     class Email(object):
         """E-mail message structure.

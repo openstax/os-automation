@@ -1,11 +1,11 @@
 """Test cases for performance forecast functionality."""
 
-from tests.markers import expected_failure, nondestructive  # noqa
+from tests.markers import expected_failure, nondestructive, skip_test  # noqa
 from tests.markers import test_case, tutor  # noqa
 
 
 @test_case('')
-@expected_failure
+@skip_test(reason='Script not written')
 @tutor
 def test_user_performance_bar(tutor_base_url, selenium, student):
     """Test the user performance bar."""
@@ -19,7 +19,7 @@ def test_user_performance_bar(tutor_base_url, selenium, student):
 
 
 @test_case('')
-@expected_failure
+@skip_test(reason='Script not written')
 @tutor
 def test_performance_bar_question(tutor_base_url, selenium, student):
     """Test the performance bar questions."""
@@ -33,7 +33,7 @@ def test_performance_bar_question(tutor_base_url, selenium, student):
 
 
 @test_case('')
-@expected_failure
+@skip_test(reason='Script not written')
 @tutor
 def test_performance_bar_answer(tutor_base_url, selenium, student):
     """Test the performance bar answers."""
@@ -48,7 +48,7 @@ def test_performance_bar_answer(tutor_base_url, selenium, student):
 
 
 @test_case('')
-@expected_failure
+@skip_test(reason='Script not written')
 @tutor
 def test_performance_bar_submit(tutor_base_url, selenium, student):
     """Test the performance bar submit button."""
@@ -63,7 +63,7 @@ def test_performance_bar_submit(tutor_base_url, selenium, student):
 
 
 @test_case('')
-@expected_failure
+@skip_test(reason='Script not written')
 @tutor
 def test_performance_bar_assessment(tutor_base_url, selenium, student):
     """Test the performance bar assessment."""
@@ -81,7 +81,7 @@ def test_performance_bar_assessment(tutor_base_url, selenium, student):
 
 
 @test_case('')
-@expected_failure
+@skip_test(reason='Script not written')
 @tutor
 def test_performance_bar_feedback(tutor_base_url, selenium, student):
     """Test the performance bar feedback."""
@@ -97,7 +97,7 @@ def test_performance_bar_feedback(tutor_base_url, selenium, student):
 
 
 @test_case('')
-@expected_failure
+@skip_test(reason='Script not written')
 @tutor
 def test_performance_bar_breadcrumb(tutor_base_url, selenium, student):
     """Test the performance bar breadcrumb."""
@@ -112,7 +112,7 @@ def test_performance_bar_breadcrumb(tutor_base_url, selenium, student):
 
 
 @test_case('')
-@expected_failure
+@skip_test(reason='Script not written')
 @tutor
 def test_performance_forecast(tutor_base_url, selenium, student):
     """Test the performance forecast."""
@@ -126,7 +126,7 @@ def test_performance_forecast(tutor_base_url, selenium, student):
 
 
 @test_case('')
-@expected_failure
+@skip_test(reason='Script not written')
 @tutor
 def test_performance_forecast_info_icon_for_a_student(tutor_base_url, selenium,
                                                       student):
@@ -140,9 +140,9 @@ def test_performance_forecast_info_icon_for_a_student(tutor_base_url, selenium,
     # THEN: Info icon shows an explanation of the data
 
 
-@expected_failure
-@nondestructive
 @test_case('')
+@skip_test(reason='Script not written')
+@nondestructive
 @tutor
 def test_performance_forecast_info_icon_for_a_teacher(tutor_base_url, selenium,
                                                       teacher):
@@ -157,7 +157,7 @@ def test_performance_forecast_info_icon_for_a_teacher(tutor_base_url, selenium,
 
 
 @test_case('')
-@expected_failure
+@skip_test(reason='Script not written')
 @tutor
 def test_performance_color_key(tutor_base_url, selenium, student):
     """Test the performance color key."""
@@ -173,7 +173,7 @@ def test_performance_color_key(tutor_base_url, selenium, student):
 
 
 @test_case('')
-@expected_failure
+@skip_test(reason='Script not written')
 @tutor
 def test_performance_forecast_with_zero_question(
         tutor_base_url, selenium, student):
@@ -190,7 +190,7 @@ def test_performance_forecast_with_zero_question(
 
 
 @test_case('')
-@expected_failure
+@skip_test(reason='Script not written')
 @tutor
 def test_performance_forecast_weak_area(tutor_base_url, selenium, student):
     """Test the weak area of the performance forecast."""
@@ -205,7 +205,7 @@ def test_performance_forecast_weak_area(tutor_base_url, selenium, student):
 
 
 @test_case('')
-@expected_failure
+@skip_test(reason='Script not written')
 @tutor
 def test_performance_forecast_individual_section(
         tutor_base_url, selenium, student):
@@ -221,7 +221,7 @@ def test_performance_forecast_individual_section(
 
 
 @test_case('')
-@expected_failure
+@skip_test(reason='Script not written')
 @tutor
 def test_performance_forecast_chapter(tutor_base_url, selenium, student):
     """Test the performance forecast chapter bar."""
@@ -237,7 +237,7 @@ def test_performance_forecast_chapter(tutor_base_url, selenium, student):
 
 
 @test_case('')
-@expected_failure
+@skip_test(reason='Script not written')
 @tutor
 def test_performance_forecast_section_bar(tutor_base_url, selenium, student):
     """Test the performance forecast section bar."""
@@ -253,7 +253,7 @@ def test_performance_forecast_section_bar(tutor_base_url, selenium, student):
 
 
 @test_case('')
-@expected_failure
+@skip_test(reason='Script not written')
 @tutor
 def test_performance_forecast_without_data(tutor_base_url, selenium, student):
     """Test the performance forecast individual section without enough data."""
@@ -268,7 +268,7 @@ def test_performance_forecast_without_data(tutor_base_url, selenium, student):
 
 
 @test_case('')
-@expected_failure
+@skip_test(reason='Script not written')
 @tutor
 def test_performance_forecast_finished_assignment(
         tutor_base_url, selenium, student):
@@ -283,9 +283,9 @@ def test_performance_forecast_finished_assignment(
     # THEN: Performance forecast with the finished assignment updated is loaded
 
 
-@expected_failure
-@nondestructive
 @test_case('')
+@skip_test(reason='Script not written')
+@nondestructive
 @tutor
 def test_view_period_performance_forecast(tutor_base_url, selenium, teacher):
     """View performance forecast page."""
@@ -297,9 +297,9 @@ def test_view_period_performance_forecast(tutor_base_url, selenium, teacher):
     # THEN: The period Performance Forecast is presented to the user
 
 
-@expected_failure
-@nondestructive
 @test_case('')
+@skip_test(reason='Script not written')
+@nondestructive
 @tutor
 def test_view_the_performance_color_key(tutor_base_url, selenium, teacher):
     """View performance color key in performance forecast page."""
@@ -311,9 +311,9 @@ def test_view_the_performance_color_key(tutor_base_url, selenium, teacher):
     # THEN: The performance color key is presented to the user
 
 
-@expected_failure
-@nondestructive
 @test_case('')
+@skip_test(reason='Script not written')
+@nondestructive
 @tutor
 def test_period_tabs_are_shown(tutor_base_url, selenium, teacher):
     """Check period tabs in performance forecast page."""
@@ -326,9 +326,9 @@ def test_period_tabs_are_shown(tutor_base_url, selenium, teacher):
     # THEN: The period tabs are shown to the user
 
 
-@expected_failure
-@nondestructive
 @test_case('')
+@skip_test(reason='Script not written')
+@nondestructive
 @tutor
 def test_period_with_zero_answers(tutor_base_url, selenium, teacher):
     """Check that a period with no answers doesn't show section breakdowns."""
@@ -340,9 +340,9 @@ def test_period_with_zero_answers(tutor_base_url, selenium, teacher):
     # THEN: The user should see no section breakdowns
 
 
-@expected_failure
-@nondestructive
 @test_case('')
+@skip_test(reason='Script not written')
+@nondestructive
 @tutor
 def test_perforemance_forecast_weaker_areas(tutor_base_url, selenium, teacher):
     """Check weaker areas show up to four problematic sections."""
