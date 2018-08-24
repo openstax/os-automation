@@ -81,6 +81,7 @@ class AccountsHome(AccountsBase):
             self.find_element(*self._password_field_locator) \
                 .send_keys(password)
             self.find_element(*self._login_submit_button_locator).click()
+            sleep(1)
 
         def facebook_login(self, user, facebook_user, password):
             """Log into the site with facebook."""

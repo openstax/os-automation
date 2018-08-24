@@ -13,10 +13,14 @@ def test_sign_up_as_a_student_user(accounts_base_url, selenium, student):
     """Test student user signup."""
     # GIVEN: a valid and accessible email address
     # AND: the Accounts Home page is loaded
-    name = Utility.random_hex()
-    email = RestMail(name)
+    name = Utility.random_name()
+    email = RestMail(
+        '{first}.{last}.{tag}'
+        .format(first=name[1], last=name[2], tag=Utility.random_hex(3))
+        .lower()
+    )
     email.empty()
-    address = name + '@restmail.net'
+    address = email.address
     password = student[1]
     page = Home(selenium, accounts_base_url).open()
 
@@ -37,8 +41,8 @@ def test_sign_up_as_a_student_user(accounts_base_url, selenium, student):
         password,
         _type='Student',
         provider='restmail',
-        name=['', name, name, ''],
-        school='staxly',
+        name=name,
+        school='Automation',
         news=False)
 
     # THEN: the Account Profile page is loaded
@@ -52,10 +56,14 @@ def test_sign_up_as_an_instructor(accounts_base_url, selenium, teacher):
     """Test non-student user signup."""
     # GIVEN: a valid and accessible email address
     # AND: the Accounts Home page is loaded
-    name = Utility.random_hex()
-    email = RestMail(name)
+    name = Utility.random_name()
+    email = RestMail(
+        '{first}.{last}.{tag}'
+        .format(first=name[1], last=name[2], tag=Utility.random_hex(3))
+        .lower()
+    )
     email.empty()
-    address = name + '@restmail.net'
+    address = email.address
     password = teacher[1]
     page = Home(selenium, accounts_base_url).open()
 
@@ -79,12 +87,12 @@ def test_sign_up_as_an_instructor(accounts_base_url, selenium, teacher):
         password,
         _type='Instructor',
         provider='restmail',
-        name=['', name, name, ''],
-        school='staxly',
+        name=name,
+        school='Automation',
         news=False,
         phone=Utility.random_phone(),
         webpage='https://openstax.org/',
-        subjects=['accounting', 'astronomy'],
+        subjects=subject_list(2),
         students=10,
         use='Fully adopted and using it as the primary textbook')
 
@@ -99,10 +107,14 @@ def test_sign_up_as_a_nonstudent_user(accounts_base_url, selenium, teacher):
     """Test non-student user signup."""
     # GIVEN: a valid and accessible email address
     # AND: the Accounts Home page is loaded
-    name = Utility.random_hex()
-    email = RestMail(name)
+    name = Utility.random_name()
+    email = RestMail(
+        '{first}.{last}.{tag}'
+        .format(first=name[1], last=name[2], tag=Utility.random_hex(3))
+        .lower()
+    )
     email.empty()
-    address = name + '@restmail.net'
+    address = email.address
     password = teacher[1]
     page = Home(selenium, accounts_base_url).open()
 
@@ -126,12 +138,12 @@ def test_sign_up_as_a_nonstudent_user(accounts_base_url, selenium, teacher):
         password,
         _type='Other',
         provider='restmail',
-        name=['', name, name, ''],
-        school='staxly',
+        name=name,
+        school='Automation',
         news=False,
         phone=Utility.random_phone(),
         webpage='https://openstax.org/',
-        subjects=['accounting', 'astronomy'],)
+        subjects=subject_list(3))
 
     # THEN: the Account Profile page is loaded
     assert(page.current_url == accounts_base_url + '/profile'), \

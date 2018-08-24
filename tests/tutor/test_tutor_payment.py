@@ -1,10 +1,10 @@
 """Test case for tutor page student payment interaction."""
 
-from tests.markers import expected_failure, nondestructive, test_case, tutor
+from tests.markers import nondestructive, skip_test, test_case, tutor
 
 
 @test_case('')
-@expected_failure
+@skip_test(reason='Script not written')
 @nondestructive
 @tutor
 def test_tutor_payment_page(tutor_base_url, selenium, student):
@@ -17,7 +17,7 @@ def test_tutor_payment_page(tutor_base_url, selenium, student):
 
 
 @test_case('')
-@expected_failure
+@skip_test(reason='Script not written')
 @nondestructive
 @tutor
 def test_tutor_invoice_page(tutor_base_url, selenium, student):
@@ -32,7 +32,7 @@ def test_tutor_invoice_page(tutor_base_url, selenium, student):
 
 
 @test_case('')
-@expected_failure
+@skip_test(reason='Script not written')
 @tutor
 def test_payment_option(tutor_base_url, selenium, student):
     """Test the tutor payment option section."""
@@ -49,7 +49,7 @@ def test_payment_option(tutor_base_url, selenium, student):
 
 
 @test_case('')
-@expected_failure
+@skip_test(reason='Script not written')
 @tutor
 def test_course_payment(tutor_base_url, selenium, student):
     """Test the process of making payment for a course."""
@@ -66,7 +66,7 @@ def test_course_payment(tutor_base_url, selenium, student):
 
 
 @test_case('')
-@expected_failure
+@skip_test(reason='Script not written')
 @tutor
 def test_invalid__card_payment(tutor_base_url, selenium, student):
     """Test the tutor invalid payment methods."""
@@ -85,7 +85,7 @@ def test_invalid__card_payment(tutor_base_url, selenium, student):
 
 
 @test_case('')
-@expected_failure
+@skip_test(reason='Script not written')
 @tutor
 def test_unfilled_purchase(tutor_base_url, selenium, student):
     """Test the tutor assignment review."""
@@ -99,7 +99,7 @@ def test_unfilled_purchase(tutor_base_url, selenium, student):
 
 
 @test_case('')
-@expected_failure
+@skip_test(reason='Script not written')
 @tutor
 def test_not_payed_course_skip_payment(tutor_base_url, selenium, student):
     """Test that course not payed skips the payment section."""
@@ -113,7 +113,7 @@ def test_not_payed_course_skip_payment(tutor_base_url, selenium, student):
 
 
 @test_case('')
-@expected_failure
+@skip_test(reason='Script not written')
 @tutor
 def test_buy_free_trial(tutor_base_url, selenium, student):
     """Test buying a course from free trial."""
