@@ -63,6 +63,14 @@ To run a specific test, pass in a value for `-k`:
 $ tox -- --driver chrome -k test_my_feature
 ```
 
+Or tests for a specific product, pass in one or more values for `--systems`
+
+```bash
+$ tox -- --driver chrome --systems accounts web
+```
+
+_Accepted values: `accounts`, `biglearn`, `exercises`, `hypothesis`, `payments`, `tutor`, `web`_
+
 ### Additional Options
 
 The pytest plugin that we use for running tests has a number of advanced command line options available. To see the options available, run `pytest --help`. The full documentation for the plugin can be found [here][pytest-selenium].
