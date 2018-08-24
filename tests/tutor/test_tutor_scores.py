@@ -1,10 +1,10 @@
 """Tests for Tutor course student scores."""
 
-from tests.markers import expected_failure, nondestructive, test_case, tutor
+from tests.markers import nondestructive, skip_test, test_case, tutor
 
 
 @test_case('')
-@expected_failure
+@skip_test(reason='Script not written')
 @tutor
 def test_score_page(tutor_base_url, selenium, student):
     """Test the score page."""
@@ -18,7 +18,7 @@ def test_score_page(tutor_base_url, selenium, student):
 
 
 @test_case('')
-@expected_failure
+@skip_test(reason='Script not written')
 @tutor
 def test_average_section(tutor_base_url, selenium, student):
     """Test the average section of the homework assignment."""
@@ -32,9 +32,9 @@ def test_average_section(tutor_base_url, selenium, student):
     # THEN: See the average section widen
 
 
-@expected_failure
-@nondestructive
 @test_case('')
+@skip_test(reason='Script not written')
+@nondestructive
 @tutor
 def test_view_student_scores(tutor_base_url, selenium, teacher):
     """View student scores."""
@@ -46,9 +46,9 @@ def test_view_student_scores(tutor_base_url, selenium, teacher):
     # THEN: Scores for selected period are displayed in a table
 
 
-@expected_failure
-@nondestructive
 @test_case('')
+@skip_test(reason='Script not written')
+@nondestructive
 @tutor
 def test_section_tab(tutor_base_url, selenium, teacher):
     """Switch to view different sections of student scores."""
@@ -60,9 +60,9 @@ def test_section_tab(tutor_base_url, selenium, teacher):
     # THEN: Period tabs should be displayed
 
 
-@expected_failure
-@nondestructive
 @test_case('')
+@skip_test(reason='Script not written')
+@nondestructive
 @tutor
 def test_switch_between_score_representation(
         tutor_base_url, selenium, teacher):
@@ -75,9 +75,9 @@ def test_switch_between_score_representation(
     # THEN: The representation of score representation change accordingly
 
 
-@expected_failure
-@nondestructive
 @test_case('')
+@skip_test(reason='Script not written')
+@nondestructive
 @tutor
 def test_download_spreadsheet_of_class_score(
         tutor_base_url, selenium, teacher):
@@ -92,9 +92,9 @@ def test_download_spreadsheet_of_class_score(
     # THEN: Spreadsheet of scores is saved as an xlsx file
 
 
-@expected_failure
-@nondestructive
 @test_case('')
+@skip_test(reason='Script not written')
+@nondestructive
 @tutor
 def test_view_performance_forecast_for_single_student(tutor_base_url, selenium,
                                                       teacher):
@@ -107,9 +107,9 @@ def test_view_performance_forecast_for_single_student(tutor_base_url, selenium,
     # THEN: Performance Forecast for selected student is displayed
 
 
-@expected_failure
-@nondestructive
 @test_case('')
+@skip_test(reason='Script not written')
+@nondestructive
 @tutor
 def test_sort_the_student_list_by_last_name(tutor_base_url, selenium, teacher):
     """Sort student by last name in the score page."""
@@ -122,9 +122,9 @@ def test_sort_the_student_list_by_last_name(tutor_base_url, selenium, teacher):
     # THEN: The students are sorted alphabetically by last name
 
 
-@expected_failure
-@nondestructive
 @test_case('')
+@skip_test(reason='Script not written')
+@nondestructive
 @tutor
 def test_sort_score_by_assignment_completion(tutor_base_url, selenium,
                                              teacher):
@@ -138,9 +138,9 @@ def test_sort_score_by_assignment_completion(tutor_base_url, selenium,
     # THEN: Students are sorted by completion of selected assignment.
 
 
-@expected_failure
-@nondestructive
 @test_case('')
+@skip_test(reason='Script not written')
+@nondestructive
 @tutor
 def test_sort_score_by_assignment_score(tutor_base_url, selenium, teacher):
     """Sort student by scores of an assignment in the score page."""
@@ -153,8 +153,8 @@ def test_sort_score_by_assignment_score(tutor_base_url, selenium, teacher):
     # THEN: Students are sorted by completion of selected assignment.
 
 
-@expected_failure
 @test_case('')
+@skip_test(reason='Script not written')
 @tutor
 def test_edit_score_weights(tutor_base_url, selenium, teacher):
     """Edit score weights."""
@@ -167,9 +167,9 @@ def test_edit_score_weights(tutor_base_url, selenium, teacher):
     # AND: user should be able to change the weights from this window
 
 
-@expected_failure
-@nondestructive
 @test_case('')
+@skip_test(reason='Script not written')
+@nondestructive
 @tutor
 def test_cancel_edit_score_weights(tutor_base_url, selenium, teacher):
     """Cancel editing score weights."""
@@ -181,9 +181,9 @@ def test_cancel_edit_score_weights(tutor_base_url, selenium, teacher):
     # THEN: User is taken back to the scores page, nothing should change
 
 
-@expected_failure
-@nondestructive
 @test_case('')
+@skip_test(reason='Script not written')
+@nondestructive
 @tutor
 def test_click_see_why_in_score_weights(tutor_base_url, selenium, teacher):
     """Go to 'see why' blog page from score weights."""
@@ -196,9 +196,9 @@ def test_click_see_why_in_score_weights(tutor_base_url, selenium, teacher):
     # THEN: the openstax blog should open up in another tab
 
 
-@expected_failure
-@nondestructive
 @test_case('')
+@skip_test(reason='Script not written')
+@nondestructive
 @tutor
 def test_scrolling_in_assignments_section(tutor_base_url, selenium, teacher):
     """Scroll left and right in assignment section in score page."""
@@ -210,9 +210,9 @@ def test_scrolling_in_assignments_section(tutor_base_url, selenium, teacher):
     # THEN: Table should move accordingly with the scrolling
 
 
-@expected_failure
-@nondestructive
 @test_case('')
+@skip_test(reason='Script not written')
+@nondestructive
 @tutor
 def test_score_page_for_section_with_no_scores(tutor_base_url, selenium,
                                                teacher):
@@ -225,9 +225,9 @@ def test_score_page_for_section_with_no_scores(tutor_base_url, selenium,
     # THEN: The page contains button to settings and roaster
 
 
-@expected_failure
-@nondestructive
 @test_case('')
+@skip_test(reason='Script not written')
+@nondestructive
 @tutor
 def test_view_overall_students_performance(tutor_base_url, selenium, teacher):
     """View the overall performance of students in scores page."""
@@ -240,9 +240,9 @@ def test_view_overall_students_performance(tutor_base_url, selenium, teacher):
     # THEN: Each question has a correct response displayed
 
 
-@expected_failure
-@nondestructive
 @test_case('')
+@skip_test(reason='Script not written')
+@nondestructive
 @tutor
 def test_view_student_assignment_detail(tutor_base_url, selenium, teacher):
     """View student's assignment from score page."""
@@ -254,9 +254,9 @@ def test_view_student_assignment_detail(tutor_base_url, selenium, teacher):
     # THEN: the teacher is taken to the assignment page with student's answers
 
 
-@expected_failure
-@nondestructive
 @test_case('')
+@skip_test(reason='Script not written')
+@nondestructive
 @tutor
 def test_no_score_is_displayed_for_readings(tutor_base_url, selenium, teacher):
     """Check no score for readings in the score page."""
@@ -269,9 +269,9 @@ def test_no_score_is_displayed_for_readings(tutor_base_url, selenium, teacher):
     # THEN: The user is presented with progress icon but no score for reading
 
 
-@expected_failure
-@nondestructive
 @test_case('')
+@skip_test(reason='Script not written')
+@nondestructive
 @tutor
 def test_scores_info_icon(tutor_base_url, selenium, teacher):
     """Check the info icon in the score page displays proper information."""
@@ -284,8 +284,8 @@ def test_scores_info_icon(tutor_base_url, selenium, teacher):
     # are calculated.
 
 
-@expected_failure
 @test_case('')
+@skip_test(reason='Script not written')
 @tutor
 def test_accept_late_work(tutor_base_url, selenium, teacher):
     """Accept late work in the score page."""
@@ -300,8 +300,8 @@ def test_accept_late_work(tutor_base_url, selenium, teacher):
     # THEN: The late score replaces the score at due date
 
 
-@expected_failure
 @test_case('')
+@skip_test(reason='Script not written')
 @tutor
 def test_unaccept_late_work(tutor_base_url, selenium, teacher):
     """Unaccept late work in the score page."""
@@ -316,9 +316,9 @@ def test_unaccept_late_work(tutor_base_url, selenium, teacher):
     # THEN: The score is converted back to the score at due date
 
 
-@expected_failure
-@nondestructive
 @test_case('')
+@skip_test(reason='Script not written')
+@nondestructive
 @tutor
 def test_external_assignments_in_the_scores_export(tutor_base_url, selenium,
                                                    teacher):
@@ -331,9 +331,9 @@ def test_external_assignments_in_the_scores_export(tutor_base_url, selenium,
     # THEN: External assignments are not included in the scores export
 
 
-@expected_failure
-@nondestructive
 @test_case('')
+@skip_test(reason='Script not written')
+@nondestructive
 @tutor
 def test_dropped_students_in_student_scores(tutor_base_url, selenium, teacher):
     """Check removal of dropped students in scores page."""
@@ -345,9 +345,9 @@ def test_dropped_students_in_student_scores(tutor_base_url, selenium, teacher):
     # THEN: Dropped student should not be displayed in Student Scores
 
 
-@expected_failure
-@nondestructive
 @test_case('')
+@skip_test(reason='Script not written')
+@nondestructive
 @tutor
 def test_moved_students_in_student_scores(tutor_base_url, selenium, teacher):
     """Check moved students appear in their current sections in scores."""
@@ -359,9 +359,9 @@ def test_moved_students_in_student_scores(tutor_base_url, selenium, teacher):
     # THEN: The user is presented with the moved student under their new period
 
 
-@expected_failure
-@nondestructive
 @test_case('')
+@skip_test(reason='Script not written')
+@nondestructive
 @tutor
 def test_view_score_at_due_date(tutor_base_url, selenium, teacher):
     """Check teacher view scores at due date in score's page."""
@@ -374,9 +374,9 @@ def test_view_score_at_due_date(tutor_base_url, selenium, teacher):
     # THEN: User is displayed with scores at due date
 
 
-@expected_failure
-@nondestructive
 @test_case('')
+@skip_test(reason='Script not written')
+@nondestructive
 @tutor
 def test_view_current_score(tutor_base_url, selenium, teacher):
     """View current score in score's page."""

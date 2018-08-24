@@ -30,6 +30,7 @@ class Google(Page):
 
     def log_in(self, user, password):
         """Log into Google."""
+        sleep(1.0)
         from pages.accounts.signup import Signup
         if not self.at_google:
             return Signup(self.driver)

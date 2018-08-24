@@ -12,6 +12,10 @@ class PaymentsNav(Region):
     _view_site_locator = (By.PARTIAL_LINK_TEXT, 'SITE')
     _log_out_locator = (By.PARTIAL_LINK_TEXT, 'OUT')
 
+    def is_displayed(self):
+        """Return True if the navigation bar is visible."""
+        return self.find_element(*self._logo_locator).is_displayed()
+
     def click_logo(self):
         """Click on the logo to return home."""
         self.find_element(*self._logo_locator).click()

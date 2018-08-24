@@ -1,11 +1,11 @@
 """Test of teacher functions."""
 
-from tests.markers import expected_failure, nondestructive, test_case, tutor
+from tests.markers import nondestructive, skip_test, test_case, tutor
 
 
-@expected_failure
-@nondestructive
 @test_case('')
+@skip_test(reason='Script not written')
+@nondestructive
 @tutor
 def test_back_to_question_library(tutor_base_url, selenium, teacher):
     """Test teacher to go back to question library."""
@@ -20,9 +20,9 @@ def test_back_to_question_library(tutor_base_url, selenium, teacher):
     # THEN: User is taken back to question library page
 
 
-@expected_failure
-@nondestructive
 @test_case('')
+@skip_test(reason='Script not written')
+@nondestructive
 @tutor
 def test_back_to_dashboard(tutor_base_url, selenium, teacher):
     """Test teacher to go back to dashboard."""

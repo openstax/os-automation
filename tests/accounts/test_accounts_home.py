@@ -106,8 +106,7 @@ def test_attempt_to_log_in_with_an_invalid_email(accounts_base_url, selenium):
 
     # WHEN: an invalid email address is entered
     # AND: the "NEXT" button is clicked
-    user = Utility.fake_email(
-        Utility.random_name(), Utility.random_name())
+    user = Utility.fake_email(*Utility.random_name()[1:3])
     password = ''
     with pytest.raises(NoSuchElementException):
         page.log_in(user, password)

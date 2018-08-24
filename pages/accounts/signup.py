@@ -162,12 +162,12 @@ class Signup(AccountsBase):
             self.next()
         elif kwargs['social'] == 'facebook':
             # use Facebook
-            self.password.use_social_login().use_facebook.log_in(
-                email, email_password)
+            self.password.use_social_login() \
+                .use_facebook.log_in(email, email_password)
         else:
             # use Google
-            self.password.use_social_login().use_google.log_in(email,
-                                                               email_password)
+            self.password.use_social_login() \
+                .use_google.log_in(email, email_password)
 
         # enter user details in group order
         # all users
@@ -181,10 +181,9 @@ class Signup(AccountsBase):
             self.instructor.phone = kwargs['phone']
             self.instructor.webpage = kwargs['webpage']
             subjects_to_select = []
-            for i in Signup.SUBJECTS:
-                for j in kwargs['subjects']:
-                    if i[0] == j:
-                        subjects_to_select.append(i[1])
+            for subject, name in Signup.SUBJECTS:
+                if name in kwargs.get('subjects'):
+                    subjects_to_select.append(name)
             self.instructor.subjects = subjects_to_select
         # instructor-only
         if instructor:
@@ -200,7 +199,6 @@ class Signup(AccountsBase):
         # request e-mail confirmation for an elevated account
         if non_student_role:
             self.notice.get_confirmation_email()
-            sleep(0.5)
             self.next()
 
         return profile.Profile(self.driver)
@@ -226,6 +224,7 @@ class Signup(AccountsBase):
                 page = page.login.go(email, password)
             WebDriverWait(page.driver, 60.0).until(
                 lambda _: page.emails[0].has_pin)
+            sleep(5.0)
             pin = page.emails[0].get_pin
             page.driver.get(return_url)
             sleep(1.0)
@@ -552,6 +551,7 @@ class Signup(AccountsBase):
         def subjects(self, subject_list):
             """Mark each interested subject."""
             for subject in self.subjects:
+                print(subject.title, subject_list, '\n')
                 if subject.title in subject_list:
                     subject.select()
             return self
@@ -570,6 +570,7 @@ class Signup(AccountsBase):
             def select(self):
                 """Select a book."""
                 self.find_element(*self._checkbox_locator).click()
+                sleep(1)
                 return self
 
     class InstructorNotice(Region):
@@ -579,7 +580,7 @@ class Signup(AccountsBase):
 
         def get_confirmation_email(self):
             """Get an e-mail confirmation when instructor access approved."""
-            print(self.find_element(*self._get_email_confirmation_locator)
-                  .get_attribute('outerHTML'))
+            sleep(0.5)
             self.find_element(*self._get_email_confirmation_locator).click()
+            sleep(0.5)
             return self
