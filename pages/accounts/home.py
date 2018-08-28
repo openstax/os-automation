@@ -39,7 +39,6 @@ class AccountsHome(AccountsBase):
         _user_field_locator = (By.ID, 'login_username_or_email')
         _password_field_locator = (By.ID, 'login_password')
         _login_submit_button_locator = (By.CSS_SELECTOR, '.footer > input')
-        _password_reset_locator = (By.CSS_SELECTOR, '.footer a')
         _trouble_locator = (By.CSS_SELECTOR, '.trouble')
         _login_help_locator = (By.CSS_SELECTOR, '.login-help')
         _salesforce_link_locator = (By.CSS_SELECTOR, '.login-help a')
@@ -48,6 +47,10 @@ class AccountsHome(AccountsBase):
         _form_box_locator = (By.TAG_NAME, 'input')
         _error_locator = (By.CSS_SELECTOR, '.alert')
         _signup_locator = (By.CSS_SELECTOR, '.extra-info a')
+
+        _password_reset_locator = (By.CSS_SELECTOR, '.footer a')
+        _password_reset_fields_locator = (By.CSS_SELECTOR, '[type=password]')
+        _password_reset_submit = (By.CSS_SELECTOR, '.footer input')
 
         _fb_locator = (By.ID, 'facebook-login-button')
         _fb_email_field_locator = (By.ID, 'email')
@@ -66,6 +69,38 @@ class AccountsHome(AccountsBase):
             """Return True if a user is logged in."""
             return 'profile' in self.driver.current_url
 
+        @property
+        def user(self):
+            return self.find_element(*self._user_field_locator)
+
+        @user.setter
+        def user(self, login):
+            """Send the login email or username."""
+            self.user.send_keys(login)
+            return self
+
+        def next(self):
+            """Click the NEXT button."""
+            self.find_element(*self._login_submit_button_locator).click()
+            sleep(1.0)
+            return self
+
+        def reset(self):
+            """Click the reset password link."""
+            self.find_element(*self._password_reset_locator).click()
+            sleep(1.0)
+            return self
+
+        @property
+        def password(self):
+            return self.find_element(*self._password_field_locator)
+
+        @password.setter
+        def password(self, password):
+            """Send the password."""
+            self.password.send_keys(password)
+            return self
+
         def login(self, user, password):
             """Log into the accounts with a specific user."""
             self.service_login(user, password)
@@ -75,19 +110,15 @@ class AccountsHome(AccountsBase):
 
         def service_login(self, user, password):
             """Log into the site with a specific user from another service."""
-            self.find_element(*self._user_field_locator).send_keys(user)
-            self.find_element(*self._login_submit_button_locator).click()
-            sleep(1)
-            self.find_element(*self._password_field_locator) \
-                .send_keys(password)
-            self.find_element(*self._login_submit_button_locator).click()
-            sleep(1)
+            self.user = user
+            self.next()
+            self.password = password
+            self.next()
 
         def facebook_login(self, user, facebook_user, password):
             """Log into the site with facebook."""
-            self.find_element(*self._user_field_locator).send_keys(user)
-            self.find_element(*self._login_submit_button_locator).click()
-            sleep(1)
+            self.user = user
+            self.next()
             self.find_element(*self._fb_locator).click()
             self.wait.until(
                 expect.visibility_of_element_located(
@@ -102,15 +133,14 @@ class AccountsHome(AccountsBase):
                     expect.visibility_of_element_located(
                         self._fb_safari_specific_locator))
                 self.find_element(*self._fb_safari_specific_locator).click()
-            sleep(2)
+            sleep(2.0)
             from pages.accounts.profile import Profile
             return Profile(self.driver)
 
         def google_login(self, user, google_user, password):
             """Log into the site with google."""
-            self.find_element(*self._user_field_locator).send_keys(user)
-            self.find_element(*self._login_submit_button_locator).click()
-            sleep(1)
+            self.user = user
+            self.next()
             self.find_element(*self._google_locator).click()
             self.wait.until(
                 expect.visibility_of_element_located(
@@ -122,14 +152,28 @@ class AccountsHome(AccountsBase):
             self.find_element(*self._google_password_locator) \
                 .send_keys(password)
             self.find_element(*self._google_pass_next_locator).click()
-            sleep(2)
+            sleep(2.0)
             from pages.accounts.profile import Profile
             return Profile(self.driver)
 
-        def reset_password(self, user, new_password):
-            """Reset a current user's password."""
-            # TODO: add password reset method
-            return
+        def trigger_reset(self, user):
+            """Start a password reset for a user."""
+            self.user = user
+            self.next()
+            self.reset()
+
+        def reset_password(self, url, password):
+            """Reset the password for the current user."""
+            self.driver.get(url)
+            fields = self.find_elements(*self._password_reset_fields_locator)
+            for field in fields:
+                field.send_keys(password)
+            self.find_element(*self._password_reset_submit).click()
+            sleep(1.0)
+            self.find_element(*self._password_reset_submit).click()
+            sleep(1.0)
+            from pages.accounts.profile import Profile
+            return Profile(self.driver)
 
         @property
         def is_help_shown(self):
@@ -140,7 +184,6 @@ class AccountsHome(AccountsBase):
         def toggle_help(self):
             """Show or hide Account help info."""
             self.find_element(*self._trouble_locator).click()
-            from time import sleep
             sleep(0.25)
             return self
 
