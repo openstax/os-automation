@@ -164,7 +164,6 @@ class AccountsHome(AccountsBase):
 
         def get_error_color(self):
             """Return the background color for missing or illegal fields."""
-            print(self.driver.page_source)
             fields = self.find_elements(*self._input_field_locator)
             issues = list(filter(
                 lambda element: 'has-error' in element.get_attribute('class'),

@@ -3,7 +3,9 @@
 import pytest
 
 __all__ = ['student', 'teacher', 'admin', 'content',
-           'salesforce', 'facebook', 'google', 'gmail']
+           'salesforce',
+           'facebook', 'facebook_signup',
+           'google', 'google_signup']
 
 
 @pytest.fixture(scope='module')
@@ -43,15 +45,21 @@ def facebook(request):
 
 
 @pytest.fixture(scope='module')
+def facebook_signup(request):
+    """Set the Facebook user email information."""
+    return _data_return(request, 'facebook_signup')
+
+
+@pytest.fixture(scope='module')
 def google(request):
     """Set the Google user information."""
     return _data_return(request, 'google')
 
 
 @pytest.fixture(scope='module')
-def gmail(request):
+def google_signup(request):
     """Set the Google Gmail user information."""
-    return _data_return(request, 'gmail')
+    return _data_return(request, 'google_signup')
 
 
 def _data_return(request, target):

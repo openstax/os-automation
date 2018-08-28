@@ -115,25 +115,31 @@ def pytest_addoption(parser):
                            nargs=2,
                            default=[os.getenv('SALESFORCE_USERNAME'),
                                     os.getenv('SALESFORCE_PASSWORD')],
-                           help='OpenStax test content manager account')
+                           help='OpenStax test Salesforce manager account')
     user_options.addoption('--facebook',
                            action='store',
                            nargs=2,
                            default=[os.getenv('FACEBOOK_USERNAME'),
                                     os.getenv('FACEBOOK_PASSWORD')],
-                           help='OpenStax test content manager account')
+                           help='OpenStax test Facebook account')
+    user_options.addoption('--facebook-signup',
+                           action='store',
+                           nargs=2,
+                           default=[os.getenv('FACEBOOK_SIGNUP'),
+                                    os.getenv('FACEBOOK_SIGNUP_PASSWORD')],
+                           help='OpenStax test Facebook user signup account')
     user_options.addoption('--google',
                            action='store',
                            nargs=2,
                            default=[os.getenv('GOOGLE_USERNAME'),
                                     os.getenv('GOOGLE_PASSWORD')],
-                           help='OpenStax test content manager account')
-    user_options.addoption('--gmail',
+                           help='OpenStax test Google account account')
+    user_options.addoption('--google-signup',
                            action='store',
                            nargs=2,
-                           default=[os.getenv('GMAIL_USERNAME'),
-                                    os.getenv('GMAIL_PASSWORD')],
-                           help='OpenStax test content manager account')
+                           default=[os.getenv('GOOGLE_SIGNUP'),
+                                    os.getenv('GOOGLE_SIGNUP_PASSWORD')],
+                           help='OpenStax test Google user signup account')
 
     # Product options
     product_options.addoption('--systems',

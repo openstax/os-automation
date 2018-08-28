@@ -75,6 +75,36 @@ _Accepted values: `accounts`, `biglearn`, `exercises`, `hypothesis`, `payments`,
 
 The pytest plugin that we use for running tests has a number of advanced command line options available. To see the options available, run `pytest --help`. The full documentation for the plugin can be found [here][pytest-selenium].
 
+## Conditions for a Passing Test
+
+### Runtime Options
+
+- [ ] Chrome sequential (`--driver chrome`)
+- [ ] Chrome sequential headless (`--driver chrome --headless`)
+- [ ] Chrome multi-processor (`--driver chrome -n 5`)
+- [ ] Chrome multi-processor headless (`--driver chrome --headless -n 5`)
+- [ ] Safari sequential (`--driver safari`)
+- [ ] Firefox sequential (`--driver firefox`)
+- [ ] Firefox sequentail headless (`--driver firefox --headless`)
+- [ ] Firefox multi-processor (`--driver firefox -n 5`)
+- [ ] Firefox multi-processor headless (`--driver chrome --headless -n 5`)
+- [ ] Edge sequential (`--driver edge`)
+
+### Why do all of these matter?
+
+Tests may run in different orders due to multi-processor mode (tests should stand on their own; collections requiring ordering should be gathered into a test set).
+Tests may update data being used by other tests (a real world issue).
+Websites may respond differently to different browsers (browsers all implement, or not, web standards in their own peculiar ways).
+Websites may respond differently to headless browsing (looking at you, Google...).
+
+### Why are there four methods for Chrome and Firefox but only one for Safari and Edge?
+
+Safari and Edge currently run Webdriver in a hungry way: they want to emulate a real user as closely as possible so they take over a lot of computer inputs. Safari goes so far as to overlay a 'glass' cover over the automation browser window and any attempt to modify the browser outside of the test will interupt the automation.
+
+Additionally, multi-processor testing isn't available (and any test run in processes 2+ will fail).
+
+Lastly, headless modes are not implemented for Safari and Edge.
+
 ## Framework Design
 
 This testing framework heavily relies on the [PyPOM][pypom]. The [PyPOM][pypom]

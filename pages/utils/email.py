@@ -99,54 +99,62 @@ class Google(GoogleBase):
         _from_locator = (By.CSS_SELECTOR, '.yW span[email]')
         _subject_locator = (By.CLASS_NAME, 'bog')
         _excerpt_locator = (By.CSS_SELECTOR, '.y6 + .y2')
+        _sent_locator = (By.CSS_SELECTOR, '.xW span[title]')
 
         @property
         def sender(self):
             """Return the e-mail sender."""
-            send = self.find_element(*self._from_locator) \
+            return self.find_element(*self._from_locator) \
                 .get_attribute('email')
-            print(send)
-            return send
 
         @property
         def subject(self):
             """Return the e-mail subject."""
-            sub = self.find_element(*self._subject_locator).text
-            print(sub)
-            return sub
+            return self.find_element(*self._subject_locator).text
 
         @property
         def excerpt(self):
             """Return the e-mail body excerpt."""
-            ex = self.find_element(*self._excerpt_locator).text
-            print(ex)
-            return ex
+            return self.find_element(*self._excerpt_locator).text
 
         @property
         def has_pin(self):
             """Return True if a pin string is in the body excerpt."""
-            pin = PIN_MATCHER.search(self.excerpt)
-            print(pin)
-            return pin
+            return PIN_MATCHER.search(self.excerpt)
 
         @property
         def get_pin(self):
             """Return the numeric pin."""
             if self.has_pin:
-                pin = (PIN_MATCHER.search(self.excerpt).group())[-6:]
-                print(pin)
-                return pin
+                return (PIN_MATCHER.search(self.excerpt).group())[-6:]
             raise EmailVerificationError('No pin found')
+
+        @property
+        def sent(self):
+            """Return the sent time and date."""
+            return datetime.strptime(
+                self.find_element(*self._sent_locator).get_attribute('title'),
+                '%a, %b %d, %Y, %I:%M %p'
+            )
+
+        @property
+        def is_new(self):
+            """Return True if the email was sent less than 5 minutes ago."""
+            return ((datetime.now() - self.sent).seconds / 60.0) < 5.0
 
 
 class GmailReader(object):
     """Read the user's inbox."""
 
-    def __init__(self):
+    def __init__(self, tag=''):
         """Initialize the reader."""
         # If modifying the scope(s), delete the file token.json.
         self._scopes = 'https://www.googleapis.com/auth/gmail.readonly'
         self._inbox = []
+        self._tag = '_{suffix}'.format(suffix=tag) if tag else ''
+        self._file = 'client_secret{suffix}.json'.format(suffix=self._tag)
+        print('"{one}": "{two}" "{three}"'.format(one=tag, two=self._tag,
+                                                  three=self._file))
 
     def add_email(self, request_id, response, exception):
         """Do something with the batch response.
@@ -175,11 +183,11 @@ class GmailReader(object):
                     default to just the inbox
 
         """
-        store = file.Storage('token.json')
+        store = file.Storage('token{suffix}.json'
+                             .format(suffix=self._tag))
         creds = store.get()
         if not creds or creds.invalid:
-            flow = client.flow_from_clientsecrets('client_secret.json',
-                                                  self._scopes)
+            flow = client.flow_from_clientsecrets(self._file, self._scopes)
             creds = tools.run_flow(flow, store)
         service = build('gmail', 'v1', http=creds.authorize(Http()))
         data_line = []
@@ -193,7 +201,10 @@ class GmailReader(object):
         while request is not None:
             data = request.execute()
             data_line.append(data.get('messages'))
-            request = service.users().messages().list_next(request, data)
+            request = (service
+                       .users()
+                       .messages()
+                       .list_next(request, data))
 
         # For each list of email IDs, download the emails as batches to
         # minimize the number of HTTP requests
@@ -225,6 +236,15 @@ class GmailReader(object):
     def size(self):
         """Return the number of messages in the inbox."""
         return len(self._inbox)
+
+    def get(self, key):
+        """Return the email at the key's location."""
+        return self.__getitem__(key)
+
+    @property
+    def latest(self):
+        """Return the most recent email."""
+        return self.get(0)
 
     def __getitem__(self, key):
         """Enable the bracket operator for the inbox list."""
@@ -315,12 +335,19 @@ class GmailReader(object):
         @property
         def excerpt(self):
             """Return the short text snippet as displayed by Gmail."""
-            return self._snippet
+            return self._excerpt
 
         @property
         def body(self):
             """Return the body text as displayed by selecting the email."""
             return self._body
+
+        @property
+        def get_pin(self):
+            """Return the numeric pin."""
+            match = PIN_MATCHER.search(self.excerpt)
+            if match:
+                return (match.group())[-6:]
 
 
 class EmptyInboxError(IndexError):
@@ -465,6 +492,11 @@ class GuerrillaMail(Page):
             if self.has_pin:
                 return (PIN_MATCHER.search(self.excerpt).group())[-6:]
             raise EmailVerificationError('No pin found')
+
+        @property
+        def is_new(self):
+            """Short circuit timing for GuerrillaMail."""
+            return True
 
         def open_email(self):
             """Open this email."""

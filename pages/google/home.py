@@ -14,7 +14,7 @@ class Google(Page):
     _root_locator = (By.ID, 'initialView')
     _identifier_locator = (By.ID, 'identifierId')
     _identifier_next_button_locator = (By.ID, 'identifierNext')
-    _password_locator = (By.ID, '[name=password]')
+    _password_locator = (By.CSS_SELECTOR, '[name=password]')
     _password_next_button_locator = (By.ID, 'passwordNext')
 
     def wait_for_page_to_load(self):
@@ -33,10 +33,11 @@ class Google(Page):
         sleep(1.0)
         from pages.accounts.signup import Signup
         if not self.at_google:
+            # still have a logged in Google session so skip login
             return Signup(self.driver)
         self.find_element(*self._identifier_locator).send_keys(user)
         self.find_element(*self._identifier_next_button_locator).click()
-        sleep(0.5)
+        sleep(1.0)
         self.find_element(*self._password_locator).send_keys(password)
         self.find_element(*self._password_next_button_locator).click()
         sleep(0.5)
