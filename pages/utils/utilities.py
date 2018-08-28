@@ -1,9 +1,12 @@
 """Helper functions for OpenStax Pages."""
 
+from platform import system
 from random import randint
 from time import sleep
 
 from faker import Faker
+from selenium.webdriver.common.action_chains import ActionChains
+from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support.color import Color
 from selenium.webdriver.support.ui import Select
 
@@ -121,6 +124,24 @@ class Utility(object):
     def compare_colors(cls, left, right):
         """Return True if two RGB color strings match."""
         return Color.from_string(left) == Color.from_string(right)
+
+    @classmethod
+    def clear_field(cls, driver, field=None, field_locator=None):
+        """Clear the contents of text-type fields."""
+        sleep(0.1)
+        if not field:
+            field = driver.find_element(*field_locator)
+        if driver.name == 'chrome':
+            field.clear()
+        elif driver.name == 'firefox':
+            special = Keys.COMMAND if system() == 'Darwin' else Keys.CONTROL
+            ActionChains(driver) \
+                .click(field) \
+                .key_down(special) \
+                .send_keys('a') \
+                .key_up(special) \
+                .send_keys(Keys.DELETE) \
+                .perform()
 
     @classmethod
     def get_test_credit_card(cls, card=None, status=None):

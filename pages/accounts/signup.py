@@ -1,14 +1,16 @@
 """Break the signup process out of the base."""
 
 from time import sleep
+from urllib.parse import urlparse
 
 from pypom import Region
+from selenium.common.exceptions import TimeoutException
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 
 from pages.accounts import home, profile
 from pages.accounts.base import AccountsBase
-from pages.utils.email import GoogleBase, GuerrillaMail, RestMail
+from pages.utils.email import GmailReader, GuerrillaMail, RestMail
 from pages.utils.utilities import Utility
 
 
@@ -67,7 +69,7 @@ class Signup(AccountsBase):
     _next_button_locator = (By.CSS_SELECTOR, '[type=submit]')
 
     def account_signup(self, email,
-                       password=None, _type='Student', provider='guerrilla',
+                       password=None, _type='Student', provider='restmail',
                        **kwargs):
         """Single signup entry point.
 
@@ -84,6 +86,7 @@ class Signup(AccountsBase):
             provider (str): The e-mail host -
                 'google': Google Gmail
                 'guerrilla': Guerrilla Mail
+                'restmail': RestMail API mail
             **kwargs: Arbitrary keyword arguments
                 'email_password': (str) Webmail login password
                 'name': user name fields
@@ -95,6 +98,8 @@ class Signup(AccountsBase):
                 'school': (str) school name
                 'social': (str) Use a social login -
                     facebook, google
+                'social_login': (str) Social account login
+                'social_password': (str) Social account password
                 'students': (int) number of course students
                 'subjects': ([str]) list of subject interest -
                     accounting, algebra_and_trigonometry, american_government,
@@ -134,52 +139,73 @@ class Signup(AccountsBase):
             self.next()
 
         # verify the pin
-        email_password = None
-        if 'google' in provider:
-            mailer = GoogleBase(self.driver)
-            email_password = kwargs['email_password']
-        elif 'guerrilla' in provider:
-            mailer = GuerrillaMail(self.driver)
-
-        elif 'restmail' in provider:
-            account_name = email[:email.rfind("@")]
-            mailer = RestMail(account_name)
-        else:
-            mailer = _type(self.driver)
-            email_password = kwargs['email_password']
-        pin = self._get_pin(page=mailer,
-                            provider=provider,
-                            return_url=(self.seed_url + '/verify_email'),
-                            email=email,
-                            password=email_password)
-        self.pin.verify_pin = pin
-        self.next()
+        not_verified = True
+        while not_verified:
+            email_password = None
+            if 'google' in provider:
+                # mailer = GoogleBase(self.driver)
+                pin = (GmailReader(email[0:7])
+                       .read_mail()
+                       .sort_mail()
+                       .latest
+                       .get_pin)
+                email_password = kwargs.get('email_password')
+            elif 'guerrilla' in provider:
+                mailer = GuerrillaMail(self.driver)
+            elif 'restmail' in provider:
+                account_name = email[:email.rfind("@")]
+                mailer = RestMail(account_name)
+            else:
+                mailer = _type(self.driver)
+                email_password = kwargs.get('email_password')
+            if 'google' not in provider:
+                pin = self._get_pin(page=mailer,
+                                    provider=provider,
+                                    return_url=(self.seed_url +
+                                                '/verify_email'),
+                                    email=email,
+                                    password=email_password)
+            if not pin:
+                raise ValueError('PIN not found')
+            self.pin.clear_pin()
+            self.pin.verify_pin = pin
+            self.next()
+            sleep(0.25)
+            if not self.pin.pin_failure:
+                not_verified = False
 
         if 'social' not in kwargs:
             # set the initial password
             self.password.password = password
             self.password.confirmation = password
             self.next()
-        elif kwargs['social'] == 'facebook':
+        elif kwargs.get('social') == 'facebook':
             # use Facebook
             self.password.use_social_login() \
-                .use_facebook.log_in(email, email_password)
+                .use_facebook.log_in(kwargs.get('social_login'),
+                                     kwargs.get('social_password'))
+            sleep(3.0)
         else:
             # use Google
             self.password.use_social_login() \
-                .use_google.log_in(email, email_password)
+                .use_google.log_in(kwargs.get('social_login'),
+                                   kwargs.get('social_password'))
+            sleep(3.0)
 
+        # make sure we're actually back on Accounts
+        self.wait.until(
+            lambda _: 'accounts' in urlparse(self.selenium.current_url).netloc)
         # enter user details in group order
         # all users
         if 'social' not in kwargs:
-            self.user.first_name = kwargs['name'][Signup.FIRST]
-            self.user.last_name = kwargs['name'][Signup.LAST]
-            self.user.suffix = kwargs['name'][Signup.SUFFIX]
-        self.user.school = kwargs['school']
+            self.user.first_name = kwargs.get('name')[Signup.FIRST]
+            self.user.last_name = kwargs.get('name')[Signup.LAST]
+            self.user.suffix = kwargs.get('name')[Signup.SUFFIX]
+        self.user.school = kwargs.get('school')
         # elevated users
         if non_student_role:
-            self.instructor.phone = kwargs['phone']
-            self.instructor.webpage = kwargs['webpage']
+            self.instructor.phone = kwargs.get('phone')
+            self.instructor.webpage = kwargs.get('webpage')
             subjects_to_select = []
             for subject, name in Signup.SUBJECTS:
                 if name in kwargs.get('subjects'):
@@ -187,10 +213,10 @@ class Signup(AccountsBase):
             self.instructor.subjects = subjects_to_select
         # instructor-only
         if instructor:
-            self.instructor.students = kwargs['students']
-            self.instructor.using = kwargs['use']
+            self.instructor.students = kwargs.get('students')
+            self.instructor.using = kwargs.get('use')
         # completion
-        if not kwargs['news']:
+        if not kwargs.get('news'):
             self.user.toggle_news()
         self.user.agree_to_terms()
         sleep(0.25)
@@ -223,7 +249,7 @@ class Signup(AccountsBase):
             if 'google' in provider:
                 page = page.login.go(email, password)
             WebDriverWait(page.driver, 60.0).until(
-                lambda _: page.emails[0].has_pin)
+                lambda _: page.emails[0].has_pin and page.emails[0].is_new)
             sleep(5.0)
             pin = page.emails[0].get_pin
             page.driver.get(return_url)
@@ -313,6 +339,7 @@ class Signup(AccountsBase):
 
         _pin_locator = (By.ID, 'pin_pin')
         _email_edit_locator = (By.CSS_SELECTOR, '.extra-info a')
+        _error_locator = (By.CLASS_NAME, 'alert-danger')
 
         @property
         def verify_pin(self):
@@ -330,6 +357,20 @@ class Signup(AccountsBase):
             self.find_element(*self._email_edit_locator).click()
             sleep(1)
             return self.UserType(self)
+
+        @property
+        def pin_failure(self):
+            """Return True if an error occurs during pin verification."""
+            try:
+                WebDriverWait(self.selenium, 1).until(
+                    lambda _: self.find_element(*self._error_locator))
+            except TimeoutException:
+                return False
+            return True
+
+        def clear_pin(self):
+            """Clear the pin field for Chrome and Firefox."""
+            Utility.clear_field(self.selenium, self.verify_pin)
 
     class SetPassword(Region):
         """Set the user's password."""
@@ -436,6 +477,7 @@ class Signup(AccountsBase):
         @property
         def school(self):
             """Return the school field."""
+            print(self.selenium.current_url)
             return self.find_element(*self._school_locator)
 
         @school.setter

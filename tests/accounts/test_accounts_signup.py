@@ -4,7 +4,7 @@ from pages.accounts.home import AccountsHome as Home
 from pages.accounts.signup import Signup
 from pages.utils.email import RestMail
 from pages.utils.utilities import Utility
-from tests.markers import accounts, skip_test, social, test_case
+from tests.markers import accounts, social, test_case
 
 
 @test_case('C195549')
@@ -37,8 +37,8 @@ def test_sign_up_as_a_student_user(accounts_base_url, selenium, student):
     #      Privacy Policy."
     # AND: clicks the "CREATE ACCOUNT" button
     page.login.go_to_signup.account_signup(
-        address,
-        password,
+        email=address,
+        password=password,
         _type='Student',
         provider='restmail',
         name=name,
@@ -83,8 +83,8 @@ def test_sign_up_as_an_instructor(accounts_base_url, selenium, teacher):
     # AND: clicks the "OK" button
 
     page.login.go_to_signup.account_signup(
-        address,
-        password,
+        email=address,
+        password=password,
         _type='Instructor',
         provider='restmail',
         name=name,
@@ -134,8 +134,8 @@ def test_sign_up_as_a_nonstudent_user(accounts_base_url, selenium, teacher):
     # AND: clicks the "CREATE ACCOUNT" button
     # AND: clicks the "OK" button
     page.login.go_to_signup.account_signup(
-        address,
-        password,
+        email=address,
+        password=password,
         _type='Other',
         provider='restmail',
         name=name,
@@ -151,13 +151,23 @@ def test_sign_up_as_a_nonstudent_user(accounts_base_url, selenium, teacher):
 
 
 @test_case('C200745')
-@skip_test(reason='Script not written')
 @social
 @accounts
-def test_sign_up_as_a_facebook_user(accounts_base_url, selenium, facebook):
+def test_sign_up_as_a_facebook_user(
+        accounts_base_url, selenium, facebook_signup, student):
     """Test signing up with a Facebook account."""
     # GIVEN: a valid Facebook that is not associated with a current account
     # AND: the Accounts Home page is loaded
+    name = Utility.random_name()
+    email = RestMail(
+        '{first}.{last}.{tag}'
+        .format(first=name[1], last=name[2], tag=Utility.random_hex(3))
+        .lower()
+    )
+    email.empty()
+    address = email.address
+    password = student[1]
+    page = Home(selenium, accounts_base_url).open()
 
     # WHEN: the user clicks the "Sign up here." link
     # AND: selects "Student" from the drop down menu
@@ -171,9 +181,27 @@ def test_sign_up_as_a_facebook_user(accounts_base_url, selenium, facebook):
     # AND: clicks the checkbox next to "I agree to the Terms of Use and the
     #      Privacy Policy."
     # AND: clicks the "CREATE ACCOUNT" button
+    page = page.login.go_to_signup
+    page = page.account_signup(
+        email=address,
+        password=password,
+        _type='Student',
+        provider='restmail',
+        news=True,
+        school='Automation',
+        social='facebook',
+        social_login=facebook_signup[0],
+        social_password=facebook_signup[1]
+    )
 
     # THEN: the account profile for the new student is displayed
     # AND: the name is the same as the Facebook user's name
+    assert ('profile' in selenium.current_url)
+    full_name = page.name.get_name_parts()
+    for name in (full_name[1].lower().split() + full_name[2].lower().split()):
+        assert(name in facebook_signup[0]), \
+            '{missing} not in {signup}'.format(missing=name,
+                                               signup=facebook_signup[0])
 
     # WHEN: the name field is changed
     # AND: a verified email is added to the profile
@@ -181,6 +209,24 @@ def test_sign_up_as_a_facebook_user(accounts_base_url, selenium, facebook):
     # AND: a password log in option is added
     # AND: the email associated with the Facebook account is deleted
     # AND: the Facebook log in option is deleted
+    name = Utility.random_name()
+    page.name.open()
+    page.name.first_name = name[1]
+    page.name.last_name = name[2]
+    page.name.confirm()
+    username = name[1] + name[2] + str(Utility.random(100, 999))
+    page.emails.add_email(username + '@restmail.net')
+    password = student[1]
+    page.login_method.add_password(password)
+    page.login_method.get_active_options()[0].delete
+    email = RestMail(username)
+    email.get_mail()
+    email.inbox[-1].confirm_email()
+    page.reload()
+    for email in page.emails.emails:
+        if email.email_text == facebook_signup[0]:
+            email.delete()
+            break
 
     # THEN: the Facebook account is available for use
 
@@ -188,11 +234,20 @@ def test_sign_up_as_a_facebook_user(accounts_base_url, selenium, facebook):
 @test_case('C200746')
 @social
 @accounts
-def test_sign_up_as_a_google_user(accounts_base_url, selenium, google,
-                                  student):
+def test_sign_up_as_a_google_user(
+        accounts_base_url, selenium, google_signup, student):
     """Test signing up with a Google account."""
     # GIVEN: a valid Google email that is not associated with a current account
     # AND: the Accounts Home page is loaded
+    name = Utility.random_name()
+    email = RestMail(
+        '{first}.{last}.{tag}'
+        .format(first=name[1], last=name[2], tag=Utility.random_hex(3))
+        .lower()
+    )
+    email.empty()
+    address = email.address
+    password = student[1]
     page = Home(selenium, accounts_base_url).open()
 
     # WHEN: the user clicks the "Sign up here." link
@@ -207,22 +262,26 @@ def test_sign_up_as_a_google_user(accounts_base_url, selenium, google,
     # AND: clicks the checkbox next to "I agree to the Terms of Use and the
     #      Privacy Policy."
     # AND: clicks the "CREATE ACCOUNT" button
-    page = page.login.go_to_signup
-    page = page.account_signup(
-        google[0],
-        student[1],
-        provider='google',
-        email_password=google[1],
+    page = page.login.go_to_signup.account_signup(
+        email=address,
+        password=password,
+        _type='Student',
+        provider='restmail',
         news=True,
         school='Automation',
-        social='google'
+        social='google',
+        social_login=google_signup[0],
+        social_password=google_signup[1]
     )
 
     # THEN: the account profile for the new student is displayed
     # AND: the name is the same as the Google user's name
     assert ('profile' in selenium.current_url)
-    name = page.name.get_name_parts()
-    assert (name[1].lower() in google[0] and name[2].lower() in google[0])
+    full_name = page.name.get_name_parts()
+    for name in (full_name[1].lower().split() + full_name[2].lower().split()):
+        assert(name in google_signup[0]), \
+            '{missing} not in {signup}'.format(missing=name,
+                                               signup=google_signup[0])
 
     # WHEN: the name field is changed
     # AND: a verified email is added to the profile
@@ -245,7 +304,7 @@ def test_sign_up_as_a_google_user(accounts_base_url, selenium, google,
     email.inbox[-1].confirm_email()
     page.reload()
     for email in page.emails.emails:
-        if email.email_text == google[0]:
+        if email.email_text == google_signup[0]:
             email.delete()
             break
 

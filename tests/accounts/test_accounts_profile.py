@@ -173,7 +173,6 @@ def test_get_current_emails_and_status(accounts_base_url, selenium, student):
 
 
 @test_case('C195554')
-@skip_test(reason='Script not written')
 @accounts
 def test_verify_an_email(accounts_base_url, selenium, student):
     """Test the user email verification process."""
@@ -254,7 +253,7 @@ def test_add_a_verified_email_to_profile(accounts_base_url, selenium, student):
 @test_case('C195555')
 @accounts
 @social
-def test_log_in_using_google(accounts_base_url, gmail, selenium):
+def test_log_in_using_google(accounts_base_url, google, selenium):
     """Test the Gmail login method."""
     # GIVEN: a user with the Google authentication setup using a Gmail address
     # AND: the Accounts Home page is loaded
@@ -263,17 +262,16 @@ def test_log_in_using_google(accounts_base_url, gmail, selenium):
     # WHEN: the user enters the Gmail address in the input
     # AND: clicks the "NEXT" button
     # AND: clicks the "Log in with Google" button
-    page.login.google_login(gmail[0], *gmail)
+    page.login.google_login(google[0], *google)
 
     # THEN: the user is taken to their profile
-    assert (page.logged_in), 'Failed to login with google'
+    assert (page.logged_in), 'Failed to login with Google'
 
 
 @test_case('C195556')
-@expected_failure
 @accounts
 @social
-def test_log_in_using_facebook(accounts_base_url, gmail, selenium):
+def test_log_in_using_facebook(accounts_base_url, facebook, selenium):
     """Test the Facebook login method."""
     # GIVEN: a user with the Facebook authentication setup using a Gmail
     #        address
@@ -283,7 +281,7 @@ def test_log_in_using_facebook(accounts_base_url, gmail, selenium):
     # WHEN: the user enters the email address in the input
     # AND: clicks the "NEXT" button
     # AND: clicks the "Log in with Facebook" button
-    page.login.facebook_login(gmail[0], *gmail)
+    page.login.facebook_login(facebook[0], *facebook)
 
     # THEN: the user is taken to their profile
     assert (page.logged_in), 'Failed to login with facebook'
