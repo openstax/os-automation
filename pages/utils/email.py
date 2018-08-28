@@ -23,6 +23,10 @@ PIN_MATCHER = re.compile(r'(PIN\:? \d{6})')
 URL_MATCHER = re.compile(
     r'(https:\/\/accounts([-\w]*)?\.openstax\.org\/confirm\?code=\w{1,64})'
 )
+RESET_MATCHER = re.compile(
+    r'(https:\/\/accounts([-\w]*)?\.openstax\.org' +
+    r'\/password\/reset\?token=\w{1,64})'
+)
 
 
 class GoogleBase(Page):
@@ -626,6 +630,7 @@ class RestMail(object):
         raise requests.exceptions.Timeout(
             'Mail not received in {time} seconds'.format(time=max_time)
         )
+        return self
 
     @property
     def size(self):
@@ -770,8 +775,29 @@ class RestMail(object):
             """Access the confirmation link."""
             send = requests.get(self.confirmation_link)
             if not send.status_code == requests.codes.ok:
-                raise EmailVerificationError('Email not confirmed. ({code})'
-                                             .format(code=send.status_code))
+                raise EmailVerificationError(
+                    'Email not confirmed. ({code})'
+                    .format(code=send.status_code))
+
+        @property
+        def has_reset(self):
+            """Return True if a password reset URL is in the excerpt."""
+            return bool(RESET_MATCHER.search(self._excerpt))
+
+        @property
+        def reset_link(self):
+            """Access the password reset URL link."""
+            if self.has_reset:
+                return RESET_MATCHER.search(self._excerpt).group()
+            raise EmailVerificationError('No password reset link found')
+
+        def submit_reset(self):
+            """Access the reset link."""
+            send = requests.get(self.reset_link)
+            if not send.status_code == requests.codes.ok:
+                raise EmailVerificationError(
+                    'Reset link not successful. ({code})'
+                    .format(code=send.status_code))
 
 
 class SendMail(object):
