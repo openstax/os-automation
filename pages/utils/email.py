@@ -102,7 +102,8 @@ class Google(GoogleBase):
 
         _from_locator = (By.CSS_SELECTOR, '.yW span[email]')
         _subject_locator = (By.CLASS_NAME, 'bog')
-        _excerpt_locator = (By.CSS_SELECTOR, '.y6 + .y2')
+        _excerpt_old_locator = (By.CSS_SELECTOR, '.y6 .y2')
+        _excerpt_new_locator = (By.CSS_SELECTOR, '.y6 + .y2')
         _sent_locator = (By.CSS_SELECTOR, '.xW span[title]')
 
         @property
@@ -119,18 +120,35 @@ class Google(GoogleBase):
         @property
         def excerpt(self):
             """Return the e-mail body excerpt."""
-            return self.find_element(*self._excerpt_locator).text
+            segment_one = ''
+            segment_two = ''
+            try:
+                segment_one = self.find_element(
+                    *self._excerpt_old_locator).text
+            except Exception:
+                pass
+            try:
+                segment_two = self.find_element(
+                    *self._excerpt_new_locator).text
+            except Exception:
+                pass
+            return segment_one if len(segment_one) > len(segment_two) else \
+                segment_two
 
         @property
         def has_pin(self):
             """Return True if a pin string is in the body excerpt."""
-            return PIN_MATCHER.search(self.excerpt)
+            return bool(PIN_MATCHER.search(self.excerpt) or
+                        PIN_MATCHER.search(self.subject))
 
         @property
         def get_pin(self):
             """Return the numeric pin."""
             if self.has_pin:
-                return (PIN_MATCHER.search(self.excerpt).group())[-6:]
+                try:
+                    return (PIN_MATCHER.search(self.excerpt).group())[-6:]
+                except Exception:
+                    return (PIN_MATCHER.search(self.subject).group())[-6:]
             raise EmailVerificationError('No pin found')
 
         @property
@@ -139,6 +157,27 @@ class Google(GoogleBase):
             return datetime.strptime(
                 self.find_element(*self._sent_locator).get_attribute('title'),
                 '%a, %b %d, %Y, %I:%M %p'
+            )
+
+        def __str__(self):
+            """Override the string method."""
+            return self.__unicode__()
+
+        def __unicode__(self):
+            """Write an email printer."""
+            return (
+                'From:    {sender}\n'
+                'Subject: {subject}\n'
+                'Excerpt: {excerpt}\n'
+                'Sent:    {sent}\n'
+                'PIN:     {has} : {pin}\n'
+            ).format(
+                sender=self.sender,
+                subject=self.subject,
+                excerpt=self.excerpt,
+                sent=self.sent,
+                has=self.has_pin,
+                pin=self.get_pin if self.has_pin else ''
             )
 
         @property
