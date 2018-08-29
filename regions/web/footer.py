@@ -22,20 +22,20 @@ class Footer(Region):
     @property
     def box(self):
         """Access the box region."""
-        region = self.find_element(*self._box_locator)
-        return self.Box(self, region)
+        region_root = self.find_element(*self._box_locator)
+        return self.Box(self, region_root)
 
     @property
     def directory(self):
         """Access the directory."""
-        region = self.find_element(*self._directory_locator)
-        return self.Directory(self, region)
+        region_root = self.find_element(*self._directory_locator)
+        return self.Directory(self, region_root)
 
     @property
     def social(self):
         """Access the social services."""
-        region = self.find_element(*self._social_locator)
-        return self.SocialLinks(self, region)
+        region_root = self.find_element(*self._social_locator)
+        return self.SocialLinks(self, region_root)
 
     class Box(Region):
         """The footer's statement box."""
