@@ -71,6 +71,7 @@ class AccountsHome(AccountsBase):
 
         @property
         def user(self):
+            """Return the user field."""
             return self.find_element(*self._user_field_locator)
 
         @user.setter
@@ -93,6 +94,7 @@ class AccountsHome(AccountsBase):
 
         @property
         def password(self):
+            """Return the password field."""
             return self.find_element(*self._password_field_locator)
 
         @password.setter

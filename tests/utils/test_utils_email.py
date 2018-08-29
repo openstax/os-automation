@@ -48,12 +48,10 @@ def test_google_mail_user_has_pin_emails(google_signup, selenium):
             if mail.has_pin:
                 assert(mail.sender), 'E-mail does not show a sender'
                 assert(mail.subject), 'E-mail does not show a subject'
-                assert(mail.excerpt), 'Excerpt not shown'
                 assert(mail.get_pin), 'Pin not recovered'
             else:
                 assert(mail.sender), 'E-mail does not show a sender'
                 assert(mail.subject), 'E-mail does not show a subject'
-                assert(mail.excerpt), 'Excerpt not shown'
                 with pytest.raises(EmailVerificationError):
                     mail.get_pin
     except StaleElementReferenceException:
