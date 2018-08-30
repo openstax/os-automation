@@ -1,17 +1,18 @@
 """Basic page parent for all OpenStax Web pages."""
 
-from pypom import Page, Region
+from pypom import Page
 from selenium.webdriver.common.by import By
 
 from regions.web.footer import Footer
 from regions.web.openstax_nav import OpenStaxNav
+from regions.web.sticky_note import StickyNote
 from regions.web.web_nav import WebNav
 
 
 class WebBase(Page):
     """Base class."""
 
-    _root_locator = (By.CLASS_NAME, 'home-page')
+    _root_locator = (By.CSS_SELECTOR, 'body.page-loaded')
 
     def wait_for_page_to_load(self):
         """Override page load."""
@@ -19,31 +20,21 @@ class WebBase(Page):
             lambda _: self.find_element(*self._root_locator).is_displayed())
 
     @property
-    def header(self):
-        """Return Web header."""
-        return self.Header(self)
+    def sticky_note(self):
+        """Access the sticky note."""
+        return StickyNote(self)
+
+    @property
+    def openstax_nav(self):
+        """Access the OpenStax header navigation."""
+        return OpenStaxNav(self)
+
+    @property
+    def web_nav(self):
+        """Access the website header navigation."""
+        return WebNav(self)
 
     @property
     def footer(self):
         """Return Web footer."""
         return Footer(self)
-
-    class Header(Region):
-        """Web page header."""
-
-        _root_locator = (By.CLASS_NAME, 'page-header')
-
-        @property
-        def is_displayed(self):
-            """Header display boolean."""
-            return self.loaded
-
-        @property
-        def web_nav(self):
-            """Web nav region."""
-            return WebNav(self)
-
-        @property
-        def openstax_nav(self):
-            """Openstax nav region."""
-            return OpenStaxNav(self)
