@@ -5,6 +5,8 @@ from time import sleep
 from pypom import Region
 from selenium.webdriver.common.by import By
 
+from pages.utils.web import Web as Support
+
 
 class StickyNote(Region):
     """OpenStax Web's sticky note region."""
@@ -33,14 +35,14 @@ class StickyNote(Region):
         return self.find_element(*self._link_locator)
 
     def go(self):
-        """Follow the sticky note link."""
+        """Follow the sticky note link.
+
+        Return a 'Destination' so the function will fail if
+        a new link is added.
+        """
         destination = self.button.get_attribute('href')
         self.button.click()
         sleep(1.0)
-        if 'give' in destination:
-            from pages.web.give import Donate
-            return Donate(self.driver)
-
-        # if the destination is new and unknown, return the home page
-        from pages.web.home import WebHome
-        return WebHome(self.driver)
+        if Support.GIVE in destination:
+            from pages.web.give import Donate as Destination
+        return Destination(self.driver)

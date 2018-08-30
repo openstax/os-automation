@@ -8,8 +8,8 @@ from tests.markers import test_case, web  # NOQA
 @test_case('')
 @nondestructive
 @web
-def test_top_navigation_bar_present(web_base_url, selenium):
-    """Test if the top navigation bar is present."""
+def test_navigation_bars_are_present(web_base_url, selenium):
+    """Test if the navigation bars are present."""
     # GIVEN: On the OpenStax homepage
     page = Home(selenium, web_base_url).open()
 
@@ -17,7 +17,8 @@ def test_top_navigation_bar_present(web_base_url, selenium):
 
     # THEN: Page with navigation bar with about us,
     #       supporters, blog, give, help, Rice logo is displayed
-    assert(page.header.is_displayed), 'Header is not displayed'
+    assert(page.openstax_nav.is_displayed), 'OpenStax nav is not displayed'
+    assert(page.web_nav.is_displayed), 'Website nav is not displayed'
 
 
 @test_case('')
