@@ -17,7 +17,7 @@ from pypom import Page, Region
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as expect
 
-from pages.utils.utilities import Utility
+from utils.utilities import Utility
 
 PIN_MATCHER = re.compile(r'(PIN\:? \d{6})')
 URL_MATCHER = re.compile(

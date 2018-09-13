@@ -3,8 +3,8 @@
 from selenium.webdriver.common.by import By
 
 from pages.accounts.home import AccountsHome as Home
-from pages.utils.utilities import Status, Utility
 from tests.markers import accounts, nondestructive, test_case
+from utils.utilities import Status, Utility
 
 
 @test_case('C195539')

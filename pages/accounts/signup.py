@@ -10,8 +10,8 @@ from selenium.webdriver.support.ui import WebDriverWait
 
 from pages.accounts import home, profile
 from pages.accounts.base import AccountsBase
-from pages.utils.email import GmailReader, GuerrillaMail, RestMail
-from pages.utils.utilities import Utility
+from utils.email import GmailReader, GuerrillaMail, RestMail
+from utils.utilities import Utility
 
 
 class Signup(AccountsBase):

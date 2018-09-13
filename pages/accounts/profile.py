@@ -6,7 +6,7 @@ from pypom import Region
 from selenium.webdriver.common.by import By
 
 from pages.accounts.home import AccountsHome
-from pages.utils.utilities import Utility
+from utils.utilities import Utility
 
 
 class Profile(AccountsHome):

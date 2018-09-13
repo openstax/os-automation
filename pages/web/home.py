@@ -6,8 +6,8 @@ from pypom import Region
 from selenium.common.exceptions import NoSuchElementException
 from selenium.webdriver.common.by import By
 
-from pages.utils.web import Web as Support
 from pages.web.base import WebBase
+from utils.web import Web as Support
 
 
 class Link(Region):

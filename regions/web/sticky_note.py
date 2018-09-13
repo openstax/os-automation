@@ -5,7 +5,7 @@ from time import sleep
 from pypom import Region
 from selenium.webdriver.common.by import By
 
-from pages.utils.web import Web as Support
+from utils.web import Web as Support
 
 
 class StickyNote(Region):

@@ -4,9 +4,9 @@ import pytest
 from selenium.common.exceptions import NoSuchElementException, TimeoutException
 
 from pages.accounts.home import AccountsHome as Home
-from pages.utils.email import RestMail
-from pages.utils.utilities import Utility
 from tests.markers import accounts, nondestructive, test_case
+from utils.email import RestMail
+from utils.utilities import Utility
 
 
 @test_case('C195135')
