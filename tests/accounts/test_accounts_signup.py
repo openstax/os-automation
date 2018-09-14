@@ -2,9 +2,9 @@
 
 from pages.accounts.home import AccountsHome as Home
 from pages.accounts.signup import Signup
-from pages.utils.email import RestMail
-from pages.utils.utilities import Utility
 from tests.markers import accounts, social, test_case
+from utils.email import RestMail
+from utils.utilities import Utility
 
 
 @test_case('C195549')

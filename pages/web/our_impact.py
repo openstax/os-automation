@@ -1,0 +1,1 @@
+"""The Our Impact webpage."""

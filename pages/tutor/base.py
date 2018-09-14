@@ -9,8 +9,8 @@ from pages.accounts.home import AccountsHome
 from pages.rice.gdpr import GeneralDataPrivacyRegulation
 from pages.rice.home import Rice
 from pages.salesforce.home import Salesforce
-from pages.utils.utilities import Utility
-from pages.web.tutor_marketing import TutorMarketing
+from pages.web.tutor import TutorMarketing
+from utils.utilities import Utility
 
 
 class TutorBase(Page):

@@ -1,0 +1,1 @@
+"""Creative Commons home page."""

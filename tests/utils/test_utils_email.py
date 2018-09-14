@@ -8,9 +8,9 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as expect
 from selenium.webdriver.support.ui import WebDriverWait
 
-from pages.utils.email import EmailVerificationError, GoogleBase  # NOQA
-from pages.utils.email import GuerrillaMail, RestMail, SendMail  # NOQA
 from tests.markers import nondestructive, test_case
+from utils.email import EmailVerificationError, GoogleBase  # NOQA
+from utils.email import GuerrillaMail, RestMail, SendMail  # NOQA
 
 TEST_EMAIL_SUBJECT = (
     '[OpenStax] Use PIN 999999 to confirm your email address'

@@ -4,6 +4,8 @@ import pytest
 from pytest_testrail.plugin import pytestrail
 
 nondestructive = pytest.mark.nondestructive
+parameters = pytest.mark.parametrize
+
 accounts = pytest.mark.accounts
 biglearn = pytest.mark.biglearn
 exercises = pytest.mark.exercises

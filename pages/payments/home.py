@@ -5,9 +5,9 @@ from selenium.webdriver.common.by import By
 from pages.payments.base import PaymentsBase
 from pages.payments.email_logs import EmailLogs
 from pages.payments.orders import PaymentOrders
-from pages.utils.utilities import Utility
 from regions.payments.nav import PaymentsNav
 from regions.payments.section import PaymentsListSection
+from utils.utilities import Utility
 
 
 class PaymentsHome(PaymentsBase):

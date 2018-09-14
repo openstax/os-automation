@@ -4,7 +4,7 @@ from pypom import Region
 from selenium.webdriver.common.by import By
 
 from pages.tutor.base import TutorBase
-from pages.utils.utilities import Utility
+from utils.utilities import Utility
 
 
 class TutorPayment(TutorBase):

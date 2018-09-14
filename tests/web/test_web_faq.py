@@ -1,0 +1,1 @@
+"""Test the FAQ page."""
