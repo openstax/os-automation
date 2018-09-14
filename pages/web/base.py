@@ -14,10 +14,10 @@ class WebBase(Page):
 
     _root_locator = (By.CSS_SELECTOR, 'body.page-loaded')
 
-    def wait_for_page_to_load(self):
-        """Override page load."""
-        self.wait.until(
-            lambda _: self.find_element(*self._root_locator).is_displayed())
+    @property
+    def loaded(self):
+        """Return True when the page-loaded class is added to the body tag."""
+        return self.find_element(*self._root_locator).is_displayed()
 
     @property
     def sticky_note(self):
@@ -38,3 +38,13 @@ class WebBase(Page):
     def footer(self):
         """Return Web footer."""
         return Footer(self)
+
+    def reload(self):
+        """Reload the current page."""
+        self.driver.navigate().refresh()
+        return self
+
+    def back(self):
+        """Go back to the previous page."""
+        self.driver.execute_script('window.history.go(-1)')
+        return self

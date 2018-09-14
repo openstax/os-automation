@@ -229,7 +229,7 @@ def test_users_may_view_the_webinar_schedule(web_base_url, selenium):
 @nondestructive
 @web
 def test_book_allies_have_a_name_description_and_link(web_base_url, selenium):
-    """OpenStax Allies show the company information and site link."""
+    """Allies show the company information and site link."""
 
 
 @test_case('C210375')
