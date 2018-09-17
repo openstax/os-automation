@@ -14,6 +14,10 @@ class WebBase(Page):
 
     _root_locator = (By.CSS_SELECTOR, 'body.page-loaded')
 
+    def __init__(self, driver, base_url=None, timeout=60, **url_kwargs):
+        """Override the initialization to hold onto the Web timeout."""
+        super(WebBase, self).__init__(driver, base_url, 60, **url_kwargs)
+
     @property
     def loaded(self):
         """Return True when the page-loaded class is added to the body tag."""
@@ -42,6 +46,7 @@ class WebBase(Page):
     def reload(self):
         """Reload the current page."""
         self.driver.navigate().refresh()
+        self.wait_for_page_to_load()
         return self
 
     def back(self):

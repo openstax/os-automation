@@ -13,8 +13,9 @@ class Subjects(WebBase):
 
     URL_TEMPLATE = '/subjects'
 
-    _root_locator = (By.CSS_SELECTOR, 'main.loaded')
+    _root_locator = (By.TAG_NAME, 'main')
 
     @property
     def loaded(self):
+        """Override the base loader."""
         return self.find_element(*self._root_locator).is_displayed

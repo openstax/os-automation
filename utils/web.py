@@ -27,5 +27,7 @@ class Web(object):
     IMPACT = 'impact'
     NEWSLETTER = 'www2.openstax.org'
     PARTNERS = 'partners'
+    RESEARCH = 'research'
     SUBJECTS = 'subjects'
     TECHNOLOGY = 'technology'
+    TUTOR = 'openstax-tutor'

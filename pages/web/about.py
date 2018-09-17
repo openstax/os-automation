@@ -6,6 +6,7 @@ from pypom import Region
 from selenium.webdriver.common.by import By
 
 from pages.web.base import WebBase
+from utils.web import Web
 
 
 class AboutUs(WebBase):
@@ -20,6 +21,7 @@ class AboutUs(WebBase):
 
     @property
     def loaded(self):
+        """Wait until the three panels are displayed."""
         return (self.who_we_are.is_displayed
                 and self.what_we_do.is_displayed
                 and self.where_were_going.is_displayed)
@@ -38,11 +40,13 @@ class AboutUs(WebBase):
 
     @property
     def where_were_going(self):
+        """Access the Where we're going panel."""
         where = self.find_element(*self._where_section_locator)
         return self.WhereWereGoing(self, where)
 
     @property
     def content_map(self):
+        """Return the content map element."""
         return self.find_element(*self._map_locator)
 
     class WhoWeAre(Region):
@@ -84,6 +88,7 @@ class AboutUs(WebBase):
 
         _library_link_locator = (By.CSS_SELECTOR, '[href$=subjects]')
         _tutor_marketing_link_locator = (By.CSS_SELECTOR, '[href$="-tutor"]')
+        _card_locator = (By.CLASS_NAME, 'card')
 
         @property
         def is_displayed(self):
@@ -104,6 +109,43 @@ class AboutUs(WebBase):
             from pages.web.tutor import TutorMarketing
             return TutorMarketing(self.driver)
 
+        @property
+        def cards(self):
+            """Access the cards."""
+            return [self.Card(self, element)
+                    for element in self.find_elements(*self._card_locator)]
+
+        class Card(Region):
+            """An information card."""
+
+            @property
+            def image(self):
+                """Access the card image."""
+                return self.find_element(*self._image_locator)
+
+            def click(self):
+                """Click the card."""
+                href = self.root.get_attribute('href')
+                self.root.click()
+                if Web.SUBJECTS in href:
+                    from pages.web.subjects import Subjects as Destination
+                elif Web.TUTOR in href:
+                    from pages.web.tutor import TutorMarketing as Destination
+                elif Web.RESEARCH in href:
+                    from pages.web.research import Research as Destination
+                elif Web.PARTNERS in href:
+                    from pages.web.partners import Partners as Destination
+                else:
+                    raise PageNotFound('{dest} is not a known destination'
+                                       .format(dest=href.split('/')[-1]))
+                sleep(1.0)
+                return Destination(self.driver)
+
+            @property
+            def text(self):
+                """Return the card content."""
+                return self.find_element(*self._content_locator).text
+
     class WhereWereGoing(Region):
         """The Where we're going panel."""
 
@@ -111,3 +153,9 @@ class AboutUs(WebBase):
         def is_displayed(self):
             """Return True if the panel is displayed."""
             return self.root.is_displayed
+
+
+class PageNotFound(Exception):
+    """Page is not a known destination error."""
+
+    pass

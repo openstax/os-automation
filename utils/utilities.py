@@ -43,10 +43,21 @@ class Utility(object):
             .text
 
     @classmethod
-    def scroll_to(cls, driver, element_locator):
-        """Scroll the screen to the element found at the locator."""
-        driver.execute_script('arguments[0].scrollIntoView();',
-                              driver.find_element(*element_locator))
+    def scroll_to(cls, driver, element_locator=None, element=None):
+        """Scroll the screen to the element.
+
+        Args:
+            driver (webdriver): the selenium browser object
+            element_locator (Tuple(str, str)): a By selector and locator
+            element (WebElement): a specific element
+
+        """
+        if element_locator:
+            driver.execute_script(
+                'arguments[0].scrollIntoView();',
+                driver.find_element(*element_locator) if element_locator
+                else element
+            )
 
     @classmethod
     def random_hex(cls, length=20, lower=False):
