@@ -1,7 +1,8 @@
 """OpenStax About Us Page."""
 
+from time import sleep
+
 from pypom import Region
-from selenium.common.exceptions import NoSuchElementException
 from selenium.webdriver.common.by import By
 
 from pages.web.base import WebBase
@@ -19,9 +20,9 @@ class AboutUs(WebBase):
 
     @property
     def loaded(self):
-        return (self.who_we_are.loaded
-                and self.what_we_do.loaded
-                and self.where_were_going.loaded)
+        return (self.who_we_are.is_displayed
+                and self.what_we_do.is_displayed
+                and self.where_were_going.is_displayed)
 
     @property
     def who_we_are(self):
@@ -48,24 +49,42 @@ class AboutUs(WebBase):
         """The Who we are panel."""
 
         _child_locator = (By.TAG_NAME, 'div')
-
-        @property
-        def loaded(self):
-            try:
-                self.find_element(*self._child_locator)
-            except NoSuchElementException:
-                return False
-            return True
+        _foundation_link_locator = (By.CSS_SELECTOR, '[href$=foundation]')
+        _resources_link_locator = (By.CSS_SELECTOR, '[href$=partners]')
+        _faq_link_locator = (By.CSS_SELECTOR, '[href$=faq]')
 
         @property
         def is_displayed(self):
+            """Return True if the panel is displayed."""
             return self.root.is_displayed
+
+        def foundations(self):
+            """Follow the philanthropic foundations link."""
+            self.find_element(*self._foundation_link_locator).click()
+            sleep(1.0)
+            from pages.web.supporters import Supporters
+            return Supporters(self.driver)
+
+        def resources(self):
+            """Follow the educational resources link."""
+            self.find_element(*self._resources_link_locator).click()
+            sleep(1.0)
+            from pages.web.partners import Partners
+            return Partners(self.driver)
+
+        def faq(self):
+            """Follow the FAQ link."""
+            self.find_element(*self._faq_link_locator).click()
+            sleep(1.0)
+            from pages.web.faq import FAQ
+            return FAQ(self.driver)
 
     class WhatWeDo(Region):
         """The What we do panel."""
 
         @property
         def is_displayed(self):
+            """Return True if the panel is displayed."""
             return self.root.is_displayed
 
     class WhereWereGoing(Region):
@@ -73,4 +92,5 @@ class AboutUs(WebBase):
 
         @property
         def is_displayed(self):
+            """Return True if the panel is displayed."""
             return self.root.is_displayed
