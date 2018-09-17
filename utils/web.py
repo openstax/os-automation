@@ -31,3 +31,12 @@ class Web(object):
     SUBJECTS = 'subjects'
     TECHNOLOGY = 'technology'
     TUTOR = 'openstax-tutor'
+
+    ACCESSIBILITY = [
+        'Accessibility',
+        'Web Accessibility',
+        'Our progress',
+        'Feedback',
+        'Interactive Simulations',
+        'User-Contributed Content'
+    ]
