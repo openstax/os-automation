@@ -58,21 +58,21 @@ class AboutUs(WebBase):
             """Return True if the panel is displayed."""
             return self.root.is_displayed
 
-        def foundations(self):
+        def go_to_foundations(self):
             """Follow the philanthropic foundations link."""
             self.find_element(*self._foundation_link_locator).click()
             sleep(1.0)
             from pages.web.supporters import Supporters
             return Supporters(self.driver)
 
-        def resources(self):
+        def go_to_resources(self):
             """Follow the educational resources link."""
             self.find_element(*self._resources_link_locator).click()
             sleep(1.0)
             from pages.web.partners import Partners
             return Partners(self.driver)
 
-        def faq(self):
+        def go_to_faq(self):
             """Follow the FAQ link."""
             self.find_element(*self._faq_link_locator).click()
             sleep(1.0)
@@ -82,10 +82,27 @@ class AboutUs(WebBase):
     class WhatWeDo(Region):
         """The What we do panel."""
 
+        _library_link_locator = (By.CSS_SELECTOR, '[href$=subjects]')
+        _tutor_marketing_link_locator = (By.CSS_SELECTOR, '[href$="-tutor"]')
+
         @property
         def is_displayed(self):
             """Return True if the panel is displayed."""
             return self.root.is_displayed
+
+        def go_to_library(self):
+            """Follow the current library link."""
+            self.find_element(*self._library_link_locator).click()
+            sleep(1.0)
+            from pages.web.subjects import Subjects
+            return Subjects(self.driver)
+
+        def go_to_tutor_marketing(self):
+            """Follow the OpenStax Tutor Beta link."""
+            self.find_element(*self._tutor_marketing_link_locator).click()
+            sleep(1.0)
+            from pages.web.tutor import TutorMarketing
+            return TutorMarketing(self.driver)
 
     class WhereWereGoing(Region):
         """The Where we're going panel."""
