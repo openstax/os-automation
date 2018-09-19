@@ -16,5 +16,5 @@ class TutorMarketing(WebHome):
     @property
     def loaded(self):
         """Override the base loader."""
-        return (self.find_element(*self._student_viewer_locator).is_displayed
-                and self.find_element(*self._canvas_locator).is_displayed)
+        return (self.find_element(*self._student_viewer_locator).is_displayed()
+                and self.find_element(*self._canvas_locator).is_displayed())

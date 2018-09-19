@@ -56,7 +56,8 @@ class WebNav(Region):
         """The Subject navigation menu dropdown."""
 
         _open_menu_locator = (By.CSS_SELECTOR, '[href="."]')
-        _all_option_locator = (By.CSS_SELECTOR, '[href$=subjects]')
+        _menu_expand_locator = (By.CSS_SELECTOR, 'nav.dropdown-menu')
+        _all_option_locator = (By.CSS_SELECTOR, '[href$=view-all]')
         _math_option_locator = (By.CSS_SELECTOR, '[href$=math]')
         _science_option_locator = (By.CSS_SELECTOR, '[href$=science]')
         _social_sciences_option_locator = (By.CSS_SELECTOR,
@@ -67,7 +68,11 @@ class WebNav(Region):
         @property
         def open(self):
             """Select the Subjects menu."""
-            self.find_element(*self._open_menu_locator).click()
+            menu = self.find_element(*self._open_menu_locator)
+            menu_state = self.find_element(*self._menu_expand_locator)
+            print(menu_state.get_attribute('aria-expanded'))
+            if menu_state.get_attribute('aria-expanded') != 'true':
+                menu.click()
             sleep(0.5)
             return self
 

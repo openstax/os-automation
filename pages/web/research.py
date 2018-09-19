@@ -18,4 +18,4 @@ class Research(WebBase):
     @property
     def loaded(self):
         """Override the base loader."""
-        return self.find_element(*self._root_locator).is_displayed
+        return self.find_element(*self._root_locator).is_displayed()

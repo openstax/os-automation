@@ -24,6 +24,11 @@ class TutorBase(Page):
             lambda _: self.find_element(*self._root_locator).is_displayed())
 
     @property
+    def location(self):
+        """Return the current URL."""
+        return self.driver.current_url
+
+    @property
     def header(self):
         """Return initial Tutor header."""
         return self.Header(self)

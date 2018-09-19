@@ -17,5 +17,6 @@ class Interest(WebBase):
     @property
     def loaded(self):
         """Wait until the form is displayed."""
-        return (self.find_element(*self._loaded_locator).is_displayed and
-                self.find_element(*self._drop_down_menu_locator).is_displayed)
+        return (self.find_element(*self._loaded_locator).is_displayed() and
+                self.find_element(*self._drop_down_menu_locator).is_displayed()
+                )

@@ -110,7 +110,7 @@ class WebHome(WebBase):
             @property
             def is_displayed(self):
                 """Return True if the banner is visible."""
-                return self.root.is_displayed
+                return self.root.is_displayed()
 
             @property
             def destination(self):

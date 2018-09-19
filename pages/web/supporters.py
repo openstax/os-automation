@@ -15,4 +15,4 @@ class Supporters(WebBase):
     @property
     def loaded(self):
         """Return True if the hero banner is found."""
-        return self.find_element(*self._banner_locator).is_displayed
+        return self.find_element(*self._banner_locator).is_displayed()

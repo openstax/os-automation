@@ -1,5 +1,7 @@
 """Basic page parent for all OpenStax Web pages."""
 
+from time import sleep
+
 from pypom import Page
 from selenium.webdriver.common.by import By
 
@@ -45,11 +47,22 @@ class WebBase(Page):
 
     def reload(self):
         """Reload the current page."""
-        self.driver.navigate().refresh()
+        self.driver.execute_script('location.reload();')
         self.wait_for_page_to_load()
+        sleep(1.0)
         return self
 
     def back(self):
         """Go back to the previous page."""
         self.driver.execute_script('window.history.go(-1)')
         return self
+
+    @property
+    def location(self):
+        """Return the current URL."""
+        return self.driver.current_url
+
+    @property
+    def url(self):
+        """Return the last segment of the current URL."""
+        return self.location.split('/')[-1]

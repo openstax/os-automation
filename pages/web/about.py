@@ -60,7 +60,7 @@ class AboutUs(WebBase):
         @property
         def is_displayed(self):
             """Return True if the panel is displayed."""
-            return self.root.is_displayed
+            return self.root.is_displayed()
 
         def go_to_foundations(self):
             """Follow the philanthropic foundations link."""
@@ -93,7 +93,7 @@ class AboutUs(WebBase):
         @property
         def is_displayed(self):
             """Return True if the panel is displayed."""
-            return self.root.is_displayed
+            return self.root.is_displayed()
 
         def go_to_library(self):
             """Follow the current library link."""
@@ -155,7 +155,7 @@ class AboutUs(WebBase):
         @property
         def is_displayed(self):
             """Return True if the panel is displayed."""
-            return self.root.is_displayed
+            return self.root.is_displayed()
 
         def go_to_student_learning(self):
             """Follow the improving student learning link."""

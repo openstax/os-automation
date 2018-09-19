@@ -32,6 +32,16 @@ class Web(object):
     TECHNOLOGY = 'technology'
     TUTOR = 'openstax-tutor'
 
+    # User types
+    STUDENT = 'Student'
+    INSTRUCTOR = 'Instructor'
+    ADMINISTRATOR = 'Administrator'
+    LIBRARIAN = 'Librarian'
+    DESIGNER = 'Instructional Designer'
+    HOMESCHOOL = 'Homeschool Instructor'
+    ADJUNCT = 'Adjunct Faculty'
+    OTHER = 'Other'
+
     ACCESSIBILITY = [
         'Accessibility',
         'Web Accessibility',

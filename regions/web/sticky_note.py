@@ -11,7 +11,7 @@ from utils.web import Web as Support
 class StickyNote(Region):
     """OpenStax Web's sticky note region."""
 
-    _root_locator = (By.TAG_NAME, 'sticky_note')
+    _root_locator = (By.CLASS_NAME, 'sticky-note')
     _display_locator = (By.CSS_SELECTOR, '[role=alert]')
     _close_button_locator = (By.TAG_NAME, 'button')
     _link_locator = (By.TAG_NAME, 'a')
@@ -19,9 +19,8 @@ class StickyNote(Region):
     @property
     def is_displayed(self):
         """Return True if the sticky note is currently displayed."""
-        return self.find_element(*self._display_locator).is_displayed
+        return self.find_element(*self._display_locator).is_displayed()
 
-    @property
     def close(self):
         """Close the sticky note."""
         self.find_element(*self._close_button_locator).click()
@@ -44,5 +43,5 @@ class StickyNote(Region):
         self.button.click()
         sleep(1.0)
         if Support.GIVE in destination:
-            from pages.web.give import Donate as Destination
+            from pages.web.donation import Give as Destination
         return Destination(self.driver)
