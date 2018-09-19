@@ -18,12 +18,12 @@ class WebBase(Page):
 
     def __init__(self, driver, base_url=None, timeout=60, **url_kwargs):
         """Override the initialization to hold onto the Web timeout."""
-        super(WebBase, self).__init__(driver, base_url, 60, **url_kwargs)
+        super(WebBase, self).__init__(driver, base_url, timeout, **url_kwargs)
 
     @property
     def loaded(self):
         """Return True when the page-loaded class is added to the body tag."""
-        return self.find_element(*self._root_locator).is_displayed()
+        return self.root.is_displayed()
 
     @property
     def sticky_note(self):
@@ -66,3 +66,14 @@ class WebBase(Page):
     def url(self):
         """Return the last segment of the current URL."""
         return self.location.split('/')[-1]
+
+    def resize_window(self, width=1024, height=768):
+        """Set the browser window size.
+
+        Args:
+            width (int): browser window width, default 4:3
+            height (int): browser window height, default 4:3
+
+        """
+        self.driver.set_window_size(width, height)
+        sleep(1.5)

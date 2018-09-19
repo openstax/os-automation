@@ -15,9 +15,9 @@ class Footer(Region):
     _social_locator = (By.CLASS_NAME, 'social')
 
     @property
-    def is_displayed(self):
+    def loaded(self):
         """Return true if the footer is currently displayed."""
-        return self.is_displayed
+        return self.find_element(*self._root_locator).is_displayed()
 
     @property
     def box(self):

@@ -9,7 +9,7 @@ from selenium.webdriver.common.by import By
 class OpenStaxNav(Region):
     """OpenStax's website shared navigational control."""
 
-    _root_locator = (By.CLASS_NAME, '.meta-nav')
+    _root_locator = (By.CLASS_NAME, 'meta-nav')
     _our_impact_locator = (By.CSS_SELECTOR, '[href$=impact]')
     _supporters_locator = (By.CSS_SELECTOR, '[href$=foundation]')
     _blog_locator = (By.CSS_SELECTOR, '[href$=blog]')
@@ -17,9 +17,10 @@ class OpenStaxNav(Region):
     _help_locator = (By.CSS_SELECTOR, '[href$=help]')
     _rice_locator = (By.CLASS_NAME, '.rice-logo')
 
+    @property
     def is_displayed(self):
-        """Return True if the OpenStax navigation bar is visible."""
-        return self.is_displayed
+        """Return True if the nav bar is displayed."""
+        return self.root.is_displayed()
 
     def view_our_impact(self):
         """Go to the impact page."""

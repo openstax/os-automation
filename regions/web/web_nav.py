@@ -16,11 +16,12 @@ class WebNav(Region):
     _technology_dropdown_locator = (By.CLASS_NAME, 'technology-dropdown')
     _what_we_do_dropdown_locator = (By.CLASS_NAME, 'what-we-do-dropdown')
     _user_menu_locator = (By.CLASS_NAME, 'login')
+    _meta_menu_locator = (By.CLASS_NAME, 'expand')
 
     @property
     def is_displayed(self):
-        """Return True if the site navigation bar is visible."""
-        return self.find_element(*self._openstax_logo_locator).is_displayed
+        """Return True if the nav bar is displayed."""
+        return self.root.is_displayed()
 
     def go_home(self):
         """Return to the home page by clicking on the OpenStax logo."""
@@ -51,6 +52,32 @@ class WebNav(Region):
     def login(self):
         """Access the Login option or menu."""
         return self.Login(self)
+
+    @property
+    def meta(self):
+        """Access the meta menu for condensed views."""
+        region_root = self.find_element(*self._meta_menu_locator)
+        return self.Meta(self, region_root)
+
+    class Meta(Region):
+        """The meta menu control for non-full screen viewers."""
+
+        @property
+        def is_displayed(self):
+            return self.root.is_displayed()
+
+        @property
+        def is_open(self):
+            status = self.driver.execute_script(
+                'return document.querySelector("body.no-scroll");')
+            print(status)
+            return bool(status)
+
+        def toggle_menu(self):
+            """Click the menu to open or close it."""
+            self.root.click()
+            sleep(1.25)
+            return self
 
     class Subjects(Region):
         """The Subject navigation menu dropdown."""

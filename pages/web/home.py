@@ -63,6 +63,10 @@ class WebHome(WebBase):
     _information_locator = (By.CLASS_NAME, 'buckets')
 
     @property
+    def loaded(self):
+        return self.carousel.is_displayed
+
+    @property
     def carousel(self):
         """Access the book banner carousel."""
         region_root = self.find_element(*self._banner_locator)
@@ -91,6 +95,11 @@ class WebHome(WebBase):
 
         _banner_image_locator = (By.CSS_SELECTOR, '.image-row a')
         _dot_button_locator = (By.CSS_SELECTOR, '.dots button')
+
+        @property
+        def is_displayed(self):
+            """Return True when the carousel is loaded."""
+            return self.root.is_displayed()
 
         @property
         def banners(self):
