@@ -49,7 +49,9 @@ class Link(Region):
             from pages.web.subjects import Subjects as Destination
         elif destination.endswith(Support.TECHNOLOGY):
             from pages.web.technology import Technology as Destination
-        return Destination(self.driver)
+        go_to = Destination(self.driver)
+        go_to.wait_for_page_to_load()
+        return go_to
 
 
 class WebHome(WebBase):
@@ -64,7 +66,8 @@ class WebHome(WebBase):
 
     @property
     def loaded(self):
-        return self.carousel.is_displayed
+        """Return True when the banner carousel is displayed."""
+        return self.carousel.is_displayed()
 
     @property
     def carousel(self):
@@ -96,9 +99,8 @@ class WebHome(WebBase):
         _banner_image_locator = (By.CSS_SELECTOR, '.image-row a')
         _dot_button_locator = (By.CSS_SELECTOR, '.dots button')
 
-        @property
         def is_displayed(self):
-            """Return True when the carousel is loaded."""
+            """Return True when the carousel is displayed."""
             return self.root.is_displayed()
 
         @property
@@ -116,7 +118,6 @@ class WebHome(WebBase):
         class Banner(Region):
             """An individual banner."""
 
-            @property
             def is_displayed(self):
                 """Return True if the banner is visible."""
                 return self.root.is_displayed()
@@ -153,7 +154,9 @@ class WebHome(WebBase):
                     from pages.web.about_us import AboutUs as Destination
                 self.root.click()
                 sleep(1.0)
-                return Destination(self.driver)
+                go_to = Destination(self.driver)
+                go_to.wait_for_page_to_load()
+                return go_to
 
         class Dot(Region):
             """An individual sellection button."""
@@ -167,7 +170,9 @@ class WebHome(WebBase):
                 """Select a dot to display the corresponding banner."""
                 self.root.click()
                 sleep(0.5)
-                return WebHome(self.driver)
+                go_to = WebHome(self.driver)
+                go_to.wait_for_page_to_load()
+                return go_to
 
     class Quotes(Region):
         """Quotes and page links."""
@@ -241,7 +246,9 @@ class WebHome(WebBase):
                 elif Support.BOOKSTORE in destination:
                     from pages.web.bookstore \
                         import Bookstore as Destination
-                return Destination(self.driver)
+                go_to = Destination(self.driver)
+                go_to.wait_for_page_to_load()
+                return go_to
 
     class Education(Region):
         """Education and page links."""

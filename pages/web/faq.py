@@ -15,4 +15,8 @@ class FAQ(WebBase):
     @property
     def loaded(self):
         """Return True if the hero banner is found."""
+        return bool(self.find_element(*self._main_content_locator))
+
+    def is_displayed(self):
+        """Return True if the main content is loaded."""
         return self.find_element(*self._main_content_locator).is_displayed()

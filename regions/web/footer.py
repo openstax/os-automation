@@ -16,8 +16,8 @@ class Footer(Region):
 
     @property
     def loaded(self):
-        """Return true if the footer is currently displayed."""
-        return self.find_element(*self._root_locator).is_displayed()
+        """Return True if the footer is currently displayed."""
+        return self.root.is_displayed()
 
     @property
     def box(self):

@@ -17,7 +17,6 @@ class OpenStaxNav(Region):
     _help_locator = (By.CSS_SELECTOR, '[href$=help]')
     _rice_locator = (By.CLASS_NAME, '.rice-logo')
 
-    @property
     def is_displayed(self):
         """Return True if the nav bar is displayed."""
         return self.root.is_displayed()

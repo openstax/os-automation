@@ -16,3 +16,10 @@ class Supporters(WebBase):
     def loaded(self):
         """Return True if the hero banner is found."""
         return self.find_element(*self._banner_locator).is_displayed()
+
+    def is_displayed(self):
+        """Return True if the supporters page is displayed."""
+        try:
+            return self.loaded
+        except Exception:
+            return False

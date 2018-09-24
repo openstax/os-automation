@@ -6,6 +6,7 @@ from pypom import Region
 from selenium.webdriver.common.by import By
 
 from pages.web.base import WebBase
+from utils.utilities import go_to_
 
 
 class Adoption(WebBase):
@@ -25,6 +26,10 @@ class Adoption(WebBase):
                 self.find_element(*self._drop_down_menu_locator).is_displayed()
                 )
 
+    def is_displayed(self):
+        """Return True if the adoption form is displayed."""
+        return self.find_element(*self._drop_down_menu_locator).is_displayed()
+
     def go_to_interest(self):
         """Switch to the interest form."""
         self.wait.until(
@@ -32,7 +37,7 @@ class Adoption(WebBase):
         ).click()
         sleep(1.0)
         from pages.web.interest import Interest
-        return Interest(self.driver)
+        return go_to_(Interest(self.driver))
 
     @property
     def form(self):
@@ -81,7 +86,7 @@ class Adoption(WebBase):
             """Click the student GO BACK button."""
             self.find_element(*self._go_back_button_locator).click()
             sleep(1.0)
-            return WebBase(self.driver)
+            return go_to_(WebBase(self.driver))
 
 
 class AdoptionConfirmation(WebBase):

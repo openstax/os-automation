@@ -33,7 +33,7 @@ def test_the_donation_banner_is_displayed(web_base_url, selenium):
     # THEN: a sticky note is displayed at the top of the page
     # AND:  a button is displayed linking to the donation page
     assert(home.sticky_note.loaded)
-    assert(home.sticky_note.button.is_displayed)
+    assert(home.sticky_note.button.is_displayed())
 
     # WHEN: the user clicks the "Give now" button
     donation = home.sticky_note.go()
@@ -47,7 +47,7 @@ def test_the_donation_banner_is_displayed(web_base_url, selenium):
     home.sticky_note.close()
 
     # THEN: the sticky note is closed (no longer visible)
-    assert(not home.sticky_note.is_displayed)
+    assert(not home.sticky_note.is_displayed())
 
 
 @test_case('C214019')
@@ -58,14 +58,14 @@ def test_the_donation_banner_is_not_displayed_after_repeat_reloads(
     # GIVEN: a user viewing the Web home page
     # AND:   the donation sticky note is present
     home = Home(selenium, web_base_url).open()
-    assert(home.sticky_note.is_displayed)
+    assert(home.sticky_note.is_displayed())
 
     # WHEN: they reload the home page five times
     for _ in range(5):
-        home.reload()
+        home = home.reload()
 
     # THEN: the donation sticky note is not displayed
-    assert(not home.sticky_note.is_displayed)
+    assert(not home.sticky_note.is_displayed())
 
 
 @test_case('C210298')
@@ -74,25 +74,101 @@ def test_the_donation_banner_is_not_displayed_after_repeat_reloads(
 def test_the_openstax_nav_is_displayed(web_base_url, selenium):
     """Test the visibility of the OpenStax nav for full and mobile users."""
     # GIVEN: a user viewing the Web home page
-    home = Home(selenium, web_base_url, 20).open()
+    home = Home(selenium, web_base_url)
+    home.resize_window(width=1024)
+    home.open()
 
     # WHEN:
 
     # THEN: the OpenStax nav is visible
-    assert(home.openstax_nav.is_displayed)
-    assert(not home.web_nav.meta.is_displayed)
+    assert(home.openstax_nav.is_displayed())
 
-    # WHEN: the screen is reduced to 960 pixels
+    # WHEN: the screen is reduced to 960 pixels or less
     home.resize_window(width=900)
 
     # THEN: the OpenStax nav is hidden
     # AND:  the menu toggle is displayed
-    assert(not home.openstax_nav.is_displayed)
-    assert(home.web_nav.meta.is_displayed)
+    assert(not home.openstax_nav.is_displayed())
+    assert(home.web_nav.meta.is_displayed())
 
     # WHEN: the user clicks on the menu toggle
     home.web_nav.meta.toggle_menu()
 
     # THEN: the OpenStax nav options are displayed
-    assert(home.openstax_nav.is_displayed)
+    assert(home.openstax_nav.is_displayed())
     assert(home.web_nav.meta.is_open)
+
+
+@test_case('C210299')
+@nondestructive
+@web
+def test_mobile_menu_navigation(web_base_url, selenium):
+    """Test the ability to navigate using the mobile menu."""
+    # GIVEN: a user viewing the Web home page
+    # AND:   the screen width is 960 pixels or less
+    home = Home(selenium, web_base_url)
+    home.resize_window(width=900)
+    home.open()
+
+    # WHEN: they click on the menu toggle
+    # AND:  click on the "Subjects" link
+    home.web_nav.meta.toggle_menu()
+    home.web_nav.subjects.open()
+
+    # THEN: the "Subjects" links are displayed
+    assert(home.web_nav.subjects.all.is_displayed())
+    assert(home.web_nav.subjects.math.is_displayed())
+    assert(home.web_nav.subjects.science.is_displayed())
+    assert(home.web_nav.subjects.social_sciences.is_displayed())
+    assert(home.web_nav.subjects.humanities.is_displayed())
+    assert(home.web_nav.subjects.business.is_displayed())
+    assert(home.web_nav.subjects.ap.is_displayed())
+
+    # WHEN: they click on the "Back" link
+    home.web_nav.back()
+
+    # THEN: the nav categories are displayed
+    assert(home.web_nav.subjects.is_displayed())
+    assert(home.web_nav.technology.is_displayed())
+    assert(home.web_nav.openstax.is_displayed())
+    assert(home.web_nav.login.is_displayed())
+
+    # WHEN: they click on the "Technology" link
+    home.web_nav.technology.open()
+
+    # THEN: the "Technology" links are displayed
+    assert(home.web_nav.technology.technology.is_displayed())
+    assert(home.web_nav.technology.tutor.is_displayed())
+    assert(home.web_nav.technology.partners.is_displayed())
+
+    # WHEN: they click on the "Back" link
+    home.web_nav.back()
+
+    # THEN: the nav categories are displayed
+    assert(home.web_nav.subjects.is_displayed())
+    assert(home.web_nav.technology.is_displayed())
+    assert(home.web_nav.openstax.is_displayed())
+    assert(home.web_nav.login.is_displayed())
+
+    # WHEN: they click on the "What we do" link
+    home.web_nav.openstax.open()
+
+    # THEN: the "What we do" links are displayed
+    assert(home.web_nav.openstax.about_us.is_displayed())
+    assert(home.web_nav.openstax.team.is_displayed())
+    assert(home.web_nav.openstax.research.is_displayed())
+
+    # WHEN: they click on the "Back" link
+    home.web_nav.back()
+
+    # THEN: the nav categories are displayed
+    assert(home.web_nav.subjects.is_displayed())
+    assert(home.web_nav.technology.is_displayed())
+    assert(home.web_nav.openstax.is_displayed())
+    assert(home.web_nav.login.is_displayed())
+
+    # WHEN: they click on the "X" icon
+    home.web_nav.meta.toggle_menu()
+
+    # THEN: the mobile menu is closed
+    assert(not home.web_nav.meta.is_open)

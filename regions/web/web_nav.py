@@ -3,7 +3,8 @@
 from time import sleep
 
 from pypom import Region
-from selenium.common.exceptions import NoSuchElementException
+from selenium.common.exceptions import NoSuchElementException  # NOQA
+from selenium.common.exceptions import WebDriverException
 from selenium.webdriver.common.by import By
 
 
@@ -16,9 +17,9 @@ class WebNav(Region):
     _technology_dropdown_locator = (By.CLASS_NAME, 'technology-dropdown')
     _what_we_do_dropdown_locator = (By.CLASS_NAME, 'what-we-do-dropdown')
     _user_menu_locator = (By.CLASS_NAME, 'login')
+    _back_link_locator = (By.CSS_SELECTOR, 'a.close')
     _meta_menu_locator = (By.CLASS_NAME, 'expand')
 
-    @property
     def is_displayed(self):
         """Return True if the nav bar is displayed."""
         return self.root.is_displayed()
@@ -53,6 +54,18 @@ class WebNav(Region):
         """Access the Login option or menu."""
         return self.Login(self)
 
+    def back(self):
+        """Click on the back link within the mobile menu.
+
+        Use a document query because the back button and menu name are
+        outside the scope of the Web Nav region.
+        """
+        self.driver.execute_script(
+            'document.querySelector("%s").click()' %
+            self._back_link_locator[1])
+        sleep(1.0)
+        return self
+
     @property
     def meta(self):
         """Access the meta menu for condensed views."""
@@ -62,20 +75,27 @@ class WebNav(Region):
     class Meta(Region):
         """The meta menu control for non-full screen viewers."""
 
-        @property
         def is_displayed(self):
+            """Return True if the region is displayed."""
             return self.root.is_displayed()
 
         @property
         def is_open(self):
+            """Return True if the meta menu for mobile displays is open."""
             status = self.driver.execute_script(
                 'return document.querySelector("body.no-scroll");')
-            print(status)
             return bool(status)
 
         def toggle_menu(self):
-            """Click the menu to open or close it."""
-            self.root.click()
+            """Click the menu to open or close it.
+
+            If the page overlay is still in place, wait and retry.
+            """
+            try:
+                self.root.click()
+            except WebDriverException:
+                sleep(1.0)
+                self.root.click()
             sleep(1.25)
             return self
 
@@ -90,17 +110,21 @@ class WebNav(Region):
         _social_sciences_option_locator = (By.CSS_SELECTOR,
                                            '[href$=social-sciences]')
         _humanities_option_locator = (By.CSS_SELECTOR, '[href$=humanities]')
-        _ap_option_locator = (By.CSS_SELECTOR, '[href$=AP]')
+        _business_option_locator = (By.CSS_SELECTOR, '[href$=business]')
+        _ap_option_locator = (By.CSS_SELECTOR, '[href$=ap]')
 
-        @property
+        def is_displayed(self):
+            """Return True if the region is displayed."""
+            return self.root.is_displayed()
+
         def open(self):
             """Select the Subjects menu."""
-            menu = self.find_element(*self._open_menu_locator)
-            menu_state = self.find_element(*self._menu_expand_locator)
-            print(menu_state.get_attribute('aria-expanded'))
-            if menu_state.get_attribute('aria-expanded') != 'true':
-                menu.click()
-            sleep(0.5)
+            is_expanded = (self
+                           .find_element(*self._menu_expand_locator)
+                           .get_attribute('aria-expanded'))
+            if not (is_expanded == 'true'):
+                self.find_element(*self._open_menu_locator).click()
+                sleep(1.0)
             return self
 
         @property
@@ -110,7 +134,7 @@ class WebNav(Region):
 
         def view_all(self):
             """View all book subjects."""
-            return self.open._selection_helper(
+            return self.open()._selection_helper(
                 self._all_option_locator)
 
         @property
@@ -120,7 +144,7 @@ class WebNav(Region):
 
         def view_math(self):
             """View all math books."""
-            return self.open._selection_helper(
+            return self.open()._selection_helper(
                 self._math_option_locator)
 
         @property
@@ -130,18 +154,38 @@ class WebNav(Region):
 
         def view_science(self):
             """View all science books."""
-            return self.open._selection_helper(
+            return self.open()._selection_helper(
                 self._science_option_locator)
 
         @property
-        def social_science(self):
+        def social_sciences(self):
             """Return the social science subjects link."""
-            return self.find_element(*self._social_science_option_locator)
+            return self.find_element(*self._social_sciences_option_locator)
 
-        def view_social_science(self):
+        def view_social_sciences(self):
             """View all social science books."""
-            return self.open._selection_helper(
+            return self.open()._selection_helper(
                 self._social_sciences_option_locator)
+
+        @property
+        def humanities(self):
+            """Return the humanities subjects link."""
+            return self.find_element(*self._humanities_option_locator)
+
+        def view_humanities(self):
+            """View all humanities books."""
+            return self.open()._selection_helper(
+                self._humanities_option_locator)
+
+        @property
+        def business(self):
+            """Return the business subjects link."""
+            return self.find_element(*self._business_option_locator)
+
+        def view_business(self):
+            """View all business books."""
+            return self.open()._selection_helper(
+                self._business_option_locator)
 
         @property
         def ap(self):
@@ -150,12 +194,12 @@ class WebNav(Region):
 
         def view_ap(self):
             """View all AP books."""
-            return self.open._selection_helper(
+            return self.open()._selection_helper(
                 self._ap_option_locator)
 
         def _selection_helper(self, locator):
             """Select the corresponding option."""
-            self.open.find_element(*locator).click()
+            self.open().find_element(*locator).click()
             sleep(1.0)
             from pages.web.subjects import Subjects
             return Subjects(self.driver)
@@ -168,7 +212,10 @@ class WebNav(Region):
         _tutor_option_locator = (By.CSS_SELECTOR, '[href$=openstax-tutor]')
         _partners_option_locator = (By.CSS_SELECTOR, '[href$=partners]')
 
-        @property
+        def is_displayed(self):
+            """Return True if the region is displayed."""
+            return self.root.is_displayed()
+
         def open(self):
             """Select the Technology menu."""
             self.find_element(*self._open_menu_locator).click()
@@ -182,7 +229,7 @@ class WebNav(Region):
 
         def view_technology(self):
             """View the technology page."""
-            self.open.technology.click()
+            self.open().technology.click()
             sleep(1.0)
             from pages.web.technology import Technology
             return Technology(self.driver)
@@ -194,7 +241,7 @@ class WebNav(Region):
 
         def view_tutor(self):
             """View the OpenStax Tutor beta marketing page."""
-            self.open.tutor.click()
+            self.open().tutor.click()
             sleep(1.0)
             from pages.web.tutor_marketing import TutorMarketing
             return TutorMarketing(self.driver)
@@ -206,7 +253,7 @@ class WebNav(Region):
 
         def view_partners(self):
             """View the OpenStax partners page."""
-            self.open.partners.click()
+            self.open().partners.click()
             sleep(1.0)
             from pages.web.partners import Partners
             return Partners(self.driver)
@@ -219,7 +266,10 @@ class WebNav(Region):
         _team_option_locator = (By.CSS_SELECTOR, '[href$=team]')
         _research_option_locator = (By.CSS_SELECTOR, '[href$=research]')
 
-        @property
+        def is_displayed(self):
+            """Return True if the region is displayed."""
+            return self.root.is_displayed()
+
         def open(self):
             """Select the What we do menu."""
             self.find_element(*self._open_menu_locator).click()
@@ -233,7 +283,7 @@ class WebNav(Region):
 
         def view_about_us(self):
             """View the About Us page."""
-            self.open.about_us.click()
+            self.open().about_us.click()
             sleep(1.0)
             from pages.web.about_us import AboutUs
             return AboutUs(self.driver)
@@ -245,7 +295,7 @@ class WebNav(Region):
 
         def view_team(self):
             """View the OpenStax team page."""
-            self.open.team.click()
+            self.open().team.click()
             sleep(1.0)
             from pages.web.team import Team
             return Team(self.driver)
@@ -257,7 +307,7 @@ class WebNav(Region):
 
         def view_research(self):
             """View the OpenStax researcher page."""
-            self.open.research.click()
+            self.open().research.click()
             sleep(1.0)
             from pages.web.research import Research
             return Research(self.driver)
@@ -278,6 +328,10 @@ class WebNav(Region):
             """Return the log in link."""
             return self.find_element(*self._log_in_link_locator)
 
+        def is_displayed(self):
+            """Return True if the log in link is displayed."""
+            return self.login.is_displayed()
+
         def log_in(self, user, password):
             """Log a user into the website."""
             accounts = self.login.click()
@@ -295,7 +349,6 @@ class WebNav(Region):
                 return False
             return True
 
-        @property
         def open(self):
             """Select the user menu."""
             self.find_element(*self._open_menu_locator).click()
@@ -314,7 +367,7 @@ class WebNav(Region):
 
         def view_profile(self):
             """View the user's account profile on Accounts."""
-            self.open.profile.click()
+            self.open().profile.click()
             sleep(1.0)
             from pages.accounts.profile import Profile
             return Profile(self.driver)
@@ -326,7 +379,7 @@ class WebNav(Region):
 
         def view_tutor(self):
             """View OpenStax Tutor Beta for the current user."""
-            self.open.tutor.click()
+            self.open().tutor.click()
             sleep(1.0)
             from pages.tutor.dashboard import Dashboard
             return Dashboard(self.driver)
@@ -338,7 +391,7 @@ class WebNav(Region):
 
         def log_out(self):
             """Log the current user out."""
-            self.open.logout.click()
+            self.open().logout.click()
             sleep(1.0)
             from pages.web.home import WebHome
             return WebHome(self.driver)

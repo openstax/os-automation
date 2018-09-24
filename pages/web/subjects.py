@@ -14,13 +14,29 @@ class Subjects(WebBase):
 
     URL_TEMPLATE = '/subjects'
 
-    _root_locator = (By.TAG_NAME, 'main')
+    _root_locator = (By.ID, 'main')
+    _banner_locator = (By.CSS_SELECTOR, '.loaded .hero')
     _book_locator = (By.CSS_SELECTOR, 'div.book-category:not(.hidden) .cover')
+    _image_locators = (By.CSS_SELECTOR, _book_locator[1] + ' img')
 
     @property
     def loaded(self):
         """Override the base loader."""
-        return self.find_element(*self._root_locator).is_displayed()
+        print('Subjects')
+        print(self._image_locators,
+              Utility.is_image_visible(self.driver,
+                                       locator=self._image_locators))
+        return (
+            bool(self.find_element(*self._root_locator))
+            and Utility.is_image_visible(self.driver,
+                                         locator=self._image_locators))
+
+    def is_displayed(self):
+        """Return True if the subjects page is displayed."""
+        if self.URL_TEMPLATE not in self.location:
+            print(self.location)
+            return False
+        return self.loaded
 
     @property
     def _active_books(self):

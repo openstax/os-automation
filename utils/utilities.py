@@ -166,6 +166,45 @@ class Utility(object):
         use_card = test_cards[select]
         return (use_card['number'], use_card['cvv'])
 
+    @classmethod
+    def is_image_visible(cls, driver, image=None, locator=None):
+        """Return True if an image is rendered."""
+        if image:
+            image_group = image if isinstance(image, list) else [image]
+        else:
+            image_group = driver.find_elements(*locator)
+            auto = ('return window.getComputedStyle('
+                    'arguments[0]).height!="auto"')
+            print('    Before: ', len(image_group))
+            image_group = list(filter(
+                lambda img: driver.execute_script(auto, img),
+                image_group))
+            print('    After:  ', len(image_group))
+        ie = 'internet explorer'
+        from selenium.webdriver import Ie
+        if (isinstance(driver, Ie) or
+                driver.capabilities.get('browserName') == ie):
+            script = 'return arguments[0].complete'
+        else:
+            script = ('return ((typeof arguments[0].naturalWidth)!="undefined"'
+                      ')')  # && (arguments[0].naturalWidth>0))')
+        c = []
+        for x in image_group:
+            c.append((x.get_attribute('src').split('/')[-1],
+                     driver.execute_script(
+                        'return (typeof arguments[0]'
+                        '.naturalWidth)!="undefined"',
+                        x),
+                     driver.execute_script(
+                        'return arguments[0].naturalWidth>0',
+                        x)))
+        print(c)
+        from functools import reduce
+        map_list = (list(map(
+            lambda img: driver.execute_script(script, img), image_group)))
+        print(map_list)
+        return reduce(lambda img, group: img and group, map_list, True)
+
 
 class Card(object):
     """Fake card objects."""
@@ -243,3 +282,9 @@ class Status(object):
     RESPONSE = 'response'
     DECLINED = 'processor declined'
     FAILED = 'failed (3000)'
+
+
+def go_to_(destination):
+    """Follow a destination link and wait for the page to load."""
+    destination.wait_for_page_to_load()
+    return destination

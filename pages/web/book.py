@@ -2,11 +2,9 @@
 
 from time import sleep
 
-# from pypom import Region
 from selenium.webdriver.common.by import By
 
 from pages.web.base import WebBase
-# from utils.utilities import Utility
 
 
 class Book(WebBase):
