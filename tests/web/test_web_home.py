@@ -172,3 +172,30 @@ def test_mobile_menu_navigation(web_base_url, selenium):
 
     # THEN: the mobile menu is closed
     assert(not home.web_nav.meta.is_open)
+
+
+@test_case('C210300')
+@nondestructive
+@web
+def test_nav_our_impact_loads_the_impact_page(web_base_url, selenium):
+    """Test the OpenStax nav link to Our Impact."""
+    # GIVEN: a user viewing the Web home page
+    home = Home(selenium, web_base_url).open()
+
+    # WHEN: they click the "Our Impact" link in the OpenStax nav
+    impact = home.openstax_nav.view_our_impact()
+
+    # THEN: the impact webpage is displayed
+    assert(impact.is_displayed())
+
+    # WHEN: the user returns to the home page
+    # AND:  the screen is reduced to 960 pixels or less
+    # AND:  they click on the menu toggle
+    # AND:  click the "Our Impact" link
+    home.open()
+    home.resize_window(width=900)
+    home.web_nav.meta.toggle_menu()
+    impact = home.openstax_nav.view_our_impact()
+
+    # THEN: the impact webpage is displayed
+    assert(impact.is_displayed())

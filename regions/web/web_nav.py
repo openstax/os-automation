@@ -7,6 +7,8 @@ from selenium.common.exceptions import NoSuchElementException  # NOQA
 from selenium.common.exceptions import WebDriverException
 from selenium.webdriver.common.by import By
 
+from utils.utilities import go_to_
+
 
 class WebNav(Region):
     """Website navbar region."""
@@ -29,7 +31,7 @@ class WebNav(Region):
         self.find_element(*self._openstax_logo_locator).click()
         sleep(1.0)
         from pages.web.home import WebHome
-        return WebHome(self.driver)
+        return go_to_(WebHome(self.driver))
 
     @property
     def subjects(self):
@@ -202,7 +204,7 @@ class WebNav(Region):
             self.open().find_element(*locator).click()
             sleep(1.0)
             from pages.web.subjects import Subjects
-            return Subjects(self.driver)
+            return go_to_(Subjects(self.driver))
 
     class Technology(Region):
         """The Technology navigation menu dropdown."""
@@ -232,7 +234,7 @@ class WebNav(Region):
             self.open().technology.click()
             sleep(1.0)
             from pages.web.technology import Technology
-            return Technology(self.driver)
+            return go_to_(Technology(self.driver))
 
         @property
         def tutor(self):
@@ -244,7 +246,7 @@ class WebNav(Region):
             self.open().tutor.click()
             sleep(1.0)
             from pages.web.tutor_marketing import TutorMarketing
-            return TutorMarketing(self.driver)
+            return go_to_(TutorMarketing(self.driver))
 
         @property
         def partners(self):
@@ -256,7 +258,7 @@ class WebNav(Region):
             self.open().partners.click()
             sleep(1.0)
             from pages.web.partners import Partners
-            return Partners(self.driver)
+            return go_to_(Partners(self.driver))
 
     class WhatWeDo(Region):
         """The What we do navigation menu dropdown."""
@@ -286,7 +288,7 @@ class WebNav(Region):
             self.open().about_us.click()
             sleep(1.0)
             from pages.web.about_us import AboutUs
-            return AboutUs(self.driver)
+            return go_to_(AboutUs(self.driver))
 
         @property
         def team(self):
@@ -298,7 +300,7 @@ class WebNav(Region):
             self.open().team.click()
             sleep(1.0)
             from pages.web.team import Team
-            return Team(self.driver)
+            return go_to_(Team(self.driver))
 
         @property
         def research(self):
@@ -310,7 +312,7 @@ class WebNav(Region):
             self.open().research.click()
             sleep(1.0)
             from pages.web.research import Research
-            return Research(self.driver)
+            return go_to_(Research(self.driver))
 
     class Login(Region):
         """The login option and menu."""
@@ -338,7 +340,7 @@ class WebNav(Region):
             sleep(1.0)
             accounts.log_in(user, password)
             from pages.web.home import WebHome
-            return WebHome(accounts.driver)
+            return go_to_(WebHome(accounts.driver))
 
         @property
         def logged_in(self):
@@ -370,7 +372,7 @@ class WebNav(Region):
             self.open().profile.click()
             sleep(1.0)
             from pages.accounts.profile import Profile
-            return Profile(self.driver)
+            return go_to_(Profile(self.driver))
 
         @property
         def tutor(self):
@@ -382,7 +384,7 @@ class WebNav(Region):
             self.open().tutor.click()
             sleep(1.0)
             from pages.tutor.dashboard import Dashboard
-            return Dashboard(self.driver)
+            return go_to_(Dashboard(self.driver))
 
         @property
         def logout(self):
@@ -394,4 +396,4 @@ class WebNav(Region):
             self.open().logout.click()
             sleep(1.0)
             from pages.web.home import WebHome
-            return WebHome(self.driver)
+            return go_to_(WebHome(self.driver))

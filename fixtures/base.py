@@ -2,7 +2,7 @@
 
 import pytest
 
-__all__ = ['selenium', 'chrome_options']
+__all__ = ['selenium', 'chrome_options', 'firefox_options']
 
 
 # https://docs.pytest.org/en/latest/example/simple.html
@@ -11,6 +11,7 @@ __all__ = ['selenium', 'chrome_options']
 def selenium(request, selenium, pytestconfig):
     """Set default information for webdriver instances."""
     selenium.implicitly_wait(0)
+    selenium.set_window_size(width=1024, height=768)
     yield selenium
     # request.node is an "item" because we use the default "function" scope
     if (pytestconfig.getoption('--print-page-source-on-failure') and
