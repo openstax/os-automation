@@ -199,3 +199,31 @@ def test_nav_our_impact_loads_the_impact_page(web_base_url, selenium):
 
     # THEN: the impact webpage is displayed
     assert(impact.is_displayed())
+
+
+@test_case('C210301')
+@nondestructive
+@web
+def test_nav_supporters_loads_the_foundation_supporters_page(
+        web_base_url, selenium):
+    """Test the OpenStax nav link to Supporters."""
+    # GIVEN: a user viewing the Web home page
+    home = Home(selenium, web_base_url).open()
+
+    # WHEN: they click the "Supporters" link in the OpenStax nav
+    supporters = home.openstax_nav.view_supporters()
+
+    # THEN: the supporters webpage is displayed
+    assert(supporters.is_displayed())
+
+    # WHEN: the user returns to the home page
+    # AND:  the screen is reduced to 960 pixels
+    # AND:  they click on the menu toggle
+    # AND:  click the "Supporters" link
+    home.open()
+    home.resize_window(width=900)
+    home.web_nav.meta.toggle_menu()
+    supporters = home.openstax_nav.view_supporters()
+
+    # THEN: the supporters webpage is displayed
+    assert(supporters.is_displayed())
