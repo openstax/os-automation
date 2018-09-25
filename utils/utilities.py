@@ -140,6 +140,12 @@ class Utility(object):
                 driver.window_handles[new_handle])
 
     @classmethod
+    def close_tab(cls, driver):
+        """Close the current tab and switch to the other tab."""
+        driver.close()
+        driver.switch_to.window(driver.window_handles[0])
+
+    @classmethod
     def compare_colors(cls, left, right):
         """Return True if two RGB color strings match."""
         return Color.from_string(left) == Color.from_string(right)

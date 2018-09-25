@@ -9,6 +9,7 @@ from regions.web.footer import Footer
 from regions.web.openstax_nav import OpenStaxNav
 from regions.web.sticky_note import StickyNote
 from regions.web.web_nav import WebNav
+from utils.utilities import Utility
 
 
 class WebBase(Page):
@@ -55,6 +56,14 @@ class WebBase(Page):
     def back(self):
         """Go back to the previous page."""
         self.driver.execute_script('window.history.go(-1)')
+        return self
+
+    def close_tab(self):
+        """Close the current tab and switch to the remaining one.
+
+        Assumes 2 browser tabs are open.
+        """
+        Utility.close_tab(self.driver)
         return self
 
     @property

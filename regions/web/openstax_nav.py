@@ -6,7 +6,7 @@ from pypom import Region
 from selenium.common.exceptions import WebDriverException
 from selenium.webdriver.common.by import By
 
-from utils.utilities import go_to_
+from utils.utilities import go_to_, Utility
 
 
 class OpenStaxNav(Region):
@@ -54,15 +54,13 @@ class OpenStaxNav(Region):
 
     def view_help_articles(self):
         """Go to the Salesforce help site."""
-        self._click(self._help_locator)
-        sleep(1.0)
+        Utility.switch_to(self.driver, self._help_locator)
         from pages.salesforce.home import Salesforce
         return go_to_(Salesforce(self.driver))
 
     def go_to_rice(self):
         """Go to the Rice University home page."""
-        self._click(self._rice_locator)
-        sleep(1.0)
+        Utility.switch_to(self.driver, self._rice_locator)
         from pages.rice.home import Rice
         return go_to_(Rice(self.driver))
 

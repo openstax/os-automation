@@ -217,7 +217,7 @@ def test_nav_supporters_loads_the_foundation_supporters_page(
     assert(supporters.is_displayed())
 
     # WHEN: the user returns to the home page
-    # AND:  the screen is reduced to 960 pixels
+    # AND:  the screen is reduced to 960 pixels or less
     # AND:  they click on the menu toggle
     # AND:  click the "Supporters" link
     home.open()
@@ -244,7 +244,7 @@ def test_nav_blog_loads_the_openstax_blog(web_base_url, selenium):
     assert(openstax_blog.is_displayed())
 
     # WHEN: the user returns to the home page
-    # AND:  the screen is reduced to 960 pixels
+    # AND:  the screen is reduced to 960 pixels or less
     # AND:  they click on the menu toggle
     # AND:  click the "Blog" link
     home.open()
@@ -271,7 +271,7 @@ def test_nav_give_loads_the_donation_page(web_base_url, selenium):
     assert(give.is_displayed())
 
     # WHEN: the user returns to the home page
-    # AND:  the screen is reduced to 960 pixels
+    # AND:  the screen is reduced to 960 pixels or less
     # AND:  they click on the menu toggle
     # AND:  click the "Give" link
     home.open()
@@ -281,3 +281,37 @@ def test_nav_give_loads_the_donation_page(web_base_url, selenium):
 
     # THEN: the donation webpage is displayed
     assert(give.is_displayed())
+
+
+@test_case('C210304')
+@nondestructive
+@web
+def test_nav_help_loads_the_salesforce_support_site(web_base_url, selenium):
+    """Test the OpenStax nav link to the support pages."""
+    # GIVEN: a user viewing the Web home page
+    home = Home(selenium, web_base_url).open()
+
+    # WHEN: they click the "Help" link in the OpenStax nav
+    support = home.openstax_nav.view_help_articles()
+
+    # THEN: a new browser tab is opened
+    # AND:  the Salesforce support site is displayed in the new tab
+    assert(len(selenium.window_handles) > 1), \
+        'Did not open a new tab or window'
+    assert(support.at_salesforce)
+
+    # WHEN: the user closes the new tab
+    # AND:  switches back to the original tab
+    # AND:  the screen is reduced to 960 pixels or less
+    # AND:  they click on the menu toggle
+    # AND:  click the "Help" link
+    support.close_tab()
+    home.resize_window(width=900)
+    home.web_nav.meta.toggle_menu()
+    support = home.openstax_nav.view_help_articles()
+
+    # THEN: a new browser tab is opened
+    # AND:  the Salesforce support is displayed in the new tab
+    assert(len(selenium.window_handles) > 1), \
+        'Did not open a new tab or window'
+    assert(support.at_salesforce)
