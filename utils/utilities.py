@@ -10,6 +10,14 @@ from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support.color import Color
 from selenium.webdriver.support.ui import Select
 
+JQUERY = (
+    'https://code.jquery.com/jquery-3.3.1.slim.min.js'
+)
+WAIT_FOR_IMAGE = (
+    'https://cdnjs.cloudflare.com/ajax/libs/'
+    'jquery.waitforimages/1.5.0/jquery.waitforimages.min.js'
+)
+
 
 class Utility(object):
     """Helper functions for various Pages functions."""
@@ -175,35 +183,53 @@ class Utility(object):
             image_group = driver.find_elements(*locator)
             auto = ('return window.getComputedStyle('
                     'arguments[0]).height!="auto"')
-            print('    Before: ', len(image_group))
             image_group = list(filter(
                 lambda img: driver.execute_script(auto, img),
                 image_group))
-            print('    After:  ', len(image_group))
         ie = 'internet explorer'
         from selenium.webdriver import Ie
         if (isinstance(driver, Ie) or
                 driver.capabilities.get('browserName') == ie):
             script = 'return arguments[0].complete'
         else:
-            script = ('return ((typeof arguments[0].naturalWidth)!="undefined"'
-                      ')')  # && (arguments[0].naturalWidth>0))')
-        c = []
-        for x in image_group:
-            c.append((x.get_attribute('src').split('/')[-1],
-                     driver.execute_script(
-                        'return (typeof arguments[0]'
-                        '.naturalWidth)!="undefined"',
-                        x),
-                     driver.execute_script(
-                        'return arguments[0].naturalWidth>0',
-                        x)))
-        print(c)
+            script = (
+                'return ((typeof arguments[0].naturalWidth)!="undefined")')
         from functools import reduce
         map_list = (list(map(
             lambda img: driver.execute_script(script, img), image_group)))
-        print(map_list)
         return reduce(lambda img, group: img and group, map_list, True)
+
+    @classmethod
+    def load_background_images(cls, driver, locator):
+        """Inject a script to wait for background image downloads.
+
+        Return True when complete so it can be used in loaded methods.
+        """
+        inject = (
+            r'''
+            ;(function() {
+                var head = document.getElementsByTagName("head")[0];
+                var jquery = document.createElement("script");
+                jquery.src = "JQUERY_STRING";
+                jquery.onload = function() {
+                    var $ = window.jQuery;
+                    var head = document.getElementsByTagName("head")[0];
+                    var image = document.createElement("script");
+                    image.src = "IMAGE_STRING";
+                    image.type = "text/javascript";
+                    head.appendChild(image);
+                    $("SELECTOR").waitForImages().done(
+                        function() { return true; });
+                };
+                head.appendChild(jquery);
+            });
+            return true;
+            '''
+            .replace('JQUERY_STRING', JQUERY)
+            .replace('IMAGE_STRING', WAIT_FOR_IMAGE)
+            .replace('SELECTOR', locator[1])
+        )
+        return driver.execute_script(inject)
 
 
 class Card(object):

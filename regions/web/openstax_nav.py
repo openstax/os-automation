@@ -3,6 +3,7 @@
 from time import sleep
 
 from pypom import Region
+from selenium.common.exceptions import WebDriverException
 from selenium.webdriver.common.by import By
 
 from utils.utilities import go_to_
@@ -25,42 +26,51 @@ class OpenStaxNav(Region):
 
     def view_our_impact(self):
         """Go to the impact page."""
-        self.find_element(*self._our_impact_locator).click()
+        self._click(self._our_impact_locator)
         sleep(1.0)
         from pages.web.impact import OurImpact
         return go_to_(OurImpact(self.driver))
 
     def view_supporters(self):
         """Go to the supporters page."""
-        self.find_element(*self._supporters_locator).click()
+        self._click(self._supporters_locator)
         sleep(1.0)
         from pages.web.supporters import Supporters
         return go_to_(Supporters(self.driver))
 
     def view_the_blog(self):
         """Go to the blog."""
-        self.find_element(*self._blog_locator).click()
+        self._click(self._blog_locator)
         sleep(1.0)
         from pages.web.blog import Blog
         return go_to_(Blog(self.driver))
 
     def view_donation_options(self):
         """Go to the donation page."""
-        self.find_element(*self._give_locator).click()
+        self._click(self._give_locator)
         sleep(1.0)
         from pages.web.give import Donate
         return go_to_(Donate(self.driver))
 
     def view_help_articles(self):
         """Go to the Salesforce help site."""
-        self.find_element(*self._help_locator).click()
+        self._click(self._help_locator)
         sleep(1.0)
         from pages.salesforce.home import Salesforce
         return go_to_(Salesforce(self.driver))
 
     def go_to_rice(self):
         """Go to the Rice University home page."""
-        self.find_element(*self._rice_locator).click()
+        self._click(self._rice_locator)
         sleep(1.0)
         from pages.rice.home import Rice
         return go_to_(Rice(self.driver))
+
+    def _click(self, locator):
+        """Click on the navigation link."""
+        for _ in range(30):
+            try:
+                self.find_element(*locator).click()
+                break
+            except WebDriverException:
+                sleep(1.0)
