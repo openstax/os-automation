@@ -6,7 +6,7 @@ from pypom import Region
 from selenium.webdriver.common.by import By
 
 from pages.web.base import WebBase
-from utils.utilities import go_to_
+from utils.utilities import go_to_, Utility
 from utils.web import Web
 
 
@@ -15,16 +15,16 @@ class AboutUs(WebBase):
 
     URL_TEMPLATE = '/about'
 
+    _root_locator = (By.ID, 'main')
     _image_locators = (By.CSS_SELECTOR, '#main img')
-    _who_section_locator = (By.CLASS_NAME, 'who')
-    _what_section_locator = (By.CLASS_NAME, 'what')
-    _where_section_locator = (By.CLASS_NAME, 'where')
+    _who_section_locator = (By.CSS_SELECTOR, 'section.who')
+    _what_section_locator = (By.CSS_SELECTOR, 'section.what')
+    _where_section_locator = (By.CSS_SELECTOR, 'section.where')
     _map_locator = (By.CLASS_NAME, 'map')
 
     @property
     def loaded(self):
         """Wait until the three panels are displayed."""
-        print('About')
         status = (self.who_we_are.is_displayed() and
                   self.what_we_do.is_displayed() and
                   self.where_were_going.is_displayed())
@@ -128,7 +128,7 @@ class AboutUs(WebBase):
             def click(self):
                 """Click the card."""
                 href = self.root.get_attribute('href')
-                self.root.click()
+                Utility.safari_exception_click(self.driver, element=self.root)
                 if Web.SUBJECTS in href:
                     from pages.web.subjects import Subjects as Destination
                 elif Web.TUTOR in href:
@@ -151,7 +151,8 @@ class AboutUs(WebBase):
     class WhereWereGoing(Region):
         """The Where we're going panel."""
 
-        _tutor_marketing_link_locator = (By.CSS_SELECTOR, '[href$="-tutor"]')
+        _tutor_marketing_link_locator = (By.LINK_TEXT,
+                                         'improving student learning')
         _research_link_locator = (By.CSS_SELECTOR, '[href$=research]')
 
         def is_displayed(self):
@@ -160,7 +161,8 @@ class AboutUs(WebBase):
 
         def go_to_student_learning(self):
             """Follow the improving student learning link."""
-            self.find_element(*self._tutor_marketing_link_locator).click()
+            Utility.safari_exception_click(
+                self.driver, self._tutor_marketing_link_locator)
             sleep(1.0)
             from pages.web.tutor import TutorMarketing
             return go_to_(TutorMarketing(self.driver))

@@ -93,11 +93,12 @@ class WebNav(Region):
 
             If the page overlay is still in place, wait and retry.
             """
-            try:
-                self.root.click()
-            except WebDriverException:
-                sleep(1.0)
-                self.root.click()
+            for _ in range(10):
+                try:
+                    self.root.click()
+                    break
+                except WebDriverException:
+                    sleep(1.0)
             sleep(1.25)
             return self
 

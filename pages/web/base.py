@@ -3,6 +3,7 @@
 from time import sleep
 
 from pypom import Page
+from selenium.common.exceptions import StaleElementReferenceException
 from selenium.webdriver.common.by import By
 
 from regions.web.footer import Footer
@@ -47,9 +48,17 @@ class WebBase(Page):
         return Footer(self)
 
     def reload(self):
-        """Reload the current page."""
-        self.driver.execute_script('location.reload();')
-        self.wait_for_page_to_load()
+        """Reload the current page.
+
+        Ignore stale element issues because we're reloading the page;
+        everything is going to be stale if accessed too quickly
+        (multi-process Firefox issue).
+        """
+        try:
+            self.driver.execute_script('location.reload();')
+            self.wait_for_page_to_load()
+        except StaleElementReferenceException:
+            pass
         sleep(1.0)
         return self
 

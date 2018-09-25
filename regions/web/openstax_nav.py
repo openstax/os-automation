@@ -18,7 +18,7 @@ class OpenStaxNav(Region):
     _blog_locator = (By.CSS_SELECTOR, '[href$=blog]')
     _give_locator = (By.CSS_SELECTOR, '[href$=give]')
     _help_locator = (By.CSS_SELECTOR, '[href$=help]')
-    _rice_locator = (By.CLASS_NAME, '.rice-logo')
+    _rice_locator = (By.CLASS_NAME, 'rice-logo')
 
     def is_displayed(self):
         """Return True if the nav bar is displayed."""
@@ -60,6 +60,9 @@ class OpenStaxNav(Region):
 
     def go_to_rice(self):
         """Go to the Rice University home page."""
+        # if the screen is set for mobile use, wait for the logo animation
+        if self.driver.get_window_size().get('width') <= 960:
+            sleep(0.5)
         Utility.switch_to(self.driver, self._rice_locator)
         from pages.rice.home import Rice
         return go_to_(Rice(self.driver))

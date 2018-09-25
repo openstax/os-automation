@@ -6,6 +6,7 @@ from time import sleep
 
 from faker import Faker
 from selenium.webdriver.common.action_chains import ActionChains
+from selenium.common.exceptions import ElementClickInterceptedException
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support.color import Color
 from selenium.webdriver.support.ui import Select
@@ -51,21 +52,22 @@ class Utility(object):
             .text
 
     @classmethod
-    def scroll_to(cls, driver, element_locator=None, element=None):
+    def scroll_to(
+            cls, driver, element_locator=None, element=None, shift=0):
         """Scroll the screen to the element.
 
         Args:
             driver (webdriver): the selenium browser object
             element_locator (Tuple(str, str)): a By selector and locator
             element (WebElement): a specific element
+            shift (int): adjust the page vertically by a set number of pixels
+                > 0 scrolls down, < 0 scrolls up
 
         """
-        if element_locator:
-            driver.execute_script(
-                'arguments[0].scrollIntoView();',
-                driver.find_element(*element_locator) if element_locator
-                else element
-            )
+        target = element if element else driver.find_element(*element_locator)
+        driver.execute_script('arguments[0].scrollIntoView();', target)
+        if shift != 0:
+            driver.execute_script('window.scrollBy(0, arguments[0])', shift)
 
     @classmethod
     def random_hex(cls, length=20, lower=False):
@@ -122,6 +124,22 @@ class Utility(object):
         ).lower()
 
     @classmethod
+    def safari_exception_click(cls, driver, locator=None, element=None):
+        """Click on elements which cause Safari 500 errors."""
+        element = element if element else driver.find_element(*locator)
+        Utility.scroll_to(driver=driver, element=element, shift=-80)
+        sleep(0.5)
+        if driver.capabilities.get('browserName') == 'safari':
+            driver.execute_script('arguments[0].click()', element)
+        else:
+            for _ in range(10):
+                try:
+                    element.click()
+                    break
+                except ElementClickInterceptedException:
+                    sleep(1.0)
+
+    @classmethod
     def new_tab(cls, driver):
         """Open another browser tab."""
         driver.execute_script('window.open();')
@@ -132,7 +150,7 @@ class Utility(object):
     def switch_to(cls, driver, link_locator):
         """Switch to the other window handle."""
         current = driver.current_window_handle
-        driver.find_element(*link_locator).click()
+        Utility.safari_exception_click(driver, link_locator)
         sleep(1)
         new_handle = 1 if current == driver.window_handles[0] else 0
         if len(driver.window_handles) > 1:

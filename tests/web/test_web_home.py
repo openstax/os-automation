@@ -315,3 +315,39 @@ def test_nav_help_loads_the_salesforce_support_site(web_base_url, selenium):
     assert(len(selenium.window_handles) > 1), \
         'Did not open a new tab or window'
     assert(support.at_salesforce)
+
+
+@test_case('C210305')
+@nondestructive
+@web
+def test_nav_rice_logo_loads_the_rice_university_home_page(
+        web_base_url, selenium):
+    """Test clicking the Rice logo loads the Rice home page."""
+    # GIVEN: a user viewing the Web home page
+    home = Home(selenium, web_base_url).open()
+
+    # WHEN: they click the "Rice" logo in the OpenStax nav
+    rice = home.openstax_nav.go_to_rice()
+
+    # THEN: a new browser tab is opened
+    # AND:  the Rice University home page is displayed in the new tab
+    assert(len(selenium.window_handles) > 1), \
+        'Did not open a new tab or window'
+    assert(rice.at_rice)
+
+    # WHEN: the user closes the new tab
+    # AND:  switches back to the original tab
+    # AND:  the screen is reduced to 960 pixels or less
+    # AND:  they click on the menu toggle
+    # AND:  wait for the "Rice" logo to appear
+    # AND:  click the "Rice" logo
+    rice.close_tab()
+    home.resize_window(width=900)
+    home.web_nav.meta.toggle_menu()
+    rice = home.openstax_nav.go_to_rice()
+
+    # THEN: a new browser tab is opened
+    # AND:  the Rice University home page is displayed in the new tab
+    assert(len(selenium.window_handles) > 1), \
+        'Did not open a new tab or window'
+    assert(rice.at_rice)
