@@ -49,8 +49,8 @@ class OpenStaxNav(Region):
         """Go to the donation page."""
         self._click(self._give_locator)
         sleep(1.0)
-        from pages.web.give import Donate
-        return go_to_(Donate(self.driver))
+        from pages.web.donation import Give
+        return go_to_(Give(self.driver))
 
     def view_help_articles(self):
         """Go to the Salesforce help site."""
