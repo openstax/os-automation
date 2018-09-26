@@ -31,6 +31,13 @@ class Web(object):
     SUBJECTS = 'subjects'
     TECHNOLOGY = 'technology'
     TUTOR = 'openstax-tutor'
+    VIEW_ALL = 'View All'
+    VIEW_MATH = 'Math'
+    VIEW_SCIENCE = 'Science'
+    VIEW_SOCIAL_SCIENCE = 'Social Sciences'
+    VIEW_HUMANITIES = 'Humanities'
+    VIEW_BUSINESS = 'Business'
+    VIEW_AP = 'AP®'
 
     # User types
     STUDENT = 'Student'

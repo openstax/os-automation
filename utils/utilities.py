@@ -224,6 +224,14 @@ class Utility(object):
         return reduce(lambda img, group: img and group, map_list, True)
 
     @classmethod
+    def has_height(cls, driver, locator):
+        """Return True if the computed height isn't 'auto'."""
+        auto = ('return window.getComputedStyle('
+                'document.querySelector("{selector}")).height!="auto"'
+                ).format(selector=locator)
+        return driver.execute_script(auto)
+
+    @classmethod
     def load_background_images(cls, driver, locator):
         """Inject a script to wait for background image downloads.
 
@@ -338,3 +346,28 @@ def go_to_(destination):
     """Follow a destination link and wait for the page to load."""
     destination.wait_for_page_to_load()
     return destination
+
+
+class Actions(ActionChains):
+    """Add a javascript retrieval action and a data return perform."""
+
+    def get_js_data(self, css_selector, data_type, expected):
+        """Trigger a style lookup."""
+        self._actions.append(
+            lambda: self.data_read(css_selector, data_type, expected))
+        result = None
+        if self._driver.w3c:
+            self.w3c_actions.perform()
+            result = self.data_read(css_selector, data_type, expected)
+        else:
+            for action in self._actions:
+                result = action()
+        return result
+
+    def data_read(self, css_selector, data_type, expected):
+        """."""
+        element_height = (
+            'return window.getComputedStyle(document.querySelector'
+            '("{selector}"))["{data_type}"]'
+        ).format(selector=css_selector, data_type=data_type)
+        return self._driver.execute_script(element_height) == expected

@@ -7,7 +7,7 @@ from selenium.common.exceptions import NoSuchElementException  # NOQA
 from selenium.common.exceptions import WebDriverException
 from selenium.webdriver.common.by import By
 
-from utils.utilities import go_to_, Utility
+from utils.utilities import Actions, go_to_, Utility
 
 
 class WebNav(Region):
@@ -147,6 +147,34 @@ class WebNav(Region):
         def is_displayed(self):
             """Return True if the region is displayed."""
             return self.root.is_displayed()
+
+        def is_available(self, label):
+            """Return True if the menu option is available."""
+            subjects = {
+                'All': self._all_option_locator[1],
+                'Math': self._math_option_locator[1],
+                'Science': self._science_option_locator[1],
+                'Social Sciences': self._social_sciences_option_locator[1],
+                'Humanities': self._humanities_option_locator[1],
+                'Business': self._business_option_locator[1],
+                'AP': self._ap_option_locator[1],
+            }
+            locator = ('li.subjects-dropdown {subject}'
+                       .format(subject=subjects.get(label)))
+            return Utility.has_height(self.driver, locator)
+
+        def hover(self):
+            """Return the CSS style of a hovered element."""
+            menu = self.root
+            view_all = self._all_option_locator[1]
+            action = (
+                Actions(self.driver)
+                .move_to_element(menu)
+                .pause(1)
+                .get_js_data(view_all, 'height', 'auto')
+            )
+            # if the result is 'auto', the menu option isn't displayed
+            return not action
 
         def open(self):
             """Select the Subjects menu."""

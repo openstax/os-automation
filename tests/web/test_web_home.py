@@ -4,6 +4,7 @@ from pages.web.home import WebHome as Home
 from pages.web.impact import OurImpact
 from tests.markers import expected_failure, nondestructive, skip_test  # NOQA
 from tests.markers import test_case, web  # NOQA
+from utils.web import Web
 
 
 @test_case('C210296')
@@ -422,6 +423,7 @@ def test_the_openstax_slogan_is_displayed_by_the_logo(web_base_url, selenium):
     # WHEN:
 
     # THEN: the OpenStax slogan is stated
+    assert(home.web_nav.slogan_visible())
     assert(home.web_nav.slogan == 'Access. The future of education.')
 
     # WHEN: the screen is reduced to 960 pixels or less
@@ -429,3 +431,65 @@ def test_the_openstax_slogan_is_displayed_by_the_logo(web_base_url, selenium):
 
     # THEN: the OpenStax slogan is hidden
     assert(not home.web_nav.slogan_visible())
+
+
+@test_case('C210309')
+@nondestructive
+@web
+def test_able_to_view_subjects_using_the_nav_menu(web_base_url, selenium):
+    """Test selecting a subject option opens the subject page."""
+    # GIVEN: a user viewing the Web home page
+    home = Home(selenium, web_base_url).open()
+
+    # WHEN: the mouse cursor is hovered over the "Subjects" menu in the
+    #       website nav
+    option_display = home.web_nav.subjects.hover()
+
+    # THEN: the subjects menu options are displayed
+    assert(option_display), 'The subjects menu isn not open'
+
+    # WHEN: the subjects menu is clicked
+    home.web_nav.subjects.open()
+
+    # THEN: the subjects menu options are displayed
+    assert(home.web_nav.subjects.is_available('All'))
+
+    # WHEN: the "All" menu option is clicked
+    all_subjects = home.web_nav.subjects.view_all()
+
+    # THEN: the subjects webpage is displayed
+    # AND:  the "View All" filter button is grayed (active)
+    # AND:  all subject areas are displayed ("Math", "Science", "Social
+    #       Sciences", "Humanities", "Business", and "AP®")
+    assert(all_subjects.is_displayed())
+    assert(all_subjects.filtered_by(Web.VIEW_ALL))
+    assert(all_subjects.math.is_visible)
+    assert(all_subjects.science.is_visible)
+    assert(all_subjects.social_sciences.is_visible)
+    assert(all_subjects.humanities.is_visible)
+    assert(all_subjects.business.is_visible)
+    assert(all_subjects.ap.is_visible)
+
+    # WHEN: the user returns to the home page
+    # AND:  the screen width is reduced to 960 pixels or less
+    # AND:  they click on the menu toggle
+    # AND:  the "Subjects" option is clicked
+    # AND:  the "All" option is clicked
+    home.open()
+    home.resize_window(width=900)
+    home.web_nav.meta.toggle_menu()
+    home.web_nav.subjects.open()
+    all_subjects = home.web_nav.subjects.view_all()
+
+    # THEN: the subjects webpage is displayed
+    # AND:  the "View All" filter button is grayed (active)
+    # AND:  all subject areas are displayed ("Math", "Science", "Social
+    #       Sciences", "Humanities", "Business", and "APÂ¨")
+    assert(all_subjects.is_displayed())
+    assert(all_subjects.filtered_by(Web.VIEW_ALL))
+    assert(all_subjects.math.is_visible)
+    assert(all_subjects.science.is_visible)
+    assert(all_subjects.social_sciences.is_visible)
+    assert(all_subjects.humanities.is_visible)
+    assert(all_subjects.business.is_visible)
+    assert(all_subjects.ap.is_visible)
