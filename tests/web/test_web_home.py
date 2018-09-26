@@ -1,6 +1,7 @@
 """Tests for the OpenStax Web home page."""
 
 from pages.web.home import WebHome as Home
+from pages.web.impact import OurImpact
 from tests.markers import expected_failure, nondestructive, skip_test  # NOQA
 from tests.markers import test_case, web  # NOQA
 
@@ -381,3 +382,30 @@ def test_web_nav_is_displayed(web_base_url, selenium):
     assert(home.web_nav.technology.is_displayed())
     assert(home.web_nav.openstax.is_displayed())
     assert(home.web_nav.login.is_displayed())
+
+
+@test_case('C210307')
+@nondestructive
+@web
+def test_openstax_logo_loads_the_home_page(web_base_url, selenium):
+    """Test clicking the OpenStax logo opens the home page."""
+    # GIVEN: a user viewing the impact webpage
+    impact = OurImpact(selenium, web_base_url).open()
+
+    # WHEN: they click the OpenStax logo in the website nav
+    home = impact.web_nav.go_home()
+
+    # THEN: the Web home page is displayed
+    assert(home.is_displayed())
+
+    # WHEN: they go to the impact webpage
+    # AND:  the screen is reduced to 960 pixels or less
+    # AND:  they click on the menu toggle
+    # AND:  click the OpenStax logo
+    impact.open()
+    impact.resize_window(width=900)
+    impact.web_nav.meta.toggle_menu()
+    home = impact.web_nav.go_home()
+
+    # THEN: the Web home page is displayed
+    assert(home.is_displayed())

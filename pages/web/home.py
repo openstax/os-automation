@@ -69,6 +69,10 @@ class WebHome(WebBase):
         """Return True when the banner carousel is displayed."""
         return self.carousel.is_displayed()
 
+    def is_displayed(self):
+        """Return True when the Web home page is displayed."""
+        return self.loaded
+
     @property
     def carousel(self):
         """Access the book banner carousel."""

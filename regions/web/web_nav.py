@@ -7,7 +7,7 @@ from selenium.common.exceptions import NoSuchElementException  # NOQA
 from selenium.common.exceptions import WebDriverException
 from selenium.webdriver.common.by import By
 
-from utils.utilities import go_to_
+from utils.utilities import go_to_, Utility
 
 
 class WebNav(Region):
@@ -41,8 +41,8 @@ class WebNav(Region):
 
     def go_home(self):
         """Return to the home page by clicking on the OpenStax logo."""
-        self.find_element(*self._openstax_logo_locator).click()
-        sleep(1.0)
+        Utility.safari_exception_click(self.driver,
+                                       locator=self._openstax_logo_locator)
         from pages.web.home import WebHome
         return go_to_(WebHome(self.driver))
 
@@ -73,7 +73,8 @@ class WebNav(Region):
         """Click on the back link within the mobile menu.
 
         Use a document query because the back button and menu name are
-        outside the scope of the Web Nav region.
+        outside the scope of the Web Nav region but are only used in
+        the nav.
         """
         self.driver.execute_script(
             'document.querySelector("%s").click()' %
