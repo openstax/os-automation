@@ -409,3 +409,23 @@ def test_openstax_logo_loads_the_home_page(web_base_url, selenium):
 
     # THEN: the Web home page is displayed
     assert(home.is_displayed())
+
+
+@test_case('C210308')
+@nondestructive
+@web
+def test_the_openstax_slogan_is_displayed_by_the_logo(web_base_url, selenium):
+    """Test for the presence of the slogan text next to the company logo."""
+    # GIVEN: a user viewing the Web home page
+    home = Home(selenium, web_base_url).open()
+
+    # WHEN:
+
+    # THEN: the OpenStax slogan is stated
+    assert(home.web_nav.slogan == 'Access. The future of education.')
+
+    # WHEN: the screen is reduced to 960 pixels or less
+    home.resize_window(width=900)
+
+    # THEN: the OpenStax slogan is hidden
+    assert(not home.web_nav.slogan_visible())

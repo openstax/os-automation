@@ -15,6 +15,7 @@ class WebNav(Region):
 
     _root_locator = (By.CLASS_NAME, 'nav')
     _openstax_logo_locator = (By.CSS_SELECTOR, '.os-logo > a')
+    _slogan_locator = (By.CSS_SELECTOR, '.logo-quote')
     _subjects_dropdown_locator = (By.CLASS_NAME, 'subjects-dropdown')
     _technology_dropdown_locator = (By.CLASS_NAME, 'technology-dropdown')
     _what_we_do_dropdown_locator = (By.CLASS_NAME, 'what-we-do-dropdown')
@@ -45,6 +46,19 @@ class WebNav(Region):
                                        locator=self._openstax_logo_locator)
         from pages.web.home import WebHome
         return go_to_(WebHome(self.driver))
+
+    @property
+    def slogan(self):
+        """Access the slogan."""
+        return self.find_element(*self._slogan_locator).text
+
+    def slogan_visible(self):
+        """Return True if the text is displayed."""
+        element_height = (
+            'return window.getComputedStyle(document.querySelector'
+            '("{selector}"))["height"]'
+        ).format(selector=self._slogan_locator[1])
+        return self.driver.execute_script(element_height) != '0px'
 
     @property
     def subjects(self):
