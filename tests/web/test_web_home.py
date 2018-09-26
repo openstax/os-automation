@@ -75,7 +75,6 @@ def test_the_openstax_nav_is_displayed(web_base_url, selenium):
     """Test the visibility of the OpenStax nav for full and mobile users."""
     # GIVEN: a user viewing the Web home page
     home = Home(selenium, web_base_url)
-    home.resize_window(width=1024)
     home.open()
 
     # WHEN:
@@ -351,3 +350,34 @@ def test_nav_rice_logo_loads_the_rice_university_home_page(
     assert(len(selenium.window_handles) > 1), \
         'Did not open a new tab or window'
     assert(rice.at_rice)
+
+
+@test_case('C210306')
+@nondestructive
+@web
+def test_web_nav_is_displayed(web_base_url, selenium):
+    """Test for the presence of the website navigation menu."""
+    # GIVEN: a user viewing the Web home page
+    home = Home(selenium, web_base_url).open()
+
+    # WHEN:
+
+    # THEN: the site nav is visible
+    assert(home.web_nav.is_displayed())
+
+    # WHEN: the screen is reduced to 960 pixels or less
+    home.resize_window(width=900)
+
+    # THEN: the site nav is hidden
+    # AND:  the menu toggle is displayed
+    assert(home.web_nav.is_hidden())
+    assert(home.web_nav.meta.is_displayed())
+
+    # WHEN: the user clicks on the menu toggle
+    home.web_nav.meta.toggle_menu()
+
+    # THEN: the site nav options are displayed
+    assert(home.web_nav.subjects.is_displayed())
+    assert(home.web_nav.technology.is_displayed())
+    assert(home.web_nav.openstax.is_displayed())
+    assert(home.web_nav.login.is_displayed())

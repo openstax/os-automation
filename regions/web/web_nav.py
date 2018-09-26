@@ -24,7 +24,20 @@ class WebNav(Region):
 
     def is_displayed(self):
         """Return True if the nav bar is displayed."""
-        return self.root.is_displayed()
+        if not self.root.is_displayed():
+            return False
+        current_width = self.driver.get_window_size().get('width')
+        return (
+            (current_width > 960) or
+            (current_width <= 960 and self.meta.is_open)
+        )
+
+    def is_hidden(self):
+        """Return True if the nav bar is not visible due to the mobile menu."""
+        if (not self.meta.is_open and
+                self.driver.get_window_size().get('width') <= 960):
+            return True
+        return False
 
     def go_home(self):
         """Return to the home page by clicking on the OpenStax logo."""
