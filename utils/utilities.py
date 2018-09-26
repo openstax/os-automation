@@ -134,7 +134,7 @@ class Utility(object):
         else:
             for _ in range(10):
                 try:
-                    element.click()
+                    driver.execute_script('arguments[0].click()', element)
                     break
                 except ElementClickInterceptedException:
                     sleep(1.0)

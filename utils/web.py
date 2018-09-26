@@ -34,7 +34,7 @@ class Web(object):
     VIEW_ALL = 'View All'
     VIEW_MATH = 'Math'
     VIEW_SCIENCE = 'Science'
-    VIEW_SOCIAL_SCIENCE = 'Social Sciences'
+    VIEW_SOCIAL_SCIENCES = 'Social Sciences'
     VIEW_HUMANITIES = 'Humanities'
     VIEW_BUSINESS = 'Business'
     VIEW_AP = 'AP®'

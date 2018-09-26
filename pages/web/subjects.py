@@ -25,7 +25,7 @@ class Subjects(WebBase):
     _science_category_locator = (
         By.XPATH, category_xpath.format(subject=Web.VIEW_SCIENCE))
     _social_sciences_category_locator = (
-        By.XPATH, category_xpath.format(subject=Web.VIEW_SOCIAL_SCIENCE))
+        By.XPATH, category_xpath.format(subject=Web.VIEW_SOCIAL_SCIENCES))
     _humanities_category_locator = (
         By.XPATH, category_xpath.format(subject=Web.VIEW_HUMANITIES))
     _business_category_locator = (

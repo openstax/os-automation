@@ -493,3 +493,87 @@ def test_able_to_view_subjects_using_the_nav_menu(web_base_url, selenium):
     assert(all_subjects.humanities.is_visible)
     assert(all_subjects.business.is_visible)
     assert(all_subjects.ap.is_visible)
+
+
+@test_case('C210310')
+@nondestructive
+@web
+def test_subject_menu_options_load_filtered_views(web_base_url, selenium):
+    """Each subject menu option loads the filtered subject page."""
+    # GIVEN: a user viewing the Web home page
+    home = Home(selenium, web_base_url).open()
+
+    # WHEN: they open the "Subjects" menu in the website nav
+    # AND:  click on the subject category menu option
+    subject = home.web_nav.subjects.view_math()
+
+    # THEN: the subject's webpage is displayed
+    # AND:  the subject filter button is grayed (active)
+    # AND:  the subject category is visible
+    # AND:  the other categories are not visible
+    assert(subject.location.endswith('math'))
+    assert(subject.is_displayed())
+    assert(subject.filtered_by(Web.VIEW_MATH))
+    assert(subject.math.is_visible)
+    assert(not subject.science.is_visible)
+    assert(not subject.social_sciences.is_visible)
+    assert(not subject.humanities.is_visible)
+    assert(not subject.business.is_visible)
+    assert(not subject.ap.is_visible)
+
+    # ...and repeat...
+    home.open()
+    subject = home.web_nav.subjects.view_science()
+    assert(subject.location.endswith('science') and
+           subject.is_displayed() and
+           subject.filtered_by(Web.VIEW_SCIENCE) and
+           subject.science.is_visible and
+           not subject.math.is_visible and
+           not subject.social_sciences.is_visible and
+           not subject.humanities.is_visible and
+           not subject.business.is_visible and
+           not subject.ap.is_visible)
+    home.open()
+    subject = home.web_nav.subjects.view_social_sciences()
+    assert(subject.location.endswith('social-sciences') and
+           subject.is_displayed() and
+           subject.filtered_by(Web.VIEW_SOCIAL_SCIENCES) and
+           subject.social_sciences.is_visible and
+           not subject.math.is_visible and
+           not subject.science.is_visible and
+           not subject.humanities.is_visible and
+           not subject.business.is_visible and
+           not subject.ap.is_visible)
+    home.open()
+    subject = home.web_nav.subjects.view_humanities()
+    assert(subject.location.endswith('humanities') and
+           subject.is_displayed() and
+           subject.filtered_by(Web.VIEW_HUMANITIES) and
+           subject.humanities.is_visible and
+           not subject.math.is_visible and
+           not subject.science.is_visible and
+           not subject.social_sciences.is_visible and
+           not subject.business.is_visible and
+           not subject.ap.is_visible)
+    home.open()
+    subject = home.web_nav.subjects.view_business()
+    assert(subject.location.endswith('business') and
+           subject.is_displayed() and
+           subject.filtered_by(Web.VIEW_BUSINESS) and
+           subject.business.is_visible and
+           not subject.math.is_visible and
+           not subject.science.is_visible and
+           not subject.social_sciences.is_visible and
+           not subject.humanities.is_visible and
+           not subject.ap.is_visible)
+    home.open()
+    subject = home.web_nav.subjects.view_ap()
+    assert(subject.location.endswith('ap') and
+           subject.is_displayed() and
+           subject.filtered_by(Web.VIEW_AP) and
+           subject.ap.is_visible and
+           not subject.math.is_visible and
+           not subject.science.is_visible and
+           not subject.social_sciences.is_visible and
+           not subject.humanities.is_visible and
+           not subject.business.is_visible)

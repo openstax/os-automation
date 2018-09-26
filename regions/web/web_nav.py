@@ -182,8 +182,8 @@ class WebNav(Region):
                            .find_element(*self._menu_expand_locator)
                            .get_attribute('aria-expanded'))
             if not (is_expanded == 'true'):
-                self.find_element(*self._open_menu_locator).click()
-                sleep(1.0)
+                Utility.safari_exception_click(self.driver,
+                                               locator=self._open_menu_locator)
             return self
 
         @property
@@ -258,7 +258,9 @@ class WebNav(Region):
 
         def _selection_helper(self, locator):
             """Select the corresponding option."""
-            self.open().find_element(*locator).click()
+            self.open()
+            sleep(0.5)
+            Utility.safari_exception_click(self.driver, locator=locator)
             sleep(1.0)
             from pages.web.subjects import Subjects
             return go_to_(Subjects(self.driver))
