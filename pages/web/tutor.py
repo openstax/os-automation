@@ -21,12 +21,10 @@ class TutorMarketing(WebHome):
     @property
     def loaded(self):
         """Override the base loader."""
-        print('Tutor')
         sleep(1.0)
         visible = Utility.is_image_visible(
             self.driver,
             locator=self._image_locators)
-        print(visible)
         return visible
 
     def is_displayed(self):

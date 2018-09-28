@@ -362,6 +362,7 @@ class Actions(ActionChains):
         else:
             for action in self._actions:
                 result = action()
+        sleep(1.0)
         return result
 
     def data_read(self, css_selector, data_type, expected):

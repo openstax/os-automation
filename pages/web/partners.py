@@ -15,7 +15,7 @@ class Partners(WebBase):
     @property
     def loaded(self):
         """Return True if the hero banner is found."""
-        return bool(self.find_element(*self._banner_locator))
+        return self.find_element(*self._banner_locator)
 
     def is_displayed(self):
         """Return True if the hero banner is displayed."""

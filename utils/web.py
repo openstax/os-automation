@@ -26,18 +26,27 @@ class Web(object):
     GIVE = 'give'
     IMPACT = 'impact'
     NEWSLETTER = 'www2.openstax.org'
+    NO_FILTER = 'View All'
     PARTNERS = 'partners'
     RESEARCH = 'research'
     SUBJECTS = 'subjects'
     TECHNOLOGY = 'technology'
     TUTOR = 'openstax-tutor'
-    VIEW_ALL = 'View All'
+
+    # Menus
+    VIEW_ALL = 'All'
     VIEW_MATH = 'Math'
     VIEW_SCIENCE = 'Science'
     VIEW_SOCIAL_SCIENCES = 'Social Sciences'
     VIEW_HUMANITIES = 'Humanities'
     VIEW_BUSINESS = 'Business'
     VIEW_AP = 'AP®'
+    VIEW_TECHNOLOGY = 'Technology Options'
+    VIEW_TUTOR = 'About OpenStax Tutor'
+    VIEW_PARTNERS = 'OpenStax Partners'
+    VIEW_ABOUT_US = 'About Us'
+    VIEW_TEAM = 'Team'
+    VIEW_RESEARCH = 'Research'
 
     # User types
     STUDENT = 'Student'
@@ -49,6 +58,7 @@ class Web(object):
     ADJUNCT = 'Adjunct Faculty'
     OTHER = 'Other'
 
+    # Expected lists
     ACCESSIBILITY = [
         'Accessibility',
         'Web Accessibility',
@@ -56,4 +66,34 @@ class Web(object):
         'Feedback',
         'Interactive Simulations',
         'User-Contributed Content'
+    ]
+    URL_APPENDS = [
+        'math',
+        'science',
+        'social-sciences',
+        'humanities',
+        'business',
+        'ap'
+    ]
+    FILTERS = [
+        VIEW_MATH,
+        VIEW_SCIENCE,
+        VIEW_SOCIAL_SCIENCES,
+        VIEW_HUMANITIES,
+        VIEW_BUSINESS,
+        VIEW_AP
+    ]
+    MENU_SUBJECTS = [
+        VIEW_ALL,
+        *FILTERS
+    ]
+    MENU_TECHNOLOGY = [
+        VIEW_TECHNOLOGY,
+        VIEW_TUTOR,
+        VIEW_PARTNERS
+    ]
+    MENU_WHAT_WE_DO = [
+        VIEW_ABOUT_US,
+        VIEW_TEAM,
+        VIEW_RESEARCH
     ]

@@ -446,13 +446,16 @@ def test_able_to_view_subjects_using_the_nav_menu(web_base_url, selenium):
     option_display = home.web_nav.subjects.hover()
 
     # THEN: the subjects menu options are displayed
-    assert(option_display), 'The subjects menu isn not open'
+    assert(option_display), 'The subjects menu is not open'
 
     # WHEN: the subjects menu is clicked
     home.web_nav.subjects.open()
 
     # THEN: the subjects menu options are displayed
-    assert(home.web_nav.subjects.is_available('All'))
+    for option in Web.MENU_SUBJECTS:
+        assert(home.web_nav.subjects.is_available(option)), (
+            '{option} should be visible'
+            .format(option=option))
 
     # WHEN: the "All" menu option is clicked
     all_subjects = home.web_nav.subjects.view_all()
@@ -461,14 +464,23 @@ def test_able_to_view_subjects_using_the_nav_menu(web_base_url, selenium):
     # AND:  the "View All" filter button is grayed (active)
     # AND:  all subject areas are displayed ("Math", "Science", "Social
     #       Sciences", "Humanities", "Business", and "AP®")
+    visibility = [all_subjects.math,
+                  all_subjects.science,
+                  all_subjects.social_sciences,
+                  all_subjects.humanities,
+                  all_subjects.business,
+                  all_subjects.ap]
     assert(all_subjects.is_displayed())
-    assert(all_subjects.filtered_by(Web.VIEW_ALL))
-    assert(all_subjects.math.is_visible)
-    assert(all_subjects.science.is_visible)
-    assert(all_subjects.social_sciences.is_visible)
-    assert(all_subjects.humanities.is_visible)
-    assert(all_subjects.business.is_visible)
-    assert(all_subjects.ap.is_visible)
+    assert(all_subjects.filtered_by(Web.NO_FILTER))
+    filters = all_subjects.available_filters()
+    assert(filters == len(visibility) + 1), (
+        'Available filters ({available}) should equal the '
+        'subjects plus View All ({total})'
+        .format(available=filters, total=len(visibility) + 1))
+    for index, topic in enumerate(Web.FILTERS):
+        assert(visibility[index].is_visible), (
+            '{sub} is not visible when it should be shown'
+            .format(sub=topic))
 
     # WHEN: the user returns to the home page
     # AND:  the screen width is reduced to 960 pixels or less
@@ -484,96 +496,134 @@ def test_able_to_view_subjects_using_the_nav_menu(web_base_url, selenium):
     # THEN: the subjects webpage is displayed
     # AND:  the "View All" filter button is grayed (active)
     # AND:  all subject areas are displayed ("Math", "Science", "Social
-    #       Sciences", "Humanities", "Business", and "APÂ¨")
+    #       Sciences", "Humanities", "Business", and "AP®")
+    visibility = [all_subjects.math,
+                  all_subjects.science,
+                  all_subjects.social_sciences,
+                  all_subjects.humanities,
+                  all_subjects.business,
+                  all_subjects.ap]
     assert(all_subjects.is_displayed())
-    assert(all_subjects.filtered_by(Web.VIEW_ALL))
-    assert(all_subjects.math.is_visible)
-    assert(all_subjects.science.is_visible)
-    assert(all_subjects.social_sciences.is_visible)
-    assert(all_subjects.humanities.is_visible)
-    assert(all_subjects.business.is_visible)
-    assert(all_subjects.ap.is_visible)
+    assert(all_subjects.filtered_by(Web.NO_FILTER))
+    filters = all_subjects.available_filters()
+    assert(filters == len(visibility) + 1), (
+        'Available filters ({available}) should equal the '
+        'subjects plus View All ({total})'
+        .format(available=filters, total=len(visibility) + 1))
+    for index, topic in enumerate(Web.FILTERS):
+        assert(visibility[index].is_visible), (
+            '{sub} is not visible when it should be shown'
+            .format(sub=topic))
 
 
-@test_case('C210310')
+@test_case('C210310', 'C210311')
 @nondestructive
 @web
 def test_subject_menu_options_load_filtered_views(web_base_url, selenium):
     """Each subject menu option loads the filtered subject page."""
     # GIVEN: a user viewing the Web home page
-    home = Home(selenium, web_base_url).open()
+    home = Home(selenium, web_base_url)
+    for device in ['desktop', 'mobile']:
+        if device == 'mobile':
+            home.resize_window(width=900)
+        # for each specific subject area (ignore View All)
+        for index in range(len(Web.FILTERS)):
+            home.open()
 
-    # WHEN: they open the "Subjects" menu in the website nav
-    # AND:  click on the subject category menu option
-    subject = home.web_nav.subjects.view_math()
+            # WHEN: they open the "Subjects" menu in the website nav
+            # AND:  click on the subject category menu option
+            categories = [home.web_nav.subjects.view_math,
+                          home.web_nav.subjects.view_science,
+                          home.web_nav.subjects.view_social_sciences,
+                          home.web_nav.subjects.view_humanities,
+                          home.web_nav.subjects.view_business,
+                          home.web_nav.subjects.view_ap]
+            if device == 'mobile':
+                home.web_nav.meta.toggle_menu()
+            subject = categories[index]()
 
-    # THEN: the subject's webpage is displayed
-    # AND:  the subject filter button is grayed (active)
-    # AND:  the subject category is visible
-    # AND:  the other categories are not visible
-    assert(subject.location.endswith('math'))
-    assert(subject.is_displayed())
-    assert(subject.filtered_by(Web.VIEW_MATH))
-    assert(subject.math.is_visible)
-    assert(not subject.science.is_visible)
-    assert(not subject.social_sciences.is_visible)
-    assert(not subject.humanities.is_visible)
-    assert(not subject.business.is_visible)
-    assert(not subject.ap.is_visible)
+            # THEN: the subject's webpage is displayed
+            # AND:  the subject filter button is grayed (active)
+            # AND:  the subject category is visible
+            # AND:  the other categories are not visible
+            visibility = [subject.math,
+                          subject.science,
+                          subject.social_sciences,
+                          subject.humanities,
+                          subject.business,
+                          subject.ap]
+            assert(subject.location.endswith(Web.URL_APPENDS[index])), (
+                'URL is "{current}" but should end with "{end}"'
+                .format(current=subject.location, end=Web.URL_APPENDS[index]))
+            assert(subject.is_displayed()), (
+                '{sub} is not displayed'
+                .format(sub=Web.FILTERS[index]))
+            assert(subject.filtered_by(Web.FILTERS[index])), (
+                'Results are not being filtered by "{filter}"'
+                .format(filter=Web.FILTERS[index]))
+            for topic in range(len(visibility)):
+                if topic == index:
+                    assert(visibility[index].is_visible), (
+                        '{sub} is not visible when it should be shown'
+                        .format(sub=Web.FILTERS[topic]))
+                else:
+                    assert(not visibility[topic].is_visible), (
+                        '{sub} is visible when it should be hidden'
+                        .format(sub=Web.FILTERS[topic]))
 
-    # ...and repeat...
-    home.open()
-    subject = home.web_nav.subjects.view_science()
-    assert(subject.location.endswith('science') and
-           subject.is_displayed() and
-           subject.filtered_by(Web.VIEW_SCIENCE) and
-           subject.science.is_visible and
-           not subject.math.is_visible and
-           not subject.social_sciences.is_visible and
-           not subject.humanities.is_visible and
-           not subject.business.is_visible and
-           not subject.ap.is_visible)
-    home.open()
-    subject = home.web_nav.subjects.view_social_sciences()
-    assert(subject.location.endswith('social-sciences') and
-           subject.is_displayed() and
-           subject.filtered_by(Web.VIEW_SOCIAL_SCIENCES) and
-           subject.social_sciences.is_visible and
-           not subject.math.is_visible and
-           not subject.science.is_visible and
-           not subject.humanities.is_visible and
-           not subject.business.is_visible and
-           not subject.ap.is_visible)
-    home.open()
-    subject = home.web_nav.subjects.view_humanities()
-    assert(subject.location.endswith('humanities') and
-           subject.is_displayed() and
-           subject.filtered_by(Web.VIEW_HUMANITIES) and
-           subject.humanities.is_visible and
-           not subject.math.is_visible and
-           not subject.science.is_visible and
-           not subject.social_sciences.is_visible and
-           not subject.business.is_visible and
-           not subject.ap.is_visible)
-    home.open()
-    subject = home.web_nav.subjects.view_business()
-    assert(subject.location.endswith('business') and
-           subject.is_displayed() and
-           subject.filtered_by(Web.VIEW_BUSINESS) and
-           subject.business.is_visible and
-           not subject.math.is_visible and
-           not subject.science.is_visible and
-           not subject.social_sciences.is_visible and
-           not subject.humanities.is_visible and
-           not subject.ap.is_visible)
-    home.open()
-    subject = home.web_nav.subjects.view_ap()
-    assert(subject.location.endswith('ap') and
-           subject.is_displayed() and
-           subject.filtered_by(Web.VIEW_AP) and
-           subject.ap.is_visible and
-           not subject.math.is_visible and
-           not subject.science.is_visible and
-           not subject.social_sciences.is_visible and
-           not subject.humanities.is_visible and
-           not subject.business.is_visible)
+
+@test_case('C210312', 'C210313')
+@nondestructive
+@web
+def test_technology_menu_options_load_the_corresponding_pages(
+        web_base_url, selenium):
+    """Test each tech menu option loads the respective web page."""
+    # GIVEN: a user viewing the Web home page
+    home = Home(selenium, web_base_url)
+    for device in ['desktop', 'mobile']:
+        if device == 'mobile':
+            home.resize_window(width=900)
+        home.open()
+
+        if device == 'desktop':
+            # WHEN: the mouse cursor is hovered over the "Technology" menu
+            #       in the website nav
+            option_display = home.web_nav.technology.hover()
+
+            # THEN: the technology menu options are displayed
+            assert(option_display), 'The technology menu is not open'
+
+        # WHEN: the technology menu is clicked
+        if device == 'mobile':
+            home.web_nav.meta.toggle_menu()
+        home.web_nav.technology.open()
+
+        # THEN: the technology menu options are displayed
+        for option in Web.MENU_TECHNOLOGY:
+            assert(home.web_nav.technology.is_available(option)), (
+                '{option} should be visible'
+                .format(option=option))
+
+        # WHEN: the "Technology Options" menu option is clicked
+        if device == 'mobile':
+            home.web_nav.meta.toggle_menu()
+        tech = home.web_nav.technology.view_technology()
+
+        # THEN: the technology webpage is displayed
+        assert(tech.is_displayed())
+
+        # WHEN: the "About OpenStax Tutor" menu option is clicked
+        if device == 'mobile':
+            home.web_nav.meta.toggle_menu()
+        tutor = tech.web_nav.technology.view_tutor()
+
+        # THEN: the OpenStax Tutor marketing webpage is displayed
+        assert(tutor.is_displayed())
+
+        # WHEN: the "OpenStax Partners" menu option is clicked
+        if device == 'mobile':
+            home.web_nav.meta.toggle_menu()
+        partners = tutor.web_nav.technology.view_partners()
+
+        # THEN: the OpenStax parners webpage is displayed
+        assert(partners.is_displayed())

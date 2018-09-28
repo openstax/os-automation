@@ -18,6 +18,7 @@ class Subjects(WebBase):
 
     _root_locator = (By.ID, 'main')
     _banner_locator = (By.CSS_SELECTOR, '.loaded .hero')
+    _filter_button_locator = (By.CLASS_NAME, 'filter-button')
     _filter_by_locator = (By.CSS_SELECTOR,
                           '.filter-buttons [aria-pressed=true]')
     _math_category_locator = (
@@ -48,6 +49,10 @@ class Subjects(WebBase):
         if self.URL_TEMPLATE not in self.location:
             return False
         return self.loaded
+
+    def available_filters(self):
+        """Return the number the filter options available."""
+        return len(self.find_elements(*self._filter_button_locator))
 
     def filtered_by(self, filter_):
         """Return True if the books are filtered by the submitted subject."""
