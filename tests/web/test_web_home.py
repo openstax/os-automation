@@ -727,3 +727,50 @@ def test_able_to_log_into_the_web_site(web_base_url, selenium, student):
     # AND:  the "Hi <first_name>" user menu is replaced by
     #       the "Login" menu option
     assert('Login' in home.web_nav.login.name)
+
+
+@test_case('C210317', 'C210323')
+@web
+def test_able_to_log_into_the_web_site_using_the_mobile_display(
+        web_base_url, selenium, student):
+    """Test a student logging into the web site on a reduced screen size."""
+    # GIVEN: a student with a valid user account viewing the Web home page
+    # AND:   the screen width is 960 pixels or less
+    home = Home(selenium, web_base_url)
+    home.resize_window(width=900)
+    home.open()
+
+    # WHEN: they click on the menu toggle
+    # AND:  click on the "Login" link
+    home.web_nav.meta.toggle_menu()
+    accounts = home.web_nav.login.go_to_log_in()
+
+    # THEN: they are taken to Accounts
+    assert('accounts' in accounts.current_url)
+
+    # WHEN: they log into Accounts
+    accounts.login.service_login(*student)
+    # wait for the page load because we're accessing
+    # Accounts directly instead of using the Web page
+    # object log in routine (Safari issue)
+    home.wait_for_page_to_load()
+
+    # THEN: the Web home page is displayed
+    assert(home.is_displayed())
+
+    # WHEN: they click on the menu toggle
+    home.web_nav.meta.toggle_menu()
+
+    # THEN: the "Login" menu is replaced by the "Hi <first_name>" user menu
+    assert(home.web_nav.login.name != 'Login')
+
+    # WHEN: they click on the user menu
+    # AND:  click on the "Logout" menu option
+    # AND:  click on the menu toggle
+    home.web_nav.login.log_out()
+    home.web_nav.meta.toggle_menu()
+
+    # THEN: the user is logged out of the Web page
+    # AND:  the "Hi <first_name>" user menu is replaced by
+    #       the "Login" menu option
+    assert('Login' in home.web_nav.login.name)
