@@ -774,3 +774,38 @@ def test_able_to_log_into_the_web_site_using_the_mobile_display(
     # AND:  the "Hi <first_name>" user menu is replaced by
     #       the "Login" menu option
     assert('Login' in home.web_nav.login.name)
+
+
+@test_case('C210318')
+@nondestructive
+@web
+def test_user_menu_profile_link_loads_accounts_profile_for_the_student(
+        web_base_url, selenium, student):
+    """Test a student viewing their Accounts profile from the Web user menu."""
+    # GIVEN: a user logged into the Web home page
+    home = Home(selenium, web_base_url).open()
+    home = home.web_nav.login.log_in(*student)
+    if home.web_nav.login.modal_displayed:
+        home.web_nav.login.training_wheel.close_modal()
+
+    # WHEN: they open the user menu
+    # AND:  click on the "Account Profile" menu option
+    profile = home.web_nav.login.view_profile()
+
+    # THEN: the Accounts profile page for the user is displayed in a new tab
+    assert(profile.is_displayed() and 'accounts' in profile.current_url), \
+        'Not viewing the user profile: {url}'.format(url=profile.current_url())
+
+    # WHEN: they close the new tab
+    # AND:  reduce the screen width to 960 pixels or less
+    # AND:  click on the menu toggle
+    # AND:  click on the "Hi <first_name>" link
+    # AND:  click on the "Account Profile" link
+    profile.close_tab()
+    home.resize_window(width=900)
+    home.web_nav.meta.toggle_menu()
+    profile = home.web_nav.login.view_profile()
+
+    # THEN: the Accounts profile page for the user is displayed
+    assert(profile.is_displayed() and 'accounts' in profile.current_url), \
+        'Not viewing the user profile: {url}'.format(url=profile.current_url())

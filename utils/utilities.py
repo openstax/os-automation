@@ -9,16 +9,18 @@ from selenium.webdriver.common.action_chains import ActionChains
 from selenium.common.exceptions import ElementClickInterceptedException
 from selenium.common.exceptions import WebDriverException
 from selenium.webdriver.common.keys import Keys
+from selenium.webdriver.support import expected_conditions as expect
 from selenium.webdriver.support.color import Color
-from selenium.webdriver.support.ui import Select
+from selenium.webdriver.support.ui import Select, WebDriverWait
 
-JQUERY = (
-    'https://code.jquery.com/jquery-3.3.1.slim.min.js'
-)
-WAIT_FOR_IMAGE = (
-    'https://cdnjs.cloudflare.com/ajax/libs/'
-    'jquery.waitforimages/1.5.0/jquery.waitforimages.min.js'
-)
+JAVASCRIPT_CLICK = 'arguments[0].click()'
+OPEN_TAB = 'window.open();'
+SCROLL_INTO_VIEW = 'arguments[0].scrollIntoView();'
+SHIFT_VIEW_BY = 'window.scrollBy(0, arguments[0])'
+
+JQUERY = 'https://code.jquery.com/jquery-3.3.1.slim.min.js'
+WAIT_FOR_IMAGE = ('https://cdnjs.cloudflare.com/ajax/libs/'
+                  'jquery.waitforimages/1.5.0/jquery.waitforimages.min.js')
 
 
 class Utility(object):
@@ -66,9 +68,9 @@ class Utility(object):
 
         """
         target = element if element else driver.find_element(*element_locator)
-        driver.execute_script('arguments[0].scrollIntoView();', target)
+        driver.execute_script(SCROLL_INTO_VIEW, target)
         if shift != 0:
-            driver.execute_script('window.scrollBy(0, arguments[0])', shift)
+            driver.execute_script(SHIFT_VIEW_BY, shift)
 
     @classmethod
     def random_hex(cls, length=20, lower=False):
@@ -131,30 +133,37 @@ class Utility(object):
         Utility.scroll_to(driver=driver, element=element, shift=-80)
         sleep(0.5)
         if driver.capabilities.get('browserName') == 'safari':
-            driver.execute_script('arguments[0].click()', element)
+            driver.execute_script(JAVASCRIPT_CLICK, element)
         else:
             for _ in range(10):
                 try:
-                    driver.execute_script('arguments[0].click()', element)
+                    driver.execute_script(JAVASCRIPT_CLICK, element)
                     break
                 except ElementClickInterceptedException:
                     sleep(1.0)
 
     @classmethod
-    def wait_for_overlay_then(cls, target):
-        """Wait for an overlay to clear."""
-        for _ in range(10):
+    def wait_for_overlay(cls, driver, locator):
+        """Wait for an overlay to clear making the target available."""
+        WebDriverWait(driver, 15).until(
+            expect.element_to_be_clickable(locator))
+        sleep(1.0)
+
+    @classmethod
+    def wait_for_overlay_then(cls, target, time=10.0, interval=0.5):
+        """Wait for an overlay to clear then performing the target action."""
+        for _ in range(int(time / interval)):
             try:
                 target()
                 break
             except WebDriverException:
-                sleep(0.5)
+                sleep(interval)
         sleep(1.0)
 
     @classmethod
     def new_tab(cls, driver):
         """Open another browser tab."""
-        driver.execute_script('window.open();')
+        driver.execute_script(OPEN_TAB)
         sleep(1)
         return driver.window_handles
 

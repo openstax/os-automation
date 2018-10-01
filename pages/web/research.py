@@ -1,8 +1,5 @@
 """The Web research overview page."""
 
-# from time import sleep
-#
-# from pypom import Region
 from selenium.webdriver.common.by import By
 
 from pages.web.base import WebBase

@@ -104,7 +104,7 @@ class AccountsHome(AccountsBase):
             return self
 
         def login(self, user, password):
-            """Log into the accounts with a specific user."""
+            """Log into Accounts with a specific user."""
             self.service_login(user, password)
             self.wait.until(lambda _: self.logged_in)
             from pages.accounts.profile import Profile

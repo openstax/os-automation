@@ -3,7 +3,6 @@
 from time import sleep
 
 from pypom import Region
-from selenium.common.exceptions import NoSuchElementException
 from selenium.common.exceptions import WebDriverException
 from selenium.webdriver.common.by import By
 
@@ -50,11 +49,14 @@ class WebNavMenu(Region):
             Utility.safari_exception_click(self.driver, locator=target)
         return self
 
-    def _selection_helper(self, locator, destination):
+    def _selection_helper(self, locator, destination, new_tab=False):
         """Select the corresponding option."""
         self.open()
         sleep(0.5)
-        Utility.safari_exception_click(self.driver, locator=locator)
+        if new_tab:
+            Utility.switch_to(self.driver, link_locator=locator)
+        else:
+            Utility.safari_exception_click(self.driver, locator=locator)
         sleep(1.0)
         return go_to_(destination(self.driver))
 
@@ -409,8 +411,8 @@ class WebNav(Region):
     class Login(WebNavMenu):
         """The login option and menu."""
 
-        _log_in_link_locator = (By.LINK_TEXT, 'Login')
         _menu_expand_locator = (By.CSS_SELECTOR, 'nav.dropdown-menu')
+        _log_in_link_locator = (By.CSS_SELECTOR, '.pardotTrackClick')
         _logged_in_locator = (By.CLASS_NAME, 'login-dropdown')
         _open_menu_locator = (By.CSS_SELECTOR, '[href="."]')
         _profile_link_locator = (By.CSS_SELECTOR, '[href$=profile]')
@@ -438,27 +440,25 @@ class WebNav(Region):
             if do_not_log_in:
                 return go_to_(AccountsHome(self.driver))
             else:
-                AccountsHome(self.driver).log_in(user, password)
+                AccountsHome(self.driver).service_log_in(user, password)
                 from pages.web.home import WebHome as Home
             return go_to_(Home(self.driver))
 
         @property
         def logged_in(self):
             """Return True if a user is logged into Web."""
-            try:
-                self.find_element(*self._logged_in_locator)
-            except NoSuchElementException:
-                return False
-            return True
+            return 'dropdown' in self.root.get_attribute('class')
 
         @property
         def name(self):
             """Return the user's first name as shown in the menu bar."""
-            try:
-                name = self.find_element(*self._open_menu_locator)
-            except NoSuchElementException:
-                name = self.find_element(*self._log_in_link_locator)
-            return (name.get_attribute('innerHTML').split('<')[0].split()[-1])
+            if self.logged_in:
+                return (' '.join(
+                        self.find_element(*self._open_menu_locator)
+                        .get_attribute('innerHTML')
+                        .split('<')[0]
+                        .split()[1:]))
+            return self.find_element(*self._log_in_link_locator).text
 
         @property
         def profile(self):
@@ -467,10 +467,11 @@ class WebNav(Region):
 
         def view_profile(self):
             """View the user's account profile on Accounts."""
-            self.open().profile.click()
-            sleep(1.0)
             from pages.accounts.profile import Profile
-            return go_to_(Profile(self.driver))
+            return self.open()._selection_helper(
+                self._profile_link_locator,
+                Profile,
+                new_tab=True)
 
         @property
         def tutor(self):
