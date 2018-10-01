@@ -7,8 +7,8 @@ from pages.tutor.base import TutorBase
 from pages.tutor.tutor_calendar import TutorCalendar
 
 
-class TutorDashboard(TutorBase):
-    """Tutor dashboard page object."""
+class Dashboard(TutorBase):
+    """The OpenStax Tutor Beta dashboard."""
 
     URL_TEMPLATE = '/dashboard'
 

@@ -476,14 +476,16 @@ class WebNav(Region):
         @property
         def tutor(self):
             """Return the OpenStax Tutor Beta link."""
-            return self.find_element(*self._tutor_option_locator)
+            return self.find_element(*self._openstax_tutor_link_locator)
 
         def view_tutor(self):
             """View OpenStax Tutor Beta for the current user."""
-            self.open().tutor.click()
-            sleep(1.0)
-            from pages.tutor.dashboard import Dashboard
-            return go_to_(Dashboard(self.driver))
+            from pages.tutor.home import TutorHome
+            tutor = self.open()._selection_helper(
+                self._openstax_tutor_link_locator,
+                TutorHome,
+                new_tab=True)
+            return tutor.service_pass_through()
 
         @property
         def modal_displayed(self):

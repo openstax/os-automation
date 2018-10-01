@@ -797,7 +797,7 @@ def test_user_menu_profile_link_loads_accounts_profile_for_the_student(
         'Not viewing the user profile: {url}'.format(url=profile.current_url())
 
     # WHEN: they close the new tab
-    # AND:  reduce the screen width to 960 pixels or less
+    # AND:  reduce the screen width to 960 pixels or fewer
     # AND:  click on the menu toggle
     # AND:  click on the "Hi <first_name>" link
     # AND:  click on the "Account Profile" link
@@ -809,3 +809,37 @@ def test_user_menu_profile_link_loads_accounts_profile_for_the_student(
     # THEN: the Accounts profile page for the user is displayed
     assert(profile.is_displayed() and 'accounts' in profile.current_url), \
         'Not viewing the user profile: {url}'.format(url=profile.current_url())
+
+
+@test_case('C210319')
+@nondestructive
+@web
+def test_go_to_the_users_openstax_tutor_dashboard(
+        web_base_url, selenium, student):
+    """Test a student going to their Tutor dashboard from the Web user menu."""
+    # GIVEN: a user logged into the Web home page
+    home = Home(selenium, web_base_url).open()
+    home = home.web_nav.login.log_in(*student)
+    if home.web_nav.login.modal_displayed:
+        home.web_nav.login.training_wheel.close_modal()
+
+    # WHEN: they open the user menu
+    # AND:  click on the "OpenStax Tutor" menu option
+    # AND:  click on the Tutor "LOG IN" button
+    dashboard = home.web_nav.login.view_tutor()
+
+    # THEN: the OpenStax Tutor dashboard for the user is displayed
+    assert(dashboard.is_displayed())
+
+    # WHEN: they close the new tab
+    # AND:  reduce the screen width to 960 pixels or fewer
+    # AND:  click on the menu toggle
+    # AND:  click on the "Hi <first_name>" link
+    # AND:  click on the "OpenStax Tutor" link
+    dashboard.close_tab()
+    home.resize_window(width=900)
+    home.web_nav.meta.toggle_menu()
+    dashboard = home.web_nav.login.view_tutor()
+
+    # THEN: the OpenStax Tutor dashboard for the user is displayed
+    assert(dashboard.is_displayed())
