@@ -527,18 +527,20 @@ def test_subject_menu_options_load_filtered_views(web_base_url, selenium):
         if device == 'mobile':
             home.resize_window(width=900)
         # for each specific subject area (ignore View All)
-        for index in range(len(Web.FILTERS)):
+        for index, _ in enumerate(Web.FILTERS):
             home.open()
 
             # WHEN: they open the "Subjects" menu in the website nav
             # AND:  click on the subject category menu option
-            categories = [home.web_nav.subjects.view_math,
-                          home.web_nav.subjects.view_science,
-                          home.web_nav.subjects.view_social_sciences,
-                          home.web_nav.subjects.view_humanities,
-                          home.web_nav.subjects.view_business,
-                          home.web_nav.subjects.view_ap]
-            if device == 'mobile':
+            categories = [
+                home.web_nav.subjects.view_math,
+                home.web_nav.subjects.view_science,
+                home.web_nav.subjects.view_social_sciences,
+                home.web_nav.subjects.view_humanities,
+                home.web_nav.subjects.view_business,
+                home.web_nav.subjects.view_ap
+            ]
+            if device == 'mobile' and not home.web_nav.meta.is_open:
                 home.web_nav.meta.toggle_menu()
             subject = categories[index]()
 
@@ -546,12 +548,14 @@ def test_subject_menu_options_load_filtered_views(web_base_url, selenium):
             # AND:  the subject filter button is grayed (active)
             # AND:  the subject category is visible
             # AND:  the other categories are not visible
-            visibility = [subject.math,
-                          subject.science,
-                          subject.social_sciences,
-                          subject.humanities,
-                          subject.business,
-                          subject.ap]
+            visibility = [
+                subject.math,
+                subject.science,
+                subject.social_sciences,
+                subject.humanities,
+                subject.business,
+                subject.ap
+            ]
             assert(subject.location.endswith(Web.URL_APPENDS[index])), (
                 'URL is "{current}" but should end with "{end}"'
                 .format(current=subject.location, end=Web.URL_APPENDS[index]))
@@ -561,13 +565,13 @@ def test_subject_menu_options_load_filtered_views(web_base_url, selenium):
             assert(subject.filtered_by(Web.FILTERS[index])), (
                 'Results are not being filtered by "{filter}"'
                 .format(filter=Web.FILTERS[index]))
-            for topic in range(len(visibility)):
+            for topic, category in enumerate(visibility):
                 if topic == index:
-                    assert(visibility[index].is_visible), (
+                    assert(category.is_visible), (
                         '{sub} is not visible when it should be shown'
                         .format(sub=Web.FILTERS[topic]))
                 else:
-                    assert(not visibility[topic].is_visible), (
+                    assert(not category.is_visible), (
                         '{sub} is visible when it should be hidden'
                         .format(sub=Web.FILTERS[topic]))
 
@@ -594,7 +598,7 @@ def test_technology_menu_options_load_the_corresponding_pages(
             assert(option_display), 'The technology menu is not open'
 
         # WHEN: the technology menu is clicked
-        if device == 'mobile':
+        if device == 'mobile' and not home.web_nav.meta.is_open:
             home.web_nav.meta.toggle_menu()
         home.web_nav.technology.open()
 
@@ -605,7 +609,7 @@ def test_technology_menu_options_load_the_corresponding_pages(
                 .format(option=option))
 
         # WHEN: the "Technology Options" menu option is clicked
-        if device == 'mobile':
+        if device == 'mobile' and not home.web_nav.meta.is_open:
             home.web_nav.meta.toggle_menu()
         tech = home.web_nav.technology.view_technology()
 
@@ -613,17 +617,113 @@ def test_technology_menu_options_load_the_corresponding_pages(
         assert(tech.is_displayed())
 
         # WHEN: the "About OpenStax Tutor" menu option is clicked
-        if device == 'mobile':
-            home.web_nav.meta.toggle_menu()
+        if device == 'mobile' and not tech.web_nav.meta.is_open:
+            tech.web_nav.meta.toggle_menu()
         tutor = tech.web_nav.technology.view_tutor()
 
         # THEN: the OpenStax Tutor marketing webpage is displayed
         assert(tutor.is_displayed())
 
         # WHEN: the "OpenStax Partners" menu option is clicked
-        if device == 'mobile':
-            home.web_nav.meta.toggle_menu()
+        if device == 'mobile' and not tutor.web_nav.meta.is_open:
+            tutor.web_nav.meta.toggle_menu()
         partners = tutor.web_nav.technology.view_partners()
 
         # THEN: the OpenStax parners webpage is displayed
         assert(partners.is_displayed())
+
+
+@test_case('C210314', 'C210315')
+@nondestructive
+@web
+def test_what_we_do_menu_options_load_corresponding_pages(
+        web_base_url, selenium):
+    """Test each team menu option loads the respective web page."""
+    # GIVEN: a user viewing the Web home page
+    home = Home(selenium, web_base_url)
+    for device in ['desktop', 'mobile']:
+        if device == 'mobile':
+            home.resize_window(width=900)
+        home.open()
+
+        if device == 'desktop':
+            # WHEN: the mouse cursor is hovered over the "What we do"
+            #       menu in the website nav
+            option_display = home.web_nav.openstax.hover()
+
+            # THEN: the OpenStax menu options are displayed
+            assert(option_display), 'The about us menu is not open'
+
+        # WHEN: the "What we do" menu is clicked
+        if device == 'mobile' and not home.web_nav.meta.is_open:
+            home.web_nav.meta.toggle_menu()
+        home.web_nav.openstax.open()
+
+        # THEN: the OpenStax menu options are displayed
+        for option in Web.MENU_WHAT_WE_DO:
+            assert(home.web_nav.openstax.is_available(option)), (
+                '{option} should be visible'
+                .format(option=option))
+
+        # WHEN: the "About Us" menu option is clicked
+        if device == 'mobile' and not home.web_nav.meta.is_open:
+            home.web_nav.meta.toggle_menu()
+        about = home.web_nav.openstax.view_about_us()
+
+        # THEN: the about webpage is displayed
+        assert(about.is_displayed())
+
+        # WHEN: they click on the "What we do" menu
+        # AND:  click on the "Team" menu option
+        if device == 'mobile' and not about.web_nav.meta.is_open:
+            about.web_nav.meta.toggle_menu()
+        team = about.web_nav.openstax.view_team()
+
+        # THEN: the team webpage is displayed
+        assert(team.is_displayed())
+
+        # WHEN: they click on the "What we do" menu
+        # AND:  click on the "Research" menu option
+        if device == 'mobile' and not team.web_nav.meta.is_open:
+            team.web_nav.meta.toggle_menu()
+        research = team.web_nav.openstax.view_research()
+
+        # THEN: the research mission webpage is displayed
+        assert(research.is_displayed())
+
+
+@test_case('C210316', 'C210322')
+@web
+def test_able_to_log_into_the_web_site(web_base_url, selenium, student):
+    """Test a student logging into the web site."""
+    # GIVEN: a student with a valid user account viewing the Web home page
+    home = Home(selenium, web_base_url).open()
+
+    # WHEN: they click on the "Login" menu
+    accounts = home.web_nav.login.go_to_log_in()
+
+    # THEN: they are taken to Accounts
+    assert('accounts' in accounts.current_url)
+
+    # WHEN: they log into Accounts
+    # AND:  close the OpenStax Tutor beta modal
+    accounts.login.service_login(*student)
+    # wait for the page load because we're accessing
+    # Accounts directly instead of using the Web page
+    # object log in routine (Safari issue)
+    home.wait_for_page_to_load()
+    if home.web_nav.login.modal_displayed:
+        home.web_nav.login.training_wheel.close_modal()
+
+    # THEN: the Web home page is displayed
+    # AND:  the "Login" menu is replaced by the "Hi <first_name>" user menu
+    assert(home.web_nav.login.name != 'Login')
+
+    # WHEN: they open the user menu
+    # AND:  click on the "Logout" menu option
+    home.web_nav.login.log_out()
+
+    # THEN: the user is logged out of the Web page
+    # AND:  the "Hi <first_name>" user menu is replaced by
+    #       the "Login" menu option
+    assert('Login' in home.web_nav.login.name)

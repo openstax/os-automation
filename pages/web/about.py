@@ -30,6 +30,10 @@ class AboutUs(WebBase):
                   self.where_were_going.is_displayed())
         return status
 
+    def is_displayed(self):
+        """Return True when the About Us page is loaded."""
+        return self.loaded
+
     @property
     def who_we_are(self):
         """Access the Who we are panel."""

@@ -3,7 +3,7 @@
 from time import sleep
 
 from pypom import Region
-from selenium.common.exceptions import NoSuchElementException  # NOQA
+from selenium.common.exceptions import NoSuchElementException
 from selenium.common.exceptions import WebDriverException
 from selenium.webdriver.common.by import By
 
@@ -22,10 +22,7 @@ class WebNavMenu(Region):
         """Return True if the menu option is available."""
         locator = ('li.{menu}-dropdown {topic}'
                    .format(menu=menu, topic=options.get(label)))
-        ret = Utility.has_height(self.driver, locator)
-        print(locator)
-        print(ret)
-        return ret
+        return Utility.has_height(self.driver, locator)
 
     def _hover(self, locator):
         """Return the CSS style of a hovered element."""
@@ -42,22 +39,15 @@ class WebNavMenu(Region):
 
     def open(self):
         """Select the menu."""
-        for i, x in enumerate(self.find_elements(*self._menu_expand_locator)):
-            print(i,
-                  x.get_attribute('aria-expanded'),
-                  x.get_attribute('outerHTML'))
-        is_expanded = (self
-                       .find_element(*self._menu_expand_locator)
-                       .get_attribute('aria-expanded'))
-        if not (is_expanded == 'true'):
+        is_expanded = self.find_element(*self._menu_expand_locator) \
+            .get_attribute('aria-expanded') == 'true'
+        if not is_expanded:
             target = (
                 self._open_menu_locator[0],
                 '.{parent} {menu_locator}'.format(
-                    parent=self.root.get_attribute('class'),
+                    parent='.'.join(self.root.get_attribute('class').split()),
                     menu_locator=self._open_menu_locator[1]))
-            print(target)
-            Utility.safari_exception_click(self.driver,
-                                           locator=target)
+            Utility.safari_exception_click(self.driver, locator=target)
         return self
 
     def _selection_helper(self, locator, destination):
@@ -140,7 +130,8 @@ class WebNav(Region):
     @property
     def login(self):
         """Access the Login option or menu."""
-        return self.Login(self)
+        region_root = self.find_element(*self._user_menu_locator)
+        return self.Login(self, region_root)
 
     def back(self):
         """Click on the back link within the mobile menu.
@@ -180,13 +171,7 @@ class WebNav(Region):
 
             If the page overlay is still in place, wait and retry.
             """
-            for _ in range(10):
-                try:
-                    self.root.click()
-                    break
-                except WebDriverException:
-                    sleep(1.0)
-            sleep(1.25)
+            Utility.wait_for_overlay_then(self.root.click)
             return self
 
     class Subjects(WebNavMenu):
@@ -421,33 +406,41 @@ class WebNav(Region):
                 self._research_option_locator,
                 Research)
 
-    class Login(Region):
+    class Login(WebNavMenu):
         """The login option and menu."""
 
         _log_in_link_locator = (By.LINK_TEXT, 'Login')
+        _menu_expand_locator = (By.CSS_SELECTOR, 'nav.dropdown-menu')
         _logged_in_locator = (By.CLASS_NAME, 'login-dropdown')
         _open_menu_locator = (By.CSS_SELECTOR, '[href="."]')
-        _user_name_locator = (By.PARTIAL_LINK_TEXT, 'Hi ')
         _profile_link_locator = (By.CSS_SELECTOR, '[href$=profile]')
         _openstax_tutor_link_locator = (By.LINK_TEXT, 'OpenStax Tutor')
-        _log_out_link_locator = (By.CSS_SELECTOR, '[href*=logout]')
+        _training_wheel_locator = (By.CSS_SELECTOR, '.training-wheel')
+        _log_out_link_locator = (By.CSS_SELECTOR, '[href*=signout]')
 
         @property
         def login(self):
             """Return the log in link."""
             return self.find_element(*self._log_in_link_locator)
 
+        def go_to_log_in(self):
+            """Click on the login menu link."""
+            return self.log_in(do_not_log_in=True)
+
         def is_displayed(self):
-            """Return True if the log in link is displayed."""
+            """Return True if the log in link or user's name is displayed."""
             return self.login.is_displayed()
 
-        def log_in(self, user, password):
+        def log_in(self, user=None, password=None, do_not_log_in=False):
             """Log a user into the website."""
-            accounts = self.login.click()
-            sleep(1.0)
-            accounts.log_in(user, password)
-            from pages.web.home import WebHome
-            return go_to_(WebHome(accounts.driver))
+            Utility.wait_for_overlay_then(self.login.click)
+            from pages.accounts.home import AccountsHome
+            if do_not_log_in:
+                return go_to_(AccountsHome(self.driver))
+            else:
+                AccountsHome(self.driver).log_in(user, password)
+                from pages.web.home import WebHome as Home
+            return go_to_(Home(self.driver))
 
         @property
         def logged_in(self):
@@ -458,16 +451,14 @@ class WebNav(Region):
                 return False
             return True
 
-        def open(self):
-            """Select the user menu."""
-            self.find_element(*self._open_menu_locator).click()
-            sleep(0.5)
-            return self
-
         @property
         def name(self):
             """Return the user's first name as shown in the menu bar."""
-            return self.find_element(*self._user_name_locator).text[3:].strip()
+            try:
+                name = self.find_element(*self._open_menu_locator)
+            except NoSuchElementException:
+                name = self.find_element(*self._log_in_link_locator)
+            return (name.get_attribute('innerHTML').split('<')[0].split()[-1])
 
         @property
         def profile(self):
@@ -494,13 +485,63 @@ class WebNav(Region):
             return go_to_(Dashboard(self.driver))
 
         @property
+        def modal_displayed(self):
+            """Return True if the Tutor modal is displayed."""
+            try:
+                self.find_element(*self._training_wheel_locator)
+                return True
+            except WebDriverException:
+                return False
+
+        @property
+        def training_wheel(self):
+            """Return the training wheel modal."""
+            training_root = self.find_element(*self._training_wheel_locator)
+            return self.TrainingWheel(self, training_root)
+
+        @property
         def logout(self):
             """Return the log out link."""
             return self.find_element(*self._log_out_link_locator)
 
         def log_out(self):
             """Log the current user out."""
-            self.open().logout.click()
-            sleep(1.0)
-            from pages.web.home import WebHome
-            return go_to_(WebHome(self.driver))
+            from pages.web.home import WebHome as Home
+            return self.open()._selection_helper(
+                self._log_out_link_locator,
+                Home)
+
+        class TrainingWheel(Region):
+            """The Tutor beta training wheel."""
+
+            _image_locator = (By.CSS_SELECTOR, 'img')
+            _message_locator = (By.CSS_SELECTOR, '.message')
+            _x_close_locator = (By.CSS_SELECTOR, '.put-away')
+            _got_it_button_locator = (By.CSS_SELECTOR, '.button-row button')
+
+            @property
+            def image(self):
+                """Return the modal image."""
+                return self.find_element(*self._image_locator)
+
+            @property
+            def message(self):
+                """Return the text of the modal message."""
+                return self.find_element(*self._message_locator).text
+
+            def close_modal(self, option=''):
+                """Close the training wheel modal.
+
+                If option is set and equals 'x', use the x close button.
+                If option is set and isn't 'x', use the Got It button.
+                If option isn't set, randomize which button gets used.
+                """
+                if option:
+                    button = (self._x_close_locator
+                              if option == 'x'
+                              else self._got_it_button_locator)
+                else:
+                    button = (self._x_close_locator
+                              if bool(Utility.random(0, 1))
+                              else self._got_it_button_locator)
+                Utility.wait_for_overlay_then(self.find_element(*button).click)

@@ -7,6 +7,7 @@ from time import sleep
 from faker import Faker
 from selenium.webdriver.common.action_chains import ActionChains
 from selenium.common.exceptions import ElementClickInterceptedException
+from selenium.common.exceptions import WebDriverException
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support.color import Color
 from selenium.webdriver.support.ui import Select
@@ -138,6 +139,17 @@ class Utility(object):
                     break
                 except ElementClickInterceptedException:
                     sleep(1.0)
+
+    @classmethod
+    def wait_for_overlay_then(cls, target):
+        """Wait for an overlay to clear."""
+        for _ in range(10):
+            try:
+                target()
+                break
+            except WebDriverException:
+                sleep(0.5)
+        sleep(1.0)
 
     @classmethod
     def new_tab(cls, driver):
@@ -366,7 +378,7 @@ class Actions(ActionChains):
         return result
 
     def data_read(self, css_selector, data_type, expected):
-        """."""
+        """Compare the computed height to an expected value."""
         element_height = (
             'return window.getComputedStyle(document.querySelector'
             '("{selector}"))["{data_type}"]'
