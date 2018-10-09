@@ -1211,3 +1211,35 @@ def test_the_home_page_information_bars(web_base_url, selenium):
     # THEN: the partners page is displayed
     assert(partners.is_displayed())
     assert('partners' in partners.location)
+
+
+@test_case('C210330')
+@nondestructive
+@web
+def test_page_footer_is_displayed(web_base_url, selenium):
+    """Test the page footer is beng displayed."""
+    # GIVEN: a user viewing the Web home page
+    home = Home(selenium, web_base_url).open()
+
+    # WHEN: they scroll to the bottom of the page
+    home.footer.show()
+
+    # THEN: the footer is visible
+    assert(home.footer.is_displayed())
+
+
+@test_case('C210331')
+@nondestructive
+@web
+def test_the_licensing_link_in_the_footer(web_base_url, selenium):
+    """Test the footer's licensing link."""
+    # GIVEN: a user viewing the Web page footer
+    home = Home(selenium, web_base_url).open()
+
+    # WHEN: they click the "Licensing" link
+    home.footer.show()
+    license = home.footer.directory.view_licensing()
+
+    # THEN: the licensing page is displayed
+    assert(license.is_displayed())
+    assert('license' in license.location)
