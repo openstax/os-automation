@@ -1140,3 +1140,31 @@ def test_home_page_quote_boxes(web_base_url, selenium):
 
     # THEN: they are taken to the bookstore suppliers page
     assert(bookstore.is_displayed())
+
+
+@test_case('C210328')
+@nondestructive
+@web
+def test_the_home_page_education_section(web_base_url, selenium):
+    """Test the education section and links of the home page."""
+    # GIVEN: a user viewing the Web home page
+    home = Home(selenium, web_base_url).open()
+
+    # WHEN: they scroll to the education section
+    # AND:  click the "Books" pane
+    home.education.show()
+    subjects = home.education.links[Web.BOOKS].click()
+
+    # THEN: the book subjects page is displayed
+    assert(subjects.is_displayed())
+    assert('subjects' in subjects.location)
+
+    # WHEN: the user opens the Web home page
+    # AND:  click the "Technology" pane
+    home.open()
+    home.education.show()
+    technology = home.education.links[Web.TECH].click()
+
+    # THEN: the technology page is displayed
+    assert(technology.is_displayed())
+    assert('technology' in technology.location)

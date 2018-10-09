@@ -20,6 +20,10 @@ class Web(object):
     BOOK_QUALITY_RIGGS = 1
     BOOKSTORE_SUPPLIERS = 2
 
+    # Links
+    BOOKS = 0
+    TECH = 1
+
     # Matching strings
     ABOUT = 'about'
     BOOKSTORE = 'bookstore-suppliers'

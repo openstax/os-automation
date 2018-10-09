@@ -40,8 +40,7 @@ class Link(Region):
         a new link is added.
         """
         destination = self.link.get_attribute('href')
-        self.link.click()
-        sleep(1.0)
+        Utility.wait_for_overlay_then(self.link.click)
         if destination.endswith(Support.IMPACT):
             from pages.web.impact import OurImpact as Destination
         elif destination.endswith(Support.PARTNERS):
@@ -50,9 +49,7 @@ class Link(Region):
             from pages.web.subjects import Subjects as Destination
         elif destination.endswith(Support.TECHNOLOGY):
             from pages.web.technology import Technology as Destination
-        go_to = Destination(self.driver)
-        go_to.wait_for_page_to_load()
-        return go_to
+        return go_to_(Destination(self.driver))
 
 
 class WebHome(WebBase):
@@ -266,7 +263,7 @@ class WebHome(WebBase):
         _square_two_locator = (By.CLASS_NAME, 'square-2')
         _quote_locator = (By.CLASS_NAME, 'quote')
         _student_locator = (By.CLASS_NAME, 'student')
-        _link_locator = (By.CLASS_NAME, 'links')
+        _link_locator = (By.CSS_SELECTOR, '.links li')
 
         @property
         def box_one(self):
@@ -293,6 +290,11 @@ class WebHome(WebBase):
             """Access the educational links."""
             return [Link(self, el)
                     for el in self.find_elements(*self._link_locator)]
+
+        def show(self):
+            """Scroll the section into view."""
+            Utility.scroll_to(self.driver, element=self.root, shift=-80)
+            return self.page
 
     class Information(Region):
         """Information buckets."""
