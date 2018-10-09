@@ -7,6 +7,7 @@ from selenium.common.exceptions import NoSuchElementException
 from selenium.webdriver.common.by import By
 
 from pages.web.base import WebBase
+from utils.utilities import Utility, go_to_
 from utils.web import Web as Support
 
 
@@ -155,12 +156,9 @@ class WebHome(WebBase):
                 if self.destination.endswith(Support.SUBJECTS):
                     from pages.web.subjects import Subjects as Destination
                 elif self.destination.endswith(Support.ABOUT):
-                    from pages.web.about_us import AboutUs as Destination
-                self.root.click()
-                sleep(1.0)
-                go_to = Destination(self.driver)
-                go_to.wait_for_page_to_load()
-                return go_to
+                    from pages.web.about import AboutUs as Destination
+                Utility.wait_for_overlay_then(self.root.click)
+                return go_to_(Destination(self.driver))
 
         class Dot(Region):
             """An individual sellection button."""
@@ -172,11 +170,8 @@ class WebHome(WebBase):
 
             def click(self):
                 """Select a dot to display the corresponding banner."""
-                self.root.click()
-                sleep(0.5)
-                go_to = WebHome(self.driver)
-                go_to.wait_for_page_to_load()
-                return go_to
+                Utility.wait_for_overlay_then(self.root.click)
+                return go_to_(WebHome(self.driver))
 
     class Quotes(Region):
         """Quotes and page links."""
