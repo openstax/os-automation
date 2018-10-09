@@ -20,9 +20,11 @@ class Web(object):
     BOOK_QUALITY_RIGGS = 1
     BOOKSTORE_SUPPLIERS = 2
 
-    # Links
+    # Home page boxes
     BOOKS = 0
     TECH = 1
+    OUR_IMPACT = 0
+    OPENSTAX_PARTNERS = 1
 
     # Matching strings
     ABOUT = 'about'

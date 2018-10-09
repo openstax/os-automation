@@ -1168,3 +1168,46 @@ def test_the_home_page_education_section(web_base_url, selenium):
     # THEN: the technology page is displayed
     assert(technology.is_displayed())
     assert('technology' in technology.location)
+
+
+@test_case('C210329')
+@nondestructive
+@web
+def test_the_home_page_information_bars(web_base_url, selenium):
+    """Test the information bars."""
+    # GIVEN: a user viewing the Web home page
+    home = Home(selenium, web_base_url).open()
+
+    # WHEN: they scroll to the information bars
+    home.information.show()
+
+    # THEN: they are presented 2 boxes
+    # AND:  the first discusses the OpenStax impact
+    assert(home.information.box[Web.OUR_IMPACT].is_displayed())
+    assert(home.information.box[Web.OPENSTAX_PARTNERS].is_displayed())
+    assert('Wolchonok has saved students' in
+           home.information.box[Web.OUR_IMPACT].text)
+    assert(home.information.box[Web.OUR_IMPACT].has_image)
+
+    # WHEN: the user clicks the "See our impact" button
+    impact = home.information.box[Web.OUR_IMPACT].click()
+
+    # THEN: the impact page is displayed
+    assert(impact.is_displayed())
+    assert('impact' in impact.location)
+
+    # WHEN: the user opens the Web home page
+    # AND:  scroll to the information bars
+    home.open()
+    home.information.show()
+
+    # THEN: the second box discusses OpenStax partners
+    assert('OpenStax partners have united with us' in
+           home.information.box[Web.OPENSTAX_PARTNERS].text)
+
+    # WHEN: the user clicks the "View Partners" button
+    partners = home.information.box[Web.OPENSTAX_PARTNERS].click()
+
+    # THEN: the partners page is displayed
+    assert(partners.is_displayed())
+    assert('partners' in partners.location)

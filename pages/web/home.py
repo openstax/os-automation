@@ -18,6 +18,10 @@ class Link(Region):
     _text_locator = (By.CLASS_NAME, 'blurb')
     _link_locator = (By.TAG_NAME, 'a')
 
+    def is_displayed(self):
+        """Return True if the link root is displayed."""
+        return self.root.is_displayed()
+
     @property
     def title(self):
         """Return the resource title."""
@@ -307,6 +311,11 @@ class WebHome(WebBase):
             return [self.Bucket(self, el)
                     for el in self.find_elements(*self._bucket_locator)]
 
+        def show(self):
+            """Scroll the section into view."""
+            Utility.scroll_to(self.driver, element=self.root, shift=-80)
+            return self.page
+
         class Bucket(Link):
             """Individual information boxes."""
 
@@ -317,6 +326,6 @@ class WebHome(WebBase):
                 """Return True if the box has an image."""
                 try:
                     self.find_element(*self._image_locator)
+                    return True
                 except NoSuchElementException:
                     return False
-                return True
