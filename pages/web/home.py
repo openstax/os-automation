@@ -179,7 +179,7 @@ class WebHome(WebBase):
         _bucket_locator = (By.CLASS_NAME, 'quote-bucket')
 
         @property
-        def quote(self):
+        def quotes(self):
             """Access the individual quotes."""
             return [self.Quote(self, el)
                     for el in self.find_elements(*self._bucket_locator)]
@@ -194,6 +194,15 @@ class WebHome(WebBase):
             _image_locator = (By.CLASS_NAME, 'image')
             _block_quote_locator = (By.TAG_NAME, 'quote-html')
             _button_locator = (By.CLASS_NAME, 'btn')
+
+            def is_displayed(self):
+                """Return True if the quote box is displayed."""
+                return self.root.is_displayed()
+
+            def show(self):
+                """Scroll the quote box into view."""
+                Utility.scroll_to(self.driver, element=self.root, shift=-80)
+                return self
 
             @property
             def has_image(self):
@@ -216,7 +225,7 @@ class WebHome(WebBase):
             @property
             def text(self):
                 """Return the quote text."""
-                return self._text
+                return self.find_element(*self._block_quote_locator).text
 
             @property
             def image(self):
@@ -237,17 +246,18 @@ class WebHome(WebBase):
                 a new quote is added.
                 """
                 destination = self.button.get_attribute('href')
-                self.button.click()
-                sleep(1.0)
                 if Support.NEWSLETTER in destination:
+                    Utility.switch_to(self.driver, action=self.button.click)
                     from pages.web.newsletter \
                         import NewsletterSignup as Destination
                 elif Support.BOOKSTORE in destination:
-                    from pages.web.bookstore \
+                    self.button.click()
+                    from pages.web.bookstore_suppliers \
                         import Bookstore as Destination
-                go_to = Destination(self.driver)
-                go_to.wait_for_page_to_load()
-                return go_to
+                else:
+                    raise ValueError('Unknown destination: %s' % destination)
+                sleep(1.0)
+                return go_to_(Destination(self.driver))
 
     class Education(Region):
         """Education and page links."""

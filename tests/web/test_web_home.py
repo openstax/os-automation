@@ -1094,3 +1094,49 @@ def test_carousel_banners_link_to_other_pages(web_base_url, selenium):
     # THEN: the subjects page is displayed
     assert(books.is_displayed())
     assert(books.url == carousel[Web._29_BOOKS])
+
+
+@test_case('C210327')
+@nondestructive
+@web
+def test_home_page_quote_boxes(web_base_url, selenium):
+    """Test the three home page quote boxes."""
+    # GIVEN: a user viewing the Web home page
+    home = Home(selenium, web_base_url).open()
+
+    # WHEN: they scroll to the quotes
+    home.quotes.quotes[Web.SUBSCRIBE].show()
+
+    # THEN: they are presented 3 quote boxes
+    # AND:  the first box discusses information updates with a mail list
+    for quote in home.quotes.quotes:
+        assert(quote.is_displayed())
+    assert(home.quotes.quotes[Web.SUBSCRIBE].has_image)
+    assert('OpenStax updates' in home.quotes.quotes[Web.SUBSCRIBE].text)
+    assert(home.quotes.quotes[Web.SUBSCRIBE].has_button)
+
+    # WHEN: the user clicks the "Subscribe" link
+    subscribe = Utility.switch_to(
+        selenium, action=home.quotes.quotes[Web.SUBSCRIBE].click)
+
+    # THEN: they are taken to the subscription form in a new tab
+    assert(subscribe.is_displayed())
+    assert('www2.openstax.org' in subscribe.location)
+
+    # WHEN: they close the new tab
+    subscribe.close_tab()
+
+    # THEN: the second box displays a quote
+    # AND:  the third box discusses information for book stores
+    assert('OpenStax is amazing. Access to these high-quality textbooks '
+           'is game-changing for our students.'
+           in home.quotes.quotes[Web.BOOK_QUALITY_RIGGS].text)
+    assert('a campus bookstore or school and looking for print copies'
+           in home.quotes.quotes[Web.BOOKSTORE_SUPPLIERS].text)
+    assert(home.quotes.quotes[Web.BOOKSTORE_SUPPLIERS].has_button)
+
+    # WHEN: the user clicks the "Learn more" link
+    bookstore = home.quotes.quotes[Web.BOOKSTORE_SUPPLIERS].click()
+
+    # THEN: they are taken to the bookstore suppliers page
+    assert(bookstore.is_displayed())
