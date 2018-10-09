@@ -384,7 +384,7 @@ class Details(AccountsAdmin):
     @property
     def salesforce_contact_id(self):
         """Return the Salesforce contact ID."""
-        return self.find_element(*self._saleforce_id_locator).text
+        return self.find_element(*self._saleforce_id_locator).text.strip()
 
     @salesforce_contact_id.setter
     def salesforce_contact_id(self, contact_id):

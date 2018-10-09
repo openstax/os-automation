@@ -925,3 +925,82 @@ def test_instructor_access_application(
     #       visible in the user menu
     with pytest.raises(NoSuchElementException):
         home.web_nav.login.instructor_access.is_displayed()
+
+
+@test_case('C210321')
+@accounts
+@web
+def test_instructor_access_application_on_mobile(
+        accounts_base_url, web_base_url, selenium, admin, teacher):
+    """Test a teacher applying for instructor resource access."""
+    # GIVEN: a user with rejected instructor access
+    # AND:   logged into the Web home page
+    # AND:   the screen width is 960 pixels or less
+    name = Utility.random_name()
+    email = RestMail('{first}.{last}.{tag}'.format(
+        first=name[1], last=name[2], tag=Utility.random_hex(3)).lower())
+    email.empty()
+    address = email.address
+    password = teacher[1]
+    accounts = AccountsHome(selenium, accounts_base_url).open()
+    profile = accounts.login.go_to_signup.account_signup(
+        name=name, email=address, password=password, _type=Signup.INSTRUCTOR,
+        provider=Signup.RESTMAIL, school='Automation', news=False,
+        phone=Utility.random_phone(), webpage=web_base_url,
+        subjects=Signup(selenium).subject_list(2), students=10,
+        use=Signup.RECOMMENDED)
+    profile.log_out()
+    profile = accounts.log_in(*admin)
+    search = Search(selenium, accounts_base_url).open()
+    details = Utility.switch_to(
+        driver=selenium,
+        action=search.find(terms={'email': address}).users[0].edit)
+    details.faculty_status = Accounts.REJECTED
+    details.save()
+    details.close_tab()
+    search.nav.user_menu.sign_out()
+    accounts.log_in(address, password)
+    home = Home(selenium, web_base_url)
+    home.resize_window(width=900)
+    home.open()
+
+    # WHEN: they open the user menu
+    # AND:  click on the "Request instructor access" menu
+    #       option
+    home.web_nav.meta.toggle_menu()
+    form = home.web_nav.login.request_access()
+
+    # THEN: the instructor application form is displayed
+    assert(form.is_displayed())
+
+    # WHEN: they their role from the drop down menu
+    # AND:  enter their school-assigned email address
+    # AND:  a contact telephone number
+    # AND:  the school name
+    # AND:  the school website address
+    # AND:  select at least one book or "Not Listed"
+    # AND:  click on the "APPLY" button
+    # AND:  check the box to receive confirmation
+    #       concerning instructor resources
+    # AND:  click on the "OK" button
+    # AND:  open the Web homepage
+    # AND:  open the user menu
+    form.instructor_access(
+        role=Signup.INSTRUCTOR,
+        school_email=address,
+        phone_number=Utility.random_phone(),
+        school='Automation',
+        students=10,
+        webpage=web_base_url,
+        using=Signup.RECOMMENDED,
+        interests=Signup(selenium).subject_list(Utility.random(2, 4)),
+        get_newsletter=False
+    )
+    home.open()
+    home.web_nav.meta.toggle_menu()
+    home.web_nav.login.open()
+
+    # THEN: "Request instructor access" is no longer
+    #       visible in the user menu
+    with pytest.raises(NoSuchElementException):
+        home.web_nav.login.instructor_access.is_displayed()
