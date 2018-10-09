@@ -1004,3 +1004,27 @@ def test_instructor_access_application_on_mobile(
     #       visible in the user menu
     with pytest.raises(NoSuchElementException):
         home.web_nav.login.instructor_access.is_displayed()
+
+
+@test_case('C210324')
+@nondestructive
+@web
+def test_tutor_training_wheel_is_displayed_when_a_tutor_user_logs_in(
+        web_base_url, selenium, student):
+    """The Tutor modal is displayed when a Tutor user logs into Web."""
+    # GIVEN: an OpenStax Tutor user viewing the Web home page
+    home = Home(selenium, web_base_url).open()
+
+    # WHEN: they log into the Web home
+    # AND:  wait for up to one minute
+    home = home.web_nav.login.log_in(*student)
+
+    # THEN: an OpenStax Tutor modal is presented
+    assert(home.wait.until(lambda _: home.web_nav.login.modal_displayed)), \
+        'Modal was not displayed within the wait period'
+
+    # WHEN: they click "GOT IT"
+    home.web_nav.login.training_wheel.close_modal()
+
+    # THEN: the modal closes
+    assert(not home.web_nav.login.modal_displayed)
