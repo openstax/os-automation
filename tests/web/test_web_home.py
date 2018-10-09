@@ -1028,3 +1028,19 @@ def test_tutor_training_wheel_is_displayed_when_a_tutor_user_logs_in(
 
     # THEN: the modal closes
     assert(not home.web_nav.login.modal_displayed)
+
+
+@test_case('C210325')
+@nondestructive
+@web
+def test_switch_panels_in_banner_carousel(web_base_url, selenium):
+    """Test a user switching between the various banners in the carousel."""
+    # GIVEN: a user viewing the Web home page
+    home = Home(selenium, web_base_url).open()
+
+    # WHEN: they click each of the carousel dots
+    for index, banner in enumerate(home.carousel.banners):
+        home.carousel.dots[index].click()
+
+    # THEN: the banner changes
+        assert(banner.is_displayed())

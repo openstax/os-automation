@@ -116,7 +116,7 @@ class WebHome(WebBase):
         @property
         def dots(self):
             """Access the banner dot buttons."""
-            return [self.Dots(self, el)
+            return [self.Dot(self, el)
                     for el in self.find_elements(*self._dot_button_locator)]
 
         class Banner(Region):
