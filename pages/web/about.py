@@ -6,7 +6,7 @@ from pypom import Region
 from selenium.webdriver.common.by import By
 
 from pages.web.base import WebBase
-from utils.utilities import go_to_, Utility
+from utils.utilities import Utility, go_to_
 from utils.web import Web
 
 

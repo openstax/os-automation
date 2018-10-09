@@ -21,6 +21,7 @@ class Subjects(WebBase):
     _filter_button_locator = (By.CLASS_NAME, 'filter-button')
     _filter_by_locator = (By.CSS_SELECTOR,
                           '.filter-buttons [aria-pressed=true]')
+    _category_locator = (By.CSS_SELECTOR, '.book-category')
     _math_category_locator = (
         By.XPATH, category_xpath.format(subject=Web.VIEW_MATH))
     _science_category_locator = (
@@ -41,6 +42,7 @@ class Subjects(WebBase):
         """Override the base loader."""
         return (
             bool(self.find_element(*self._root_locator))
+            and bool(self.find_element(*self._category_locator))
             and Utility.is_image_visible(self.driver,
                                          locator=self._image_locators))
 
@@ -60,32 +62,40 @@ class Subjects(WebBase):
 
     @property
     def math(self):
+        """Return the subjects filtered by math titles."""
+        print(self.driver.current_url)
+        print(self.driver.page_source)
         math_root = self.find_element(*self._math_category_locator)
         return self.Category(self, math_root)
 
     @property
     def science(self):
+        """Return the subjects filtered by the science titles."""
         science_root = self.find_element(*self._science_category_locator)
         return self.Category(self, science_root)
 
     @property
     def social_sciences(self):
+        """Return the subjects filtered by the social sciences titles."""
         social_root = self.find_element(
             *self._social_sciences_category_locator)
         return self.Category(self, social_root)
 
     @property
     def humanities(self):
+        """Return the subjects filtered by the humanities titles."""
         humanities_root = self.find_element(*self._humanities_category_locator)
         return self.Category(self, humanities_root)
 
     @property
     def business(self):
+        """Return the subjects filtered by the business titles."""
         business_root = self.find_element(*self._business_category_locator)
         return self.Category(self, business_root)
 
     @property
     def ap(self):
+        """Return the subjects filtered by the AP titles."""
         ap_root = self.find_element(*self._ap_category_locator)
         return self.Category(self, ap_root)
 

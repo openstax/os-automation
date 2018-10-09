@@ -6,7 +6,7 @@ from pypom import Region
 from selenium.common.exceptions import WebDriverException
 from selenium.webdriver.common.by import By
 
-from utils.utilities import Actions, go_to_, Utility
+from utils.utilities import Actions, Utility, go_to_
 from utils.web import Web
 
 
@@ -38,6 +38,7 @@ class WebNavMenu(Region):
 
     def open(self):
         """Select the menu."""
+        sleep(0.5)
         is_expanded = self.find_element(*self._menu_expand_locator) \
             .get_attribute('aria-expanded') == 'true'
         if not is_expanded:
@@ -47,6 +48,7 @@ class WebNavMenu(Region):
                     parent='.'.join(self.root.get_attribute('class').split()),
                     menu_locator=self._open_menu_locator[1]))
             Utility.safari_exception_click(self.driver, locator=target)
+        sleep(0.25)
         return self
 
     def _selection_helper(self, locator, destination, new_tab=False):
@@ -142,6 +144,7 @@ class WebNav(Region):
         outside the scope of the Web Nav region but are only used in
         the nav.
         """
+        sleep(0.5)
         self.driver.execute_script(
             'document.querySelector("%s").click()' %
             self._back_link_locator[1])
@@ -192,6 +195,7 @@ class WebNav(Region):
 
         def is_available(self, label):
             """Return True if the menu option is available."""
+            sleep(0.5)
             subjects = {
                 Web.VIEW_ALL: self._all_option_locator[1],
                 Web.VIEW_MATH: self._math_option_locator[1],
@@ -418,6 +422,7 @@ class WebNav(Region):
         _profile_link_locator = (By.CSS_SELECTOR, '[href$=profile]')
         _openstax_tutor_link_locator = (By.LINK_TEXT, 'OpenStax Tutor')
         _training_wheel_locator = (By.CSS_SELECTOR, '.training-wheel')
+        _faculty_access_locator = (By.CSS_SELECTOR, '[href*=faculty]')
         _log_out_link_locator = (By.CSS_SELECTOR, '[href*=signout]')
 
         @property
@@ -501,6 +506,19 @@ class WebNav(Region):
             """Return the training wheel modal."""
             training_root = self.find_element(*self._training_wheel_locator)
             return self.TrainingWheel(self, training_root)
+
+        @property
+        def instructor_access(self):
+            """Return the link to apply for faculty access."""
+            return self.find_element(*self._faculty_access_locator)
+
+        def request_access(self):
+            """Click the faculty access link to start the application."""
+            from pages.accounts.signup import Signup
+            return self.open()._selection_helper(
+                self._faculty_access_locator,
+                Signup,
+                new_tab=True)
 
         @property
         def logout(self):

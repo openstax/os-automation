@@ -1,5 +1,7 @@
 """The OpenStax blog."""
 
+from time import sleep
+
 from selenium.webdriver.common.by import By
 
 from pages.web.base import WebBase
@@ -21,7 +23,7 @@ class Blog(WebBase):
         test = Utility.load_background_images(
             driver=self.driver,
             locator=self._initial_image_locators)
-        print('Blog: %s' % test)
+        sleep(3.0)
         return test
 
     def is_displayed(self):

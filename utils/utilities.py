@@ -5,9 +5,9 @@ from random import randint
 from time import sleep
 
 from faker import Faker
+from selenium.common.exceptions import ElementClickInterceptedException  # NOQA
+from selenium.common.exceptions import WebDriverException  # NOQA
 from selenium.webdriver.common.action_chains import ActionChains
-from selenium.common.exceptions import ElementClickInterceptedException
-from selenium.common.exceptions import WebDriverException
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support import expected_conditions as expect
 from selenium.webdriver.support.color import Color
@@ -168,15 +168,21 @@ class Utility(object):
         return driver.window_handles
 
     @classmethod
-    def switch_to(cls, driver, link_locator):
+    def switch_to(cls, driver, link_locator=None, action=None):
         """Switch to the other window handle."""
         current = driver.current_window_handle
-        Utility.safari_exception_click(driver, link_locator)
+        data = None
+        if link_locator:
+            Utility.safari_exception_click(driver, link_locator)
+        else:
+            data = action()
         sleep(1)
         new_handle = 1 if current == driver.window_handles[0] else 0
         if len(driver.window_handles) > 1:
             driver.switch_to.window(
                 driver.window_handles[new_handle])
+        if data:
+            return data
 
     @classmethod
     def close_tab(cls, driver):

@@ -1,9 +1,17 @@
 """Tests for the OpenStax Web home page."""
 
+import pytest
+from selenium.common.exceptions import NoSuchElementException
+
+from pages.accounts.admin.users import Search
+from pages.accounts.home import AccountsHome
+from pages.accounts.signup import Signup
 from pages.web.home import WebHome as Home
 from pages.web.impact import OurImpact
-from tests.markers import expected_failure, nondestructive, skip_test  # NOQA
-from tests.markers import test_case, web  # NOQA
+from tests.markers import accounts, nondestructive, test_case, web
+from utils.accounts import Accounts
+from utils.email import RestMail
+from utils.utilities import Utility
 from utils.web import Web
 
 
@@ -843,3 +851,77 @@ def test_go_to_the_users_openstax_tutor_dashboard(
 
     # THEN: the OpenStax Tutor dashboard for the user is displayed
     assert(dashboard.is_displayed())
+
+
+@test_case('C210320')
+@accounts
+@web
+def test_instructor_access_application(
+        accounts_base_url, web_base_url, selenium, admin, teacher):
+    """Test a teacher applying for instructor resource access."""
+    # GIVEN: a user with rejected instructor access
+    # AND:   logged into the Web home page
+    name = Utility.random_name()
+    email = RestMail('{first}.{last}.{tag}'.format(
+        first=name[1], last=name[2], tag=Utility.random_hex(3)).lower())
+    email.empty()
+    address = email.address
+    password = teacher[1]
+    accounts = AccountsHome(selenium, accounts_base_url).open()
+    profile = accounts.login.go_to_signup.account_signup(
+        name=name, email=address, password=password, _type=Signup.INSTRUCTOR,
+        provider=Signup.RESTMAIL, school='Automation', news=False,
+        phone=Utility.random_phone(), webpage=web_base_url,
+        subjects=Signup(selenium).subject_list(2), students=10,
+        use=Signup.RECOMMENDED)
+    profile.log_out()
+    profile = accounts.log_in(*admin)
+    search = Search(selenium, accounts_base_url).open()
+    details = Utility.switch_to(
+        driver=selenium,
+        action=search.find(terms={'email': address}).users[0].edit)
+    details.faculty_status = Accounts.REJECTED
+    details.save()
+    details.close_tab()
+    search.nav.user_menu.sign_out()
+    accounts.log_in(address, password)
+    home = Home(selenium, web_base_url).open()
+
+    # WHEN: they open the user menu
+    # AND:  click on the "Request instructor access" menu
+    #       option
+    form = home.web_nav.login.request_access()
+
+    # THEN: the instructor application form is displayed
+    assert(form.is_displayed())
+
+    # WHEN: they their role from the drop down menu
+    # AND:  enter their school-assigned email address
+    # AND:  a contact telephone number
+    # AND:  the school name
+    # AND:  the school website address
+    # AND:  select at least one book or "Not Listed"
+    # AND:  click on the "APPLY" button
+    # AND:  check the box to receive confirmation
+    #       concerning instructor resources
+    # AND:  click on the "OK" button
+    # AND:  open the Web homepage
+    # AND:  open the user menu
+    form.instructor_access(
+        role=Signup.INSTRUCTOR,
+        school_email=address,
+        phone_number=Utility.random_phone(),
+        school='Automation',
+        students=10,
+        webpage=web_base_url,
+        using=Signup.RECOMMENDED,
+        interests=Signup(selenium).subject_list(Utility.random(2, 4)),
+        get_newsletter=False
+    )
+    home.open()
+    home.web_nav.login.open()
+
+    # THEN: "Request instructor access" is no longer
+    #       visible in the user menu
+    with pytest.raises(NoSuchElementException):
+        home.web_nav.login.instructor_access.is_displayed()

@@ -6,7 +6,7 @@ from pypom import Region
 from selenium.common.exceptions import WebDriverException
 from selenium.webdriver.common.by import By
 
-from utils.utilities import go_to_, Utility
+from utils.utilities import Utility, go_to_
 
 
 class OpenStaxNav(Region):

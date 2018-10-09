@@ -194,6 +194,16 @@ def test_verify_an_email(accounts_base_url, selenium, student):
     address = name + '@restmail.net'
     page.emails.add_email(address)
     page.emails.emails[-1].resend_confirmation()
+    # ************
+    restmail.wait_for_mail()
+    print('RestMail %s' % address)
+    from time import sleep
+    sleep(3)
+    print('Inbox: %s' % str(len(restmail.inbox)))
+    for index, message in enumerate(restmail.inbox):
+        print('************************************')
+        print(index, message._text)
+    # ************
     restmail.wait_for_mail()[-1].confirm_email()
     page.open()
 

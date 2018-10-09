@@ -3,7 +3,8 @@
 from time import sleep
 
 from pypom import Region
-from selenium.common.exceptions import WebDriverException
+from selenium.common.exceptions import NoSuchElementException
+from selenium.common.exceptions import WebDriverException  # NOQA
 from selenium.webdriver.common.by import By
 
 from utils.web import Web as Support
@@ -36,9 +37,13 @@ class StickyNote(Region):
     @property
     def button(self):
         """Return the sticky note action button."""
-        if self.driver.get_window_size().get('width') <= 600:
-            return self.find_element(*self._mobile_link_locator)
-        return self.find_element(*self._desktop_link_locator)
+        locator = (self._mobile_link_locator
+                   if self.driver.get_window_size().get('width') <= 600
+                   else self._desktop_link_locator)
+        try:
+            return self.find_element(*locator)
+        except NoSuchElementException:
+            assert(False), 'The sticky note button wasn\'t found.'
 
     def go(self):
         """Follow the sticky note link.

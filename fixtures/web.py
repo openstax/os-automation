@@ -14,6 +14,10 @@ def web_base_url(request):
                 config.getini('web_base_url'))
     instance = (config.getoption('instance') or
                 config.getini('instance')).lower()
+    # Return early if testing the new Web instance set -- TEMP CONFIG
+    if '/cms-.' in base_url:
+        return base_url
+    # END TEMP CONFIG
     if instance and base_url:
         segments = base_url.split(SPLIT)
         insert = ('' if instance == 'prod' or instance == 'production' else
