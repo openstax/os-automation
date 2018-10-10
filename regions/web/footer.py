@@ -1,7 +1,5 @@
 """OpenStax Web's shared footer region."""
 
-from time import sleep
-
 from pypom import Region
 from selenium.webdriver.common.by import By
 
@@ -74,57 +72,57 @@ class Footer(Region):
 
         def view_licensing(self):
             """Go to the website license page."""
-            self.find_element(*self._license_locator).click()
-            sleep(1.0)
+            Utility.safari_exception_click(
+                self.driver, locator=self._license_locator)
             from pages.web.legal import License
             return go_to_(License(self.driver))
 
         def view_the_terms_of_use(self):
             """View the terms of use."""
-            self.find_element(*self._terms_of_use_locator).click()
-            sleep(1.0)
-            from pages.web.terms import Terms
+            Utility.safari_exception_click(
+                self.driver, locator=self._terms_of_use_locator)
+            from pages.web.legal import Terms
             return go_to_(Terms(self.driver))
 
         def view_the_privacy_policy(self):
             """View the privacy policy."""
-            self.find_element(*self._privacy_policy_locator).click()
-            sleep(1.0)
-            from pages.web.privacy import PrivacyPolicy
+            Utility.safari_exception_click(
+                self.driver, locator=self._privacy_policy_locator)
+            from pages.web.legal import PrivacyPolicy
             return go_to_(PrivacyPolicy(self.driver))
 
         def view_the_accessibility_statement(self):
             """View the accessibility statement."""
-            self.find_element(*self._accessibility_statement_locator).click()
-            sleep(1.0)
+            Utility.safari_exception_click(
+                self.driver, locator=self._accessibility_statement_locator)
             from pages.web.accessibility import Accessibility
             return go_to_(Accessibility(self.driver))
 
         def view_the_code(self):
             """Open GitHub and view the OpenStax repositories."""
-            self.find_element(*self._opens_source_locator).click()
-            sleep(1.0)
+            Utility.safari_exception_click(
+                self.driver, locator=self._opens_source_locator)
             from pages.github.home import GitHub
             return go_to_(GitHub(self.driver))
 
         def go_to_the_contact_form(self):
             """Go to the contact form."""
-            self.find_element(*self._contact_us_locator).click()
-            sleep(1.0)
+            Utility.safari_exception_click(
+                self.driver, locator=self._contact_us_locator)
             from pages.web.contact import Contact
             return go_to_(Contact(self.driver))
 
         def view_press_releases(self):
             """View the press page."""
-            self.find_element(*self._press_locator).click()
-            sleep(1.0)
+            Utility.safari_exception_click(
+                self.driver, locator=self._press_locator)
             from pages.web.press import Press
             return go_to_(Press(self.driver))
 
         def go_to_the_newsletter_signup_form(self):
             """Go to the newsletter signup."""
-            self.find_element(*self._newsletter_locator).click()
-            sleep(1.0)
+            Utility.safari_exception_click(
+                self.driver, locator=self._newsletter_locator)
             from pages.web.newsletter import NewsletterSignup
             return go_to_(NewsletterSignup(self.driver))
 
@@ -153,28 +151,28 @@ class Footer(Region):
 
         def go_to_facebook(self):
             """Go to OpenStax's Facebook page."""
-            self.find_element(*self._facebook_locator).click()
-            sleep(1.0)
+            Utility.safari_exception_click(
+                self.driver, locator=self._facebook_locator)
             from pages.facebook.home import Facebook
             return go_to_(Facebook(self.driver))
 
         def go_to_twitter(self):
             """Go to OpenStax's Twitter page."""
-            self.find_element(*self._twitter_locator).click()
-            sleep(1.0)
+            Utility.safari_exception_click(
+                self.driver, locator=self._twitter_locator)
             from pages.twitter.home import Twitter
             return go_to_(Twitter(self.driver))
 
         def go_to_linkedin(self):
             """Go to OpenStax's LinkedIn company page."""
-            self.find_element(*self._linkedin_locator).click()
-            sleep(1.0)
+            Utility.safari_exception_click(
+                self.driver, locator=self._linkedin_locator)
             from pages.linkedin.home import LinkedIn
             return go_to_(LinkedIn(self.driver))
 
         def go_to_instagram(self):
             """Go to OpenStax's Instagram page."""
-            self.find_element(*self._instagram_locator).click()
-            sleep(1.0)
+            Utility.safari_exception_click(
+                self.driver, locator=self._instagram_locator)
             from pages.instagram.home import Instagram
             return go_to_(Instagram(self.driver))

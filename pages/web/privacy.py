@@ -1,1 +1,0 @@
-"""The OpenStax privacy policy."""

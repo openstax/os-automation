@@ -132,9 +132,9 @@ class Utility(object):
         element = element if element else driver.find_element(*locator)
         Utility.scroll_to(driver=driver, element=element, shift=-80)
         sleep(0.5)
-        if driver.capabilities.get('browserName') == 'safari':
-            driver.execute_script(JAVASCRIPT_CLICK, element)
-        else:
+        try:
+            element.click()
+        except WebDriverException:
             for _ in range(10):
                 try:
                     driver.execute_script(JAVASCRIPT_CLICK, element)

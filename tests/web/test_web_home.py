@@ -1235,11 +1235,28 @@ def test_the_licensing_link_in_the_footer(web_base_url, selenium):
     """Test the footer's licensing link."""
     # GIVEN: a user viewing the Web page footer
     home = Home(selenium, web_base_url).open()
+    home.footer.show()
 
     # WHEN: they click the "Licensing" link
-    home.footer.show()
     license = home.footer.directory.view_licensing()
 
     # THEN: the licensing page is displayed
     assert(license.is_displayed())
     assert('license' in license.location)
+
+
+@test_case('C210332')
+@nondestructive
+@web
+def test_the_terms_of_use_link_in_the_footer(web_base_url, selenium):
+    """Test the footer's terms of use link."""
+    # GIVEN: a user viewing the Web page footer
+    home = Home(selenium, web_base_url).open()
+    home.footer.show()
+
+    # WHEN: they click the "Terms of Use" link
+    terms = home.footer.directory.view_the_terms_of_use()
+
+    # THEN: the terms page is displayed
+    assert(terms.is_displayed())
+    assert('tos' in terms.location)
