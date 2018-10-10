@@ -1330,3 +1330,21 @@ def test_the_github_link_in_the_footer(web_base_url, selenium):
     assert(github.is_displayed())
     assert('github' in github.location)
     assert(github.name == 'OpenStax')
+
+
+@test_case('C210337')
+@nondestructive
+@web
+def test_the_contact_us_link_in_the_footer_opens_the_contact_form(
+        web_base_url, selenium):
+    """Test the footer's contact link."""
+    # GIVEN: a user viewing the Web page footer
+    home = Home(selenium, web_base_url).open()
+    home.footer.show()
+
+    # WHEN: they click the "Contact Us" link
+    contact = home.footer.directory.go_to_the_contact_form()
+
+    # THEN: the contact form is displayed
+    assert(contact.is_displayed())
+    assert('contact' in contact.location)
