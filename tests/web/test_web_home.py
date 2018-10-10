@@ -1295,3 +1295,20 @@ def test_the_accessibility_statement_link_in_the_footer(
     # THEN: the accessibility statement page is displayed
     assert(accessibility.is_displayed())
     assert('accessibility-statement' in accessibility.location)
+
+
+@test_case('C210335')
+@nondestructive
+@web
+def test_the_careers_link_in_the_footer(web_base_url, selenium):
+    """Test the footer's careers link."""
+    # GIVEN: a user viewing the Web page footer
+    home = Home(selenium, web_base_url).open()
+    home.footer.show()
+
+    # WHEN: they click the "Careers" link
+    careers = home.footer.directory.view_openstax_career_opportunities()
+
+    # THEN: the jobs page is displayed
+    assert(careers.is_displayed())
+    assert('careers' in careers.location)
