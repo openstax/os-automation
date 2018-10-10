@@ -25,6 +25,8 @@ class License(LegalBase):
 
     URL_TEMPLATE = '/license'
 
+    _heading_locator = (By.CSS_SELECTOR, '#maincontent h2')
+
 
 class Terms(LegalBase):
     """The OpenStax.org terms of use."""

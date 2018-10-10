@@ -1348,3 +1348,20 @@ def test_the_contact_us_link_in_the_footer_opens_the_contact_form(
     # THEN: the contact form is displayed
     assert(contact.is_displayed())
     assert('contact' in contact.location)
+
+
+@test_case('C210338')
+@nondestructive
+@web
+def test_the_press_link_in_the_footer(web_base_url, selenium):
+    """Test the footer's press and news page link."""
+    # GIVEN: a user viewing the Web page footer
+    home = Home(selenium, web_base_url).open()
+    home.footer.show()
+
+    # WHEN: they click the "Press" link
+    press = home.footer.directory.view_press_releases()
+
+    # THEN: the press page is displayed
+    assert(press.is_displayed())
+    assert('press' in press.location)
