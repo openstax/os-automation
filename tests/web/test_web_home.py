@@ -1271,9 +1271,27 @@ def test_the_privacy_policy_link_in_the_footer(web_base_url, selenium):
     home = Home(selenium, web_base_url).open()
     home.footer.show()
 
-    # WHEN: they click the "Terms of Use" link
+    # WHEN: they click the "Privacy Policy" link
     privacy = home.footer.directory.view_the_privacy_policy()
 
-    # THEN: the terms page is displayed
+    # THEN: the privacy policy page is displayed
     assert(privacy.is_displayed())
     assert('privacy-policy' in privacy.location)
+
+
+@test_case('C210334')
+@nondestructive
+@web
+def test_the_accessibility_statement_link_in_the_footer(
+        web_base_url, selenium):
+    """Test the footer's accessibility statement link."""
+    # GIVEN: a user viewing the Web page footer
+    home = Home(selenium, web_base_url).open()
+    home.footer.show()
+
+    # WHEN: they click the "Accessibility Statement" link
+    accessibility = home.footer.directory.view_the_accessibility_statement()
+
+    # THEN: the accessibility statement page is displayed
+    assert(accessibility.is_displayed())
+    assert('accessibility-statement' in accessibility.location)
