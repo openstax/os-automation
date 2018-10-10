@@ -23,7 +23,7 @@ def test_menu_select(accounts_base_url, selenium):
 
 @test_case('C195540')
 @nondestructive
-def test_random(selenium):
+def test_random():
     """Get a random number between 0 and 50, inclusive, 10 times."""
     for _ in range(10):
         value = Utility.random(0, 50)
@@ -32,7 +32,7 @@ def test_random(selenium):
 
 @test_case('C195541')
 @nondestructive
-def test_random_name(selenium):
+def test_random_name():
     """Test the random name generator list."""
     for _ in range(25):
         name = Utility.random_name()

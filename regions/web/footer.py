@@ -52,7 +52,7 @@ class Footer(Region):
         @property
         def statement(self):
             """Return the hero banner statement."""
-            return self.root.text
+            return self.root.text.strip()
 
     class Directory(Region):
         """The site map directory links."""
@@ -67,8 +67,8 @@ class Footer(Region):
         _contact_us_locator = (By.CSS_SELECTOR, '[href$=contact]')
         _press_locator = (By.CSS_SELECTOR, '[href*=press]')
         _newsletter_locator = (By.LINK_TEXT, 'Newsletter')
-        _nonprofit_statement_locator = (By.CSS_SELECTOR, 'p:first-child')
-        _copyright_statement_locator = (By.CSS_SELECTOR, 'p:nth-child(2)')
+        _nonprofit_statement_locator = (By.CSS_SELECTOR, 'p:first-of-type')
+        _copyright_statement_locator = (By.CSS_SELECTOR, 'p:first-of-type ~ p')
         _ap_statement_locator = (By.TAG_NAME, 'ap-html')
 
         def view_licensing(self):
@@ -142,12 +142,14 @@ class Footer(Region):
         @property
         def copyright(self):
             """Return the OpenStax copyright statement."""
-            return self.find_element(*self._copyright_statement_locator).text
+            return (self.find_element(*self._copyright_statement_locator)
+                    .text.replace('\n', ' ').strip())
 
         @property
         def ap_statement(self):
             """Return the AP statement."""
-            return self.find_element(*self._ap_statement_locator).text
+            return (self.find_element(*self._ap_statement_locator)
+                    .text.replace('\n', ' ').strip())
 
     class Social(Region):
         """OpenStax social program Links."""

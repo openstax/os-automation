@@ -1365,3 +1365,25 @@ def test_the_press_link_in_the_footer(web_base_url, selenium):
     # THEN: the press page is displayed
     assert(press.is_displayed())
     assert('press' in press.location)
+
+
+@test_case('C210339')
+@nondestructive
+@web
+def test_footer_static_text(web_base_url, selenium):
+    """Test for the footer slogan, nonprofit status and copyright info."""
+    # GIVEN: a user viewing the Web page footer
+    home = Home(selenium, web_base_url).open()
+    home.footer.show()
+
+    # WHEN:
+
+    # THEN: the company slogan is stated
+    # AND:  the company nonprofit status is stated
+    # AND:  the copyright information is stated
+    assert('Access. The future of education.' in home.footer.box.statement)
+    assert('501(c)(3) nonprofit' in home.footer.directory.organization)
+    assert('licensed under a Creative Commons'
+           in home.footer.directory.copyright)
+    assert('trademarks registered and/or owned by the College Board'
+           in home.footer.directory.ap_statement)
