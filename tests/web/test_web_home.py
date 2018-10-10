@@ -1312,3 +1312,21 @@ def test_the_careers_link_in_the_footer(web_base_url, selenium):
     # THEN: the jobs page is displayed
     assert(careers.is_displayed())
     assert('careers' in careers.location)
+
+
+@test_case('C210336')
+@nondestructive
+@web
+def test_the_github_link_in_the_footer(web_base_url, selenium):
+    """Test the footer's GitHub link to OpenStax repositories."""
+    # GIVEN: a user viewing the Web page footer
+    home = Home(selenium, web_base_url).open()
+    home.footer.show()
+
+    # WHEN: they click the "Open Source Code" link
+    github = home.footer.directory.view_the_code()
+
+    # THEN: the OpenStax GitHub repository page is displayed in a new tab
+    assert(github.is_displayed())
+    assert('github' in github.location)
+    assert(github.name == 'OpenStax')

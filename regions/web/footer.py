@@ -62,6 +62,7 @@ class Footer(Region):
         _privacy_policy_locator = (By.CSS_SELECTOR, '[href$=privacy-policy]')
         _accessibility_statement_locator = (By.CSS_SELECTOR,
                                             '[href*=accessibility]')
+        _careers_locator = (By.CSS_SELECTOR, '[href$=careers]')
         _open_source_locator = (By.CSS_SELECTOR, '[href*=github]')
         _contact_us_locator = (By.CSS_SELECTOR, '[href$=contact]')
         _press_locator = (By.CSS_SELECTOR, '[href*=press]')
@@ -98,10 +99,17 @@ class Footer(Region):
             from pages.web.accessibility import Accessibility
             return go_to_(Accessibility(self.driver))
 
+        def view_openstax_career_opportunities(self):
+            """View the careers page."""
+            Utility.safari_exception_click(
+                self.driver, locator=self._careers_locator)
+            from pages.web.careers import Careers
+            return go_to_(Careers(self.driver))
+
         def view_the_code(self):
             """Open GitHub and view the OpenStax repositories."""
-            Utility.safari_exception_click(
-                self.driver, locator=self._opens_source_locator)
+            Utility.switch_to(
+                self.driver, link_locator=self._open_source_locator)
             from pages.github.home import GitHub
             return go_to_(GitHub(self.driver))
 
