@@ -151,7 +151,7 @@ class Footer(Region):
             return (self.find_element(*self._ap_statement_locator)
                     .text.replace('\n', ' ').strip())
 
-    class Social(Region):
+    class SocialLinks(Region):
         """OpenStax social program Links."""
 
         _facebook_locator = (By.CLASS_NAME, 'facebook')
@@ -161,28 +161,28 @@ class Footer(Region):
 
         def go_to_facebook(self):
             """Go to OpenStax's Facebook page."""
-            Utility.safari_exception_click(
-                self.driver, locator=self._facebook_locator)
+            Utility.switch_to(
+                self.driver, link_locator=self._facebook_locator)
             from pages.facebook.home import Facebook
             return go_to_(Facebook(self.driver))
 
         def go_to_twitter(self):
             """Go to OpenStax's Twitter page."""
-            Utility.safari_exception_click(
-                self.driver, locator=self._twitter_locator)
+            Utility.switch_to(
+                self.driver, link_locator=self._twitter_locator)
             from pages.twitter.home import Twitter
             return go_to_(Twitter(self.driver))
 
         def go_to_linkedin(self):
             """Go to OpenStax's LinkedIn company page."""
-            Utility.safari_exception_click(
-                self.driver, locator=self._linkedin_locator)
+            Utility.switch_to(
+                self.driver, link_locator=self._linkedin_locator)
             from pages.linkedin.home import LinkedIn
             return go_to_(LinkedIn(self.driver))
 
         def go_to_instagram(self):
             """Go to OpenStax's Instagram page."""
-            Utility.safari_exception_click(
-                self.driver, locator=self._instagram_locator)
+            Utility.switch_to(
+                self.driver, link_locator=self._instagram_locator)
             from pages.instagram.home import Instagram
             return go_to_(Instagram(self.driver))

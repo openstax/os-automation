@@ -18,11 +18,19 @@ class Facebook(Page):
     _log_in_button_locator = (By.ID, 'loginbutton')
     _continue_button_locator = (By.CLASS_NAME, '_51_n')
 
-    def wait_for_page_to_load(self):
-        """Override page load."""
-        self.wait.until(
-            lambda _: (self.find_element(*self._root_locator).is_displayed())
-        )
+    @property
+    def loaded(self):
+        """Return the root element to show when the page is loaded."""
+        return self.find_element(*self._root_locator)
+
+    def is_displayed(self):
+        """Return True if the Facebook page is displayed."""
+        return self.loaded.is_displayed()
+
+    @property
+    def location(self):
+        """Return the current URL."""
+        return self.driver.current_url
 
     @property
     def at_facebook(self):

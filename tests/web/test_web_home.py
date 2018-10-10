@@ -1387,3 +1387,71 @@ def test_footer_static_text(web_base_url, selenium):
            in home.footer.directory.copyright)
     assert('trademarks registered and/or owned by the College Board'
            in home.footer.directory.ap_statement)
+
+
+@test_case('C210340')
+@nondestructive
+@web
+def test_the_footer_openstax_facebook_link(web_base_url, selenium):
+    """Test the footer Facebook icon loads the OpenStax Facebook page."""
+    # GIVEN: a user viewing the Web page footer
+    home = Home(selenium, web_base_url).open()
+    home.footer.show()
+
+    # WHEN: they click the Facebook icon
+    facebook = home.footer.social.go_to_facebook()
+
+    # THEN: the OpenStax Facebook page is displayed in a new tab
+    assert(facebook.is_displayed())
+    assert('facebook' in facebook.location)
+
+
+@test_case('C210341')
+@nondestructive
+@web
+def test_the_footer_openstax_twitter_link(web_base_url, selenium):
+    """Test the footer Twitter icon loads the OpenStax Twitter feed."""
+    # GIVEN: a user viewing the Web page footer
+    home = Home(selenium, web_base_url).open()
+    home.footer.show()
+
+    # WHEN: they click the Twitter icon
+    twitter = home.footer.social.go_to_twitter()
+
+    # THEN: the OpenStax Twitter feed is displayed in a new tab
+    assert(twitter.is_displayed())
+    assert('twitter' in twitter.location)
+
+
+@test_case('C210342')
+@nondestructive
+@web
+def test_the_footer_openstax_linkedin_link(web_base_url, selenium):
+    """Test the footer LinkedIn icon loads the OpenStax LinkedIn page."""
+    # GIVEN: a user viewing the Web page footer
+    home = Home(selenium, web_base_url).open()
+    home.footer.show()
+
+    # WHEN: they click the LinkedIn icon
+    linkedin = home.footer.social.go_to_linkedin()
+
+    # THEN: the OpenStax LinkedIn company page is displayed in a new tab
+    assert(linkedin.is_displayed())
+    assert('linkedin' in linkedin.location)
+
+
+@test_case('C214021')
+@nondestructive
+@web
+def test_the_footer_openstax_instagram_link(web_base_url, selenium):
+    """Test the footer Instagram icon loads the OpenStax Instagram page."""
+    # GIVEN: a user viewing the Web page footer
+    home = Home(selenium, web_base_url).open()
+    home.footer.show()
+
+    # WHEN: they click the Instagram icon
+    instagram = home.footer.social.go_to_instagram()
+
+    # THEN: the OpenStax Instagram page is displayed in a new tab
+    assert(instagram.is_displayed())
+    assert('instagram' in instagram.location)
