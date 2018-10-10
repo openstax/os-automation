@@ -1260,3 +1260,20 @@ def test_the_terms_of_use_link_in_the_footer(web_base_url, selenium):
     # THEN: the terms page is displayed
     assert(terms.is_displayed())
     assert('tos' in terms.location)
+
+
+@test_case('C210333')
+@nondestructive
+@web
+def test_the_privacy_policy_link_in_the_footer(web_base_url, selenium):
+    """Test the footer's privacy policy link."""
+    # GIVEN: a user viewing the Web page footer
+    home = Home(selenium, web_base_url).open()
+    home.footer.show()
+
+    # WHEN: they click the "Terms of Use" link
+    privacy = home.footer.directory.view_the_privacy_policy()
+
+    # THEN: the terms page is displayed
+    assert(privacy.is_displayed())
+    assert('privacy-policy' in privacy.location)
