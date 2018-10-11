@@ -18,6 +18,7 @@ class Accessibility(WebBase):
         return self.find_element(*self._section_locator)
 
     def is_displayed(self):
+        """Return True if the first statement header is displayed."""
         return self.loaded.is_displayed()
 
     @property

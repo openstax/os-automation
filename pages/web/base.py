@@ -25,7 +25,7 @@ class WebBase(Page):
     @property
     def loaded(self):
         """Return True when the page-loaded class is added to the body tag."""
-        return self.root.is_displayed()
+        return self.find_element(*self._root_locator).is_displayed()
 
     @property
     def sticky_note(self):

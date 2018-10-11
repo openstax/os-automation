@@ -1,10 +1,9 @@
 """A marketing page for an OpenStax book."""
 
-from time import sleep
-
 from selenium.webdriver.common.by import By
 
 from pages.web.base import WebBase
+from utils.utilities import Utility, go_to_
 
 
 class Book(WebBase):
@@ -17,6 +16,33 @@ class Book(WebBase):
     _adoption_link_locator = (By.CSS_SELECTOR, '.let-us-know .link')
     _interest_link_locator = (By.CSS_SELECTOR, '.let-us-know .top')
 
+    _content_locator = (By.CSS_SELECTOR, '.details-tab')
+    _instructor_locator = (By.CSS_SELECTOR, '.instructor-resources')
+    _student_locator = (By.CSS_SELECTOR, '.student-resources')
+
+    @property
+    def root(self):
+        """Return the base node for the content."""
+        return self.find_element(*self._root_locator)
+
+    @property
+    def loaded(self):
+        """Return True when the book details page is loaded."""
+        details = self.find_element(*self._content_locator)
+        instructor = self.find_element(*self._instructor_locator)
+        student = self.find_element(*self._student_locator)
+        return (
+            Utility.is_image_visible(
+                self.driver, image=self.find_element(*self._banner_locator))
+            and Utility.has_children(details)
+            and Utility.has_children(instructor)
+            and Utility.has_children(student)
+        )
+
+    def is_displayed(self):
+        """Return True if the book details banner image is displayed."""
+        return self.find_element(*self._banner_locator).is_displayed()
+
     @property
     def title(self):
         """Return the book title."""
@@ -24,14 +50,14 @@ class Book(WebBase):
 
     def is_using(self):
         """Click the adoption report link."""
-        self.find_element(*self._adoption_link_locator).click()
-        sleep(1.0)
+        Utility.safari_exception_click(
+            self.driver, locator=self._adoption_link_locator)
         from pages.web.adoption import Adoption
-        return Adoption(self.driver)
+        return go_to_(Adoption(self.driver))
 
     def is_interested(self):
         """Click the interest report link."""
-        self.find_element(*self._interest_link_locator).click()
-        sleep(1.0)
+        Utility.safari_exception_click(
+            self.driver, locator=self._interest_link_locator)
         from pages.web.interest import Interest
-        return Interest(self.driver)
+        return go_to_(Interest(self.driver))

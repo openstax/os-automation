@@ -11,7 +11,6 @@ class Bookstore(WebBase):
 
     URL_TEMPLATE = '/bookstore-suppliers'
 
-    _root_locator = (By.TAG_NAME, 'main')
     _initial_image_locators = (By.CSS_SELECTOR, '#main .img')
     _banner_heading_locator = (By.CSS_SELECTOR, '.hero h1')
 
@@ -24,4 +23,5 @@ class Bookstore(WebBase):
 
     def is_displayed(self):
         """Return True if the blog pinned article is displayed."""
+        print(self.driver.page_source)
         return self.find_element(*self._banner_heading_locator).is_displayed()

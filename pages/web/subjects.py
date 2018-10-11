@@ -6,7 +6,7 @@ from pypom import Region
 from selenium.webdriver.common.by import By
 
 from pages.web.base import WebBase
-from utils.utilities import Utility
+from utils.utilities import Utility, go_to_
 from utils.web import Web
 
 
@@ -173,3 +173,14 @@ class Book(Region):
         if 'Fizyka' in self.title:
             return 'polish'
         return 'english'
+
+    def click(self):
+        """Click on the book cover."""
+        book_name = self.url_append
+        Utility.safari_exception_click(
+            self.driver, element=self.find_element(*self._url_locator))
+        from pages.web.book import Book as Details
+        return go_to_(Details(self.driver,
+                              self.page.base_url,
+                              self.page.timeout,
+                              book_name=book_name))

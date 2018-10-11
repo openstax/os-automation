@@ -73,6 +73,11 @@ class Utility(object):
             driver.execute_script(SHIFT_VIEW_BY, shift)
 
     @classmethod
+    def scroll_top(cls, driver):
+        """Scroll to the top of the browser screen."""
+        driver.execute_script('window.scrollTo(0, 0);')
+
+    @classmethod
     def random_hex(cls, length=20, lower=False):
         """Return a random hex number of size length."""
         line = ''.join([Utility.HEX_DIGITS[randint(0, 0xF)]
@@ -224,6 +229,13 @@ class Utility(object):
         select = randint(0, len(test_cards) - 1)
         use_card = test_cards[select]
         return (use_card['number'], use_card['cvv'])
+
+    @classmethod
+    def has_children(cls, element):
+        """Return True if a specific element has one or more children."""
+        locator = ('xpath', '/*')
+        children = element.find_elements(*locator)
+        return len(children) > 0
 
     @classmethod
     def is_image_visible(cls, driver, image=None, locator=None):

@@ -79,8 +79,10 @@ class Adoption(WebBase):
 
             Drop the text from the child element first.
             """
-            message = self.find_element(*self._student_message_locator).text
-            message = message.split('\n')[0]
+            message = (self.find_element(*self._student_message_locator)
+                       .get_attribute('innerHTML')
+                       .split('\n')[0]
+                       .split('<')[0])
             return message
 
         def go_back(self):

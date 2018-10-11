@@ -2,7 +2,7 @@
 
 from pages.web.adoption import Adoption
 from pages.web.home import WebHome
-from tests.markers import expected_failure, nondestructive, test_case, web
+from tests.markers import nondestructive, test_case, web
 from utils.web import Web
 
 
@@ -36,7 +36,6 @@ def test_adoption_form_links_to_the_interest_form(web_base_url, selenium):
 
 
 @test_case('C210387')
-@expected_failure
 @nondestructive
 @web
 def test_students_do_not_need_to_fill_out_the_adoption_form(
@@ -68,7 +67,7 @@ def test_students_do_not_need_to_fill_out_the_adoption_form(
     book_title = book.title
     adoption = book.is_using()
     adoption.form.select(Web.STUDENT)
-    book = adoption.form.go_back()
+    adoption.form.go_back()
 
     # THEN: the book page is displayed
     assert(book.is_displayed() and book.title == book_title)

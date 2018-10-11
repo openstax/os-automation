@@ -14,12 +14,18 @@ class Blog(WebBase):
     URL_TEMPLATE = '/blog'
 
     _root_locator = (By.TAG_NAME, 'main')
+    _article_locator = (By.CSS_SELECTOR, '.articles .article:not(.hidden)')
     _initial_image_locators = (By.CSS_SELECTOR, '#main .img')
     _pinned_article_locator = (By.CLASS_NAME, 'pinned')
 
     @property
     def loaded(self):
         """Return True when all of the blog article images are loaded."""
+        articles = self.find_elements(*self._article_locator)
+        for article in articles:
+            Utility.scroll_to(self.driver, element=article)
+            sleep(0.25)
+        Utility.scroll_top(self.driver)
         test = Utility.load_background_images(
             driver=self.driver,
             locator=self._initial_image_locators)

@@ -18,7 +18,7 @@ class Instagram(Page):
 
     def is_displayed(self):
         """Return True if the main content is loaded."""
-        return self.find_element(*self._username_locator).is_displayed()
+        return 'openstax' in self.driver.page_source
 
     @property
     def location(self):
