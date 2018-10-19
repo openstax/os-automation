@@ -3,7 +3,8 @@
 from time import sleep
 
 from pypom import Page
-from selenium.common.exceptions import NoSuchElementException, WebDriverException  # NOQA
+from selenium.common.exceptions import NoSuchElementException  # NOQA
+from selenium.common.exceptions import WebDriverException  # NOQA
 from selenium.webdriver.common.by import By
 
 

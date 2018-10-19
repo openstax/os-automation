@@ -30,11 +30,11 @@ def chrome_options(chrome_options, pytestconfig):
     """Set Chrome options."""
     if pytestconfig.getoption('--headless'):
         chrome_options.headless = True
-        chrome69 = ('Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_6) '
-                    'AppleWebKit/537.36 (KHTML, like Gecko) '
-                    'Chrome/69.0.3497.100 Safari/537.36')
-        chrome_options.add_argument('--user-agent={agent}'
-                                    .format(agent=chrome69))
+    chrome70 = ('Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_0) '
+                'AppleWebKit/537.36 (KHTML, like Gecko) '
+                'Chrome/70.0.3538.67 Safari/537.36')
+    chrome_options.add_argument('--user-agent={agent}'
+                                .format(agent=chrome70))
 
     # Required to run in Travis containers
     if pytestconfig.getoption('--no-sandbox'):
@@ -48,9 +48,7 @@ def chrome_options(chrome_options, pytestconfig):
     chrome_options.add_experimental_option(
         'prefs', {
             'profile.default_content_setting_values.notifications': 2, })
-
-    chrome_options.accept_untrusted_certs = True
-    chrome_options.add_argument('--enable-automation')
+    chrome_options.add_argument('--auto-open-devtools-for-tabs')
 
     return chrome_options
 
