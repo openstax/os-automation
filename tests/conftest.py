@@ -153,7 +153,7 @@ def pytest_addoption(parser):
                                        'tutor',
                                        'web'],
                               help='Systems under test\n' +
-                                   'Options: accounts, biglearn, exercises' +
+                                   'Options: accounts, biglearn, exercises\n' +
                                    '         hypothesis, payments, tutor, web')
 
 

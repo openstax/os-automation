@@ -3,7 +3,7 @@
 from time import sleep
 
 from pypom import Page
-from selenium.common.exceptions import NoSuchElementException
+from selenium.common.exceptions import NoSuchElementException, WebDriverException  # NOQA
 from selenium.webdriver.common.by import By
 
 
@@ -50,7 +50,12 @@ class Facebook(Page):
                 self.find_element(*self._continue_button_locator).click()
                 break
             except NoSuchElementException:
-                pass
+                sleep(1)
+            except WebDriverException as ex:
+                if '_3ixn' in str(ex):
+                    print(ex)
+                    print(self.driver.page_source)
+                sleep(1)
             finally:
                 sleep(1.0)
         # poll the webpage until it changes due to Safari slowness

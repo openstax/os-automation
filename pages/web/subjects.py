@@ -63,8 +63,6 @@ class Subjects(WebBase):
     @property
     def math(self):
         """Return the subjects filtered by math titles."""
-        print(self.driver.current_url)
-        print(self.driver.page_source)
         math_root = self.find_element(*self._math_category_locator)
         return self.Category(self, math_root)
 

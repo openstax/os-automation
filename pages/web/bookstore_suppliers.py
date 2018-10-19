@@ -3,7 +3,6 @@
 from selenium.webdriver.common.by import By
 
 from pages.web.base import WebBase
-from utils.utilities import Utility
 
 
 class Bookstore(WebBase):
@@ -17,11 +16,8 @@ class Bookstore(WebBase):
     @property
     def loaded(self):
         """Return True when the images are loaded."""
-        return Utility.is_image_visible(
-            driver=self.driver,
-            locator=self._initial_image_locators)
+        return 'order print copies' in self.driver.page_source
 
     def is_displayed(self):
         """Return True if the blog pinned article is displayed."""
-        print(self.driver.page_source)
         return self.find_element(*self._banner_heading_locator).is_displayed()

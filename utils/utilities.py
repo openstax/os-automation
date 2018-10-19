@@ -24,7 +24,7 @@ WAIT_FOR_IMAGE = ('https://cdnjs.cloudflare.com/ajax/libs/'
 
 
 class Utility(object):
-    """Helper functions for various Pages functions."""
+    """Helper functions for various Pages actions."""
 
     HEX_DIGITS = '0123456789ABCDEF'
 
@@ -78,6 +78,13 @@ class Utility(object):
         driver.execute_script('window.scrollTo(0, 0);')
 
     @classmethod
+    def get_error_information(cls, error):
+        """Break up an assertion error object."""
+        short = str(error.getrepr(style='short'))
+        info = short.split('AssertionError: ')[-1:][0]
+        return info.replace("'", '').replace('{', '').replace('}', '')
+
+    @classmethod
     def random_hex(cls, length=20, lower=False):
         """Return a random hex number of size length."""
         line = ''.join([Utility.HEX_DIGITS[randint(0, 0xF)]
@@ -88,6 +95,20 @@ class Utility(object):
     def random(cls, start=0, end=100000):
         """Return a random integer from start to end."""
         return randint(start, end)
+
+    @classmethod
+    def random_set(cls, group, size=1):
+        """Return a unique set from a list."""
+        if size <= 0:
+            return []
+        if size >= len(group):
+            return group
+        new_set = []
+        while len(new_set) < size:
+            selected = group[Utility.random(0, len(group) - 1)]
+            if selected not in new_set:
+                new_set.append(selected)
+        return new_set
 
     @classmethod
     def random_name(cls, is_male=None, is_female=None):

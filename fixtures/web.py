@@ -14,14 +14,12 @@ def web_base_url(request):
                 config.getini('web_base_url'))
     instance = (config.getoption('instance') or
                 config.getini('instance')).lower()
-    # Return early if testing the new Web instance set -- TEMP CONFIG
-    if '/cms-.' in base_url:
-        return base_url
-    # END TEMP CONFIG
     if instance and base_url:
         segments = base_url.split(SPLIT)
         insert = ('' if instance == 'prod' or instance == 'production' else
-                  'oscms-{0}.'.format(instance))
+                  '{staging}cms-{instance}.'
+                  .format(staging='os' if instance == 'staging' else '',
+                          instance=instance))
         return '{0}{3}{2}{1}'.format(*segments, SPLIT, insert)
     if base_url is not None:
         return base_url

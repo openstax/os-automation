@@ -10,12 +10,12 @@ class Partners(WebBase):
 
     URL_TEMPLATE = '/partners'
 
-    _banner_locator = (By.CLASS_NAME, 'partners-page')
+    _banner_locator = (By.CSS_SELECTOR, '.container h1')
 
     @property
     def loaded(self):
         """Return True if the hero banner is found."""
-        return self.find_element(*self._banner_locator)
+        return 'OpenStax Partners' in self.driver.page_source
 
     def is_displayed(self):
         """Return True if the hero banner is displayed."""

@@ -44,6 +44,14 @@ def chrome_options(chrome_options, pytestconfig):
     # a language other than English as their preferred language in Chrome
     chrome_options.add_argument('--lang=en')
 
+    # Disable Chrome notifications
+    chrome_options.add_experimental_option(
+        'prefs', {
+            'profile.default_content_setting_values.notifications': 2, })
+
+    chrome_options.accept_untrusted_certs = True
+    chrome_options.add_argument('--enable-automation')
+
     return chrome_options
 
 

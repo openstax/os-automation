@@ -3,11 +3,13 @@
 from time import sleep
 
 from pypom import Region
+from selenium.common.exceptions import WebDriverException
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as expect
 
 from pages.accounts.base import AccountsBase
 from pages.salesforce.home import Salesforce
+from utils.utilities import Utility
 
 
 class AccountsHome(AccountsBase):
@@ -22,7 +24,7 @@ class AccountsHome(AccountsBase):
 
     def log_in(self, user, password):
         """Log into the site with a specific user."""
-        return self.Login(self).login(user, password)
+        return self.login.login(user, password)
 
     def service_log_in(self, user, password):
         """Log into the site with a specific user from another service."""
@@ -33,12 +35,17 @@ class AccountsHome(AccountsBase):
         """Return user log in status."""
         return self.Login(self).logged_in
 
+    @property
+    def location(self):
+        """Return the current URL."""
+        return self.driver.current_url
+
     class Login(Region):
         """User login pane."""
 
         _user_field_locator = (By.ID, 'login_username_or_email')
         _password_field_locator = (By.ID, 'login_password')
-        _login_submit_button_locator = (By.CSS_SELECTOR, '.footer > input')
+        _login_submit_button_locator = (By.CSS_SELECTOR, '[type=submit]')
         _trouble_locator = (By.CSS_SELECTOR, '.trouble')
         _login_help_locator = (By.CSS_SELECTOR, '.login-help')
         _salesforce_link_locator = (By.CSS_SELECTOR, '.login-help a')
@@ -47,6 +54,7 @@ class AccountsHome(AccountsBase):
         _form_box_locator = (By.TAG_NAME, 'input')
         _error_locator = (By.CSS_SELECTOR, '.alert')
         _signup_locator = (By.CSS_SELECTOR, '.extra-info a')
+        _terms_agreement = (By.CSS_SELECTOR, '#agreement_i_agree')
 
         _password_reset_locator = (By.CSS_SELECTOR, '.footer a')
         _password_reset_fields_locator = (By.CSS_SELECTOR, '[type=password]')
@@ -103,6 +111,11 @@ class AccountsHome(AccountsBase):
             self.password.send_keys(password)
             return self
 
+        @property
+        def agreement_checkbox(self):
+            """Return the terms of use agreement checkbox."""
+            return self.find_element(*self._terms_agreement)
+
         def login(self, user, password):
             """Log into Accounts with a specific user."""
             self.service_login(user, password)
@@ -114,8 +127,14 @@ class AccountsHome(AccountsBase):
             """Log into the site with a specific user from another service."""
             self.user = user
             self.next()
+            assert(not self.get_login_error()), 'Username failed'
             self.password = password
             self.next()
+            assert(not self.get_login_error()), 'Password failed'
+            while 'terms/pose' in self.page.location:
+                Utility.scroll_to(self.driver, element=self.agreement_checkbox)
+                self.agreement_checkbox.click()
+                self.next()
 
         def facebook_login(self, user, facebook_user, password):
             """Log into the site with facebook."""
@@ -205,7 +224,10 @@ class AccountsHome(AccountsBase):
 
         def get_login_error(self):
             """Return Account log in error message."""
-            return self.find_element(*self._error_locator).text
+            try:
+                return self.find_element(*self._error_locator).text
+            except WebDriverException:
+                return ''
 
         def get_error_color(self):
             """Return the background color for missing or illegal fields."""
