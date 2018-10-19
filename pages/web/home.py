@@ -7,6 +7,7 @@ from selenium.common.exceptions import NoSuchElementException
 from selenium.webdriver.common.by import By
 
 from pages.web.base import WebBase
+from utils.utilities import Utility, go_to_
 from utils.web import Web as Support
 
 
@@ -16,6 +17,10 @@ class Link(Region):
     _title_locator = (By.CLASS_NAME, 'title')
     _text_locator = (By.CLASS_NAME, 'blurb')
     _link_locator = (By.TAG_NAME, 'a')
+
+    def is_displayed(self):
+        """Return True if the link root is displayed."""
+        return self.root.is_displayed()
 
     @property
     def title(self):
@@ -39,8 +44,7 @@ class Link(Region):
         a new link is added.
         """
         destination = self.link.get_attribute('href')
-        self.link.click()
-        sleep(1.0)
+        Utility.wait_for_overlay_then(self.link.click)
         if destination.endswith(Support.IMPACT):
             from pages.web.impact import OurImpact as Destination
         elif destination.endswith(Support.PARTNERS):
@@ -49,7 +53,7 @@ class Link(Region):
             from pages.web.subjects import Subjects as Destination
         elif destination.endswith(Support.TECHNOLOGY):
             from pages.web.technology import Technology as Destination
-        return Destination(self.driver)
+        return go_to_(Destination(self.driver))
 
 
 class WebHome(WebBase):
@@ -61,6 +65,15 @@ class WebHome(WebBase):
     _quote_locator = (By.CLASS_NAME, 'quote-buckets')
     _education_locator = (By.ID, 'education')
     _information_locator = (By.CLASS_NAME, 'buckets')
+
+    @property
+    def loaded(self):
+        """Return True when the banner carousel is displayed."""
+        return self.carousel.is_displayed()
+
+    def is_displayed(self):
+        """Return True when the Web home page is displayed."""
+        return self.loaded
 
     @property
     def carousel(self):
@@ -92,6 +105,10 @@ class WebHome(WebBase):
         _banner_image_locator = (By.CSS_SELECTOR, '.image-row a')
         _dot_button_locator = (By.CSS_SELECTOR, '.dots button')
 
+        def is_displayed(self):
+            """Return True when the carousel is displayed."""
+            return self.root.is_displayed()
+
         @property
         def banners(self):
             """Access the banner."""
@@ -101,16 +118,15 @@ class WebHome(WebBase):
         @property
         def dots(self):
             """Access the banner dot buttons."""
-            return [self.Dots(self, el)
+            return [self.Dot(self, el)
                     for el in self.find_elements(*self._dot_button_locator)]
 
         class Banner(Region):
             """An individual banner."""
 
-            @property
             def is_displayed(self):
                 """Return True if the banner is visible."""
-                return self.root.is_displayed
+                return self.root.is_displayed()
 
             @property
             def destination(self):
@@ -141,10 +157,9 @@ class WebHome(WebBase):
                 if self.destination.endswith(Support.SUBJECTS):
                     from pages.web.subjects import Subjects as Destination
                 elif self.destination.endswith(Support.ABOUT):
-                    from pages.web.about_us import AboutUs as Destination
-                self.root.click()
-                sleep(1.0)
-                return Destination(self.driver)
+                    from pages.web.about import AboutUs as Destination
+                Utility.wait_for_overlay_then(self.root.click)
+                return go_to_(Destination(self.driver))
 
         class Dot(Region):
             """An individual sellection button."""
@@ -156,9 +171,8 @@ class WebHome(WebBase):
 
             def click(self):
                 """Select a dot to display the corresponding banner."""
-                self.root.click()
-                sleep(0.5)
-                return WebHome(self.driver)
+                Utility.wait_for_overlay_then(self.root.click)
+                return go_to_(WebHome(self.driver))
 
     class Quotes(Region):
         """Quotes and page links."""
@@ -166,7 +180,7 @@ class WebHome(WebBase):
         _bucket_locator = (By.CLASS_NAME, 'quote-bucket')
 
         @property
-        def quote(self):
+        def quotes(self):
             """Access the individual quotes."""
             return [self.Quote(self, el)
                     for el in self.find_elements(*self._bucket_locator)]
@@ -181,6 +195,15 @@ class WebHome(WebBase):
             _image_locator = (By.CLASS_NAME, 'image')
             _block_quote_locator = (By.TAG_NAME, 'quote-html')
             _button_locator = (By.CLASS_NAME, 'btn')
+
+            def is_displayed(self):
+                """Return True if the quote box is displayed."""
+                return self.root.is_displayed()
+
+            def show(self):
+                """Scroll the quote box into view."""
+                Utility.scroll_to(self.driver, element=self.root, shift=-80)
+                return self
 
             @property
             def has_image(self):
@@ -203,7 +226,7 @@ class WebHome(WebBase):
             @property
             def text(self):
                 """Return the quote text."""
-                return self._text
+                return self.find_element(*self._block_quote_locator).text
 
             @property
             def image(self):
@@ -224,15 +247,18 @@ class WebHome(WebBase):
                 a new quote is added.
                 """
                 destination = self.button.get_attribute('href')
-                self.button.click()
-                sleep(1.0)
                 if Support.NEWSLETTER in destination:
+                    Utility.switch_to(self.driver, action=self.button.click)
                     from pages.web.newsletter \
                         import NewsletterSignup as Destination
                 elif Support.BOOKSTORE in destination:
-                    from pages.web.bookstore \
+                    self.button.click()
+                    from pages.web.bookstore_suppliers \
                         import Bookstore as Destination
-                return Destination(self.driver)
+                else:
+                    raise ValueError('Unknown destination: %s' % destination)
+                sleep(1.0)
+                return go_to_(Destination(self.driver))
 
     class Education(Region):
         """Education and page links."""
@@ -241,7 +267,7 @@ class WebHome(WebBase):
         _square_two_locator = (By.CLASS_NAME, 'square-2')
         _quote_locator = (By.CLASS_NAME, 'quote')
         _student_locator = (By.CLASS_NAME, 'student')
-        _link_locator = (By.CLASS_NAME, 'links')
+        _link_locator = (By.CSS_SELECTOR, '.links li')
 
         @property
         def box_one(self):
@@ -269,6 +295,11 @@ class WebHome(WebBase):
             return [Link(self, el)
                     for el in self.find_elements(*self._link_locator)]
 
+        def show(self):
+            """Scroll the section into view."""
+            Utility.scroll_to(self.driver, element=self.root, shift=-80)
+            return self.page
+
     class Information(Region):
         """Information buckets."""
 
@@ -280,6 +311,11 @@ class WebHome(WebBase):
             return [self.Bucket(self, el)
                     for el in self.find_elements(*self._bucket_locator)]
 
+        def show(self):
+            """Scroll the section into view."""
+            Utility.scroll_to(self.driver, element=self.root, shift=-80)
+            return self.page
+
         class Bucket(Link):
             """Individual information boxes."""
 
@@ -290,6 +326,6 @@ class WebHome(WebBase):
                 """Return True if the box has an image."""
                 try:
                     self.find_element(*self._image_locator)
+                    return True
                 except NoSuchElementException:
                     return False
-                return True

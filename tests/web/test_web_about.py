@@ -24,10 +24,10 @@ def test_the_about_us_panels_load(web_base_url, selenium):
     # AND:  the "What we do" section is displayed
     # AND:  the "Where we're going" section is displayed
     # AND:  the stats map is displayed
-    assert(about.who_we_are.is_displayed)
-    assert(about.what_we_do.is_displayed)
-    assert(about.where_were_going.is_displayed)
-    assert(about.content_map.is_displayed)
+    assert(about.who_we_are.is_displayed())
+    assert(about.what_we_do.is_displayed())
+    assert(about.where_were_going.is_displayed())
+    assert(about.content_map.is_displayed())
 
 
 @test_case('C210379')
@@ -42,7 +42,7 @@ def test_who_we_are_links(web_base_url, selenium):
     foundations = about.who_we_are.go_to_foundations()
 
     # THEN: the foundations page is displayed
-    assert(foundations.loaded)
+    assert(foundations.is_displayed())
 
     # WHEN: they return to the about page
     # AND:  click on the "educational resource companies" link
@@ -50,7 +50,7 @@ def test_who_we_are_links(web_base_url, selenium):
     resources = about.who_we_are.go_to_resources()
 
     # THEN: the partners page is displayed
-    assert(resources.loaded)
+    assert(resources.is_displayed())
 
     # WHEN: they return to the about page
     # AND:  click on the "FAQ page" link
@@ -58,7 +58,7 @@ def test_who_we_are_links(web_base_url, selenium):
     faq = about.who_we_are.go_to_faq()
 
     # THEN: the faq page is displayed
-    assert(faq.loaded)
+    assert(faq.is_displayed())
 
 
 @test_case('C210380')
@@ -73,7 +73,7 @@ def test_what_we_do_links(web_base_url, selenium):
     subjects = about.what_we_do.go_to_library()
 
     # THEN: the subjects page is displayed
-    assert(subjects.loaded)
+    assert(subjects.is_displayed())
 
     # WHEN: they return to the about page
     # AND:  click on the "OpenStax Tutor Beta" link
@@ -81,7 +81,7 @@ def test_what_we_do_links(web_base_url, selenium):
     tutor_marketing = about.what_we_do.go_to_tutor_marketing()
 
     # THEN: the Tutor marketing page is displayed
-    assert(tutor_marketing.loaded)
+    assert(tutor_marketing.is_displayed())
 
 
 @test_case('C210381')
@@ -102,7 +102,7 @@ def test_what_we_do_information_cards(web_base_url, selenium):
     subjects = about.what_we_do.cards[FIRST].click()
 
     # THEN: the subjects page is displayed
-    assert(subjects.loaded), \
+    assert(subjects.is_displayed()), \
         ('{dest} is not the Subjects page'
          .format(dest=selenium.current_url))
 
@@ -112,7 +112,7 @@ def test_what_we_do_information_cards(web_base_url, selenium):
     tutor_marketing = about.what_we_do.cards[SECOND].click()
 
     # THEN: the Tutor marketing page is displayed
-    assert(tutor_marketing.loaded), \
+    assert(tutor_marketing.is_displayed()), \
         ('{dest} is not the Tutor marketing page'
          .format(dest=selenium.current_url))
 
@@ -122,7 +122,7 @@ def test_what_we_do_information_cards(web_base_url, selenium):
     research = about.what_we_do.cards[THIRD].click()
 
     # THEN: the research page is displayed
-    assert(research.loaded), \
+    assert(research.is_displayed()), \
         ('{dest} is not the Research page'
          .format(dest=selenium.current_url))
 
@@ -132,7 +132,7 @@ def test_what_we_do_information_cards(web_base_url, selenium):
     partners = about.what_we_do.cards[FOURTH].click()
 
     # THEN: the partners page is displayed
-    assert(partners.loaded), \
+    assert(partners.is_displayed()), \
         ('{dest} is not the Partners page'
          .format(dest=selenium.current_url))
 
@@ -149,7 +149,7 @@ def test_where_were_going_links(web_base_url, selenium):
     tutor_marketing = about.where_were_going.go_to_student_learning()
 
     # THEN: the Tutor marketing page is displayed
-    assert(tutor_marketing.loaded)
+    assert(tutor_marketing.is_displayed())
 
     # WHEN: they return to the about page
     # AND:  click on the "research in learning science" link
@@ -157,4 +157,4 @@ def test_where_were_going_links(web_base_url, selenium):
     research = about.where_were_going.go_to_research()
 
     # THEN: the research page is displayed
-    assert(research.loaded)
+    assert(research.is_displayed())

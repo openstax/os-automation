@@ -17,7 +17,9 @@ def web_base_url(request):
     if instance and base_url:
         segments = base_url.split(SPLIT)
         insert = ('' if instance == 'prod' or instance == 'production' else
-                  'oscms-{0}.'.format(instance))
+                  '{staging}cms-{instance}.'
+                  .format(staging='os' if instance == 'staging' else '',
+                          instance=instance))
         return '{0}{3}{2}{1}'.format(*segments, SPLIT, insert)
     if base_url is not None:
         return base_url

@@ -10,9 +10,14 @@ class Supporters(WebBase):
 
     URL_TEMPLATE = '/foundation'
 
-    _banner_locator = (By.CLASS_NAME, 'foundation-page')
+    _root_locator = (By.TAG_NAME, 'main')
+    _hero_locator = (By.CSS_SELECTOR, '.hero h1')
 
     @property
     def loaded(self):
-        """Return True if the hero banner is found."""
-        return self.find_element(*self._banner_locator).is_displayed
+        """Return whether the hero banner is found."""
+        return self.find_element(*self._hero_locator)
+
+    def is_displayed(self):
+        """Return True if the supporters page is displayed."""
+        return self.find_element(*self._hero_locator).is_displayed()

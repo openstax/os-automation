@@ -5,14 +5,26 @@ from random import randint
 from time import sleep
 
 from faker import Faker
+from selenium.common.exceptions import ElementClickInterceptedException  # NOQA
+from selenium.common.exceptions import WebDriverException  # NOQA
 from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.common.keys import Keys
+from selenium.webdriver.support import expected_conditions as expect
 from selenium.webdriver.support.color import Color
-from selenium.webdriver.support.ui import Select
+from selenium.webdriver.support.ui import Select, WebDriverWait
+
+JAVASCRIPT_CLICK = 'arguments[0].click()'
+OPEN_TAB = 'window.open();'
+SCROLL_INTO_VIEW = 'arguments[0].scrollIntoView();'
+SHIFT_VIEW_BY = 'window.scrollBy(0, arguments[0])'
+
+JQUERY = 'https://code.jquery.com/jquery-3.3.1.slim.min.js'
+WAIT_FOR_IMAGE = ('https://cdnjs.cloudflare.com/ajax/libs/'
+                  'jquery.waitforimages/1.5.0/jquery.waitforimages.min.js')
 
 
 class Utility(object):
-    """Helper functions for various Pages functions."""
+    """Helper functions for various Pages actions."""
 
     HEX_DIGITS = '0123456789ABCDEF'
 
@@ -43,21 +55,34 @@ class Utility(object):
             .text
 
     @classmethod
-    def scroll_to(cls, driver, element_locator=None, element=None):
+    def scroll_to(
+            cls, driver, element_locator=None, element=None, shift=0):
         """Scroll the screen to the element.
 
         Args:
             driver (webdriver): the selenium browser object
             element_locator (Tuple(str, str)): a By selector and locator
             element (WebElement): a specific element
+            shift (int): adjust the page vertically by a set number of pixels
+                > 0 scrolls down, < 0 scrolls up
 
         """
-        if element_locator:
-            driver.execute_script(
-                'arguments[0].scrollIntoView();',
-                driver.find_element(*element_locator) if element_locator
-                else element
-            )
+        target = element if element else driver.find_element(*element_locator)
+        driver.execute_script(SCROLL_INTO_VIEW, target)
+        if shift != 0:
+            driver.execute_script(SHIFT_VIEW_BY, shift)
+
+    @classmethod
+    def scroll_top(cls, driver):
+        """Scroll to the top of the browser screen."""
+        driver.execute_script('window.scrollTo(0, 0);')
+
+    @classmethod
+    def get_error_information(cls, error):
+        """Break up an assertion error object."""
+        short = str(error.getrepr(style='short'))
+        info = short.split('AssertionError: ')[-1:][0]
+        return info.replace("'", '').replace('{', '').replace('}', '')
 
     @classmethod
     def random_hex(cls, length=20, lower=False):
@@ -70,6 +95,20 @@ class Utility(object):
     def random(cls, start=0, end=100000):
         """Return a random integer from start to end."""
         return randint(start, end)
+
+    @classmethod
+    def random_set(cls, group, size=1):
+        """Return a unique set from a list."""
+        if size <= 0:
+            return []
+        if size >= len(group):
+            return group
+        new_set = []
+        while len(new_set) < size:
+            selected = group[Utility.random(0, len(group) - 1)]
+            if selected not in new_set:
+                new_set.append(selected)
+        return new_set
 
     @classmethod
     def random_name(cls, is_male=None, is_female=None):
@@ -114,22 +153,68 @@ class Utility(object):
         ).lower()
 
     @classmethod
+    def safari_exception_click(cls, driver, locator=None, element=None):
+        """Click on elements which cause Safari 500 errors."""
+        element = element if element else driver.find_element(*locator)
+        Utility.scroll_to(driver=driver, element=element, shift=-80)
+        sleep(0.5)
+        try:
+            element.click()
+        except WebDriverException:
+            for _ in range(10):
+                try:
+                    driver.execute_script(JAVASCRIPT_CLICK, element)
+                    break
+                except ElementClickInterceptedException:
+                    sleep(1.0)
+
+    @classmethod
+    def wait_for_overlay(cls, driver, locator):
+        """Wait for an overlay to clear making the target available."""
+        WebDriverWait(driver, 15).until(
+            expect.element_to_be_clickable(locator))
+        sleep(1.0)
+
+    @classmethod
+    def wait_for_overlay_then(cls, target, time=10.0, interval=0.5):
+        """Wait for an overlay to clear then performing the target action."""
+        for _ in range(int(time / interval)):
+            try:
+                target()
+                break
+            except WebDriverException:
+                sleep(interval)
+        sleep(1.0)
+
+    @classmethod
     def new_tab(cls, driver):
         """Open another browser tab."""
-        driver.execute_script('window.open();')
+        driver.execute_script(OPEN_TAB)
         sleep(1)
         return driver.window_handles
 
     @classmethod
-    def switch_to(cls, driver, link_locator):
+    def switch_to(cls, driver, link_locator=None, action=None):
         """Switch to the other window handle."""
         current = driver.current_window_handle
-        driver.find_element(*link_locator).click()
+        data = None
+        if link_locator:
+            Utility.safari_exception_click(driver, link_locator)
+        else:
+            data = action()
         sleep(1)
         new_handle = 1 if current == driver.window_handles[0] else 0
         if len(driver.window_handles) > 1:
             driver.switch_to.window(
                 driver.window_handles[new_handle])
+        if data:
+            return data
+
+    @classmethod
+    def close_tab(cls, driver):
+        """Close the current tab and switch to the other tab."""
+        driver.close()
+        driver.switch_to.window(driver.window_handles[0])
 
     @classmethod
     def compare_colors(cls, left, right):
@@ -165,6 +250,78 @@ class Utility(object):
         select = randint(0, len(test_cards) - 1)
         use_card = test_cards[select]
         return (use_card['number'], use_card['cvv'])
+
+    @classmethod
+    def has_children(cls, element):
+        """Return True if a specific element has one or more children."""
+        locator = ('xpath', '/*')
+        children = element.find_elements(*locator)
+        return len(children) > 0
+
+    @classmethod
+    def is_image_visible(cls, driver, image=None, locator=None):
+        """Return True if an image is rendered."""
+        if image:
+            image_group = image if isinstance(image, list) else [image]
+        else:
+            image_group = driver.find_elements(*locator)
+            auto = ('return window.getComputedStyle('
+                    'arguments[0]).height!="auto"')
+            image_group = list(filter(
+                lambda img: driver.execute_script(auto, img),
+                image_group))
+        ie = 'internet explorer'
+        from selenium.webdriver import Ie
+        if (isinstance(driver, Ie) or
+                driver.capabilities.get('browserName') == ie):
+            script = 'return arguments[0].complete'
+        else:
+            script = (
+                'return ((typeof arguments[0].naturalWidth)!="undefined")')
+        from functools import reduce
+        map_list = (list(map(
+            lambda img: driver.execute_script(script, img), image_group)))
+        return reduce(lambda img, group: img and group, map_list, True)
+
+    @classmethod
+    def has_height(cls, driver, locator):
+        """Return True if the computed height isn't 'auto'."""
+        auto = ('return window.getComputedStyle('
+                'document.querySelector("{selector}")).height!="auto"'
+                ).format(selector=locator)
+        return driver.execute_script(auto)
+
+    @classmethod
+    def load_background_images(cls, driver, locator):
+        """Inject a script to wait for background image downloads.
+
+        Return True when complete so it can be used in loaded methods.
+        """
+        inject = (
+            r'''
+            ;(function() {
+                var head = document.getElementsByTagName("head")[0];
+                var jquery = document.createElement("script");
+                jquery.src = "JQUERY_STRING";
+                jquery.onload = function() {
+                    var $ = window.jQuery;
+                    var head = document.getElementsByTagName("head")[0];
+                    var image = document.createElement("script");
+                    image.src = "IMAGE_STRING";
+                    image.type = "text/javascript";
+                    head.appendChild(image);
+                    $("SELECTOR").waitForImages().done(
+                        function() { return true; });
+                };
+                head.appendChild(jquery);
+            });
+            return true;
+            '''
+            .replace('JQUERY_STRING', JQUERY)
+            .replace('IMAGE_STRING', WAIT_FOR_IMAGE)
+            .replace('SELECTOR', locator[1])
+        )
+        return driver.execute_script(inject)
 
 
 class Card(object):
@@ -243,3 +400,35 @@ class Status(object):
     RESPONSE = 'response'
     DECLINED = 'processor declined'
     FAILED = 'failed (3000)'
+
+
+def go_to_(destination):
+    """Follow a destination link and wait for the page to load."""
+    destination.wait_for_page_to_load()
+    return destination
+
+
+class Actions(ActionChains):
+    """Add a javascript retrieval action and a data return perform."""
+
+    def get_js_data(self, css_selector, data_type, expected):
+        """Trigger a style lookup."""
+        self._actions.append(
+            lambda: self.data_read(css_selector, data_type, expected))
+        result = None
+        if self._driver.w3c:
+            self.w3c_actions.perform()
+            result = self.data_read(css_selector, data_type, expected)
+        else:
+            for action in self._actions:
+                result = action()
+        sleep(1.0)
+        return result
+
+    def data_read(self, css_selector, data_type, expected):
+        """Compare the computed height to an expected value."""
+        element_height = (
+            'return window.getComputedStyle(document.querySelector'
+            '("{selector}"))["{data_type}"]'
+        ).format(selector=css_selector, data_type=data_type)
+        return self._driver.execute_script(element_height) == expected

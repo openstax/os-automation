@@ -1,9 +1,9 @@
 """OpenStax Web's shared footer region."""
 
-from time import sleep
-
 from pypom import Region
 from selenium.webdriver.common.by import By
+
+from utils.utilities import Utility, go_to_
 
 
 class Footer(Region):
@@ -15,9 +15,13 @@ class Footer(Region):
     _social_locator = (By.CLASS_NAME, 'social')
 
     @property
+    def loaded(self):
+        """Return True if the footer is currently displayed."""
+        return self.root.is_displayed()
+
     def is_displayed(self):
-        """Return true if the footer is currently displayed."""
-        return self.is_displayed
+        """Return True if the region is displayed."""
+        return self.root.is_displayed()
 
     @property
     def box(self):
@@ -37,13 +41,18 @@ class Footer(Region):
         region_root = self.find_element(*self._social_locator)
         return self.SocialLinks(self, region_root)
 
+    def show(self):
+        """Scroll the section into view."""
+        Utility.scroll_to(self.driver, element=self.root)
+        return self.page
+
     class Box(Region):
         """The footer's statement box."""
 
         @property
         def statement(self):
             """Return the hero banner statement."""
-            return self.root.text
+            return self.root.text.strip()
 
     class Directory(Region):
         """The site map directory links."""
@@ -53,69 +62,77 @@ class Footer(Region):
         _privacy_policy_locator = (By.CSS_SELECTOR, '[href$=privacy-policy]')
         _accessibility_statement_locator = (By.CSS_SELECTOR,
                                             '[href*=accessibility]')
+        _careers_locator = (By.CSS_SELECTOR, '[href$=careers]')
         _open_source_locator = (By.CSS_SELECTOR, '[href*=github]')
         _contact_us_locator = (By.CSS_SELECTOR, '[href$=contact]')
         _press_locator = (By.CSS_SELECTOR, '[href*=press]')
         _newsletter_locator = (By.LINK_TEXT, 'Newsletter')
-        _nonprofit_statement_locator = (By.CSS_SELECTOR, 'p:first-child')
-        _copyright_statement_locator = (By.CSS_SELECTOR, 'p:nth-child(2)')
+        _nonprofit_statement_locator = (By.CSS_SELECTOR, 'p:first-of-type')
+        _copyright_statement_locator = (By.CSS_SELECTOR, 'p:first-of-type ~ p')
         _ap_statement_locator = (By.TAG_NAME, 'ap-html')
 
         def view_licensing(self):
             """Go to the website license page."""
-            self.find_element(*self._license_locator).click()
-            sleep(1.0)
-            from pages.web.license import License
-            return License(self.driver)
+            Utility.safari_exception_click(
+                self.driver, locator=self._license_locator)
+            from pages.web.legal import License
+            return go_to_(License(self.driver))
 
         def view_the_terms_of_use(self):
             """View the terms of use."""
-            self.find_element(*self._terms_of_use_locator).click()
-            sleep(1.0)
-            from pages.web.terms import Terms
-            return Terms(self.driver)
+            Utility.safari_exception_click(
+                self.driver, locator=self._terms_of_use_locator)
+            from pages.web.legal import Terms
+            return go_to_(Terms(self.driver))
 
         def view_the_privacy_policy(self):
             """View the privacy policy."""
-            self.find_element(*self._privacy_policy_locator).click()
-            sleep(1.0)
-            from pages.web.privacy import PrivacyPolicy
-            return PrivacyPolicy(self.driver)
+            Utility.safari_exception_click(
+                self.driver, locator=self._privacy_policy_locator)
+            from pages.web.legal import PrivacyPolicy
+            return go_to_(PrivacyPolicy(self.driver))
 
         def view_the_accessibility_statement(self):
             """View the accessibility statement."""
-            self.find_element(*self._accessibility_statement_locator).click()
-            sleep(1.0)
+            Utility.safari_exception_click(
+                self.driver, locator=self._accessibility_statement_locator)
             from pages.web.accessibility import Accessibility
-            return Accessibility(self.driver)
+            return go_to_(Accessibility(self.driver))
+
+        def view_openstax_career_opportunities(self):
+            """View the careers page."""
+            Utility.safari_exception_click(
+                self.driver, locator=self._careers_locator)
+            from pages.web.careers import Careers
+            return go_to_(Careers(self.driver))
 
         def view_the_code(self):
             """Open GitHub and view the OpenStax repositories."""
-            self.find_element(*self._opens_source_locator).click()
-            sleep(1.0)
+            Utility.switch_to(
+                self.driver, link_locator=self._open_source_locator)
             from pages.github.home import GitHub
-            return GitHub(self.driver)
+            return go_to_(GitHub(self.driver))
 
         def go_to_the_contact_form(self):
             """Go to the contact form."""
-            self.find_element(*self._contact_us_locator).click()
-            sleep(1.0)
+            Utility.safari_exception_click(
+                self.driver, locator=self._contact_us_locator)
             from pages.web.contact import Contact
-            return Contact(self.driver)
+            return go_to_(Contact(self.driver))
 
         def view_press_releases(self):
             """View the press page."""
-            self.find_element(*self._press_locator).click()
-            sleep(1.0)
+            Utility.safari_exception_click(
+                self.driver, locator=self._press_locator)
             from pages.web.press import Press
-            return Press(self.driver)
+            return go_to_(Press(self.driver))
 
         def go_to_the_newsletter_signup_form(self):
             """Go to the newsletter signup."""
-            self.find_element(*self._newsletter_locator).click()
-            sleep(1.0)
+            Utility.safari_exception_click(
+                self.driver, locator=self._newsletter_locator)
             from pages.web.newsletter import NewsletterSignup
-            return NewsletterSignup(self.driver)
+            return go_to_(NewsletterSignup(self.driver))
 
         @property
         def organization(self):
@@ -125,37 +142,47 @@ class Footer(Region):
         @property
         def copyright(self):
             """Return the OpenStax copyright statement."""
-            return self.find_element(*self._copyright_statement_locator).text
+            return (self.find_element(*self._copyright_statement_locator)
+                    .text.replace('\n', ' ').strip())
 
         @property
         def ap_statement(self):
             """Return the AP statement."""
-            return self.find_element(*self._ap_statement_locator).text
+            return (self.find_element(*self._ap_statement_locator)
+                    .text.replace('\n', ' ').strip())
 
-    class Social(Region):
+    class SocialLinks(Region):
         """OpenStax social program Links."""
 
         _facebook_locator = (By.CLASS_NAME, 'facebook')
         _twitter_locator = (By.CLASS_NAME, 'twitter')
         _linkedin_locator = (By.CLASS_NAME, 'linkedin')
+        _instagram_locator = (By.CLASS_NAME, 'instagram')
 
         def go_to_facebook(self):
             """Go to OpenStax's Facebook page."""
-            self.find_element(*self._facebook_locator).click()
-            sleep(1.0)
+            Utility.switch_to(
+                self.driver, link_locator=self._facebook_locator)
             from pages.facebook.home import Facebook
-            return Facebook(self.driver)
+            return go_to_(Facebook(self.driver))
 
         def go_to_twitter(self):
             """Go to OpenStax's Twitter page."""
-            self.find_element(*self._twitter_locator).click()
-            sleep(1.0)
+            Utility.switch_to(
+                self.driver, link_locator=self._twitter_locator)
             from pages.twitter.home import Twitter
-            return Twitter(self.driver)
+            return go_to_(Twitter(self.driver))
 
         def go_to_linkedin(self):
             """Go to OpenStax's LinkedIn company page."""
-            self.find_element(*self._linkedin_locator).click()
-            sleep(1.0)
+            Utility.switch_to(
+                self.driver, link_locator=self._linkedin_locator)
             from pages.linkedin.home import LinkedIn
-            return LinkedIn(self.driver)
+            return go_to_(LinkedIn(self.driver))
+
+        def go_to_instagram(self):
+            """Go to OpenStax's Instagram page."""
+            Utility.switch_to(
+                self.driver, link_locator=self._instagram_locator)
+            from pages.instagram.home import Instagram
+            return go_to_(Instagram(self.driver))

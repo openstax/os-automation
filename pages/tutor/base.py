@@ -18,10 +18,19 @@ class TutorBase(Page):
 
     _root_locator = (By.TAG_NAME, 'body')
 
-    def wait_for_page_to_load(self):
-        """Override page load."""
-        self.wait.until(
-            lambda _: self.find_element(*self._root_locator).is_displayed())
+    @property
+    def loaded(self):
+        """Override the default loaded function."""
+        return self.find_element(*self._root_locator).is_displayed()
+
+    def is_displayed(self):
+        """Return True when the Tutor page is loaded."""
+        return self.loaded
+
+    @property
+    def location(self):
+        """Return the current URL."""
+        return self.driver.current_url
 
     @property
     def header(self):
@@ -44,6 +53,14 @@ class TutorBase(Page):
     def log_in(self, username, password):
         """Log into Tutor."""
         return
+
+    def close_tab(self):
+        """Close the current tab and switch to the remaining one.
+
+        Assumes 2 browser tabs are open.
+        """
+        Utility.close_tab(self.driver)
+        return self
 
     class Header(Region):
         """Tutor landing page header."""

@@ -5,6 +5,8 @@ from time import sleep
 from pypom import Page
 from selenium.webdriver.common.by import By
 
+from utils.utilities import Utility
+
 
 class Salesforce(Page):
     """OpenStax Salesforce help homepage."""
@@ -30,3 +32,11 @@ class Salesforce(Page):
         self.wait.until(lambda _: self.find_element(*self._title_locator)
                         .is_displayed())
         return self.find_element(*self._title_locator).text.strip()
+
+    def close_tab(self):
+        """Close the current tab and switch to the remaining one.
+
+        Assumes 2 browser tabs are open.
+        """
+        Utility.close_tab(self.driver)
+        return self

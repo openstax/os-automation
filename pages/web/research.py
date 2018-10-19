@@ -1,8 +1,5 @@
 """The Web research overview page."""
 
-# from time import sleep
-#
-# from pypom import Region
 from selenium.webdriver.common.by import By
 
 from pages.web.base import WebBase
@@ -18,4 +15,8 @@ class Research(WebBase):
     @property
     def loaded(self):
         """Override the base loader."""
-        return self.find_element(*self._root_locator).is_displayed
+        return self.find_element(*self._title_locator)
+
+    def is_displayed(self):
+        """Return True if the research page is displayed."""
+        return self.find_element(*self._title_locator).is_displayed()

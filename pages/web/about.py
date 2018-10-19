@@ -6,6 +6,7 @@ from pypom import Region
 from selenium.webdriver.common.by import By
 
 from pages.web.base import WebBase
+from utils.utilities import Utility, go_to_
 from utils.web import Web
 
 
@@ -14,17 +15,24 @@ class AboutUs(WebBase):
 
     URL_TEMPLATE = '/about'
 
-    _who_section_locator = (By.CLASS_NAME, 'who')
-    _what_section_locator = (By.CLASS_NAME, 'what')
-    _where_section_locator = (By.CLASS_NAME, 'where')
+    _root_locator = (By.ID, 'main')
+    _image_locators = (By.CSS_SELECTOR, '#main img')
+    _who_section_locator = (By.CSS_SELECTOR, 'section.who')
+    _what_section_locator = (By.CSS_SELECTOR, 'section.what')
+    _where_section_locator = (By.CSS_SELECTOR, 'section.where')
     _map_locator = (By.CLASS_NAME, 'map')
 
     @property
     def loaded(self):
         """Wait until the three panels are displayed."""
-        return (self.who_we_are.is_displayed
-                and self.what_we_do.is_displayed
-                and self.where_were_going.is_displayed)
+        status = (self.who_we_are.is_displayed() and
+                  self.what_we_do.is_displayed() and
+                  self.where_were_going.is_displayed())
+        return status
+
+    def is_displayed(self):
+        """Return True when the About Us page is loaded."""
+        return self.loaded
 
     @property
     def who_we_are(self):
@@ -57,31 +65,30 @@ class AboutUs(WebBase):
         _resources_link_locator = (By.CSS_SELECTOR, '[href$=partners]')
         _faq_link_locator = (By.CSS_SELECTOR, '[href$=faq]')
 
-        @property
         def is_displayed(self):
             """Return True if the panel is displayed."""
-            return self.root.is_displayed
+            return self.root.is_displayed()
 
         def go_to_foundations(self):
             """Follow the philanthropic foundations link."""
             self.find_element(*self._foundation_link_locator).click()
             sleep(1.0)
             from pages.web.supporters import Supporters
-            return Supporters(self.driver)
+            return go_to_(Supporters(self.driver))
 
         def go_to_resources(self):
             """Follow the educational resources link."""
             self.find_element(*self._resources_link_locator).click()
             sleep(1.0)
             from pages.web.partners import Partners
-            return Partners(self.driver)
+            return go_to_(Partners(self.driver))
 
         def go_to_faq(self):
             """Follow the FAQ link."""
             self.find_element(*self._faq_link_locator).click()
             sleep(1.0)
             from pages.web.faq import FAQ
-            return FAQ(self.driver)
+            return go_to_(FAQ(self.driver))
 
     class WhatWeDo(Region):
         """The What we do panel."""
@@ -90,24 +97,23 @@ class AboutUs(WebBase):
         _tutor_marketing_link_locator = (By.CSS_SELECTOR, '[href$="-tutor"]')
         _card_locator = (By.CLASS_NAME, 'card')
 
-        @property
         def is_displayed(self):
             """Return True if the panel is displayed."""
-            return self.root.is_displayed
+            return self.root.is_displayed()
 
         def go_to_library(self):
             """Follow the current library link."""
             self.find_element(*self._library_link_locator).click()
             sleep(1.0)
             from pages.web.subjects import Subjects
-            return Subjects(self.driver)
+            return go_to_(Subjects(self.driver))
 
         def go_to_tutor_marketing(self):
             """Follow the OpenStax Tutor Beta link."""
             self.find_element(*self._tutor_marketing_link_locator).click()
             sleep(1.0)
             from pages.web.tutor import TutorMarketing
-            return TutorMarketing(self.driver)
+            return go_to_(TutorMarketing(self.driver))
 
         @property
         def cards(self):
@@ -126,7 +132,7 @@ class AboutUs(WebBase):
             def click(self):
                 """Click the card."""
                 href = self.root.get_attribute('href')
-                self.root.click()
+                Utility.safari_exception_click(self.driver, element=self.root)
                 if Web.SUBJECTS in href:
                     from pages.web.subjects import Subjects as Destination
                 elif Web.TUTOR in href:
@@ -139,7 +145,7 @@ class AboutUs(WebBase):
                     raise PageNotFound('{dest} is not a known destination'
                                        .format(dest=href.split('/')[-1]))
                 sleep(1.0)
-                return Destination(self.driver)
+                return go_to_(Destination(self.driver))
 
             @property
             def text(self):
@@ -149,27 +155,28 @@ class AboutUs(WebBase):
     class WhereWereGoing(Region):
         """The Where we're going panel."""
 
-        _tutor_marketing_link_locator = (By.CSS_SELECTOR, '[href$="-tutor"]')
+        _tutor_marketing_link_locator = (By.LINK_TEXT,
+                                         'improving student learning')
         _research_link_locator = (By.CSS_SELECTOR, '[href$=research]')
 
-        @property
         def is_displayed(self):
             """Return True if the panel is displayed."""
-            return self.root.is_displayed
+            return self.root.is_displayed()
 
         def go_to_student_learning(self):
             """Follow the improving student learning link."""
-            self.find_element(*self._tutor_marketing_link_locator).click()
+            Utility.safari_exception_click(
+                self.driver, self._tutor_marketing_link_locator)
             sleep(1.0)
             from pages.web.tutor import TutorMarketing
-            return TutorMarketing(self.driver)
+            return go_to_(TutorMarketing(self.driver))
 
         def go_to_research(self):
             """Follow the research in learning science link."""
             self.find_element(*self._research_link_locator).click()
             sleep(1.0)
             from pages.web.research import Research
-            return Research(self.driver)
+            return go_to_(Research(self.driver))
 
 
 class PageNotFound(Exception):

@@ -3,8 +3,64 @@
 from time import sleep
 
 from pypom import Region
-from selenium.common.exceptions import NoSuchElementException
+from selenium.common.exceptions import WebDriverException
 from selenium.webdriver.common.by import By
+
+from utils.utilities import Actions, Utility, go_to_
+from utils.web import Web
+
+
+class WebNavMenu(Region):
+    """Shared nav menu functionality."""
+
+    def is_displayed(self):
+        """Return True if the region is displayed."""
+        return self.root.is_displayed()
+
+    def _is_available(self, label, menu, options):
+        """Return True if the menu option is available."""
+        locator = ('li.{menu}-dropdown {topic}'
+                   .format(menu=menu, topic=options.get(label)))
+        return Utility.has_height(self.driver, locator)
+
+    def _hover(self, locator):
+        """Return the CSS style of a hovered element."""
+        menu = self.root
+        option = locator[1]
+        action = (
+            Actions(self.driver)
+            .move_to_element(menu)
+            .pause(1)
+            .get_js_data(option, 'height', 'auto')
+        )
+        # if the result is 'auto', the menu option isn't displayed
+        return not action
+
+    def open(self):
+        """Select the menu."""
+        sleep(0.5)
+        is_expanded = self.find_element(*self._menu_expand_locator) \
+            .get_attribute('aria-expanded') == 'true'
+        if not is_expanded:
+            target = (
+                self._open_menu_locator[0],
+                '.{parent} {menu_locator}'.format(
+                    parent='.'.join(self.root.get_attribute('class').split()),
+                    menu_locator=self._open_menu_locator[1]))
+            Utility.safari_exception_click(self.driver, locator=target)
+        sleep(0.25)
+        return self
+
+    def _selection_helper(self, locator, destination, new_tab=False):
+        """Select the corresponding option."""
+        self.open()
+        sleep(0.5)
+        if new_tab:
+            Utility.switch_to(self.driver, link_locator=locator)
+        else:
+            Utility.safari_exception_click(self.driver, locator=locator)
+        sleep(1.0)
+        return go_to_(destination(self.driver))
 
 
 class WebNav(Region):
@@ -12,22 +68,50 @@ class WebNav(Region):
 
     _root_locator = (By.CLASS_NAME, 'nav')
     _openstax_logo_locator = (By.CSS_SELECTOR, '.os-logo > a')
+    _slogan_locator = (By.CSS_SELECTOR, '.logo-quote')
     _subjects_dropdown_locator = (By.CLASS_NAME, 'subjects-dropdown')
     _technology_dropdown_locator = (By.CLASS_NAME, 'technology-dropdown')
     _what_we_do_dropdown_locator = (By.CLASS_NAME, 'what-we-do-dropdown')
     _user_menu_locator = (By.CLASS_NAME, 'login')
+    _back_link_locator = (By.CSS_SELECTOR, 'a.close')
+    _meta_menu_locator = (By.CLASS_NAME, 'expand')
 
-    @property
     def is_displayed(self):
-        """Return True if the site navigation bar is visible."""
-        return self.find_element(*self._openstax_logo_locator).is_displayed
+        """Return True if the nav bar is displayed."""
+        if not self.root.is_displayed():
+            return False
+        current_width = self.driver.get_window_size().get('width')
+        return (
+            (current_width > 960) or
+            (current_width <= 960 and self.meta.is_open)
+        )
+
+    def is_hidden(self):
+        """Return True if the nav bar is not visible due to the mobile menu."""
+        if (not self.meta.is_open and
+                self.driver.get_window_size().get('width') <= 960):
+            return True
+        return False
 
     def go_home(self):
         """Return to the home page by clicking on the OpenStax logo."""
-        self.find_element(*self._openstax_logo_locator).click()
-        sleep(1.0)
+        Utility.safari_exception_click(self.driver,
+                                       locator=self._openstax_logo_locator)
         from pages.web.home import WebHome
-        return WebHome(self.driver)
+        return go_to_(WebHome(self.driver))
+
+    @property
+    def slogan(self):
+        """Access the slogan."""
+        return self.find_element(*self._slogan_locator).text
+
+    def slogan_visible(self):
+        """Return True if the text is displayed."""
+        element_height = (
+            'return window.getComputedStyle(document.querySelector'
+            '("{selector}"))["height"]'
+        ).format(selector=self._slogan_locator[1])
+        return self.driver.execute_script(element_height) != '0px'
 
     @property
     def subjects(self):
@@ -50,26 +134,83 @@ class WebNav(Region):
     @property
     def login(self):
         """Access the Login option or menu."""
-        return self.Login(self)
+        region_root = self.find_element(*self._user_menu_locator)
+        return self.Login(self, region_root)
 
-    class Subjects(Region):
+    def back(self):
+        """Click on the back link within the mobile menu.
+
+        Use a document query because the back button and menu name are
+        outside the scope of the Web Nav region but are only used in
+        the nav.
+        """
+        sleep(0.5)
+        self.driver.execute_script(
+            'document.querySelector("%s").click()' %
+            self._back_link_locator[1])
+        sleep(1.0)
+        return self
+
+    @property
+    def meta(self):
+        """Access the meta menu for condensed views."""
+        region_root = self.find_element(*self._meta_menu_locator)
+        return self.Meta(self, region_root)
+
+    class Meta(Region):
+        """The meta menu control for non-full screen viewers."""
+
+        def is_displayed(self):
+            """Return True if the region is displayed."""
+            return self.root.is_displayed()
+
+        @property
+        def is_open(self):
+            """Return True if the meta menu for mobile displays is open."""
+            status = self.driver.execute_script(
+                'return document.querySelector("body.no-scroll");')
+            return bool(status)
+
+        def toggle_menu(self):
+            """Click the menu to open or close it.
+
+            If the page overlay is still in place, wait and retry.
+            """
+            Utility.wait_for_overlay_then(self.root.click)
+            return self
+
+    class Subjects(WebNavMenu):
         """The Subject navigation menu dropdown."""
 
         _open_menu_locator = (By.CSS_SELECTOR, '[href="."]')
-        _all_option_locator = (By.CSS_SELECTOR, '[href$=subjects]')
+        _menu_expand_locator = (By.CSS_SELECTOR, 'nav.dropdown-menu')
+        _all_option_locator = (By.CSS_SELECTOR, '[href$=view-all]')
         _math_option_locator = (By.CSS_SELECTOR, '[href$=math]')
         _science_option_locator = (By.CSS_SELECTOR, '[href$=science]')
         _social_sciences_option_locator = (By.CSS_SELECTOR,
                                            '[href$=social-sciences]')
         _humanities_option_locator = (By.CSS_SELECTOR, '[href$=humanities]')
-        _ap_option_locator = (By.CSS_SELECTOR, '[href$=AP]')
+        _business_option_locator = (By.CSS_SELECTOR, '[href$=business]')
+        _ap_option_locator = (By.CSS_SELECTOR, '[href$=ap]')
 
-        @property
-        def open(self):
-            """Select the Subjects menu."""
-            self.find_element(*self._open_menu_locator).click()
+        def is_available(self, label):
+            """Return True if the menu option is available."""
             sleep(0.5)
-            return self
+            subjects = {
+                Web.VIEW_ALL: self._all_option_locator[1],
+                Web.VIEW_MATH: self._math_option_locator[1],
+                Web.VIEW_SCIENCE: self._science_option_locator[1],
+                Web.VIEW_SOCIAL_SCIENCES: (
+                    self._social_sciences_option_locator[1]),
+                Web.VIEW_HUMANITIES: self._humanities_option_locator[1],
+                Web.VIEW_BUSINESS: self._business_option_locator[1],
+                Web.VIEW_AP: self._ap_option_locator[1],
+            }
+            return self._is_available(label, 'subjects', subjects)
+
+        def hover(self):
+            """Return the CSS style of a hovered element."""
+            return self._hover(self._all_option_locator)
 
         @property
         def all(self):
@@ -78,8 +219,10 @@ class WebNav(Region):
 
         def view_all(self):
             """View all book subjects."""
-            return self.open._selection_helper(
-                self._all_option_locator)
+            from pages.web.subjects import Subjects
+            return self.open()._selection_helper(
+                self._all_option_locator,
+                Subjects)
 
         @property
         def math(self):
@@ -88,8 +231,10 @@ class WebNav(Region):
 
         def view_math(self):
             """View all math books."""
-            return self.open._selection_helper(
-                self._math_option_locator)
+            from pages.web.subjects import Subjects
+            return self.open()._selection_helper(
+                self._math_option_locator,
+                Subjects)
 
         @property
         def science(self):
@@ -98,18 +243,46 @@ class WebNav(Region):
 
         def view_science(self):
             """View all science books."""
-            return self.open._selection_helper(
-                self._science_option_locator)
+            from pages.web.subjects import Subjects
+            return self.open()._selection_helper(
+                self._science_option_locator,
+                Subjects)
 
         @property
-        def social_science(self):
+        def social_sciences(self):
             """Return the social science subjects link."""
-            return self.find_element(*self._social_science_option_locator)
+            return self.find_element(*self._social_sciences_option_locator)
 
-        def view_social_science(self):
+        def view_social_sciences(self):
             """View all social science books."""
-            return self.open._selection_helper(
-                self._social_sciences_option_locator)
+            from pages.web.subjects import Subjects
+            return self.open()._selection_helper(
+                self._social_sciences_option_locator,
+                Subjects)
+
+        @property
+        def humanities(self):
+            """Return the humanities subjects link."""
+            return self.find_element(*self._humanities_option_locator)
+
+        def view_humanities(self):
+            """View all humanities books."""
+            from pages.web.subjects import Subjects
+            return self.open()._selection_helper(
+                self._humanities_option_locator,
+                Subjects)
+
+        @property
+        def business(self):
+            """Return the business subjects link."""
+            return self.find_element(*self._business_option_locator)
+
+        def view_business(self):
+            """View all business books."""
+            from pages.web.subjects import Subjects
+            return self.open()._selection_helper(
+                self._business_option_locator,
+                Subjects)
 
         @property
         def ap(self):
@@ -118,30 +291,32 @@ class WebNav(Region):
 
         def view_ap(self):
             """View all AP books."""
-            return self.open._selection_helper(
-                self._ap_option_locator)
-
-        def _selection_helper(self, locator):
-            """Select the corresponding option."""
-            self.open.find_element(*locator).click()
-            sleep(1.0)
             from pages.web.subjects import Subjects
-            return Subjects(self.driver)
+            return self.open()._selection_helper(
+                self._ap_option_locator,
+                Subjects)
 
-    class Technology(Region):
+    class Technology(WebNavMenu):
         """The Technology navigation menu dropdown."""
 
         _open_menu_locator = (By.CSS_SELECTOR, '[href="."]')
+        _menu_expand_locator = (By.CSS_SELECTOR, 'nav.dropdown-menu')
         _technology_option_locator = (By.CSS_SELECTOR, '[href$=technology]')
         _tutor_option_locator = (By.CSS_SELECTOR, '[href$=openstax-tutor]')
         _partners_option_locator = (By.CSS_SELECTOR, '[href$=partners]')
 
-        @property
-        def open(self):
-            """Select the Technology menu."""
-            self.find_element(*self._open_menu_locator).click()
-            sleep(0.5)
-            return self
+        def hover(self):
+            """Return the CSS style of a hovered element."""
+            return self._hover(self._technology_option_locator)
+
+        def is_available(self, label):
+            """Return True if the menu option is available."""
+            topics = {
+                Web.VIEW_TECHNOLOGY: self._technology_option_locator[1],
+                Web.VIEW_TUTOR: self._tutor_option_locator[1],
+                Web.VIEW_PARTNERS: self._partners_option_locator[1],
+            }
+            return self._is_available(label, 'technology', topics)
 
         @property
         def technology(self):
@@ -150,10 +325,10 @@ class WebNav(Region):
 
         def view_technology(self):
             """View the technology page."""
-            self.open.technology.click()
-            sleep(1.0)
             from pages.web.technology import Technology
-            return Technology(self.driver)
+            return self.open()._selection_helper(
+                self._technology_option_locator,
+                Technology)
 
         @property
         def tutor(self):
@@ -162,10 +337,10 @@ class WebNav(Region):
 
         def view_tutor(self):
             """View the OpenStax Tutor beta marketing page."""
-            self.open.tutor.click()
-            sleep(1.0)
-            from pages.web.tutor_marketing import TutorMarketing
-            return TutorMarketing(self.driver)
+            from pages.web.tutor import TutorMarketing
+            return self.open()._selection_helper(
+                self._tutor_option_locator,
+                TutorMarketing)
 
         @property
         def partners(self):
@@ -174,25 +349,32 @@ class WebNav(Region):
 
         def view_partners(self):
             """View the OpenStax partners page."""
-            self.open.partners.click()
-            sleep(1.0)
             from pages.web.partners import Partners
-            return Partners(self.driver)
+            return self.open()._selection_helper(
+                self._partners_option_locator,
+                Partners)
 
-    class WhatWeDo(Region):
+    class WhatWeDo(WebNavMenu):
         """The What we do navigation menu dropdown."""
 
         _open_menu_locator = (By.CSS_SELECTOR, '[href="."]')
+        _menu_expand_locator = (By.CSS_SELECTOR, 'nav.dropdown-menu')
         _about_us_option_locator = (By.CSS_SELECTOR, '[href$=about]')
         _team_option_locator = (By.CSS_SELECTOR, '[href$=team]')
         _research_option_locator = (By.CSS_SELECTOR, '[href$=research]')
 
-        @property
-        def open(self):
-            """Select the What we do menu."""
-            self.find_element(*self._open_menu_locator).click()
-            sleep(0.5)
-            return self
+        def hover(self):
+            """Return the CSS style of a hovered element."""
+            return self._hover(self._about_us_option_locator)
+
+        def is_available(self, label):
+            """Return True if the menu option is available."""
+            groups = {
+                Web.VIEW_ABOUT_US: self._about_us_option_locator[1],
+                Web.VIEW_TEAM: self._team_option_locator[1],
+                Web.VIEW_RESEARCH: self._research_option_locator[1],
+            }
+            return self._is_available(label, 'what-we-do', groups)
 
         @property
         def about_us(self):
@@ -201,10 +383,10 @@ class WebNav(Region):
 
         def view_about_us(self):
             """View the About Us page."""
-            self.open.about_us.click()
-            sleep(1.0)
-            from pages.web.about_us import AboutUs
-            return AboutUs(self.driver)
+            from pages.web.about import AboutUs
+            return self.open()._selection_helper(
+                self._about_us_option_locator,
+                AboutUs)
 
         @property
         def team(self):
@@ -213,10 +395,10 @@ class WebNav(Region):
 
         def view_team(self):
             """View the OpenStax team page."""
-            self.open.team.click()
-            sleep(1.0)
             from pages.web.team import Team
-            return Team(self.driver)
+            return self.open()._selection_helper(
+                self._team_option_locator,
+                Team)
 
         @property
         def research(self):
@@ -225,55 +407,63 @@ class WebNav(Region):
 
         def view_research(self):
             """View the OpenStax researcher page."""
-            self.open.research.click()
-            sleep(1.0)
             from pages.web.research import Research
-            return Research(self.driver)
+            return self.open()._selection_helper(
+                self._research_option_locator,
+                Research)
 
-    class Login(Region):
+    class Login(WebNavMenu):
         """The login option and menu."""
 
-        _log_in_link_locator = (By.LINK_TEXT, 'Login')
+        _menu_expand_locator = (By.CSS_SELECTOR, 'nav.dropdown-menu')
+        _log_in_link_locator = (By.CSS_SELECTOR, '.pardotTrackClick')
         _logged_in_locator = (By.CLASS_NAME, 'login-dropdown')
         _open_menu_locator = (By.CSS_SELECTOR, '[href="."]')
-        _user_name_locator = (By.PARTIAL_LINK_TEXT, 'Hi ')
         _profile_link_locator = (By.CSS_SELECTOR, '[href$=profile]')
         _openstax_tutor_link_locator = (By.LINK_TEXT, 'OpenStax Tutor')
-        _log_out_link_locator = (By.CSS_SELECTOR, '[href*=logout]')
+        _training_wheel_locator = (By.CSS_SELECTOR, '.training-wheel')
+        _faculty_access_locator = (By.CSS_SELECTOR, '[href*=faculty]')
+        _log_out_link_locator = (By.CSS_SELECTOR, '[href*=signout]')
 
         @property
         def login(self):
             """Return the log in link."""
             return self.find_element(*self._log_in_link_locator)
 
-        def log_in(self, user, password):
+        def go_to_log_in(self):
+            """Click on the login menu link."""
+            return self.log_in(do_not_log_in=True)
+
+        def is_displayed(self):
+            """Return True if the log in link or user's name is displayed."""
+            return self.login.is_displayed()
+
+        def log_in(self, user=None, password=None, do_not_log_in=False):
             """Log a user into the website."""
-            accounts = self.login.click()
-            sleep(1.0)
-            accounts.log_in(user, password)
-            from pages.web.home import WebHome
-            return WebHome(accounts.driver)
+            Utility.wait_for_overlay_then(self.login.click)
+            from pages.accounts.home import AccountsHome
+            if do_not_log_in:
+                return go_to_(AccountsHome(self.driver))
+            else:
+                AccountsHome(self.driver).service_log_in(user, password)
+                from pages.web.home import WebHome as Home
+            return go_to_(Home(self.driver))
 
         @property
         def logged_in(self):
             """Return True if a user is logged into Web."""
-            try:
-                self.find_element(*self._logged_in_locator)
-            except NoSuchElementException:
-                return False
-            return True
-
-        @property
-        def open(self):
-            """Select the user menu."""
-            self.find_element(*self._open_menu_locator).click()
-            sleep(0.5)
-            return self
+            return 'dropdown' in self.root.get_attribute('class')
 
         @property
         def name(self):
             """Return the user's first name as shown in the menu bar."""
-            return self.find_element(*self._user_name_locator).text[3:].strip()
+            if self.logged_in:
+                return (' '.join(
+                        self.find_element(*self._open_menu_locator)
+                        .get_attribute('innerHTML')
+                        .split('<')[0]
+                        .split()[1:]))
+            return self.find_element(*self._log_in_link_locator).text
 
         @property
         def profile(self):
@@ -282,22 +472,53 @@ class WebNav(Region):
 
         def view_profile(self):
             """View the user's account profile on Accounts."""
-            self.open.profile.click()
-            sleep(1.0)
             from pages.accounts.profile import Profile
-            return Profile(self.driver)
+            return self.open()._selection_helper(
+                self._profile_link_locator,
+                Profile,
+                new_tab=True)
 
         @property
         def tutor(self):
             """Return the OpenStax Tutor Beta link."""
-            return self.find_element(*self._tutor_option_locator)
+            return self.find_element(*self._openstax_tutor_link_locator)
 
         def view_tutor(self):
             """View OpenStax Tutor Beta for the current user."""
-            self.open.tutor.click()
-            sleep(1.0)
-            from pages.tutor.dashboard import Dashboard
-            return Dashboard(self.driver)
+            from pages.tutor.home import TutorHome
+            tutor = self.open()._selection_helper(
+                self._openstax_tutor_link_locator,
+                TutorHome,
+                new_tab=True)
+            return tutor.service_pass_through()
+
+        @property
+        def modal_displayed(self):
+            """Return True if the Tutor modal is displayed."""
+            try:
+                self.find_element(*self._training_wheel_locator)
+                return True
+            except WebDriverException:
+                return False
+
+        @property
+        def training_wheel(self):
+            """Return the training wheel modal."""
+            training_root = self.find_element(*self._training_wheel_locator)
+            return self.TrainingWheel(self, training_root)
+
+        @property
+        def instructor_access(self):
+            """Return the link to apply for faculty access."""
+            return self.find_element(*self._faculty_access_locator)
+
+        def request_access(self):
+            """Click the faculty access link to start the application."""
+            from pages.accounts.signup import Signup
+            return self.open()._selection_helper(
+                self._faculty_access_locator,
+                Signup,
+                new_tab=True)
 
         @property
         def logout(self):
@@ -306,7 +527,42 @@ class WebNav(Region):
 
         def log_out(self):
             """Log the current user out."""
-            self.open.logout.click()
-            sleep(1.0)
-            from pages.web.home import WebHome
-            return WebHome(self.driver)
+            from pages.web.home import WebHome as Home
+            return self.open()._selection_helper(
+                self._log_out_link_locator,
+                Home)
+
+        class TrainingWheel(Region):
+            """The Tutor beta training wheel."""
+
+            _image_locator = (By.CSS_SELECTOR, 'img')
+            _message_locator = (By.CSS_SELECTOR, '.message')
+            _x_close_locator = (By.CSS_SELECTOR, '.put-away')
+            _got_it_button_locator = (By.CSS_SELECTOR, '.button-row button')
+
+            @property
+            def image(self):
+                """Return the modal image."""
+                return self.find_element(*self._image_locator)
+
+            @property
+            def message(self):
+                """Return the text of the modal message."""
+                return self.find_element(*self._message_locator).text
+
+            def close_modal(self, option=''):
+                """Close the training wheel modal.
+
+                If option is set and equals 'x', use the x close button.
+                If option is set and isn't 'x', use the Got It button.
+                If option isn't set, randomize which button gets used.
+                """
+                if option:
+                    button = (self._x_close_locator
+                              if option == 'x'
+                              else self._got_it_button_locator)
+                else:
+                    button = (self._x_close_locator
+                              if bool(Utility.random(0, 1))
+                              else self._got_it_button_locator)
+                Utility.wait_for_overlay_then(self.find_element(*button).click)

@@ -70,8 +70,8 @@ class Profile(AccountsHome):
             raise AccountException('User is not an administrator')
         self.find_element(*self._full_console_locator).click()
         sleep(1)
-        from pages.accounts.admin import AccountsAdmin
-        return AccountsAdmin(self.driver)
+        from pages.accounts.admin.console import Console
+        return Console(self.driver)
 
     @property
     def is_popup_console_displayed(self):

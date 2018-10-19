@@ -2,7 +2,7 @@
 
 import pytest
 
-__all__ = ['selenium', 'chrome_options']
+__all__ = ['selenium', 'chrome_options', 'firefox_options']
 
 
 # https://docs.pytest.org/en/latest/example/simple.html
@@ -11,6 +11,7 @@ __all__ = ['selenium', 'chrome_options']
 def selenium(request, selenium, pytestconfig):
     """Set default information for webdriver instances."""
     selenium.implicitly_wait(0)
+    selenium.set_window_size(width=1024, height=768)
     yield selenium
     # request.node is an "item" because we use the default "function" scope
     if (pytestconfig.getoption('--print-page-source-on-failure') and
@@ -29,11 +30,11 @@ def chrome_options(chrome_options, pytestconfig):
     """Set Chrome options."""
     if pytestconfig.getoption('--headless'):
         chrome_options.headless = True
-        chrome67 = ('Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_5) '
-                    'AppleWebKit/537.36 (KHTML, like Gecko) Chrome/'
-                    '67.0.3396.99 Safari/537.36')
+        chrome69 = ('Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_6) '
+                    'AppleWebKit/537.36 (KHTML, like Gecko) '
+                    'Chrome/69.0.3497.100 Safari/537.36')
         chrome_options.add_argument('--user-agent={agent}'
-                                    .format(agent=chrome67))
+                                    .format(agent=chrome69))
 
     # Required to run in Travis containers
     if pytestconfig.getoption('--no-sandbox'):
@@ -43,6 +44,14 @@ def chrome_options(chrome_options, pytestconfig):
     # a language other than English as their preferred language in Chrome
     chrome_options.add_argument('--lang=en')
 
+    # Disable Chrome notifications
+    chrome_options.add_experimental_option(
+        'prefs', {
+            'profile.default_content_setting_values.notifications': 2, })
+
+    chrome_options.accept_untrusted_certs = True
+    chrome_options.add_argument('--enable-automation')
+
     return chrome_options
 
 
@@ -51,5 +60,9 @@ def firefox_options(firefox_options, pytestconfig):
     """Set Firefox options."""
     if pytestconfig.getoption('--headless'):
         firefox_options.headless = True
+    firefox62 = ('Mozilla/5.0 (Macintosh; Intel Mac OS X 10.13; rv:62.0) '
+                 'Gecko/20100101 Firefox/62.0')
+    firefox_options.add_argument('--user-agent={agent}'
+                                 .format(agent=firefox62))
 
     return firefox_options

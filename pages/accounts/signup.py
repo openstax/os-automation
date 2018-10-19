@@ -26,6 +26,10 @@ class Signup(AccountsBase):
     DESIGNER = 'Instructional Designer'
     OTHER = 'Other'
 
+    GOOGLE = 'google'
+    GUERRILLA_MAIL = 'guerrilla'
+    RESTMAIL = 'restmail'
+
     TITLE = 0
     FIRST = 1
     LAST = 2
@@ -49,6 +53,7 @@ class Signup(AccountsBase):
         ('college_algebra', 'College Algebra'),
         ('college_physics_algebra', 'College Physics'),
         ('concepts_of_bio_non_majors', 'Concepts of Biology'),
+        ('introduction_to_business', 'Introduction to Business'),
         ('introduction_to_sociology', 'Introduction to Sociology 2e'),
         ('introductory_statistics', 'Introductory Statistics'),
         ('microbiology', 'Microbiology'),
@@ -67,6 +72,19 @@ class Signup(AccountsBase):
     ]
 
     _next_button_locator = (By.CSS_SELECTOR, '[type=submit]')
+
+    def subject_list(self, size=1):
+        """Return a list of subjects for an elevated signup."""
+        subjects = len(self.SUBJECTS)
+        if size > subjects:
+            size = subjects
+        book = ''
+        group = []
+        while len(group) < size:
+            book = (self.SUBJECTS[Utility.random(0, subjects - 1)])[1]
+            if book not in group:
+                group.append(book)
+        return group
 
     def account_signup(self, email,
                        password=None, _type='Student', provider='restmail',
@@ -228,6 +246,58 @@ class Signup(AccountsBase):
             self.next()
 
         return profile.Profile(self.driver)
+
+    def instructor_access(self, role, school_email, phone_number, school,
+                          webpage, students=None, using=None, interests=None,
+                          get_newsletter=True):
+        """Request faculty access."""
+        _apply_role_locator = (By.CSS_SELECTOR, '#apply_role')
+        _apply_email_locator = (By.CSS_SELECTOR, '#apply_email')
+        _apply_phone_locator = (By.CSS_SELECTOR, '#apply_phone_number')
+        _apply_school_locator = (By.CSS_SELECTOR, '#apply_school')
+        _apply_student_locator = (By.CSS_SELECTOR, '#apply_num_students')
+        _apply_url_locator = (By.CSS_SELECTOR, '#apply_url')
+        _apply_using_locator = (By.CSS_SELECTOR, '#apply_using_openstax')
+        _apply_subject_locators = (By.CSS_SELECTOR, '.subject')
+        _subject_label_locator = (By.CSS_SELECTOR, 'label')
+        _subject_checkbox_locator = (By.CSS_SELECTOR, '[type=checkbox]')
+        _apply_newsletter_locator = (By.CSS_SELECTOR, '#apply_newsletter')
+
+        Utility.select(self.driver, _apply_role_locator, role)
+        _email = self.find_element(*_apply_email_locator)
+        Utility.scroll_to(self.driver, element=_email)
+        _email.send_keys(school_email)
+        _phone = self.find_element(*_apply_phone_locator)
+        Utility.scroll_to(self.driver, element=_phone)
+        _phone.send_keys(phone_number)
+        _school = self.find_element(*_apply_school_locator)
+        Utility.scroll_to(self.driver, element=_school)
+        _school.send_keys(school)
+        if role == self.INSTRUCTOR:
+            _students = self.find_element(*_apply_student_locator)
+            Utility.scroll_to(self.driver, element=_students)
+            _students.send_keys(students)
+        _webpage = self.find_element(*_apply_url_locator)
+        Utility.scroll_to(self.driver, element=_webpage)
+        _webpage.send_keys(webpage)
+        if role == self.INSTRUCTOR:
+            Utility.select(self.driver, _apply_using_locator, using)
+        books = self.find_elements(*_apply_subject_locators)
+        if not interests:
+            interests = self.subject_list(Utility.random(1, 5))
+        for book in books:
+            if book.find_element(*_subject_label_locator).text in interests:
+                _book = book.find_element(*_subject_checkbox_locator)
+                Utility.scroll_to(self.driver, element=_book)
+                _book.click()
+        _news = self.find_element(*_apply_newsletter_locator)
+        Utility.scroll_to(self.driver, element=_news)
+        if not get_newsletter:
+            _news.click()
+        self.next()
+        sleep(1.0)
+        self.notice.get_confirmation_email()
+        self.next()
 
     @property
     def user_type(self):
@@ -477,7 +547,6 @@ class Signup(AccountsBase):
         @property
         def school(self):
             """Return the school field."""
-            print(self.selenium.current_url)
             return self.find_element(*self._school_locator)
 
         @school.setter
@@ -593,7 +662,6 @@ class Signup(AccountsBase):
         def subjects(self, subject_list):
             """Mark each interested subject."""
             for subject in self.subjects:
-                print(subject.title, subject_list, '\n')
                 if subject.title in subject_list:
                     subject.select()
             return self

@@ -16,8 +16,8 @@ class Adopters(WebBase):
     @property
     def loaded(self):
         """Wait until the institution list is displayed."""
-        return (self.find_element(*self._loaded_locator).is_displayed
-                and self.find_element(*self._institution_locator).is_displayed)
+        return (self.find_element(*self._loaded_locator).is_displayed() and
+                self.find_element(*self._institution_locator).is_displayed())
 
     @property
     def adopters(self):

@@ -1,7 +1,6 @@
 """Test the Accounts home page."""
 
 import pytest
-from selenium.common.exceptions import NoSuchElementException, TimeoutException
 
 from pages.accounts.home import AccountsHome as Home
 from tests.markers import accounts, nondestructive, test_case
@@ -56,7 +55,7 @@ def test_attempt_to_log_in_with_a_blank_user(accounts_base_url, selenium):
     password = ''
 
     # WHEN: the "NEXT" button is clicked
-    with pytest.raises(NoSuchElementException):
+    with pytest.raises(AssertionError):
         page.log_in(user, password)
 
     # THEN: the input box is shaded
@@ -82,7 +81,7 @@ def test_attempt_to_log_in_with_an_invalid_user(accounts_base_url, selenium):
     # AND: the "NEXT" button is clicked
     user = Utility().random_hex(20)
     password = ''
-    with pytest.raises(NoSuchElementException):
+    with pytest.raises(AssertionError):
         page.log_in(user, password)
 
     # THEN: the input box is shaded
@@ -109,7 +108,7 @@ def test_attempt_to_log_in_with_an_invalid_email(accounts_base_url, selenium):
     # AND: the "NEXT" button is clicked
     user = Utility.fake_email(*Utility.random_name()[1:3])
     password = ''
-    with pytest.raises(NoSuchElementException):
+    with pytest.raises(AssertionError):
         page.log_in(user, password)
 
     # THEN: the input box is shaded
@@ -139,7 +138,7 @@ def test_attempt_to_log_in_with_an_invalid_password(
     # WHEN: the username or e-mail is entered
     # AND: enters an invalid password
     # AND: clicks the "LOG IN" button
-    with pytest.raises(TimeoutException):
+    with pytest.raises(AssertionError):
         page.log_in(user, password)
 
     # THEN: the input box is shaded

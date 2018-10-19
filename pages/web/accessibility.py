@@ -14,8 +14,12 @@ class Accessibility(WebBase):
 
     @property
     def loaded(self):
-        """Wait until the statement is displayed."""
-        return self.find_element(*self._section_locator).is_displayed
+        """Wait until the statement is found."""
+        return self.find_element(*self._section_locator)
+
+    def is_displayed(self):
+        """Return True if the first statement header is displayed."""
+        return self.loaded.is_displayed()
 
     @property
     def sections(self):

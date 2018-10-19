@@ -6,6 +6,7 @@ from pypom import Page, Region
 from selenium.webdriver.common.by import By
 
 from pages.rice.home import Rice
+from utils.utilities import Utility
 
 
 class AccountsBase(Page):
@@ -14,15 +15,16 @@ class AccountsBase(Page):
     _root_locator = (By.CSS_SELECTOR, 'body')
     _root_locator_logged_in = (By.ID, 'application-header')
 
-    def wait_for_page_to_load(self):
-        """Override page load."""
-        self.wait.until(
-            lambda _: (
-                bool(self.find_element(*self._root_locator)
+    @property
+    def loaded(self):
+        """Override the default loaded function."""
+        return (bool(self.find_element(*self._root_locator)
                      .get_attribute('class'))
-                and 'accounts' in self.driver.current_url
-                )
-        )
+                and 'accounts' in self.driver.current_url)
+
+    def is_displayed(self):
+        """Return True when Accounts is loaded."""
+        return self.loaded
 
     @property
     def header(self):
@@ -43,6 +45,40 @@ class AccountsBase(Page):
         """Reload the current page."""
         self.driver.refresh()
         self.wait_for_page_to_load()
+
+    def back(self):
+        """Go back to the previous page."""
+        self.driver.execute_script('window.history.go(-1)')
+        return self
+
+    def close_tab(self):
+        """Close the current tab and switch to the remaining one.
+
+        Assumes 2 browser tabs are open.
+        """
+        Utility.close_tab(self.driver)
+        return self
+
+    @property
+    def location(self):
+        """Return the current URL."""
+        return self.driver.current_url
+
+    @property
+    def url(self):
+        """Return the last segment of the current URL."""
+        return self.location.split('/')[-1]
+
+    def resize_window(self, width=1024, height=768):
+        """Set the browser window size.
+
+        Args:
+            width (int): browser window width, default 4:3
+            height (int): browser window height, default 4:3
+
+        """
+        self.driver.set_window_size(width, height)
+        sleep(1.5)
 
     class Header(Region):
         """Accounts header."""

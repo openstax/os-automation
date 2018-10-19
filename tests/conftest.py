@@ -153,7 +153,7 @@ def pytest_addoption(parser):
                                        'tutor',
                                        'web'],
                               help='Systems under test\n' +
-                                   'Options: accounts, biglearn, exercises' +
+                                   'Options: accounts, biglearn, exercises\n' +
                                    '         hypothesis, payments, tutor, web')
 
 
@@ -164,6 +164,7 @@ def pytest_collection_modifyitems(config, items):
     mark_run_social = pytest.mark.skip(reason='Skipping non-social tests.')
     skip_social = config.getoption('--skip-social')
     mark_skip_social = pytest.mark.skip(reason='Skipping social login tests.')
+
     run_systems = config.getoption('--systems')
     mark_skip_accounts = pytest.mark.skip(reason='Skipping Accounts tests.')
     mark_skip_biglearn = pytest.mark.skip(reason='Skipping BigLearn tests.')
