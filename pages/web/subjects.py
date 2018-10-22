@@ -14,13 +14,22 @@ class Subjects(WebBase):
     """The subjects page."""
 
     URL_TEMPLATE = '/subjects'
+    AUTHORS = 0
+    SEQUENCE = 1
+    PEER_REVIEWED = 2
+
     category_xpath = '//div[h2[text()="{subject}"]]'
 
-    _root_locator = (By.ID, 'main')
-    _banner_locator = (By.CSS_SELECTOR, '.loaded .hero')
+    _banner_locator = (By.CSS_SELECTOR, '.hero')
+    _slogan_locator = (By.CSS_SELECTOR, '.hero h2')
+    _blurb_locator = (By.CSS_SELECTOR, '.hero p')
+    _filter_toggle_locator = (By.CSS_SELECTOR, '.filter-buttons')
     _filter_button_locator = (By.CLASS_NAME, 'filter-button')
     _filter_by_locator = (By.CSS_SELECTOR,
                           '.filter-buttons [aria-pressed=true]')
+    _about_our_textbooks_locator = (By.CSS_SELECTOR, '.text-content')
+    _about_blurb_locator = (By.CSS_SELECTOR, '.text-content ~ div .blurb')
+
     _category_locator = (By.CSS_SELECTOR, '.book-category')
     _math_category_locator = (
         By.XPATH, category_xpath.format(subject=Web.VIEW_MATH))
@@ -52,13 +61,26 @@ class Subjects(WebBase):
             return False
         return self.loaded
 
-    def available_filters(self):
-        """Return the number the filter options available."""
-        return len(self.find_elements(*self._filter_button_locator))
+    @property
+    def filters(self):
+        """Return the available filters."""
+        return [self.Filter(self, button)
+                for button in self.find_elements(*self._filter_button_locator)]
 
-    def filtered_by(self, filter_):
+    def filter_toggle(self):
+        """Click on the filter menu to show the filter options."""
+        self.find_element(*self._filter_toggle_locator).click()
+        return self
+
+    @property
+    def total_filters(self):
+        """Return the number the filter options available."""
+        return len(self.filters)
+
+    def is_filtered_by(self, subject_filter):
         """Return True if the books are filtered by the submitted subject."""
-        return filter_ in self.find_element(*self._filter_by_locator).text
+        return (
+            subject_filter in self.find_element(*self._filter_by_locator).text)
 
     @property
     def math(self):
@@ -107,13 +129,13 @@ class Subjects(WebBase):
     def openstax_books(self):
         """Select active books while excluding Polish versions."""
         return [book for book in self._active_books
-                if book.language == 'english']
+                if book.language == 'English']
 
     @property
     def polish_books(self):
         """Select active books in Polish."""
         return [book for book in self._active_books
-                if book.language == 'polish']
+                if book.language == 'Polish']
 
     def select_random_book(self, all_books=False):
         """Return a random book from the active list."""
@@ -122,15 +144,57 @@ class Subjects(WebBase):
         book = Utility.random(0, total)
         selected = using[book]
         destination = selected.url_append
-        selected.click()
+        selected.select()
         sleep(1.0)
         from pages.web.book import Book as Details
         return Details(self.driver, book_name=destination)
 
+    def view_about_our_textbooks(self):
+        """Scroll to the textbook blurbs."""
+        Utility.scroll_to(self.driver, self._about_our_textbooks_locator)
+        return self
+
+    @property
+    def about(self):
+        """Return the about blurb texts."""
+        return [self.About(self, blurb)
+                for blurb in self.find_elements(*self._about_blurb_locator)]
+
+    class Filter(Region):
+        """Subject filters."""
+
+        _subject_locator = (By.CSS_SELECTOR, '[data-html]')
+
+        @property
+        def subject(self):
+            """Return the filter subject."""
+            return self.find_element(*self._subject_locator).text
+
+        @property
+        def value(self):
+            """Return the category value."""
+            return self.root.get_attribute('data-value')
+
+        def view_books(self):
+            """Select the filter category to view the topic textbooks."""
+            self.root.click()
+            return self.page
+
+        @property
+        def is_selected(self):
+            """Return True if the filter is active."""
+            return self.root.get_attribute('aria-pressed') == 'true'
+
     class Category(Region):
         """Subject category information."""
 
+        _category_name_locator = (By.CSS_SELECTOR, 'h2')
         _book_locator = (By.CSS_SELECTOR, '.cover')
+
+        @property
+        def section(self):
+            """Return the category title."""
+            return self.find_element(*self._category_name_locator).text
 
         @property
         def is_visible(self):
@@ -143,6 +207,22 @@ class Subjects(WebBase):
             return [Book(self, book)
                     for book in self.find_elements(*self._book_locator)]
 
+    class About(Region):
+        """An About Our Textbooks blurb."""
+
+        _title_locator = (By.CSS_SELECTOR, '.title')
+        _blurb_locator = (By.CSS_SELECTOR, '.text p')
+
+        @property
+        def title(self):
+            """Return the blurb title."""
+            return self.find_element(*self._title_locator).text
+
+        @property
+        def blurb(self):
+            """Return the blurb text."""
+            return self.find_element(*self._blurb_locator).text
+
 
 class Book(Region):
     """A single book title."""
@@ -153,7 +233,17 @@ class Book(Region):
     @property
     def title(self):
         """Return the book title."""
-        return self.find_element(*self._image_locator).get_attribute('alt')
+        return self.image.get_attribute('alt')
+
+    @property
+    def image(self):
+        """Return the image element."""
+        return self.find_element(*self._image_locator)
+
+    @property
+    def image_source(self):
+        """Return the image source URL."""
+        return self.image.get_attribute('src')
 
     @property
     def url(self):
@@ -169,10 +259,10 @@ class Book(Region):
     def language(self):
         """Return the book language."""
         if 'Fizyka' in self.title:
-            return 'polish'
-        return 'english'
+            return 'Polish'
+        return 'English'
 
-    def click(self):
+    def select(self):
         """Click on the book cover."""
         book_name = self.url_append
         Utility.safari_exception_click(

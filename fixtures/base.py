@@ -48,7 +48,9 @@ def chrome_options(chrome_options, pytestconfig):
     chrome_options.add_experimental_option(
         'prefs', {
             'profile.default_content_setting_values.notifications': 2, })
-    chrome_options.add_argument('--auto-open-devtools-for-tabs')
+
+    # Open developer tools for each tab
+    # chrome_options.add_argument('--auto-open-devtools-for-tabs')
 
     return chrome_options
 

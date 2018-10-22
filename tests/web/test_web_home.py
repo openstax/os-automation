@@ -480,8 +480,8 @@ def test_able_to_view_subjects_using_the_nav_menu(web_base_url, selenium):
                   all_subjects.business,
                   all_subjects.ap]
     assert(all_subjects.is_displayed())
-    assert(all_subjects.filtered_by(Web.NO_FILTER))
-    filters = all_subjects.available_filters()
+    assert(all_subjects.is_filtered_by(Web.NO_FILTER))
+    filters = all_subjects.total_filters
     assert(filters == len(visibility) + 1), (
         'Available filters ({available}) should equal the '
         'subjects plus View All ({total})'
@@ -513,8 +513,8 @@ def test_able_to_view_subjects_using_the_nav_menu(web_base_url, selenium):
                   all_subjects.business,
                   all_subjects.ap]
     assert(all_subjects.is_displayed())
-    assert(all_subjects.filtered_by(Web.NO_FILTER))
-    filters = all_subjects.available_filters()
+    assert(all_subjects.is_filtered_by(Web.NO_FILTER))
+    filters = all_subjects.total_filters
     assert(filters == len(visibility) + 1), (
         'Available filters ({available}) should equal the '
         'subjects plus View All ({total})'
