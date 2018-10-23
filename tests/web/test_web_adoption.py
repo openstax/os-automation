@@ -198,14 +198,20 @@ def test_adoption_form_identity_fields_are_required(web_base_url, selenium):
     # THEN: the contact form fields are shaded red
     # AND:  "Please fill out this field." is below each
     #       contact form field input box
+    browser = selenium.capabilities.get('browserName').lower()
+    expected_error = (
+        ': {browser_front}ill out this field'
+        .format(browser_front='F' if browser == 'safari' else 'Please f'))
     data_issues = Utility.get_error_information(error)
-    first = 'first_name: Please fill out this field.' in data_issues
-    last = 'last_name: Please fill out this field.' in data_issues
-    email = 'email: Please fill out this field.' in data_issues
-    phone = 'phone: Please fill out this field.' in data_issues
-    school = 'school: Please fill out this field.' in data_issues
-    assert(first and last and email and phone and school), \
-        'Errors not all shown:\n{errors}'.format(errors=data_issues)
+    first = ('first_name' + expected_error) in data_issues
+    last = ('last_name' + expected_error) in data_issues
+    email = ('email' + expected_error) in data_issues
+    phone = ('phone' + expected_error) in data_issues
+    school = ('school' + expected_error) in data_issues
+    assert(first and last and email and phone and school), (
+        'Errors not all shown:\n{errors}\n'.format(errors=data_issues)
+        ('{first} {last} {email} {phone} {school}'
+         .format(first=first, last=last, email=email, school=school)))
 
 
 @test_case('C210391')

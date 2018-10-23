@@ -21,7 +21,7 @@ class Footer(Region):
 
     def is_displayed(self):
         """Return True if the region is displayed."""
-        return self.root.is_displayed()
+        return self.loaded
 
     @property
     def box(self):

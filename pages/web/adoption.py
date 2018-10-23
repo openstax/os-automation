@@ -25,6 +25,8 @@ class Adoption(WebBase):
     _drop_down_menu_locator = (By.CSS_SELECTOR, '.proxy-select')
     _interest_form_link_locator = (By.CSS_SELECTOR, '[href$=interest]')
     _form_root_locator = (By.CSS_SELECTOR, '.role-selector')
+    _book_selection_locator = (By.CSS_SELECTOR, '.book-selector')
+    _image_locator = (By.CSS_SELECTOR, '.has-image img')
 
     @property
     def loaded(self):
@@ -92,13 +94,21 @@ class Adoption(WebBase):
         user_errors = self.form.get_user_errors
         assert(not user_errors), \
             'User errors: {issues}'.format(issues=user_errors)
+        self.wait.until(
+            lambda _: Utility.is_image_visible(self.driver,
+                                               locator=self._image_locator))
+        sleep(1)
+        Utility.scroll_to(self.driver, self._book_selection_locator)
+        sleep(0.5)
         self.form.select_books(books)
+        sleep(0.5)
         self.form.set_using(books)
+        sleep(0.5)
         self.form.next()
         book_error = self.form.get_book_error
-        using_errors = self.form.get_using_errors
         assert(not book_error), \
             'Book error - {book}'.format(book=book_error)
+        using_errors = self.form.get_using_errors
         assert(not using_errors), \
             'Using error - {using}'.format(using=using_errors)
         self.form.select_tech(tech_providers)
@@ -330,6 +340,8 @@ class Adoption(WebBase):
 
         def select_tech(self, providers, other=None):
             """Select the tech partners in use."""
+            if not providers:
+                return self
             for tech in self.technology:
                 if tech.company in providers and not tech.checked:
                     tech.select()
