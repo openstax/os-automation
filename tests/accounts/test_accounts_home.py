@@ -3,12 +3,13 @@
 import pytest
 
 from pages.accounts.home import AccountsHome as Home
-from tests.markers import accounts, nondestructive, test_case
+from tests.markers import accounts, nondestructive, smoke_test, test_case
 from utils.email import RestMail
 from utils.utilities import Utility
 
 
 @test_case('C195135')
+@smoke_test
 @nondestructive
 @accounts
 def test_open_the_Accounts_home_page(accounts_base_url, selenium):
@@ -27,6 +28,7 @@ def test_open_the_Accounts_home_page(accounts_base_url, selenium):
 
 
 @test_case('C195136')
+@smoke_test
 @nondestructive
 @accounts
 def test_log_in_as_a_student(accounts_base_url, selenium, student):
@@ -154,6 +156,7 @@ def test_attempt_to_log_in_with_an_invalid_password(
 
 
 @test_case('C195542')
+@smoke_test
 @accounts
 def test_reset_a_users_password(accounts_base_url, selenium, student):
     """Reset a user's password."""

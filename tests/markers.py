@@ -14,6 +14,7 @@ payments = pytest.mark.payments
 tutor = pytest.mark.tutor
 web = pytest.mark.web
 
+smoke_test = pytest.mark.smoke_test
 test_case = pytestrail.case
 
 expected_failure = pytest.mark.xfail

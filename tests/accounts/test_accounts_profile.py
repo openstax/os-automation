@@ -5,13 +5,14 @@ from functools import reduce
 import pytest
 
 from pages.accounts.profile import AccountException, Profile
-from tests.markers import accounts, expected_failure, nondestructive  # noqa
-from tests.markers import skip_test, social, test_case  # noqa
+from tests.markers import accounts, expected_failure, nondestructive  # NOQA
+from tests.markers import skip_test, smoke_test, social, test_case  # NOQA
 from utils.email import RestMail
 from utils.utilities import Utility
 
 
 @test_case('C195545')
+@smoke_test
 @nondestructive
 @accounts
 def test_a_users_profile(accounts_base_url, selenium, student):
@@ -33,6 +34,7 @@ def test_a_users_profile(accounts_base_url, selenium, student):
 
 
 @test_case('C195546')
+@smoke_test
 @nondestructive
 @accounts
 def test_an_administrators_profile(accounts_base_url, admin, selenium):
@@ -173,6 +175,7 @@ def test_get_current_emails_and_status(accounts_base_url, selenium, student):
 
 
 @test_case('C195554')
+@smoke_test
 @accounts
 def test_verify_an_email(accounts_base_url, selenium, student):
     """Test the user email verification process."""
@@ -194,16 +197,7 @@ def test_verify_an_email(accounts_base_url, selenium, student):
     address = name + '@restmail.net'
     page.emails.add_email(address)
     page.emails.emails[-1].resend_confirmation()
-    # ************
     restmail.wait_for_mail()
-    print('RestMail %s' % address)
-    from time import sleep
-    sleep(3)
-    print('Inbox: %s' % str(len(restmail.inbox)))
-    for index, message in enumerate(restmail.inbox):
-        print('************************************')
-        print(index, message._text)
-    # ************
     restmail.wait_for_mail()[-1].confirm_email()
     page.open()
 
@@ -219,6 +213,7 @@ def test_verify_an_email(accounts_base_url, selenium, student):
 
 
 @test_case('C195553')
+@smoke_test
 @accounts
 def test_add_a_verified_email_to_profile(accounts_base_url, selenium, student):
     """Test the ability to add an e-mail address to an existing user."""
@@ -298,6 +293,7 @@ def test_log_in_using_facebook(accounts_base_url, facebook, selenium):
 
 
 @test_case('C195557')
+@smoke_test
 @nondestructive
 @accounts
 def test_open_the_admin_pop_up_console(accounts_base_url, admin, selenium):
@@ -315,6 +311,7 @@ def test_open_the_admin_pop_up_console(accounts_base_url, admin, selenium):
 
 
 @test_case('C195558')
+@smoke_test
 @nondestructive
 @accounts
 def test_go_to_the_admins_full_console(accounts_base_url, admin, selenium):
