@@ -8,7 +8,8 @@ from pages.accounts.home import AccountsHome
 from pages.accounts.signup import Signup
 from pages.web.home import WebHome as Home
 from pages.web.impact import OurImpact
-from tests.markers import accounts, nondestructive, test_case, web
+from tests.markers import accounts, expected_failure, nondestructive  # NOQA
+from tests.markers import test_case, web  # NOQA
 from utils.accounts import Accounts
 from utils.email import RestMail
 from utils.utilities import Utility
@@ -32,6 +33,7 @@ def test_the_website_loads(web_base_url, selenium):
 
 
 @test_case('C210297')
+@expected_failure(reason='Sticky note may or may not be active')
 @web
 def test_the_donation_banner_is_displayed(web_base_url, selenium):
     """Test if the donation banner is shown to new visitors."""
@@ -61,6 +63,7 @@ def test_the_donation_banner_is_displayed(web_base_url, selenium):
 
 
 @test_case('C214019')
+@expected_failure(reason='Sticky note may or may not be active')
 @web
 def test_the_donation_banner_is_not_displayed_after_repeat_reloads(
         web_base_url, selenium):
@@ -571,7 +574,7 @@ def test_subject_menu_options_load_filtered_views(web_base_url, selenium):
             assert(subject.is_displayed()), (
                 '{sub} is not displayed'
                 .format(sub=Web.FILTERS[index]))
-            assert(subject.filtered_by(Web.FILTERS[index])), (
+            assert(subject.is_filtered_by(Web.FILTERS[index])), (
                 'Results are not being filtered by "{filter}"'
                 .format(filter=Web.FILTERS[index]))
             for topic, category in enumerate(visibility):
@@ -703,6 +706,7 @@ def test_what_we_do_menu_options_load_corresponding_pages(
         assert(research.is_displayed())
 
 
+@expected_failure(reason='Web logout does not show in user menu')
 @test_case('C210316', 'C210322')
 @web
 def test_able_to_log_into_the_web_site(web_base_url, selenium, student):
@@ -740,6 +744,7 @@ def test_able_to_log_into_the_web_site(web_base_url, selenium, student):
     assert('Login' in home.web_nav.login.name), 'User still shown as logged in'
 
 
+@expected_failure(reason='Web logout does not show in user menu')
 @test_case('C210317', 'C210323')
 @web
 def test_able_to_log_into_the_web_site_using_the_mobile_display(

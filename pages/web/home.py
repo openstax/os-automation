@@ -68,8 +68,16 @@ class WebHome(WebBase):
 
     @property
     def loaded(self):
-        """Return True when the banner carousel is displayed."""
-        return self.carousel.is_displayed()
+        """Return True when the banner carousel and navs are displayed."""
+        if self.driver.get_window_size().get('width') <= 960:
+            return (self.carousel.is_displayed() and
+                    self.footer.is_displayed() and
+                    (sleep(1.0) or True))
+        return (self.carousel.is_displayed() and
+                self.web_nav.is_displayed() and
+                self.openstax_nav.is_displayed() and
+                self.footer.is_displayed() and
+                (sleep(1.0) or True))
 
     def is_displayed(self):
         """Return True when the Web home page is displayed."""

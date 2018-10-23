@@ -20,6 +20,7 @@ class Subjects(WebBase):
 
     category_xpath = '//div[h2[text()="{subject}"]]'
 
+    _loader_locator = (By.CSS_SELECTOR, '.subjects-page.loaded')
     _banner_locator = (By.CSS_SELECTOR, '.hero')
     _slogan_locator = (By.CSS_SELECTOR, '.hero h2')
     _blurb_locator = (By.CSS_SELECTOR, '.hero p')
@@ -50,10 +51,11 @@ class Subjects(WebBase):
     def loaded(self):
         """Override the base loader."""
         return (
-            bool(self.find_element(*self._root_locator))
-            and bool(self.find_element(*self._category_locator))
-            and Utility.is_image_visible(self.driver,
-                                         locator=self._image_locators))
+            self.find_element(*self._loader_locator) and
+            self.find_element(*self._category_locator) and
+            Utility.is_image_visible(self.driver,
+                                     locator=self._image_locators) and
+            (sleep(1.0) or True))
 
     def is_displayed(self):
         """Return True if the subjects page is displayed."""
