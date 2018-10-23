@@ -204,11 +204,8 @@ class Utility(object):
             data = action()
         sleep(1)
         new_handle = 1 if current == driver.window_handles[0] else 0
-        print(new_handle)
         if len(driver.window_handles) > 1:
-            # if driver.capabilities.get('browserName').lower() != 'chrome':
-                driver.switch_to.window(
-                    driver.window_handles[new_handle])
+            driver.switch_to.window(driver.window_handles[new_handle])
         if data:
             return data
 
