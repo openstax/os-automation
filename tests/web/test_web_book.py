@@ -308,3 +308,17 @@ def test_page_links_to_the_interest_form(web_base_url, selenium):
 @web
 def test_page_links_to_the_adoption_form(web_base_url, selenium):
     """Test the adoption form link."""
+    # GIVEN: a user viewing the book details page
+    subjects = Subjects(selenium, web_base_url).open()
+    book = subjects.select_random_book(_from=Library.OPENSTAX)
+
+    # WHEN: they click on the "Using this book? Let us know." link
+    library = Library()
+    passed_title = library.get(book.title, Library.ADOPTION)
+    adoption = book.is_using()
+
+    # THEN: the adoption form is displayed
+    # AND:  the book title is passed in the URL
+    assert(adoption.is_displayed())
+    assert('adoption' in adoption.location)
+    assert(passed_title in adoption.location)
