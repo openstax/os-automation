@@ -8,6 +8,10 @@ from utils.utilities import Utility
 class Web(object):
     """Website shared variables."""
 
+    # Sizing
+    PHONE = 601
+    TABLET = 961
+
     # RegEx matchers
     FILENAME_MATCHER = re.compile(r'url\([\w\-\:\/\.]*\)\;')
 
@@ -27,6 +31,16 @@ class Web(object):
     TECH = 1
     OUR_IMPACT = 0
     OPENSTAX_PARTNERS = 1
+
+    # Book page tabs
+    BOOK_DETAILS = 0
+    INSTRUCTOR_RESOURCES = 1
+    PARTNER_RESOURCES = 2
+    STUDENT_RESOURCES = 3
+
+    # Book page order modals
+    INDIVIDUAL = 0
+    BOOKSTORES = 1
 
     # Matching strings
     ABOUT = 'about'
@@ -224,9 +238,9 @@ class Library():
     PHYSICS = 'College Physics'
     AP_PHYS = 'The AP Physics Collection'
     BIO_CONCEPTS = 'Concepts of Biology'
-    FIZYKA_1 = 'Fizyka dla szkół wyższych Tom 1'
-    FIZYKA_2 = 'Fizyka dla szkół wyższych Tom 2'
-    FIZYKA_3 = 'Fizyka dla szkół wyższych Tom 3'
+    FIZYKA_1 = 'Fizyka dla szkół wyższych. Tom 1'
+    FIZYKA_2 = 'Fizyka dla szkół wyższych. Tom 2'
+    FIZYKA_3 = 'Fizyka dla szkół wyższych. Tom 3'
     MICROBIOLOGY = 'Microbiology'
     U_PHYS_1 = 'University Physics Volume 1'
     U_PHYS_2 = 'University Physics Volume 2'
@@ -242,13 +256,20 @@ class Library():
     AP_MICRO = 'Principles of Microeconomics for AP® Courses 2e'
     PSYCHOLOGY = 'Psychology'
 
-    # Fields
+    # Fields and limiters
     ADOPTION = 'interest'
+    ALL_BOOKS = 'all'
+    BOOKSHARE = 'bookshare'
     CATEGORY = 'subject'
     DETAILS = 'details'
+    ENGLISH = 'English'
     INTEREST = ADOPTION
     IS_AP = 'is_ap?'
+    ITUNES = 'itunes'
+    KINDLE = 'kindle'
     LANGUAGE = 'language'
+    OPENSTAX = 'openstax'
+    POLISH = 'Polish'
     SHORT_NAME = 'short_name'
 
     # Subjects
@@ -263,289 +284,408 @@ class Library():
     def __init__(self):
         """Initialize the library."""
         self._books = {
+
+            # Business
             self.ETHICS: {
+                self.BOOKSHARE: False,
                 self.CATEGORY: [self.ALL, self.BUSINESS],
                 self.DETAILS: 'business-ethics',
                 self.INTEREST: 'Business%20Ethics',
                 self.IS_AP: False,
-                self.LANGUAGE: 'English',
+                self.ITUNES: False,
+                self.KINDLE: False,
+                self.LANGUAGE: self.ENGLISH,
                 self.SHORT_NAME: 'Business Ethics', },
             self.BUSINESS: {
+                self.BOOKSHARE: False,
                 self.CATEGORY: [self.ALL, self.BUSINESS],
                 self.DETAILS: 'introduction-business',
                 self.INTEREST: 'Intro%20to%20Business',
                 self.IS_AP: False,
-                self.LANGUAGE: 'English',
+                self.ITUNES: False,
+                self.KINDLE: False,
+                self.LANGUAGE: self.ENGLISH,
                 self.SHORT_NAME: 'Introduction to Business', },
 
             # Humanities
             self.US_HISTORY: {
+                self.BOOKSHARE: True,
                 self.CATEGORY: [self.ALL, self.HUMANITIES],
                 self.DETAILS: 'us-history',
                 self.INTEREST: 'US%20History',
                 self.IS_AP: False,
-                self.LANGUAGE: 'English',
+                self.ITUNES: True,
+                self.KINDLE: True,
+                self.LANGUAGE: self.ENGLISH,
                 self.SHORT_NAME: 'U.S. History', },
 
             # Math
             self.ALGEBRA_TRIG: {
+                self.BOOKSHARE: False,
                 self.CATEGORY: [self.ALL, self.MATH],
                 self.DETAILS: 'algebra-and-trigonometry',
                 self.INTEREST: 'Algebra%20and%20Trigonometry',
                 self.IS_AP: False,
-                self.LANGUAGE: 'English',
+                self.ITUNES: False,
+                self.KINDLE: True,
+                self.LANGUAGE: self.ENGLISH,
                 self.SHORT_NAME: 'Algebra and Trigonometry', },
             self.CALCULUS_1: {
+                self.BOOKSHARE: False,
                 self.CATEGORY: [self.ALL, self.MATH],
                 self.DETAILS: 'calculus-volume-1',
                 self.INTEREST: 'Calculus',
                 self.IS_AP: False,
-                self.LANGUAGE: 'English',
+                self.ITUNES: False,
+                self.KINDLE: True,
+                self.LANGUAGE: self.ENGLISH,
                 self.SHORT_NAME: 'Calculus', },
             self.CALCULUS_2: {
+                self.BOOKSHARE: False,
                 self.CATEGORY: [self.ALL, self.MATH],
                 self.DETAILS: 'calculus-volume-2',
                 self.INTEREST: 'Calculus',
                 self.IS_AP: False,
-                self.LANGUAGE: 'English',
+                self.ITUNES: False,
+                self.KINDLE: True,
+                self.LANGUAGE: self.ENGLISH,
                 self.SHORT_NAME: 'Calculus', },
             self.CALCULUS_3: {
+                self.BOOKSHARE: False,
                 self.CATEGORY: [self.ALL, self.MATH],
                 self.DETAILS: 'calculus-volume-3',
                 self.INTEREST: 'Calculus',
                 self.IS_AP: False,
-                self.LANGUAGE: 'English',
+                self.ITUNES: False,
+                self.KINDLE: True,
+                self.LANGUAGE: self.ENGLISH,
                 self.SHORT_NAME: 'Calculus', },
             self.ALGEBRA: {
+                self.BOOKSHARE: False,
                 self.CATEGORY: [self.ALL, self.MATH],
                 self.DETAILS: 'college-algebra',
                 self.INTEREST: 'College%20Algebra',
                 self.IS_AP: False,
-                self.LANGUAGE: 'English',
+                self.ITUNES: False,
+                self.KINDLE: True,
+                self.LANGUAGE: self.ENGLISH,
                 self.SHORT_NAME: 'College Algebra', },
             self.ELEM_ALGEBRA: {
+                self.BOOKSHARE: False,
                 self.CATEGORY: [self.ALL, self.MATH],
                 self.DETAILS: 'elementary-algebra',
                 self.INTEREST: 'Elementary%20Algebra',
                 self.IS_AP: False,
-                self.LANGUAGE: 'English',
+                self.ITUNES: False,
+                self.KINDLE: True,
+                self.LANGUAGE: self.ENGLISH,
                 self.SHORT_NAME: 'Elementary Algebra', },
             self.INTER_ALGEBRA: {
+                self.BOOKSHARE: False,
                 self.CATEGORY: [self.ALL, self.MATH],
                 self.DETAILS: 'intermediate-algebra',
                 self.INTEREST: 'Intermediate%20Algebra',
                 self.IS_AP: False,
-                self.LANGUAGE: 'English',
+                self.ITUNES: False,
+                self.KINDLE: True,
+                self.LANGUAGE: self.ENGLISH,
                 self.SHORT_NAME: 'Intermediate Algebra', },
             self.BUSINESS_STATS: {
+                self.BOOKSHARE: False,
                 self.CATEGORY: [self.ALL, self.MATH],
                 self.DETAILS: 'introductory-business-statistics',
                 self.INTEREST: 'Business%20Statistics',
                 self.IS_AP: False,
-                self.LANGUAGE: 'English',
+                self.ITUNES: False,
+                self.KINDLE: True,
+                self.LANGUAGE: self.ENGLISH,
                 self.SHORT_NAME: 'Introductory Business Statistics', },
             self.INTRO_STATS: {
+                self.BOOKSHARE: True,
                 self.CATEGORY: [self.ALL, self.MATH],
                 self.DETAILS: 'introductory-statistics',
                 self.INTEREST: 'Introductory%20Statistics',
                 self.IS_AP: False,
-                self.LANGUAGE: 'English',
+                self.ITUNES: True,
+                self.KINDLE: True,
+                self.LANGUAGE: self.ENGLISH,
                 self.SHORT_NAME: 'Introductory Statistics', },
             self.PREALGEBRA: {
+                self.BOOKSHARE: False,
                 self.CATEGORY: [self.ALL, self.MATH],
                 self.DETAILS: 'prealgebra',
                 self.INTEREST: 'Prealgebra',
                 self.IS_AP: False,
-                self.LANGUAGE: 'English',
+                self.ITUNES: False,
+                self.KINDLE: True,
+                self.LANGUAGE: self.ENGLISH,
                 self.SHORT_NAME: 'Prealgebra', },
             self.PRECALCULUS: {
+                self.BOOKSHARE: False,
                 self.CATEGORY: [self.ALL, self.MATH],
                 self.DETAILS: 'precalculus',
                 self.INTEREST: 'Precalc',
                 self.IS_AP: False,
-                self.LANGUAGE: 'English',
+                self.ITUNES: True,
+                self.KINDLE: True,
+                self.LANGUAGE: self.ENGLISH,
                 self.SHORT_NAME: 'Precalculus', },
 
             # Science
             self.ANATOMY_PHYS: {
+                self.BOOKSHARE: True,
                 self.CATEGORY: [self.ALL, self.SCIENCE],
                 self.DETAILS: 'anatomy-and-physiology',
                 self.INTEREST: 'Anatomy%20%26%20Physiology',
                 self.IS_AP: False,
-                self.LANGUAGE: 'English',
+                self.ITUNES: True,
+                self.KINDLE: True,
+                self.LANGUAGE: self.ENGLISH,
                 self.SHORT_NAME: 'Anatomy & Physiology', },
             self.ASTRONOMY: {
+                self.BOOKSHARE: False,
                 self.CATEGORY: [self.ALL, self.SCIENCE],
                 self.DETAILS: 'astronomy',
                 self.INTEREST: 'Astronomy',
                 self.IS_AP: False,
-                self.LANGUAGE: 'English',
+                self.ITUNES: True,
+                self.KINDLE: True,
+                self.LANGUAGE: self.ENGLISH,
                 self.SHORT_NAME: 'Astronomy', },
             self.BIOLOGY: {
+                self.BOOKSHARE: True,
                 self.CATEGORY: [self.ALL, self.SCIENCE],
                 self.DETAILS: 'biology',
                 self.INTEREST: 'Biology',
                 self.IS_AP: False,
-                self.LANGUAGE: 'English',
+                self.ITUNES: True,
+                self.KINDLE: True,
+                self.LANGUAGE: self.ENGLISH,
                 self.SHORT_NAME: 'Biology', },
             self.BIOLOGY_2E: {
+                self.BOOKSHARE: False,
                 self.CATEGORY: [self.ALL, self.SCIENCE],
                 self.DETAILS: 'biology-2e',
                 self.INTEREST: 'Biology',
                 self.IS_AP: False,
-                self.LANGUAGE: 'English',
+                self.ITUNES: True,
+                self.KINDLE: True,
+                self.LANGUAGE: self.ENGLISH,
                 self.SHORT_NAME: 'Biology', },
             self.AP_BIO: {
+                self.BOOKSHARE: False,
                 self.CATEGORY: [self.ALL, self.AP, self.SCIENCE],
                 self.DETAILS: 'biology-ap-courses',
                 self.INTEREST: 'AP%20Bio',
                 self.IS_AP: True,
-                self.LANGUAGE: 'English',
+                self.ITUNES: False,
+                self.KINDLE: True,
+                self.LANGUAGE: self.ENGLISH,
                 self.SHORT_NAME: 'AP Biology', },
             self.CHEMISTRY: {
+                self.BOOKSHARE: False,
                 self.CATEGORY: [self.ALL, self.SCIENCE],
                 self.DETAILS: 'chemistry',
                 self.INTEREST: 'Chemistry',
                 self.IS_AP: False,
-                self.LANGUAGE: 'English',
+                self.ITUNES: False,
+                self.KINDLE: True,
+                self.LANGUAGE: self.ENGLISH,
                 self.SHORT_NAME: 'Chemistry', },
             self.CHEM_ATOMS: {
+                self.BOOKSHARE: False,
                 self.CATEGORY: [self.ALL, self.SCIENCE],
                 self.DETAILS: 'chemistry-atoms-first',
                 self.INTEREST: 'Chem%3A%20Atoms%20First',
                 self.IS_AP: False,
-                self.LANGUAGE: 'English',
+                self.ITUNES: True,
+                self.KINDLE: True,
+                self.LANGUAGE: self.ENGLISH,
                 self.SHORT_NAME: 'Chemistry: Atoms First', },
             self.PHYSICS: {
+                self.BOOKSHARE: True,
                 self.CATEGORY: [self.ALL, self.SCIENCE],
                 self.DETAILS: 'college-physics',
                 self.INTEREST: 'College%20Physics%20(Algebra)',
                 self.IS_AP: False,
-                self.LANGUAGE: 'English',
+                self.ITUNES: True,
+                self.KINDLE: True,
+                self.LANGUAGE: self.ENGLISH,
                 self.SHORT_NAME: 'College Physics', },
             self.AP_PHYS: {
+                self.BOOKSHARE: False,
                 self.CATEGORY: [self.ALL, self.AP, self.SCIENCE],
                 self.DETAILS: 'college-physics-ap-courses',
                 self.INTEREST: 'AP%20Physics',
                 self.IS_AP: True,
-                self.LANGUAGE: 'English',
+                self.ITUNES: True,
+                self.KINDLE: True,
+                self.LANGUAGE: self.ENGLISH,
                 self.SHORT_NAME: 'AP Physics', },
             self.BIO_CONCEPTS: {
+                self.BOOKSHARE: True,
                 self.CATEGORY: [self.ALL, self.SCIENCE],
                 self.DETAILS: 'concepts-biology',
                 self.INTEREST: 'Concepts%20of%20Bio%20(non-majors)',
                 self.IS_AP: False,
-                self.LANGUAGE: 'English',
+                self.ITUNES: True,
+                self.KINDLE: True,
+                self.LANGUAGE: self.ENGLISH,
                 self.SHORT_NAME: 'Concepts of Biology', },
             self.FIZYKA_1: {
+                self.BOOKSHARE: False,
                 self.CATEGORY: [self.ALL, self.SCIENCE],
                 self.DETAILS: ('fizyka-dla-szk%C3%B3%C5%82-wy%C5%BCszych'
                                '-tom-1'),
                 self.INTEREST: None,
                 self.IS_AP: False,
-                self.LANGUAGE: 'Polish',
+                self.ITUNES: False,
+                self.KINDLE: False,
+                self.LANGUAGE: self.POLISH,
                 self.SHORT_NAME: None, },
             self.FIZYKA_2: {
+                self.BOOKSHARE: False,
                 self.CATEGORY: [self.ALL, self.SCIENCE],
                 self.DETAILS: ('fizyka-dla-szk%C3%B3%C5%82-wy%C5%BCszych'
                                '-tom-2'),
                 self.INTEREST: None,
                 self.IS_AP: False,
-                self.LANGUAGE: 'Polish',
+                self.ITUNES: False,
+                self.KINDLE: False,
+                self.LANGUAGE: self.POLISH,
                 self.SHORT_NAME: None, },
             self.FIZYKA_3: {
+                self.BOOKSHARE: False,
                 self.CATEGORY: [self.ALL, self.SCIENCE],
                 self.DETAILS: ('fizyka-dla-szk%C3%B3%C5%82-wy%C5%BCszych'
                                '-tom-3'),
                 self.INTEREST: None,
                 self.IS_AP: False,
-                self.LANGUAGE: 'Polish',
+                self.ITUNES: False,
+                self.KINDLE: False,
+                self.LANGUAGE: self.POLISH,
                 self.SHORT_NAME: None, },
             self.MICROBIOLOGY: {
+                self.BOOKSHARE: False,
                 self.CATEGORY: [self.ALL, self.SCIENCE],
                 self.DETAILS: 'microbiology',
                 self.INTEREST: 'Microbiology',
                 self.IS_AP: False,
-                self.LANGUAGE: 'English',
+                self.ITUNES: True,
+                self.KINDLE: True,
+                self.LANGUAGE: self.ENGLISH,
                 self.SHORT_NAME: 'Microbiology', },
             self.U_PHYS_1: {
+                self.BOOKSHARE: False,
                 self.CATEGORY: [self.ALL, self.SCIENCE],
                 self.DETAILS: 'university-physics-volume-1',
                 self.INTEREST: 'University%20Physics%20(Calc)',
                 self.IS_AP: False,
-                self.LANGUAGE: 'English',
+                self.ITUNES: True,
+                self.KINDLE: True,
+                self.LANGUAGE: self.ENGLISH,
                 self.SHORT_NAME: 'University Physics', },
             self.U_PHYS_2: {
+                self.BOOKSHARE: False,
                 self.CATEGORY: [self.ALL, self.SCIENCE],
                 self.DETAILS: 'university-physics-volume-2',
                 self.INTEREST: 'University%20Physics%20(Calc)',
                 self.IS_AP: False,
-                self.LANGUAGE: 'English',
+                self.ITUNES: True,
+                self.KINDLE: True,
+                self.LANGUAGE: self.ENGLISH,
                 self.SHORT_NAME: 'University Physics', },
             self.U_PHYS_3: {
+                self.BOOKSHARE: False,
                 self.CATEGORY: [self.ALL, self.SCIENCE],
                 self.DETAILS: 'university-physics-volume-3',
                 self.INTEREST: 'University%20Physics%20(Calc)',
                 self.IS_AP: False,
-                self.LANGUAGE: 'English',
+                self.ITUNES: True,
+                self.KINDLE: True,
+                self.LANGUAGE: self.ENGLISH,
                 self.SHORT_NAME: 'University Physics', },
 
             # Social Sciences
             self.GOVERNMENT: {
+                self.BOOKSHARE: False,
                 self.CATEGORY: [self.ALL, self.SOCIAL],
                 self.DETAILS: 'american-government',
                 self.INTEREST: 'American%20Government',
                 self.IS_AP: False,
-                self.LANGUAGE: 'English',
+                self.ITUNES: True,
+                self.KINDLE: True,
+                self.LANGUAGE: self.ENGLISH,
                 self.SHORT_NAME: 'American Government', },
             self.SOCIOLOGY: {
+                self.BOOKSHARE: False,
                 self.CATEGORY: [self.ALL, self.SOCIAL],
                 self.DETAILS: 'introduction-sociology-2e',
                 self.INTEREST: 'Introduction%20to%20Sociology',
                 self.IS_AP: False,
-                self.LANGUAGE: 'English',
+                self.ITUNES: True,
+                self.KINDLE: True,
+                self.LANGUAGE: self.ENGLISH,
                 self.SHORT_NAME: 'Introduction to Sociology 2e', },
             self.PRINCIPLES_ECON: {
+                self.BOOKSHARE: False,
                 self.CATEGORY: [self.ALL, self.SOCIAL],
                 self.DETAILS: 'principles-economics-2e',
                 self.INTEREST: 'Economics',
                 self.IS_AP: False,
-                self.LANGUAGE: 'English',
+                self.ITUNES: True,
+                self.KINDLE: True,
+                self.LANGUAGE: self.ENGLISH,
                 self.SHORT_NAME: 'Principles of Economics', },
             self.PRINCIPLES_MACRO: {
+                self.BOOKSHARE: False,
                 self.CATEGORY: [self.ALL, self.SOCIAL],
                 self.DETAILS: 'principles-macroeconomics-2e',
                 self.INTEREST: 'Macro%20Econ',
                 self.IS_AP: False,
-                self.LANGUAGE: 'English',
+                self.ITUNES: True,
+                self.KINDLE: True,
+                self.LANGUAGE: self.ENGLISH,
                 self.SHORT_NAME: 'Principles of Macroeconomics', },
             self.AP_MACRO: {
+                self.BOOKSHARE: False,
                 self.CATEGORY: [self.ALL, self.AP, self.SOCIAL],
                 self.DETAILS: 'principles-macroeconomics-ap-courses-2e',
                 self.INTEREST: 'AP%20Macro%20Econ',
                 self.IS_AP: True,
-                self.LANGUAGE: 'English',
+                self.ITUNES: False,
+                self.KINDLE: True,
+                self.LANGUAGE: self.ENGLISH,
                 self.SHORT_NAME: 'AP Macro Econ', },
             self.PRINCIPLES_MICRO: {
+                self.BOOKSHARE: False,
                 self.CATEGORY: [self.ALL, self.SOCIAL],
                 self.DETAILS: 'principles-microeconomics-2e',
                 self.INTEREST: 'Micro%20Econ',
                 self.IS_AP: False,
-                self.LANGUAGE: 'English',
+                self.ITUNES: True,
+                self.KINDLE: True,
+                self.LANGUAGE: self.ENGLISH,
                 self.SHORT_NAME: 'Principles of Microeconomics', },
             self.AP_MICRO: {
+                self.BOOKSHARE: False,
                 self.CATEGORY: [self.ALL, self.AP, self.SOCIAL],
                 self.DETAILS: 'principles-microeconomics-ap-courses-2e',
                 self.INTEREST: 'AP%20Micro%20Econ',
                 self.IS_AP: True,
-                self.LANGUAGE: 'English',
+                self.ITUNES: False,
+                self.KINDLE: True,
+                self.LANGUAGE: self.ENGLISH,
                 self.SHORT_NAME: 'AP Micro Econ', },
             self.PSYCHOLOGY: {
+                self.BOOKSHARE: False,
                 self.CATEGORY: [self.ALL, self.SOCIAL],
                 self.DETAILS: 'psychology',
                 self.INTEREST: 'Psychology',
                 self.IS_AP: False,
-                self.LANGUAGE: 'English',
+                self.ITUNES: True,
+                self.KINDLE: True,
+                self.LANGUAGE: self.ENGLISH,
                 self.SHORT_NAME: 'Psychology', },
         }
 
@@ -561,6 +701,12 @@ class Library():
                 if self.get(book, self.IS_AP)]
 
     @property
+    def bookshare(self):
+        """Return the books available through Bookshare."""
+        return [(book, self.get(book)) for book in self.books
+                if self.get(book, self.BOOKSHARE)]
+
+    @property
     def business(self):
         """Return the business books."""
         return self.get_by_category(self.BUSINESS)
@@ -571,10 +717,22 @@ class Library():
         return self.get_by_category(self.HUMANITIES)
 
     @property
+    def itunes(self):
+        """Return the books available through iTunes."""
+        return [(book, self.get(book)) for book in self.books
+                if self.get(book, self.ITUNES)]
+
+    @property
     def katalyst(self):
         """Return the Katalyst-modified books."""
         return [(book, self.get(book)) for book in self.books
-                if self.get(book, self.LANGUAGE) == 'Polish']
+                if self.get(book, self.LANGUAGE) == self.POLISH]
+
+    @property
+    def kindle(self):
+        """Return the books available through Amazon ebooks."""
+        return [(book, self.get(book)) for book in self.books
+                if self.get(book, self.KINDLE)]
 
     @property
     def math(self):
@@ -585,7 +743,7 @@ class Library():
     def openstax(self):
         """Return the OpenStax books."""
         return [(book, self.get(book)) for book in self.books
-                if self.get(book, self.LANGUAGE) == 'English']
+                if self.get(book, self.LANGUAGE) == self.ENGLISH]
 
     @property
     def science(self):
@@ -602,6 +760,11 @@ class Library():
     def social_sciences(self):
         """Return the social science books."""
         return self.get_by_category(self.SOCIAL)
+
+    def get_titles(self, group=None):
+        """Return a list of book titles."""
+        collection = group if group else self.books
+        return [book[0] for book in collection]
 
     def book_passthrough(self, using):
         """Return the Subjects book name and form append for a book set."""

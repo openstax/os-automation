@@ -194,12 +194,14 @@ class Utility(object):
         return driver.window_handles
 
     @classmethod
-    def switch_to(cls, driver, link_locator=None, action=None):
+    def switch_to(cls, driver, link_locator=None, element=None, action=None):
         """Switch to the other window handle."""
         current = driver.current_window_handle
         data = None
         if link_locator:
             Utility.safari_exception_click(driver, link_locator)
+        elif element:
+            Utility.safari_exception_click(driver, element=element)
         else:
             data = action()
         sleep(1)
@@ -253,9 +255,7 @@ class Utility(object):
     @classmethod
     def has_children(cls, element):
         """Return True if a specific element has one or more children."""
-        locator = ('xpath', '/*')
-        children = element.find_elements(*locator)
-        return len(children) > 0
+        return len(element.find_elements('xpath', './*')) > 0
 
     @classmethod
     def is_image_visible(cls, driver, image=None, locator=None):

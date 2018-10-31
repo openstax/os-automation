@@ -3,11 +3,14 @@
 from time import sleep
 
 from pypom import Region
+from pypom.exception import UsageError
+from selenium.common.exceptions import WebDriverException
 from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
 
 from pages.web.base import WebBase
 from utils.utilities import Utility, go_to_
-from utils.web import Web
+from utils.web import Library, Web
 
 
 class Subjects(WebBase):
@@ -56,6 +59,27 @@ class Subjects(WebBase):
             Utility.is_image_visible(self.driver,
                                      locator=self._image_locators) and
             (sleep(1.0) or True))
+
+    def wait_for_page_to_load(self):
+        """Override the page wait."""
+        WebDriverWait(self.driver, 15).until(
+            lambda _: self.loaded)
+        self.pm.hook.pypom_after_wait_for_page_to_load(page=self)
+        return self
+
+    def open(self):
+        """Open the page."""
+        if self.seed_url:
+            tries = 0
+            while tries < 1:
+                try:
+                    self.driver_adapter.open(self.seed_url)
+                    self.wait_for_page_to_load()
+                    break
+                except WebDriverException:
+                    tries = tries + 1
+            return self
+        raise UsageError("Set a base URL or URL_TEMPLATE to open this page.")
 
     def is_displayed(self):
         """Return True if the subjects page is displayed."""
@@ -128,21 +152,53 @@ class Subjects(WebBase):
                 for book in self.find_elements(*self._book_locator)]
 
     @property
+    def bookshare_books(self):
+        """Select active books available through Bookshare."""
+        library = Library()
+        collection = library.get_titles(library.bookshare)
+        return [book for book in self._active_books
+                if book.title in collection]
+
+    @property
+    def kindle_books(self):
+        """Select active books with a Kindle edition available."""
+        library = Library()
+        collection = library.get_titles(library.kindle)
+        return [book for book in self._active_books
+                if book.title in collection]
+
+    @property
+    def itunes_books(self):
+        """Select active books with an iBook eddition available."""
+        library = Library()
+        collection = library.get_titles(library.itunes)
+        return [book for book in self._active_books
+                if book.title in collection]
+
+    @property
     def openstax_books(self):
         """Select active books while excluding Polish versions."""
         return [book for book in self._active_books
-                if book.language == 'English']
+                if book.language == Library.ENGLISH]
 
     @property
     def polish_books(self):
         """Select active books in Polish."""
         return [book for book in self._active_books
-                if book.language == 'Polish']
+                if book.language == Library.POLISH]
 
-    def select_random_book(self, all_books=False):
+    def select_random_book(self, _from=Library.OPENSTAX):
         """Return a random book from the active list."""
-        using = self._active_books if all_books else self.openstax_books
+        using = {
+            Library.ALL_BOOKS: self._active_books,
+            Library.BOOKSHARE: self.bookshare_books,
+            Library.ITUNES: self.itunes_books,
+            Library.KINDLE: self.kindle_books,
+            Library.OPENSTAX: self.openstax_books,
+            Library.POLISH: self.polish_books,
+        }.get(_from)
         total = len(using) - 1
+        assert(total > 0), 'No books are available for selection'
         book = Utility.random(0, total)
         selected = using[book]
         destination = selected.url_append

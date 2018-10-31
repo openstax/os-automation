@@ -60,9 +60,9 @@ def firefox_options(firefox_options, pytestconfig):
     """Set Firefox options."""
     if pytestconfig.getoption('--headless'):
         firefox_options.headless = True
-    firefox62 = ('Mozilla/5.0 (Macintosh; Intel Mac OS X 10.13; rv:62.0) '
-                 'Gecko/20100101 Firefox/62.0')
+    firefox63 = ('Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:63.0) '
+                 'Gecko/20100101 Firefox/63.0')
     firefox_options.add_argument('--user-agent={agent}'
-                                 .format(agent=firefox62))
+                                 .format(agent=firefox63))
 
     return firefox_options
