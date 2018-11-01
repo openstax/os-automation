@@ -7,6 +7,7 @@ from pypom import Region
 from selenium.common.exceptions import WebDriverException
 from selenium.webdriver.common.by import By
 
+from pages.accounts.home import AccountsHome
 from pages.web.base import WebBase
 from utils.utilities import Utility, go_to_
 from utils.web import Web
@@ -342,17 +343,26 @@ class Book(WebBase):
             """Return the errata explanation text."""
             return self.find_element(*self._errata_blurb_locator).text
 
+        @property
+        def errata_append(self):
+            """Return the errata URL append."""
+            return (self.find_element(*self._correction_locator)
+                    .get_attribute('href')
+                    .split('=')[1])
+
         def submit_errata(self):
             """Click on the 'Suggest a correction' button."""
             book = None
             try:
                 button = self.find_element(*self._correction_locator)
                 from pages.web.errata import ErrataForm
-                book = button.get_attribute('href').split('=')[1]
+                book = self.errata_append
             except WebDriverException:
                 button = self.find_element(*self._pl_correction_locator)
                 from pages.katalyst.errata import ErrataForm
             Utility.safari_exception_click(self.driver, element=button)
+            if not self.page.web_nav.login.logged_in:
+                return go_to_(AccountsHome(self.driver))
             if book:
                 return go_to_(ErrataForm(self.driver, book=book))
             return go_to_(ErrataForm(self.driver))
@@ -759,17 +769,26 @@ class Book(WebBase):
                 """Return the errata explanation text."""
                 return self.find_element(*self._errata_blurb_locator).text
 
+            @property
+            def errata_append(self):
+                """Return the errata URL append."""
+                return (self.find_element(*self._correction_locator)
+                        .get_attribute('href')
+                        .split('=')[1])
+
             def submit_errata(self):
                 """Click on the 'Suggest a correction' button."""
                 book = None
                 try:
                     button = self.find_element(*self._correction_locator)
                     from pages.web.errata import ErrataForm
-                    book = button.get_attribute('href').split('=')[1]
+                    book = self.errata_append
                 except WebDriverException:
                     button = self.find_element(*self._pl_correction_locator)
                     from pages.katalyst.errata import ErrataForm
                 Utility.safari_exception_click(self.driver, element=button)
+                if not self.page.web_nav.login.logged_in:
+                    return go_to_(AccountsHome(self.driver))
                 if book:
                     return go_to_(ErrataForm(self.driver, book=book))
                 return go_to_(ErrataForm(self.driver))
