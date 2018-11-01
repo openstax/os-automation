@@ -416,3 +416,38 @@ def test_an_old_version_does_not_have_errata(web_base_url, selenium):
     assert(book.is_displayed())
     with pytest.raises(NoSuchElementException):
         book.details.errata_text
+
+
+@test_case('C210363')
+@nondestructive
+@web
+def test_users_may_view_the_current_list_of_errata_for_a_book(
+        web_base_url, selenium):
+    """Test any user may view the current errata list for a current book."""
+    # GIVEN: a user viewing a current edition book details page
+    # AND:   are not logged into the website
+    subjects = Subjects(selenium, web_base_url).open()
+    book = subjects.select_random_book(_from=Library.OPENSTAX,
+                                       filter_current=True)
+    book_title = book.title
+
+    # WHEN: they click the "Errata list" button
+    errata = book.details.view_errata()
+
+    # THEN: an errata list for the book is displayed
+    assert(errata.is_displayed())
+    assert('errata/?book' in errata.location)
+    assert(book_title in errata.title)
+
+    # WHEN: they return to the book details page
+    # AND:  reduce the screen to 600 pixels
+    # AND:  click on the "Report errata" bar
+    # AND:  click on the "Errata list" button
+    errata.back()
+    book.resize_window(width=600)
+    errata = book.phone.errata.view_errata()
+
+    # THEN: an errata list for the book is displayed
+    assert(errata.is_displayed())
+    assert('errata/?book' in errata.location)
+    assert(book_title in errata.title)

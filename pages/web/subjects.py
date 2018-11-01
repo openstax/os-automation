@@ -188,14 +188,11 @@ class Subjects(WebBase):
         """Select the books with a newer editions available."""
         library = Library()
         collection = library.get_titles(library.superseded)
-        print(collection)
-        for book in self._active_books:
-            print(book.title in collection, book.title)
         return [book for book in self._active_books
                 if book.title in collection]
 
     @property
-    def openstax_books(self):
+    def openstax_books(self, filter_current=False):
         """Select active books while excluding Polish versions."""
         return [book for book in self._active_books
                 if book.language == Library.ENGLISH]
@@ -206,7 +203,7 @@ class Subjects(WebBase):
         return [book for book in self._active_books
                 if book.language == Library.POLISH]
 
-    def select_random_book(self, _from=Library.OPENSTAX):
+    def select_random_book(self, _from=Library.OPENSTAX, filter_current=False):
         """Return a random book from the active list."""
         using = {
             Library.ALL_BOOKS: self._active_books,
@@ -218,6 +215,9 @@ class Subjects(WebBase):
             Library.POLISH: self.polish_books,
             Library.SUPERSEDED: self.old_book_editions,
         }.get(_from)
+        if filter_current:
+            using = list(filter(
+                lambda book: book.title not in Library.OLD_EDITIONS, using))
         total = len(using)
         assert(total > 0), 'No books are available for selection'
         book = Utility.random(0, total - 1)

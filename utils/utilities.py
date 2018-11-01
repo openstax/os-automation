@@ -29,9 +29,43 @@ class Utility(object):
     HEX_DIGITS = '0123456789ABCDEF'
 
     @classmethod
-    def select(cls, driver, element_locator, label):
-        """Select an Option from a menu."""
-        return Utility.fast_multiselect(driver, element_locator, [label])
+    def clear_field(cls, driver, field=None, field_locator=None):
+        """Clear the contents of text-type fields."""
+        sleep(0.1)
+        if not field:
+            field = driver.find_element(*field_locator)
+        if driver.name == 'chrome':
+            field.clear()
+        elif driver.name == 'firefox':
+            special = Keys.COMMAND if system() == 'Darwin' else Keys.CONTROL
+            ActionChains(driver) \
+                .click(field) \
+                .key_down(special) \
+                .send_keys('a') \
+                .key_up(special) \
+                .send_keys(Keys.DELETE) \
+                .perform()
+
+    @classmethod
+    def close_tab(cls, driver):
+        """Close the current tab and switch to the other tab."""
+        driver.close()
+        driver.switch_to.window(driver.window_handles[0])
+
+    @classmethod
+    def compare_colors(cls, left, right):
+        """Return True if two RGB color strings match."""
+        return Color.from_string(left) == Color.from_string(right)
+
+    @classmethod
+    def fake_email(cls, first_name, surname, id=False):
+        """Return a name-based fake email."""
+        template = ('{first}.{second}.{random}@os.fake.org')
+        return template.format(
+            first=first_name,
+            second=surname,
+            random=id if id else Utility.random(100, 999)
+        ).lower()
 
     @classmethod
     def fast_multiselect(cls, driver, element_locator, labels):
@@ -48,36 +82,6 @@ class Utility(object):
         return select
 
     @classmethod
-    def selected_option(cls, driver, element_locator):
-        """Return the currently selected option."""
-        return Select(driver.find_element(*element_locator)) \
-            .first_selected_option \
-            .text
-
-    @classmethod
-    def scroll_to(
-            cls, driver, element_locator=None, element=None, shift=0):
-        """Scroll the screen to the element.
-
-        Args:
-            driver (webdriver): the selenium browser object
-            element_locator (Tuple(str, str)): a By selector and locator
-            element (WebElement): a specific element
-            shift (int): adjust the page vertically by a set number of pixels
-                > 0 scrolls down, < 0 scrolls up
-
-        """
-        target = element if element else driver.find_element(*element_locator)
-        driver.execute_script(SCROLL_INTO_VIEW, target)
-        if shift != 0:
-            driver.execute_script(SHIFT_VIEW_BY, shift)
-
-    @classmethod
-    def scroll_top(cls, driver):
-        """Scroll to the top of the browser screen."""
-        driver.execute_script('window.scrollTo(0, 0);')
-
-    @classmethod
     def get_error_information(cls, error):
         """Break up an assertion error object."""
         short = str(error.getrepr(style='short'))
@@ -85,11 +89,93 @@ class Utility(object):
         return info.replace("'", '').replace('{', '').replace('}', '')
 
     @classmethod
-    def random_hex(cls, length=20, lower=False):
-        """Return a random hex number of size length."""
-        line = ''.join([Utility.HEX_DIGITS[randint(0, 0xF)]
-                       for _ in range(length)])
-        return line if not lower else line.lower()
+    def get_test_credit_card(cls, card=None, status=None):
+        """Return a random card number and CVV for test transactions."""
+        braintree = Card()
+        _card = card if card else Status.VISA
+        _status = status if status else Status.VALID
+        test_cards = braintree.get_by(Status.STATUS, _status)
+        test_cards = braintree.get_by(Status.TYPE, _card, test_cards)
+        select = randint(0, len(test_cards) - 1)
+        use_card = test_cards[select]
+        return (use_card['number'], use_card['cvv'])
+
+    @classmethod
+    def has_children(cls, element):
+        """Return True if a specific element has one or more children."""
+        return len(element.find_elements('xpath', './*')) > 0
+
+    @classmethod
+    def has_height(cls, driver, locator):
+        """Return True if the computed height isn't 'auto'."""
+        auto = ('return window.getComputedStyle('
+                'document.querySelector("{selector}")).height!="auto"'
+                ).format(selector=locator)
+        return driver.execute_script(auto)
+
+    @classmethod
+    def is_image_visible(cls, driver, image=None, locator=None):
+        """Return True if an image is rendered."""
+        if image:
+            image_group = image if isinstance(image, list) else [image]
+        else:
+            image_group = driver.find_elements(*locator)
+            auto = ('return window.getComputedStyle('
+                    'arguments[0]).height!="auto"')
+            image_group = list(filter(
+                lambda img: driver.execute_script(auto, img),
+                image_group))
+        ie = 'internet explorer'
+        from selenium.webdriver import Ie
+        if (isinstance(driver, Ie) or
+                driver.capabilities.get('browserName') == ie):
+            script = 'return arguments[0].complete'
+        else:
+            script = (
+                'return ((typeof arguments[0].naturalWidth)!="undefined")')
+        from functools import reduce
+        map_list = (list(map(
+            lambda img: driver.execute_script(script, img), image_group)))
+        return reduce(lambda img, group: img and group, map_list, True)
+
+    @classmethod
+    def load_background_images(cls, driver, locator):
+        """Inject a script to wait for background image downloads.
+
+        Return True when complete so it can be used in loaded methods.
+        """
+        inject = (
+            r'''
+            ;(function() {
+                var head = document.getElementsByTagName("head")[0];
+                var jquery = document.createElement("script");
+                jquery.src = "JQUERY_STRING";
+                jquery.onload = function() {
+                    var $ = window.jQuery;
+                    var head = document.getElementsByTagName("head")[0];
+                    var image = document.createElement("script");
+                    image.src = "IMAGE_STRING";
+                    image.type = "text/javascript";
+                    head.appendChild(image);
+                    $("SELECTOR").waitForImages().done(
+                        function() { return true; });
+                };
+                head.appendChild(jquery);
+            });
+            return true;
+            '''
+            .replace('JQUERY_STRING', JQUERY)
+            .replace('IMAGE_STRING', WAIT_FOR_IMAGE)
+            .replace('SELECTOR', locator[1])
+        )
+        return driver.execute_script(inject)
+
+    @classmethod
+    def new_tab(cls, driver):
+        """Open another browser tab."""
+        driver.execute_script(OPEN_TAB)
+        sleep(1)
+        return driver.window_handles
 
     @classmethod
     def random(cls, start=0, end=100000):
@@ -97,18 +183,11 @@ class Utility(object):
         return randint(start, end)
 
     @classmethod
-    def random_set(cls, group, size=1):
-        """Return a unique set from a list."""
-        if size <= 0:
-            return []
-        if size >= len(group):
-            return group
-        new_set = []
-        while len(new_set) < size:
-            selected = group[Utility.random(0, len(group) - 1)]
-            if selected not in new_set:
-                new_set.append(selected)
-        return new_set
+    def random_hex(cls, length=20, lower=False):
+        """Return a random hex number of size length."""
+        line = ''.join([Utility.HEX_DIGITS[randint(0, 0xF)]
+                       for _ in range(length)])
+        return line if not lower else line.lower()
 
     @classmethod
     def random_name(cls, is_male=None, is_female=None):
@@ -143,14 +222,18 @@ class Utility(object):
         return template.format(area=area_code, local=randint(100, 199))
 
     @classmethod
-    def fake_email(cls, first_name, surname, id=False):
-        """Return a name-based fake email."""
-        template = ('{first}.{second}.{random}@os.fake.org')
-        return template.format(
-            first=first_name,
-            second=surname,
-            random=id if id else Utility.random(100, 999)
-        ).lower()
+    def random_set(cls, group, size=1):
+        """Return a unique set from a list."""
+        if size <= 0:
+            return []
+        if size >= len(group):
+            return group
+        new_set = []
+        while len(new_set) < size:
+            selected = group[Utility.random(0, len(group) - 1)]
+            if selected not in new_set:
+                new_set.append(selected)
+        return new_set
 
     @classmethod
     def safari_exception_click(cls, driver, locator=None, element=None):
@@ -169,29 +252,39 @@ class Utility(object):
                     sleep(1.0)
 
     @classmethod
-    def wait_for_overlay(cls, driver, locator):
-        """Wait for an overlay to clear making the target available."""
-        WebDriverWait(driver, 15).until(
-            expect.element_to_be_clickable(locator))
-        sleep(1.0)
+    def scroll_to(
+            cls, driver, element_locator=None, element=None, shift=0):
+        """Scroll the screen to the element.
+
+        Args:
+            driver (webdriver): the selenium browser object
+            element_locator (Tuple(str, str)): a By selector and locator
+            element (WebElement): a specific element
+            shift (int): adjust the page vertically by a set number of pixels
+                > 0 scrolls down, < 0 scrolls up
+
+        """
+        target = element if element else driver.find_element(*element_locator)
+        driver.execute_script(SCROLL_INTO_VIEW, target)
+        if shift != 0:
+            driver.execute_script(SHIFT_VIEW_BY, shift)
 
     @classmethod
-    def wait_for_overlay_then(cls, target, time=10.0, interval=0.5):
-        """Wait for an overlay to clear then performing the target action."""
-        for _ in range(int(time / interval)):
-            try:
-                target()
-                break
-            except WebDriverException:
-                sleep(interval)
-        sleep(1.0)
+    def scroll_top(cls, driver):
+        """Scroll to the top of the browser screen."""
+        driver.execute_script('window.scrollTo(0, 0);')
 
     @classmethod
-    def new_tab(cls, driver):
-        """Open another browser tab."""
-        driver.execute_script(OPEN_TAB)
-        sleep(1)
-        return driver.window_handles
+    def select(cls, driver, element_locator, label):
+        """Select an Option from a menu."""
+        return Utility.fast_multiselect(driver, element_locator, [label])
+
+    @classmethod
+    def selected_option(cls, driver, element_locator):
+        """Return the currently selected option."""
+        return Select(driver.find_element(*element_locator)) \
+            .first_selected_option \
+            .text
 
     @classmethod
     def switch_to(cls, driver, link_locator=None, element=None, action=None):
@@ -212,115 +305,22 @@ class Utility(object):
             return data
 
     @classmethod
-    def close_tab(cls, driver):
-        """Close the current tab and switch to the other tab."""
-        driver.close()
-        driver.switch_to.window(driver.window_handles[0])
+    def wait_for_overlay(cls, driver, locator):
+        """Wait for an overlay to clear making the target available."""
+        WebDriverWait(driver, 15).until(
+            expect.element_to_be_clickable(locator))
+        sleep(1.0)
 
     @classmethod
-    def compare_colors(cls, left, right):
-        """Return True if two RGB color strings match."""
-        return Color.from_string(left) == Color.from_string(right)
-
-    @classmethod
-    def clear_field(cls, driver, field=None, field_locator=None):
-        """Clear the contents of text-type fields."""
-        sleep(0.1)
-        if not field:
-            field = driver.find_element(*field_locator)
-        if driver.name == 'chrome':
-            field.clear()
-        elif driver.name == 'firefox':
-            special = Keys.COMMAND if system() == 'Darwin' else Keys.CONTROL
-            ActionChains(driver) \
-                .click(field) \
-                .key_down(special) \
-                .send_keys('a') \
-                .key_up(special) \
-                .send_keys(Keys.DELETE) \
-                .perform()
-
-    @classmethod
-    def get_test_credit_card(cls, card=None, status=None):
-        """Return a random card number and CVV for test transactions."""
-        braintree = Card()
-        _card = card if card else Status.VISA
-        _status = status if status else Status.VALID
-        test_cards = braintree.get_by(Status.STATUS, _status)
-        test_cards = braintree.get_by(Status.TYPE, _card, test_cards)
-        select = randint(0, len(test_cards) - 1)
-        use_card = test_cards[select]
-        return (use_card['number'], use_card['cvv'])
-
-    @classmethod
-    def has_children(cls, element):
-        """Return True if a specific element has one or more children."""
-        return len(element.find_elements('xpath', './*')) > 0
-
-    @classmethod
-    def is_image_visible(cls, driver, image=None, locator=None):
-        """Return True if an image is rendered."""
-        if image:
-            image_group = image if isinstance(image, list) else [image]
-        else:
-            image_group = driver.find_elements(*locator)
-            auto = ('return window.getComputedStyle('
-                    'arguments[0]).height!="auto"')
-            image_group = list(filter(
-                lambda img: driver.execute_script(auto, img),
-                image_group))
-        ie = 'internet explorer'
-        from selenium.webdriver import Ie
-        if (isinstance(driver, Ie) or
-                driver.capabilities.get('browserName') == ie):
-            script = 'return arguments[0].complete'
-        else:
-            script = (
-                'return ((typeof arguments[0].naturalWidth)!="undefined")')
-        from functools import reduce
-        map_list = (list(map(
-            lambda img: driver.execute_script(script, img), image_group)))
-        return reduce(lambda img, group: img and group, map_list, True)
-
-    @classmethod
-    def has_height(cls, driver, locator):
-        """Return True if the computed height isn't 'auto'."""
-        auto = ('return window.getComputedStyle('
-                'document.querySelector("{selector}")).height!="auto"'
-                ).format(selector=locator)
-        return driver.execute_script(auto)
-
-    @classmethod
-    def load_background_images(cls, driver, locator):
-        """Inject a script to wait for background image downloads.
-
-        Return True when complete so it can be used in loaded methods.
-        """
-        inject = (
-            r'''
-            ;(function() {
-                var head = document.getElementsByTagName("head")[0];
-                var jquery = document.createElement("script");
-                jquery.src = "JQUERY_STRING";
-                jquery.onload = function() {
-                    var $ = window.jQuery;
-                    var head = document.getElementsByTagName("head")[0];
-                    var image = document.createElement("script");
-                    image.src = "IMAGE_STRING";
-                    image.type = "text/javascript";
-                    head.appendChild(image);
-                    $("SELECTOR").waitForImages().done(
-                        function() { return true; });
-                };
-                head.appendChild(jquery);
-            });
-            return true;
-            '''
-            .replace('JQUERY_STRING', JQUERY)
-            .replace('IMAGE_STRING', WAIT_FOR_IMAGE)
-            .replace('SELECTOR', locator[1])
-        )
-        return driver.execute_script(inject)
+    def wait_for_overlay_then(cls, target, time=10.0, interval=0.5):
+        """Wait for an overlay to clear then performing the target action."""
+        for _ in range(int(time / interval)):
+            try:
+                target()
+                break
+            except WebDriverException:
+                sleep(interval)
+        sleep(1.0)
 
 
 class Card(object):
@@ -430,4 +430,6 @@ class Actions(ActionChains):
             'return window.getComputedStyle(document.querySelector'
             '("{selector}"))["{data_type}"]'
         ).format(selector=css_selector, data_type=data_type)
-        return self._driver.execute_script(element_height) == expected
+        val = self._driver.execute_script(element_height)
+        print(val, val == expected)
+        return val == expected
