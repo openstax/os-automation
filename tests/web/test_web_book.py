@@ -1,6 +1,8 @@
 """Test the books webpage."""
 
+import pytest
 import requests
+from selenium.common.exceptions import NoSuchElementException
 
 from pages.web.subjects import Subjects
 from tests.markers import nondestructive, test_case, web
@@ -322,3 +324,95 @@ def test_page_links_to_the_adoption_form(web_base_url, selenium):
     assert(adoption.is_displayed())
     assert('adoption' in adoption.location)
     assert(passed_title in adoption.location)
+
+
+@test_case('C210360')
+@nondestructive
+@web
+def test_the_book_details_pane(web_base_url, selenium):
+    """Test for the presence of a summary, authors, publish date and ISBN."""
+    # GIVEN: a user viewing the book details page
+    subjects = Subjects(selenium, web_base_url).open()
+    book = subjects.select_random_book(_from=Library.OPENSTAX)
+
+    # WHEN:
+
+    # THEN: a book "Summary" is present
+    # AND:  one or more "Senior Contributing Authors" may be present
+    # AND:  one or more "Contributing Authors" may be present
+    # AND:  a publish date is present
+    # AND:  one or more ISBN numbers is present
+    # AND:  a license is present
+    assert(book.details.is_displayed())
+    assert(len(book.details.summary) > 10)
+    assert(book.details.senior_authors)
+    if book.details.has_nonsenior_authors:
+        assert(book.details.nonsenior_authors)
+    assert(book.details.published_on)
+    assert(book.details.print_isbns and book.details.digital_isbns)
+    if book.sidebar.ibooks:
+        assert(book.details.ibook_isbns)
+    assert(book.details.license)
+
+    # WHEN: the screen is reduced to 600 pixels
+    # AND:  they click on the "Book details" bar
+    book.resize_window(width=600)
+    book.details.toggle()
+
+    # THEN: the summary is displayed
+    assert(len(book.details.summary) > 10)
+
+    # WHEN: they click on the "Authors" bar
+    book.details.authors.toggle()
+
+    # THEN: one or more "Senior Contributing Authors" may be present
+    # AND:  one or more "Contributing Authors" may be present
+    assert(book.details.authors.senior_authors)
+    if book.details.authors.has_nonsenior_authors:
+        assert(book.details.authors.nonsenior_authors)
+
+    # WHEN: they click on the "Product details" bar
+    book.details.product_details.toggle()
+
+    # THEN: one or more ISBN numbers is present
+    # AND:  a license is present
+    assert(book.details.product_details.print_isbns and
+           book.details.product_details.digital_isbns)
+    if book.phone.ibooks:
+        assert(book.details.product_details.ibook_isbns)
+    assert(book.details.product_details.license)
+
+
+@test_case('C210361')
+@nondestructive
+@web
+def test_current_book_editions_have_an_errata_section(web_base_url, selenium):
+    """Test that the current edition of a book has an errata section."""
+    # GIVEN: a user viewing the subjects page
+    subjects = Subjects(selenium, web_base_url).open()
+
+    # WHEN: they click a current edition book tile
+    book = subjects.select_random_book(_from=Library.CURRENT)
+
+    # THEN: the book details page is displayed
+    # AND:  an errata section is present
+    assert(book.is_displayed())
+    assert(book.details.errata_text)
+
+
+@test_case('C210362')
+@nondestructive
+@web
+def test_an_old_version_does_not_have_errata(web_base_url, selenium):
+    """Test that the current edition of a book has an errata section."""
+    # GIVEN: a user viewing the subjects page
+    subjects = Subjects(selenium, web_base_url).open()
+
+    # WHEN: they click a current edition book tile
+    book = subjects.select_random_book(_from=Library.SUPERSEDED)
+
+    # THEN: the book details page is displayed
+    # AND:  an errata section is present
+    assert(book.is_displayed())
+    with pytest.raises(NoSuchElementException):
+        book.details.errata_text

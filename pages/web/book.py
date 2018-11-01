@@ -288,7 +288,7 @@ class Book(WebBase):
         _summary_locator = (By.CSS_SELECTOR, '.loc-summary-text div')
         _senior_auth_locator = (By.CSS_SELECTOR, '.loc-senior-author')
         _other_auth_locator = (By.CSS_SELECTOR, '.loc-nonsenior-author')
-        _errata_blurb_locator = (By.CSS_SELECTOR, '.errataBlurb')
+        _errata_blurb_locator = (By.CSS_SELECTOR, '[data-html=errataBlurb]')
         _correction_locator = (By.CSS_SELECTOR, '[href*="errata/form"]')
         _pl_correction_locator = (By.CSS_SELECTOR, '[href$="/pl/errata"]')
         _errata_list_locator = (By.CSS_SELECTOR, '[href*="errata/?book"]')
@@ -311,18 +311,31 @@ class Book(WebBase):
         @property
         def senior_authors(self):
             """Return the list of senior authors."""
-            return [
-                (author.text.split(',', 1)[0], author.text.split(',', 1)[1])
-                for author in self.find_elements(*self._senior_auth_locator)
-            ]
+            authors = self.find_elements(*self._senior_auth_locator)
+            authors = [
+                (author.text.split(', ', 1)[0], author.text.split(', ', 1)[-1])
+                for author in authors]
+            for index, author in enumerate(authors):
+                if author[0] == author[1]:
+                    authors[index] = (author[0], '')
+            return authors
+
+        @property
+        def has_nonsenior_authors(self):
+            """Return True if the contributing authors section exists."""
+            return '<h3>Contributing Authors</h3>' in self.driver.page_source
 
         @property
         def nonsenior_authors(self):
             """Return the list of non-senior authors."""
-            return [
-                (author.text.split(',', 1)[0], author.text.split(',', 1)[1])
-                for author in self.find_elements(*self._other_auth_locator)
-            ]
+            authors = self.find_elements(*self._other_auth_locator)
+            authors = [
+                (author.text.split(', ', 1)[0], author.text.split(', ', 1)[-1])
+                for author in authors]
+            for index, author in enumerate(authors):
+                if author[0] == author[1]:
+                    authors[index] = (author[0], '')
+            return authors
 
         @property
         def errata_text(self):
@@ -541,7 +554,7 @@ class Book(WebBase):
             return go_to_(Adoption(self.driver))
 
         @property
-        def book_details(self):
+        def details(self):
             """Access the book details pane."""
             phone_details_root = self.find_element(*self._book_details_locator)
             return self.CompactBookDetails(self, phone_details_root)
@@ -605,16 +618,36 @@ class Book(WebBase):
                 @property
                 def senior_authors(self):
                     """Return a list of senior authors."""
-                    return [author.text
-                            for author
-                            in self.find_elements(*self._senior_auth_locator)]
+                    authors = self.find_elements(*self._senior_auth_locator)
+                    authors = [
+                        (author.text.split(', ', 1)[0],
+                         author.text.split(', ', 1)[-1])
+                        for author in authors]
+                    for index, author in enumerate(authors):
+                        if author[0] == author[1]:
+                            authors[index] = (author[0], '')
+                    return authors
+
+                @property
+                def has_nonsenior_authors(self):
+                    """Return True if the contributing authors section exists.
+
+                    """
+                    return '<h4>Contributing Authors</h4>' \
+                        in self.driver.page_source
 
                 @property
                 def nonsenior_authors(self):
                     """Return a list of non-senior authors."""
-                    return [author.text
-                            for author
-                            in self.find_elements(*self._other_auth_locator)]
+                    authors = self.find_elements(*self._other_auth_locator)
+                    authors = [
+                        (author.text.split(', ', 1)[0],
+                         author.text.split(', ', 1)[-1])
+                        for author in authors]
+                    for index, author in enumerate(authors):
+                        if author[0] == author[1]:
+                            authors[index] = (author[0], '')
+                    return authors
 
             class ProductDetails(AccordionSubRegion):
                 """The product details information section."""
@@ -622,7 +655,7 @@ class Book(WebBase):
                 _print_locator = (By.CSS_SELECTOR, '.loc-print-isbn')
                 _digital_locator = (By.CSS_SELECTOR, '.loc-digital-isbn')
                 _ibook_locator = (By.CSS_SELECTOR, '.loc-ibook-isbn')
-                _license_locator = (By.CSS_SELECTOR, '.loc-license')
+                _license_locator = (By.CSS_SELECTOR, '.license')
 
                 @property
                 def print_isbns(self):
@@ -995,9 +1028,9 @@ def _split_isbn(driver, locator):
         group = ''
         for book in isbns:
             group = group + book.get_attribute('innerHTML')
-        return list(filter(
+        return sorted(list(set(filter(
             lambda string: string.startswith('ISBN'),
-            re.split('<|>', isbns[0])
-        ))
+            re.split('<|>', group)
+        ))))
     except WebDriverException:
         return []

@@ -261,6 +261,7 @@ class Library():
     ALL_BOOKS = 'all'
     BOOKSHARE = 'bookshare'
     CATEGORY = 'subject'
+    CURRENT = 'current'
     DETAILS = 'details'
     ENGLISH = 'English'
     INTEREST = ADOPTION
@@ -271,6 +272,7 @@ class Library():
     OPENSTAX = 'openstax'
     POLISH = 'Polish'
     SHORT_NAME = 'short_name'
+    SUPERSEDED = 'not_current'
 
     # Subjects
     ALL = 'View All'
@@ -280,6 +282,10 @@ class Library():
     MATH = 'Math'
     SCIENCE = 'Science'
     SOCIAL = 'Social Sciences'
+
+    OLD_EDITIONS = [
+        BIOLOGY
+    ]
 
     def __init__(self):
         """Initialize the library."""
@@ -712,6 +718,12 @@ class Library():
         return self.get_by_category(self.BUSINESS)
 
     @property
+    def current(self):
+        """Return the current edition of each book."""
+        return [(book, self.get(book)) for book in self.books
+                if book not in self.OLD_EDITIONS]
+
+    @property
     def humanities(self):
         """Return the humanities books."""
         return self.get_by_category(self.HUMANITIES)
@@ -760,6 +772,12 @@ class Library():
     def social_sciences(self):
         """Return the social science books."""
         return self.get_by_category(self.SOCIAL)
+
+    @property
+    def superseded(self):
+        """Return older books with a newer version available."""
+        return [(book, self.get(book)) for book in self.books
+                if book in self.OLD_EDITIONS]
 
     def get_titles(self, group=None):
         """Return a list of book titles."""

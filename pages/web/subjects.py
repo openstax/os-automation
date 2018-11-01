@@ -160,6 +160,14 @@ class Subjects(WebBase):
                 if book.title in collection]
 
     @property
+    def current_books(self):
+        """Select the current editions of each book."""
+        library = Library()
+        collection = library.get_titles(library.current)
+        return [book for book in self._active_books
+                if book.title in collection]
+
+    @property
     def kindle_books(self):
         """Select active books with a Kindle edition available."""
         library = Library()
@@ -172,6 +180,17 @@ class Subjects(WebBase):
         """Select active books with an iBook eddition available."""
         library = Library()
         collection = library.get_titles(library.itunes)
+        return [book for book in self._active_books
+                if book.title in collection]
+
+    @property
+    def old_book_editions(self):
+        """Select the books with a newer editions available."""
+        library = Library()
+        collection = library.get_titles(library.superseded)
+        print(collection)
+        for book in self._active_books:
+            print(book.title in collection, book.title)
         return [book for book in self._active_books
                 if book.title in collection]
 
@@ -192,14 +211,16 @@ class Subjects(WebBase):
         using = {
             Library.ALL_BOOKS: self._active_books,
             Library.BOOKSHARE: self.bookshare_books,
+            Library.CURRENT: self.current_books,
             Library.ITUNES: self.itunes_books,
             Library.KINDLE: self.kindle_books,
             Library.OPENSTAX: self.openstax_books,
             Library.POLISH: self.polish_books,
+            Library.SUPERSEDED: self.old_book_editions,
         }.get(_from)
-        total = len(using) - 1
+        total = len(using)
         assert(total > 0), 'No books are available for selection'
-        book = Utility.random(0, total)
+        book = Utility.random(0, total - 1)
         selected = using[book]
         destination = selected.url_append
         selected.select()
