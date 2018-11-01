@@ -320,3 +320,26 @@ class ErrataDetail(WebBase):
         book = self.errata_list.get_attribute('href').split('=')[-1]
         Utility.safari_exception_click(self.driver, self.errata_list)
         return go_to_(Errata(self.driver, book=book))
+
+
+class ErrataForm(WebBase):
+    """The errata submission form."""
+
+    URL_TEMPLATE = '/errata/form?book={book}'
+
+    _form_locator = (By.CSS_SELECTOR, '.body-block')
+    _subject_locator = (By.CSS_SELECTOR, '.select span')
+
+    @property
+    def loaded(self):
+        """Return True when an errata form is found."""
+        return self.find_element(*self._form_locator)
+
+    def is_displayed(self):
+        """Return True if the form is displayed."""
+        return self.loaded.is_displayed()
+
+    @property
+    def subject(self):
+        """Return the currently selected book title."""
+        return self.find_element(*self._subject_locator).text

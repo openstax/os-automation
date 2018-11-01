@@ -438,7 +438,8 @@ class WebNav(Region):
             """Return True if the log in link or user's name is displayed."""
             return self.login.is_displayed()
 
-        def log_in(self, user=None, password=None, do_not_log_in=False):
+        def log_in(self, user=None, password=None,
+                   do_not_log_in=False, destination=None):
             """Log a user into the website."""
             Utility.wait_for_overlay_then(self.login.click)
             from pages.accounts.home import AccountsHome
@@ -446,7 +447,9 @@ class WebNav(Region):
                 return go_to_(AccountsHome(self.driver))
             else:
                 AccountsHome(self.driver).service_log_in(user, password)
-                from pages.web.home import WebHome as Home
+            if destination:
+                return go_to_(destination(self.driver))
+            from pages.web.home import WebHome as Home
             return go_to_(Home(self.driver))
 
         @property

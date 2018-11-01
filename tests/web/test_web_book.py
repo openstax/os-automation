@@ -451,3 +451,41 @@ def test_users_may_view_the_current_list_of_errata_for_a_book(
     assert(errata.is_displayed())
     assert('errata/?book' in errata.location)
     assert(book_title in errata.title)
+
+
+@test_case('C210364')
+@nondestructive
+@web
+def test_logged_in_users_may_view_the_errata_submission_form(
+        web_base_url, selenium, teacher):
+    """Test a logged in user may view the errata submission form."""
+    # GIVEN: a user viewing a current edition book details page
+    # AND:   are logged into the website
+    subjects = Subjects(selenium, web_base_url).open()
+    subjects.web_nav.login.log_in(*teacher, destination=Subjects)
+    subjects.web_nav.login.training_wheel.close_modal()
+    book = subjects.select_random_book(_from=Library.OPENSTAX,
+                                       filter_current=True)
+    book_title = book.title
+
+    # WHEN: they click on the "Suggest a correction" button
+    errata_form = book.details.submit_errata()
+
+    # THEN: the errata form is displayed
+    # AND:  the subject is prefilled in
+    assert(errata_form.is_displayed())
+    assert(errata_form.subject == book_title)
+
+    # WHEN: they return to the book details page
+    # AND:  reduce the screen to 600 pixels
+    # AND:  click on the "Report errata" bar
+    # AND:  click on the "Suggest a correction" button
+    errata_form.back()
+    book.resize_window(width=600)
+    book.phone.errata.toggle()
+    errata_form = book.phone.errata.submit_errata()
+
+    # THEN: the errata form is displayed
+    # AND:  the subject is prefilled in
+    assert(errata_form.is_displayed())
+    assert(errata_form.subject == book_title)
