@@ -522,3 +522,40 @@ def test_non_logged_in_users_are_directed_to_log_in_to_view_the_errata_form(
     errata_form = ErrataForm(selenium, web_base_url, book=book_errata)
     assert(errata_form.is_displayed())
     assert(errata_form.subject == book_title)
+
+
+@test_case('C210366')
+@nondestructive
+@web
+def test_non_logged_in_users_on_mobile_are_directed_to_log_in_for_errata_form(
+        web_base_url, selenium, teacher):
+    """Test non-logged in users on mobile trying to view the form."""
+    # GIVEN: a user viewing a current edition book details page
+    # AND:  have a valid login and password
+    # AND:  are not logged into the website
+    # AND:  the screen width is 600 pixels
+    subjects = Subjects(selenium, web_base_url)
+    subjects.resize_window(width=600)
+    subjects.open()
+    book = subjects.select_random_book(_from=Library.OPENSTAX,
+                                       filter_current=True)
+    book_title = book.title
+    book_errata = book.phone.errata.errata_append
+
+    # WHEN: they click on the "Report errata" bar
+    # AND:  click on the "Suggest a correction" button
+    book.phone.errata.toggle()
+    accounts = book.phone.errata.submit_errata()
+
+    # THEN: the Accounts login page is displayed
+    assert(accounts.is_displayed())
+    assert('accounts' in accounts.location)
+
+    # WHEN: they log into Accounts
+    accounts.service_log_in(*teacher)
+
+    # THEN: the errata form is displayed
+    # AND:  the subject is prefilled in
+    errata_form = ErrataForm(selenium, web_base_url, book=book_errata)
+    assert(errata_form.is_displayed())
+    assert(errata_form.subject == book_title)

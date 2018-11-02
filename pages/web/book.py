@@ -787,7 +787,7 @@ class Book(WebBase):
                     button = self.find_element(*self._pl_correction_locator)
                     from pages.katalyst.errata import ErrataForm
                 Utility.safari_exception_click(self.driver, element=button)
-                if not self.page.web_nav.login.logged_in:
+                if not self.page.page.web_nav.login.logged_in:
                     return go_to_(AccountsHome(self.driver))
                 if book:
                     return go_to_(ErrataForm(self.driver, book=book))
