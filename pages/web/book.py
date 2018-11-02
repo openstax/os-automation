@@ -140,6 +140,12 @@ class Book(WebBase):
             'Tab viewing is not available in the phone display'
         return [tab for tab in self.find_elements(*self._tab_locator)]
 
+    def select_tab(self, tab):
+        """Select a specific resource tab."""
+        self.tabs[tab].click()
+        sleep(0.5)
+        return self
+
     @property
     def details(self):
         """Access the book details."""
@@ -420,10 +426,9 @@ class Book(WebBase):
             """Return True if the instructor resources content is visible."""
             return self._displayed(tab=Web.INSTRUCTOR_RESOURCES)
 
-        @property
         def sign_up(self):
             """Click the account sign up link."""
-            Utility.safari_exception_click(
+            Utility.switch_to(
                 self.driver, link_locator=self._account_signup_locator)
             from pages.accounts.signup import Signup
             return go_to_(Signup(self.driver))

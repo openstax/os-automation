@@ -559,3 +559,26 @@ def test_non_logged_in_users_on_mobile_are_directed_to_log_in_for_errata_form(
     errata_form = ErrataForm(selenium, web_base_url, book=book_errata)
     assert(errata_form.is_displayed())
     assert(errata_form.subject == book_title)
+
+
+@test_case('C210367')
+@nondestructive
+@web
+def test_teachers_are_asked_to_sign_up_to_access_locked_content(
+        web_base_url, selenium):
+    """Test users are directed to sign up to access locked resources."""
+    # GIVEN: a user viewing the book details page
+    # AND:  are not logged into the website
+    # AND:  the book has instructor resources
+    subjects = Subjects(selenium, web_base_url).open()
+    book = subjects.select_random_book(_from=Library.OPENSTAX)
+
+    # WHEN: they click on the "Sign up" link
+    book.select_tab(Web.INSTRUCTOR_RESOURCES)
+    from time import sleep
+    sleep(5)
+    accounts = book.instructor.sign_up()
+
+    # THEN: the Accounts sign up page is displayed
+    assert(accounts.is_displayed())
+    assert('accounts' in accounts.location)
