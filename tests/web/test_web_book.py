@@ -4,9 +4,13 @@ import pytest
 import requests
 from selenium.common.exceptions import NoSuchElementException
 
+from pages.accounts.home import AccountsHome
+from pages.accounts.signup import Signup
 from pages.web.errata import ErrataForm
 from pages.web.subjects import Subjects
-from tests.markers import nondestructive, test_case, web
+from tests.markers import accounts, nondestructive, test_case, web
+from utils.email import RestMail
+from utils.utilities import Utility
 from utils.web import Library, Web
 
 
@@ -575,10 +579,99 @@ def test_teachers_are_asked_to_sign_up_to_access_locked_content(
 
     # WHEN: they click on the "Sign up" link
     book.select_tab(Web.INSTRUCTOR_RESOURCES)
-    from time import sleep
-    sleep(5)
     accounts = book.instructor.sign_up()
 
     # THEN: the Accounts sign up page is displayed
     assert(accounts.is_displayed())
     assert('accounts' in accounts.location)
+
+
+@test_case('C210368')
+@accounts
+@web
+def test_pending_instructors_see_access_pending_for_locked_resources(
+        accounts_base_url, web_base_url, selenium, teacher):
+    """Test pending instructors see 'Access pending' for locked resources."""
+    # GIVEN: a user viewing the book details page
+    # AND:  have an unverified instructor account
+    # AND:  the book has locked instructor resources
+    name = Utility.random_name()
+    email = RestMail(
+        '{first}.{last}.{tag}'
+        .format(first=name[1], last=name[2], tag=Utility.random_hex(3))
+        .lower()
+    )
+    email.empty()
+    address = email.address
+    password = teacher[1]
+    accounts = AccountsHome(selenium, accounts_base_url).open()
+    accounts.login.go_to_signup.account_signup(
+        email=address, password=password, _type=Signup.INSTRUCTOR,
+        provider=Signup.RESTMAIL, name=name, school='Automation',
+        news=False, phone=Utility.random_phone(),
+        webpage='https://openstax.org/', subjects=subject_list(2), students=10,
+        use=Signup.ADOPTED)
+    subjects = Subjects(selenium, web_base_url).open()
+    book = subjects.select_random_book(_from=Library.OPENSTAX)
+
+    # WHEN: they click on the "Instructor resources" tab
+    book.select_tab(Web.INSTRUCTOR_RESOURCES)
+
+    # THEN: locked resources show "Access pending"
+    for option in book.instructor.resources:
+        assert(option.status_message == Web.PENDING), (
+            '{resource} ("{status}") not pending authorization or available'
+            .format(resource=option.title, status=option.status_message))
+
+
+@test_case('C210369')
+@accounts
+@web
+def test_verified_instructors_may_access_locked_resources(
+        accounts_base_url, web_base_url, selenium, teacher):
+    """Test verified instructors may access locked resources."""
+    # GIVEN: a user viewing the book details page
+    # AND:  they have a valid instructor login and password
+    # AND:  they are not logged into the website
+    # AND:  the book has locked instructor resources
+    subjects = Subjects(selenium, web_base_url).open()
+    book = subjects.select_random_book(_from=Library.OPENSTAX)
+
+    # WHEN: they click on the "Instructor resources" tab
+    # AND:  click on the "Click here to unlock" link
+    book.select_tab(Web.INSTRUCTOR_RESOURCES)
+    options = book.instructor.resources_by_option(Web.LOCKED)
+    assert(options)
+    option = options[Utility.random(0, len(options) - 1)]
+    option_title = option.title
+    option.select()
+    accounts = AccountsHome(selenium, accounts_base_url)
+
+    # THEN: the Accounts login page is displayed
+    assert(accounts.is_displayed())
+    assert('login' in accounts.location)
+
+    # WHEN: they log into Accounts
+    accounts.service_log_in(*teacher)
+    book.wait_for_page_to_load()
+
+    # THEN: the instructor resources tab on the book details page is displayed
+    # AND:  the resource is no longer locked
+    assert(book.instructor.is_displayed())
+    option = book.instructor.resource_by_name(option_title)
+    assert(not option.is_locked), \
+        '{option} is still locked'.format(option=option.title)
+
+
+def subject_list(size=1):
+    """Return a list of subjects for an elevated signup."""
+    subjects = len(Signup.SUBJECTS)
+    if size > subjects:
+        size = subjects
+    book = ''
+    group = []
+    while len(group) < size:
+        book = (Signup.SUBJECTS[Utility.random(0, subjects - 1)])[1]
+        if book not in group:
+            group.append(book)
+    return group

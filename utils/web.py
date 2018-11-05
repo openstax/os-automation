@@ -42,6 +42,15 @@ class Web(object):
     INDIVIDUAL = 0
     BOOKSTORES = 1
 
+    # Book page resource status options
+    DOWNLOAD = 'Download'
+    EXTERNAL = 'Go'
+    LOCKED = 'Click here to unlock'
+    PENDING = 'Access pending'
+    TRANSITION = 'Transition Guide'
+
+    ACCESS_OK = [DOWNLOAD, EXTERNAL, PENDING, TRANSITION]
+
     # Matching strings
     ABOUT = 'about'
     BOOKSTORE = 'bookstore-suppliers'

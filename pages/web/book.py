@@ -21,7 +21,8 @@ class ResourceTab(Region):
     """A base region for instructor and student resources."""
 
     _slogan_locator = (By.CSS_SELECTOR, '.free-stuff-blurb h2')
-    _resource_locator = (By.CSS_SELECTOR, '.resource-box:not(.double)')
+    _resource_locator = (
+        By.CSS_SELECTOR, '.resource-box:not(.double):not(.ally-box)')
 
     def _displayed(self, tab):
             """Return True if the instructor resources content is visible."""
@@ -38,6 +39,34 @@ class ResourceTab(Region):
         """Return a list of available resources."""
         return [Resource(self, box)
                 for box in self.find_elements(*self._resource_locator)]
+
+    def resource_by_name(self, name):
+        """Return a resource box by its name."""
+        for resource in self.resources:
+            if resource.title == name:
+                return resource
+        return None
+
+    def resources_by_status(self, message):
+        """Return a list of resources with a particular status message."""
+        if not isinstance(message, list):
+            message = [message]
+        return [resource for resource in self.resources
+                if resource.status_message in message]
+
+    def resources_by_option(self, option):
+        """Return a list of resources with a particular option."""
+        if option == Web.LOCKED:
+            return [resource for resource in self.resources
+                    if resource.is_locked]
+        if option == Web.DOWNLOADABLE:
+            return [resource for resource in self.resources
+                    if resource.can_be_downloaded]
+        if option == Web.EXTERNAL:
+            return [resource for resource in self.resources
+                    if resource.is_external]
+        raise ValueError('{option} is not a valid resource option'
+                         .format(option=option))
 
 
 class Accordion(Region):
@@ -150,7 +179,7 @@ class Book(WebBase):
     def details(self):
         """Access the book details."""
         if self.driver.get_window_size().get('width') > Web.PHONE:
-            main_root = self.find_element(*self._book_content_locator)
+            main_root = self.find_element(*self._content_locator)
             return self.Details(self, main_root)
         return self.phone.details
 
@@ -166,7 +195,7 @@ class Book(WebBase):
     def instructor(self):
         """Access the instructor resources."""
         if self.driver.get_window_size().get('width') > Web.PHONE:
-            instructor_root = self.find_element(*self._book_content_locator)
+            instructor_root = self.find_element(*self._instructor_locator)
             return self.InstructorResources(self, instructor_root)
         return self.phone.instructor
 
@@ -182,7 +211,7 @@ class Book(WebBase):
     def student(self):
         """Access the student resources."""
         if self.driver.get_window_size().get('width') > Web.PHONE:
-            student_root = self.find_element(*self._book_content_locator)
+            student_root = self.find_element(*self._student_locator)
             return self.StudentResources(self, student_root)
         return self.phone.student
 
@@ -815,6 +844,7 @@ class Resource(Region):
 
     _title_locator = (By.CSS_SELECTOR, 'h3')
     _description_locator = (By.CSS_SELECTOR, '[data-html=description]')
+    _status_message_locator = (By.CSS_SELECTOR, '.bottom .left')
     _is_locked_locator = (By.CSS_SELECTOR, '.fa-lock')
     _can_download_locator = (By.CSS_SELECTOR, '.fa-download')
     _is_external_locator = (By.CSS_SELECTOR, '.fa-external-link-alt')
@@ -835,8 +865,19 @@ class Resource(Region):
 
     def select(self):
         """Click on the resource box."""
+        if self.is_locked:
+            Utility.switch_to(self.driver, element=self.root)
+            return go_to_(AccountsHome(self.driver))
+        if self.status_message == Web.EXTERNAL:
+            Utility.switch_to(self.driver, element=self.root)
+            return self.driver
         self.root.click()
         return self
+
+    @property
+    def status_message(self):
+        """Return the status message text."""
+        return self.find_element(*self._status_message_locator).text.strip()
 
     @property
     def is_locked(self):
