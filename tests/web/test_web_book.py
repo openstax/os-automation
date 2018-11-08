@@ -759,6 +759,60 @@ def test_verified_instructors_may_request_a_comped_ibook(
     assert(not comp_copy_receipt.is_displayed())
 
 
+@test_case('C210370')
+@nondestructive
+@web
+def test_resources_have_a_title_description_and_access_type(
+        web_base_url, selenium, teacher):
+    """Test available resources have a title, description and access type."""
+    # GIVEN: a user viewing the book details page
+    # AND:  have a verified instructor account
+    # AND:  are logged into the site
+    # AND:  the book has instructor resources
+    # AND:  the book has student resources
+    home = WebHome(selenium, web_base_url).open()
+    home.web_nav.login.log_in(*teacher, destination=WebHome, url=web_base_url)
+    if home.web_nav.login.modal_displayed:
+        home.web_nav.login.training_wheel.close_modal()
+    subjects = home.web_nav.subjects.view_all()
+    book = subjects.select_random_book(_from=Library.HAS_S_UNLOCK)
+
+    # WHEN: they click on the "Instructor resources" tab
+    book.select_tab(Web.INSTRUCTOR_RESOURCES)
+
+    # THEN: each resource has a title
+    # AND:  each resource has a description
+    # AND:  each resource has an access type of "Go" to,
+    #       "Download", "Access pending", "Request your
+    #       complimentary iBooks download", or "Visit the
+    #       Hub"
+    for resource in book.instructor.resources_by_status(Web.ACCESS_OK):
+        assert(resource.title)
+        assert(resource.description)
+        assert(resource.status_message in Web.ACCESS_OK)
+
+    # WHEN: they click on the "Student resources" tab
+    book.select_tab(Web.STUDENT_RESOURCES)
+
+    # THEN: each resource has a title
+    # AND:  each resource has a description
+    # AND:  each resource has an access type of "Go" to or
+    #       "Download"
+    for resource in book.student.resources_by_status(Web.ACCESS_OK):
+        assert(resource.title)
+        assert(resource.description)
+        assert(resource.status_message in Web.ACCESS_OK)
+
+    # WHEN: the screen is reduced to 600 pixels
+    book.resize_window(width=600)
+
+    # THEN: the description is not displayed
+    for resource in book.student.resources_by_status(Web.ACCESS_OK):
+        assert(resource.title)
+        assert(not resource.description)
+        assert(resource.status_message in Web.ACCESS_OK)
+
+
 def subject_list(size=1):
     """Return a list of subjects for an elevated signup."""
     subjects = len(Signup.SUBJECTS)

@@ -816,6 +816,34 @@ class Book(WebBase):
                         for option in self.find_elements(
                             *self._instructor_resource_locator)]
 
+            def resource_by_name(self, name):
+                """Return a resource box by its name."""
+                for resource in self.resources:
+                    if resource.title == name:
+                        return resource
+                return None
+
+            def resources_by_status(self, message):
+                """Return a list of resources with a particular status."""
+                if not isinstance(message, list):
+                    message = [message]
+                return [resource for resource in self.resources
+                        if resource.status_message in message]
+
+            def resources_by_option(self, option):
+                """Return a list of resources with a particular option."""
+                if option == Web.LOCKED:
+                    return [resource for resource in self.resources
+                            if resource.is_locked]
+                if option == Web.DOWNLOADABLE:
+                    return [resource for resource in self.resources
+                            if resource.can_be_downloaded]
+                if option == Web.EXTERNAL:
+                    return [resource for resource in self.resources
+                            if resource.is_external]
+                raise ValueError('{option} is not a valid resource option'
+                                 .format(option=option))
+
             @property
             def partners(self):
                 """Return the list of available partner resources."""
@@ -834,6 +862,34 @@ class Book(WebBase):
                 return [Resource(self, option)
                         for option
                         in self.find_elements(*self._student_resource_locator)]
+
+            def resource_by_name(self, name):
+                """Return a resource box by its name."""
+                for resource in self.resources:
+                    if resource.title == name:
+                        return resource
+                return None
+
+            def resources_by_status(self, message):
+                """Return a list of resources with a particular status."""
+                if not isinstance(message, list):
+                    message = [message]
+                return [resource for resource in self.resources
+                        if resource.status_message in message]
+
+            def resources_by_option(self, option):
+                """Return a list of resources with a particular option."""
+                if option == Web.LOCKED:
+                    return [resource for resource in self.resources
+                            if resource.is_locked]
+                if option == Web.DOWNLOADABLE:
+                    return [resource for resource in self.resources
+                            if resource.can_be_downloaded]
+                if option == Web.EXTERNAL:
+                    return [resource for resource in self.resources
+                            if resource.is_external]
+                raise ValueError('{option} is not a valid resource option'
+                                 .format(option=option))
 
         class CompactErrata(Accordion):
             """The compact errata information pane."""
@@ -911,8 +967,6 @@ class Resource(Region):
 
     def select(self):
         """Click on the resource box."""
-        print(self.driver.current_url)
-        print(self.status_message)
         if self.is_locked:
             Utility.switch_to(self.driver, element=self.root)
             return go_to_(AccountsHome(self.driver))
