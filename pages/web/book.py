@@ -16,6 +16,8 @@ DISPLAY_TAB = (
     'return document.querySelectorAll(".tab")[{tab}]'
     '.attributes["aria-current"].value == "page";')
 
+# TODO: setup multiple inheritance for student and instructor resources
+
 
 class ResourceTab(Region):
     """A base region for instructor and student resources."""
