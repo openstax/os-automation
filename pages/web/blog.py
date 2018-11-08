@@ -35,3 +35,16 @@ class Blog(WebBase):
     def is_displayed(self):
         """Return True if the blog pinned article is displayed."""
         return self.find_element(*self._pinned_article_locator).is_displayed()
+
+
+class Article(Blog):
+    """The OpenStax web log article."""
+
+    URL_TEMPLATE = '/blog/{article}'
+
+    _article_locator = (By.CSS_SELECTOR, '.article .article .article')
+    _hero_banner_locator = (By.CSS_SELECTOR, '.hero')
+
+    def is_displayed(self):
+        """Return True if the blog article banner image is displayed."""
+        return self.find_element(*self._hero_banner_locator).is_displayed()

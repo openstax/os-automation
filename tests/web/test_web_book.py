@@ -11,7 +11,7 @@ from pages.web.book import Book
 from pages.web.errata import ErrataForm
 from pages.web.home import WebHome
 from tests.markers import accounts, nondestructive, skip_if_headless  # NOQA
-from tests.markers import test_case, web  # NOQA
+from tests.markers import skip_test, test_case, web  # NOQA
 from utils.accounts import Accounts
 from utils.email import RestMail
 from utils.utilities import Utility
@@ -862,6 +862,47 @@ def test_unverified_users_sent_to_faculty_verification_for_locked_resources(
     # THEN: the Accounts faculty verification form is loaded in a new tab
     assert(verification.is_displayed())
     assert('Apply for instructor access' in selenium.page_source)
+
+
+@skip_test(reason='No locked student content')
+@test_case('C210372')
+@nondestructive
+@web
+def test_students_sign_up_to_access_locked_student_content(
+        web_base_url, selenium):
+    """Users are directed to sign up to access locked student content."""
+    # GIVEN: a user viewing the student resources on a book details page
+    # AND:  is not logged into the site
+    # AND:  there is a locked student resource
+
+    # WHEN: they click on "Click here to unlock" link
+
+    # THEN: the Accounts sign up page is displayed
+
+    # WHEN: they sign up
+
+    # THEN: the student resources on the book details page is displayed
+    # AND:  the resource is available for download
+
+
+@test_case('C210373')
+@nondestructive
+@web
+def test_users_may_see_the_upcoming_webinar_schedule(web_base_url, selenium):
+    """Users may view the webinar schedule blog entry."""
+    # GIVEN: a user viewing the book details page
+    home = WebHome(selenium, web_base_url).open()
+    subjects = home.web_nav.subjects.view_all()
+    book = subjects.select_random_book(_from=Library.OPENSTAX)
+
+    # WHEN: they click on the "Instructor resources" tab
+    # AND:  click on the "Find a webinar" link
+    book.select_tab(Web.INSTRUCTOR_RESOURCES)
+    webinar = book.instructor.view_webinars()
+
+    # THEN: the webinars blog post is displayed
+    assert(webinar.is_displayed())
+    assert('webinars hosted by OpenStax' in selenium.page_source)
 
 
 def subject_list(size=1):
