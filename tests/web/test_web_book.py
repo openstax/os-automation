@@ -4,6 +4,7 @@ import pytest
 import requests
 from selenium.common.exceptions import NoSuchElementException
 
+from pages.accounts.admin.users import Search
 from pages.accounts.home import AccountsHome
 from pages.accounts.signup import Signup
 from pages.web.book import Book
@@ -11,6 +12,7 @@ from pages.web.errata import ErrataForm
 from pages.web.home import WebHome
 from tests.markers import accounts, nondestructive, skip_if_headless  # NOQA
 from tests.markers import test_case, web  # NOQA
+from utils.accounts import Accounts
 from utils.email import RestMail
 from utils.utilities import Utility
 from utils.web import Library, Web
@@ -811,6 +813,55 @@ def test_resources_have_a_title_description_and_access_type(
         assert(resource.title)
         assert(not resource.description)
         assert(resource.status_message in Web.ACCESS_OK)
+
+
+@test_case('C210371')
+@accounts
+@web
+def test_unverified_users_sent_to_faculty_verification_for_locked_resources(
+        accounts_base_url, web_base_url, selenium, admin, teacher):
+    """Test non-verified users must fill out faculty verification form."""
+    # GIVEN: a user viewing the instructor resources on a book details page
+    # AND:  have a non-verified, non-pending account
+    # AND:  are logged into the site
+    name = Utility.random_name()
+    email = RestMail('{first}.{last}.{tag}'.format(
+        first=name[1], last=name[2], tag=Utility.random_hex(3)).lower())
+    email.empty()
+    address = email.address
+    password = teacher[1]
+    accounts = AccountsHome(selenium, accounts_base_url).open()
+    profile = accounts.login.go_to_signup.account_signup(
+        name=name, email=address, password=password, _type=Signup.INSTRUCTOR,
+        provider=Signup.RESTMAIL, school='Automation', news=False,
+        phone=Utility.random_phone(), webpage=web_base_url,
+        subjects=Signup(selenium).subject_list(2), students=10,
+        use=Signup.RECOMMENDED)
+    profile.log_out()
+    profile = accounts.log_in(*admin)
+    search = Search(selenium, accounts_base_url).open()
+    details = Utility.switch_to(
+        driver=selenium,
+        action=search.find(terms={'email': address}).users[0].edit)
+    details.faculty_status = Accounts.REJECTED
+    details.save()
+    details.close_tab()
+    search.nav.user_menu.sign_out()
+    accounts.log_in(address, password)
+    home = WebHome(selenium, web_base_url).open()
+    subjects = home.web_nav.subjects.view_all()
+    book = subjects.select_random_book(_from=Library.HAS_I_LOCK)
+    book.select_tab(Web.INSTRUCTOR_RESOURCES)
+    locked_resources = book.instructor.resources_by_option(Web.LOCKED)
+    random_resource = Utility.random(0, len(locked_resources) - 1)
+    resource = locked_resources[random_resource]
+
+    # WHEN: they click on "Click here to unlock" link
+    verification = resource.select()
+
+    # THEN: the Accounts faculty verification form is loaded in a new tab
+    assert(verification.is_displayed())
+    assert('Apply for instructor access' in selenium.page_source)
 
 
 def subject_list(size=1):
