@@ -25,7 +25,7 @@ class ResourceTab(Region):
         By.CSS_SELECTOR, '.resource-box:not(.double):not(.ally-box)')
 
     def _displayed(self, tab):
-            """Return True if the instructor resources content is visible."""
+            """Return True if the resources content is visible."""
             return self.driver.execute_script(
                 DISPLAY_TAB.format(tab=tab))
 
@@ -114,6 +114,16 @@ class Book(WebBase):
 
     _sidebar_locator = (By.CSS_SELECTOR, '.sidebar')
     _phone_view_locator = (By.CSS_SELECTOR, '.phone-view')
+
+    def __str__(self):
+        """Output book information."""
+        tabs = ''
+        for tab in self.tabs:
+            tabs = tabs + ' "' + tab.text + '"'
+        return ('Book:    {title}\n'.format(title=self.title) +
+                'Tabs:   {tabs}\n'.format(tabs=tabs) +
+                'Sidebar: {sidebar}\n'.format(sidebar=self.sidebar.options) +
+                'Details: {details}\n'.format(details=self.details.options))
 
     @property
     def loaded(self):
@@ -237,6 +247,21 @@ class Book(WebBase):
         _adoption_locator = (By.CSS_SELECTOR, '[href*=adoption]')
 
         @property
+        def options(self):
+            """Return the available sideboar options."""
+            exists = self.find_elements
+            return {
+                'toc': bool(exists(*self._toc_locator)),
+                'cnx': bool(exists(*self._online_view_locator)),
+                'pdf': bool(exists(*self._pdf_download_locator)),
+                'print': bool(exists(*self._print_copy_locator)),
+                'bookshare': bool(exists(*self._bookshare_locator)),
+                'ibook': bool(exists(*self._ibook_download_locator)),
+                'kindle': bool(exists(*self._kindle_download_locator)),
+                'interest': bool(exists(*self._interest_locator)),
+                'adoption': bool(exists(*self._adoption_locator)), }
+
+        @property
         def table_of_contents(self):
             """Access the book table of contents."""
             return TableOfContents(self)
@@ -334,6 +359,21 @@ class Book(WebBase):
         _ibook_locator = (By.CSS_SELECTOR, '.loc-ibook-isbn')
         _license_locator = (By.CSS_SELECTOR, '.loc-license')
 
+        @property
+        def options(self):
+            """Return the available sideboar options."""
+            exists = self.find_elements
+            return {
+                'summary': bool(exists(*self._summary_locator)),
+                'senior': bool(exists(*self._senior_auth_locator)),
+                'non-senior': bool(exists(*self._other_auth_locator)),
+                'errata': bool(exists(*self._errata_blurb_locator)),
+                'publish': bool(exists(*self._publish_date_locator)),
+                'print': bool(exists(*self._print_locator)),
+                'digital': bool(exists(*self._digital_locator)),
+                'ibook': bool(exists(*self._ibook_locator)),
+                'license': bool(exists(*self._license_locator)), }
+
         def is_displayed(self):
             """Return True if the book details content is visible."""
             return self.driver.execute_script(
@@ -343,6 +383,12 @@ class Book(WebBase):
         def summary(self):
             """Return the book summary."""
             return self.find_element(*self._summary_locator).text
+
+        @property
+        def has_senior_authors(self):
+            """Return True if the senior authors section exists."""
+            return '<h3>Senior Contributing Authors</h3>' \
+                in self.driver.page_source
 
         @property
         def senior_authors(self):
@@ -388,6 +434,7 @@ class Book(WebBase):
         def submit_errata(self):
             """Click on the 'Suggest a correction' button."""
             book = None
+            logged_in = self.page.web_nav.login.logged_in
             try:
                 button = self.find_element(*self._correction_locator)
                 from pages.web.errata import ErrataForm
@@ -396,7 +443,7 @@ class Book(WebBase):
                 button = self.find_element(*self._pl_correction_locator)
                 from pages.katalyst.errata import ErrataForm
             Utility.safari_exception_click(self.driver, element=button)
-            if not self.page.web_nav.login.logged_in:
+            if not logged_in:
                 return go_to_(AccountsHome(self.driver))
             if book:
                 return go_to_(ErrataForm(self.driver, book=book))
@@ -674,9 +721,7 @@ class Book(WebBase):
 
                 @property
                 def has_nonsenior_authors(self):
-                    """Return True if the contributing authors section exists.
-
-                    """
+                    """Return True if the other authors section exists."""
                     return '<h4>Contributing Authors</h4>' \
                         in self.driver.page_source
 
@@ -813,6 +858,7 @@ class Book(WebBase):
             def submit_errata(self):
                 """Click on the 'Suggest a correction' button."""
                 book = None
+                logged_in = self.page.page.web_nav.login.logged_in
                 try:
                     button = self.find_element(*self._correction_locator)
                     from pages.web.errata import ErrataForm
@@ -821,7 +867,7 @@ class Book(WebBase):
                     button = self.find_element(*self._pl_correction_locator)
                     from pages.katalyst.errata import ErrataForm
                 Utility.safari_exception_click(self.driver, element=button)
-                if not self.page.page.web_nav.login.logged_in:
+                if not logged_in:
                     return go_to_(AccountsHome(self.driver))
                 if book:
                     return go_to_(ErrataForm(self.driver, book=book))
@@ -865,12 +911,17 @@ class Resource(Region):
 
     def select(self):
         """Click on the resource box."""
+        print(self.driver.current_url)
+        print(self.status_message)
         if self.is_locked:
             Utility.switch_to(self.driver, element=self.root)
             return go_to_(AccountsHome(self.driver))
         if self.status_message == Web.EXTERNAL:
             Utility.switch_to(self.driver, element=self.root)
             return self.driver
+        if self.status_message == Web.REQUEST:
+            self.root.click()
+            return CompCopyRequest(self.page)
         self.root.click()
         return self
 
@@ -1072,7 +1123,7 @@ class BookOrder(Modal):
 
         def select(self):
             """Click on the order option."""
-            if self.root.tag_name == 'a':
+            if self.root.tag_name.lower() == 'a':
                 target = self.root
             else:
                 target = self.find_element(*self._non_root_link_locator)
@@ -1084,6 +1135,102 @@ class BookOrder(Modal):
                 Utility.safari_exception_click(self.driver, element=target)
                 from pages.web.bookstore_suppliers import Bookstore
                 return go_to_(Bookstore(self.driver))
+
+
+class CompCopyRequest(Modal):
+    """The complementary book copy request form modal box."""
+
+    _title_locator = (By.CSS_SELECTOR, '.book-requested')
+    _book_cover_locator = (By.CSS_SELECTOR, 'img')
+    _student_locator = (By.CSS_SELECTOR, '[type=number]')
+    _request_button_locator = (By.CSS_SELECTOR, '.primary')
+    _cancel_button_locator = (By.CSS_SELECTOR, '[type=reset]')
+
+    @property
+    def loaded(self):
+        """Return True when the modal content exists."""
+        return self.find_element(*self._book_cover_locator)
+
+    @property
+    def title(self):
+        """Return the book title being requested."""
+        return self.find_element(*self._title_locator).text.strip()
+
+    @property
+    def cover(self):
+        """Return the book cover image element."""
+        return self.find_element(*self._book_cover_locator)
+
+    @property
+    def students(self):
+        """Return the students enrollment input box."""
+        self.wait.until(lambda _: self.find_element(*self._student_locator))
+        return self.find_element(*self._student_locator)
+
+    @students.setter
+    def students(self, total):
+        """Set the number of enrolled students for the semester."""
+        sleep(0.25)
+        self.students.send_keys(total)
+        sleep(0.25)
+        return self
+
+    @property
+    def is_valid(self):
+        """Return True if the student input is valid."""
+        return self.driver.execute_script(
+            'return arguments[0].checkValidity();', self.students)
+
+    def get_error(self):
+        """Return the validation message if the students field is invalid."""
+        if self.is_valid:
+            return ''
+        return self.driver.execute_script(
+            'return arguments[0].validationMessage;', self.students)
+
+    def submit(self):
+        """Submit the request form."""
+        button = self.find_element(*self._request_button_locator)
+        valid = self.is_valid
+        Utility.safari_exception_click(self.driver, element=button)
+        if valid:
+            return CompCopyRequestReceipt(page=self.page)
+        return self
+
+    def cancel(self):
+        """Cancel out of the form."""
+        button = self.find_element(*self._cancel_button_locator)
+        Utility.safari_exception_click(self.driver, element=button)
+        return self.page
+
+
+class CompCopyRequestReceipt(Modal):
+    """The request receipt modal box."""
+
+    _banner_heading_locator = (By.CSS_SELECTOR, '#dialog-title')
+    _confirmation_locator = (By.CSS_SELECTOR, '.confirmation')
+    _close_button_locator = (By.CSS_SELECTOR, '.close-button')
+
+    @property
+    def loaded(self):
+        """Wait until the confirmation message is available."""
+        return self.find_element(*self._confirmation_locator).is_displayed()
+
+    @property
+    def heading(self):
+        """Return the banner title text."""
+        return self.find_element(*self._banner_heading_locator).text.strip()
+
+    @property
+    def text(self):
+        """Return the confirmation message."""
+        return self.find_element(*self._confirmation_locator).text.strip()
+
+    def close(self):
+        """Click the dialog close button."""
+        button = self.find_element(*self._close_button_locator)
+        Utility.safari_exception_click(self.driver, element=button)
+        return self.page
 
 
 def _split_isbn(driver, locator):

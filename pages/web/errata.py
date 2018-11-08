@@ -94,9 +94,14 @@ class Errata(WebBase):
 
     @property
     def loaded(self):
-        """Wait for the page loader and table data."""
-        return (bool(self.find_element(*self._loaded_locator)) and
-                Utility.has_children(self.find_element(*self._table_locator)))
+        """Wait for the page loader and table data.
+
+        If there isn't data (eg a new book), sleep 3 seconds then return.
+        """
+        return (
+            bool(self.find_element(*self._loaded_locator)) and
+            (Utility.has_children(self.find_element(*self._table_locator)) or
+             (sleep(3) or True)))
 
     def is_displayed(self):
         """Return True if the errata table is displayed."""

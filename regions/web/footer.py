@@ -161,13 +161,14 @@ class Footer(Region):
 
         def go_to_facebook(self):
             """Go to OpenStax's Facebook page."""
-            url = (self.find_element(*self._facebook_locator)
-                   .get_attribute('href'))
+            facebook = self.find_element(*self._facebook_locator)
+            url = facebook.get_attribute('href')[:-8]
+            script = ('arguments[0].setAttribute("href", "{url}");'
+                      .format(url=url))
+            self.driver.execute_script(script, facebook)
             Utility.switch_to(
                 self.driver, link_locator=self._facebook_locator)
             from pages.facebook.home import Facebook
-            if self.driver.capabilities.get('browserName').lower() == 'chrome':
-                self.driver.get(url)
             return go_to_(Facebook(self.driver))
 
         def go_to_twitter(self):

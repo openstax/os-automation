@@ -72,7 +72,7 @@ def test_students_do_not_need_to_fill_out_the_adoption_form(
     book_title = book.title
     adoption = book.is_using()
     adoption.form.select(Web.STUDENT)
-    adoption.form.go_back()
+    adoption.form.go_back(destination=Book)
 
     # THEN: the book page is displayed
     assert(book.is_displayed() and book.title == book_title)
@@ -214,6 +214,7 @@ def test_adoption_form_identity_fields_are_required(web_base_url, selenium):
          .format(first=first, last=last, email=email, school=school)))
 
 
+@skip_test(reason='Not written')
 @test_case('C210391')
 @nondestructive
 @web
@@ -231,6 +232,7 @@ def test_adoption_form_school_name_auto_complete(web_base_url, selenium):
     # THEN: the suggestion list is filtered further
 
 
+@skip_test(reason='Not written')
 @test_case('C210392')
 @web
 def test_adoption_form_school_name_can_use_a_new_name(web_base_url, selenium):
@@ -283,6 +285,7 @@ def test_adoption_form_requires_at_least_one_book_selection(
         'The book error was not displayed')
 
 
+@skip_test(reason='Not written')
 @test_case('C210394')
 @nondestructive
 @web
@@ -304,6 +307,7 @@ def test_book_use_questions_are_included_for_each_selected_book(
     # AND:  the question pair for the first book are still displayed
 
 
+@skip_test(reason='Not written')
 @skip_test(reason='Need Salesforce API control for verification')
 @test_case('C210395')
 @web

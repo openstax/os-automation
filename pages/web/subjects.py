@@ -154,42 +154,42 @@ class Subjects(WebBase):
     @property
     def bookshare_books(self):
         """Select active books available through Bookshare."""
-        library = Library()
-        collection = library.get_titles(library.bookshare)
-        return [book for book in self._active_books
-                if book.title in collection]
+        return self._selection_helper(Library().bookshare)
+
+    @property
+    def comp_copy(self):
+        """Select the current editions of each book."""
+        return self._selection_helper(Library().comp_copy)
 
     @property
     def current_books(self):
         """Select the current editions of each book."""
-        library = Library()
-        collection = library.get_titles(library.current)
-        return [book for book in self._active_books
-                if book.title in collection]
+        return self._selection_helper(Library().current)
 
     @property
     def kindle_books(self):
         """Select active books with a Kindle edition available."""
-        library = Library()
-        collection = library.get_titles(library.kindle)
-        return [book for book in self._active_books
-                if book.title in collection]
+        return self._selection_helper(Library().kindle)
 
     @property
     def itunes_books(self):
         """Select active books with an iBook eddition available."""
-        library = Library()
-        collection = library.get_titles(library.itunes)
-        return [book for book in self._active_books
-                if book.title in collection]
+        return self._selection_helper(Library().itunes)
+
+    @property
+    def locked_instructor(self):
+        """Select active books with locked instructor resources."""
+        return self._selection_helper(Library().locked_instructor)
+
+    @property
+    def locked_student(self):
+        """Select active books with locked student resources."""
+        return self._selection_helper(Library().locked_student)
 
     @property
     def old_book_editions(self):
         """Select the books with a newer editions available."""
-        library = Library()
-        collection = library.get_titles(library.superseded)
-        return [book for book in self._active_books
-                if book.title in collection]
+        return self._selection_helper(Library().superseded)
 
     @property
     def openstax_books(self, filter_current=False):
@@ -203,16 +203,37 @@ class Subjects(WebBase):
         return [book for book in self._active_books
                 if book.language == Library.POLISH]
 
+    @property
+    def print_books(self):
+        """Select the books with a current print edition available."""
+        return self._selection_helper(Library().print)
+
+    @property
+    def unlocked_instructor(self):
+        """Select active books with unlocked instructor resources."""
+        return self._selection_helper(Library().unlocked_instructor)
+
+    @property
+    def unlocked_student(self):
+        """Select active books with unlocked student resources."""
+        return self._selection_helper(Library().unlocked_student)
+
     def select_random_book(self, _from=Library.OPENSTAX, filter_current=False):
         """Return a random book from the active list."""
         using = {
             Library.ALL_BOOKS: self._active_books,
             Library.BOOKSHARE: self.bookshare_books,
+            Library.COMP_COPY: self.comp_copy,
             Library.CURRENT: self.current_books,
+            Library.HAS_I_LOCK: self.locked_instructor,
+            Library.HAS_I_UNLOCK: self.unlocked_instructor,
+            Library.HAS_S_LOCK: self.locked_student,
+            Library.HAS_S_UNLOCK: self.unlocked_student,
             Library.ITUNES: self.itunes_books,
             Library.KINDLE: self.kindle_books,
             Library.OPENSTAX: self.openstax_books,
             Library.POLISH: self.polish_books,
+            Library.PRINT_COPY: self.print_books,
             Library.SUPERSEDED: self.old_book_editions,
         }.get(_from)
         if filter_current:
@@ -222,11 +243,19 @@ class Subjects(WebBase):
         assert(total > 0), 'No books are available for selection'
         book = Utility.random(0, total - 1)
         selected = using[book]
+        print(selected.title)
         destination = selected.url_append
         selected.select()
         sleep(1.0)
         from pages.web.book import Book as Details
-        return Details(self.driver, book_name=destination)
+        return go_to_(Details(self.driver, book_name=destination))
+
+    def _selection_helper(self, modifier):
+        """Return a list of books for a modified collection."""
+        library = Library()
+        collection = library.get_titles(modifier)
+        return [book for book in self._active_books
+                if book.title in collection]
 
     def view_about_our_textbooks(self):
         """Scroll to the textbook blurbs."""

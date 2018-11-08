@@ -204,6 +204,7 @@ def pytest_collection_modifyitems(config, items):
     # Runtime markers
     run_smoke_tests = config.getoption('--smoke-test')
     mark_not_for_smoke = pytest.mark.skip(reason='Skipping non-smoke tests.')
+
     run_social = config.getoption('--run-social')
     mark_run_social = pytest.mark.skip(reason='Skipping non-social tests.')
     skip_social = config.getoption('--skip-social')
@@ -219,15 +220,21 @@ def pytest_collection_modifyitems(config, items):
     mark_skip_tutor = pytest.mark.skip(reason='Skipping Tutor tests.')
     mark_skip_web = pytest.mark.skip(reason='Skipping Web tests.')
 
+    headless_mode = config.getoption('--headless')
+    mark_skip_if_headless = pytest.mark.skip(
+                                    reason='Not run during headless testing')
+
     # Apply runtime markers
     for item in items:
         if run_smoke_tests and 'smoke_test' not in item.keywords:
             item.add_marker(mark_not_for_smoke)
             continue
+
         if skip_social and 'social' in item.keywords:
             item.add_marker(mark_skip_social)
         if run_social and 'social' not in item.keywords:
             item.add_marker(mark_run_social)
+
         if run_systems:
             if 'accounts' not in run_systems and 'accounts' in item.keywords:
                 item.add_marker(mark_skip_accounts)
@@ -244,6 +251,9 @@ def pytest_collection_modifyitems(config, items):
                 item.add_marker(mark_skip_tutor)
             if 'web' not in run_systems and 'web' in item.keywords:
                 item.add_marker(mark_skip_web)
+
+        if headless_mode and 'skip_if_headless' in item.keywords:
+            item.add_marker(mark_skip_if_headless)
 
 
 def pytest_collectreport(report):

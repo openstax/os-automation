@@ -180,8 +180,7 @@ class Utility(object):
     @classmethod
     def random(cls, start=0, end=100000):
         """Return a random integer from start to end."""
-        print(start, end)
-        if start == end:
+        if start >= end:
             return start
         return randint(start, end)
 

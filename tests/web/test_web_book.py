@@ -6,9 +6,11 @@ from selenium.common.exceptions import NoSuchElementException
 
 from pages.accounts.home import AccountsHome
 from pages.accounts.signup import Signup
+from pages.web.book import Book
 from pages.web.errata import ErrataForm
-from pages.web.subjects import Subjects
-from tests.markers import accounts, nondestructive, test_case, web
+from pages.web.home import WebHome
+from tests.markers import accounts, nondestructive, skip_if_headless  # NOQA
+from tests.markers import test_case, web  # NOQA
 from utils.email import RestMail
 from utils.utilities import Utility
 from utils.web import Library, Web
@@ -20,7 +22,8 @@ from utils.web import Library, Web
 def test_for_book_details_and_user_resource_pages(web_base_url, selenium):
     """Test that the book details page is available."""
     # GIVEN: a user viewing the subjects page
-    subjects = Subjects(selenium, web_base_url).open()
+    home = WebHome(selenium, web_base_url).open()
+    subjects = home.web_nav.subjects.view_all()
 
     # WHEN: they select a standard book tile
     book = subjects.select_random_book()
@@ -34,7 +37,8 @@ def test_for_book_details_and_user_resource_pages(web_base_url, selenium):
     assert(book.tabs[Web.STUDENT_RESOURCES].is_displayed())
 
     # WHEN: they select a Polish book tile
-    subjects.open()
+    home.open()
+    subjects = home.web_nav.subjects.view_all()
     book = subjects.select_random_book(_from=Library.POLISH)
 
     # THEN: the book details page loads
@@ -52,7 +56,8 @@ def test_for_book_details_and_user_resource_pages(web_base_url, selenium):
 def test_the_availability_of_the_table_of_contents(web_base_url, selenium):
     """Test a book ToC is available."""
     # GIVEN: a user viewing the book details page
-    subjects = Subjects(selenium, web_base_url).open()
+    home = WebHome(selenium, web_base_url).open()
+    subjects = home.web_nav.subjects.view_all()
     book = subjects.select_random_book()
     book_title = book.title
 
@@ -102,7 +107,8 @@ def test_the_availability_of_the_table_of_contents(web_base_url, selenium):
 def test_webview_for_a_book_is_avaialble(web_base_url, selenium):
     """Test that the Webview of a book is available."""
     # GIVEN: a user viewing the book details page
-    subjects = Subjects(selenium, web_base_url).open()
+    home = WebHome(selenium, web_base_url).open()
+    subjects = home.web_nav.subjects.view_all()
     book = subjects.select_random_book(_from=Library.ALL_BOOKS)
     book_title = book.title
 
@@ -125,11 +131,13 @@ def test_webview_for_a_book_is_avaialble(web_base_url, selenium):
 
 @test_case('C210352')
 @nondestructive
+@skip_if_headless
 @web
 def test_details_pdf_is_downloadable(web_base_url, selenium):
     """Test that the PDF of a book may be downloaded."""
     # GIVEN: a user viewing the book details page
-    subjects = Subjects(selenium, web_base_url).open()
+    home = WebHome(selenium, web_base_url).open()
+    subjects = home.web_nav.subjects.view_all()
     book = subjects.select_random_book(_from=Library.ALL_BOOKS)
 
     # WHEN: they click on the "Download a PDF" link
@@ -148,8 +156,11 @@ def test_details_pdf_is_downloadable(web_base_url, selenium):
 def test_links_to_purchase_a_print_copy(web_base_url, selenium):
     """Test that links are provided to purchase a book print copy."""
     # GIVEN: a user viewing the book details page
-    subjects = Subjects(selenium, web_base_url).open()
-    book = subjects.select_random_book()
+    home = WebHome(selenium, web_base_url).open()
+    subjects = home.web_nav.subjects.view_all()
+    book = subjects.select_random_book(_from=Library.PRINT_COPY)
+    import logging
+    logging.debug(str(book))
 
     # WHEN: they click on the "Order a print copy" link
     # AND:  click on the "Order on Amazon" button
@@ -184,10 +195,12 @@ def test_mobile_links_to_purchase_a_print_copy(web_base_url, selenium):
     """Test that the mobile links are provided to purchase a book."""
     # GIVEN: a user viewing the book details page
     # AND:  the screen is 600 pixel or fewer wide
-    subjects = Subjects(selenium, web_base_url)
-    subjects.resize_window(width=600)
-    subjects.open()
-    book = subjects.select_random_book()
+    home = WebHome(selenium, web_base_url)
+    home.resize_window(width=600)
+    home.open()
+    home.web_nav.meta.toggle_menu()
+    subjects = home.web_nav.subjects.view_all()
+    book = subjects.select_random_book(_from=Library.PRINT_COPY)
 
     # WHEN: they click on the "Order a print copy" link
     # AND:  click on the "Order on Amazon" button
@@ -221,7 +234,8 @@ def test_mobile_links_to_purchase_a_print_copy(web_base_url, selenium):
 def test_bookshare_availability(web_base_url, selenium):
     """Test that Bookshare copies are available."""
     # GIVEN: a user viewing the book details page
-    subjects = Subjects(selenium, web_base_url).open()
+    home = WebHome(selenium, web_base_url).open()
+    subjects = home.web_nav.subjects.view_all()
     book = subjects.select_random_book(_from=Library.BOOKSHARE)
 
     # WHEN: they click on the "Bookshare" link
@@ -245,7 +259,8 @@ def test_bookshare_availability(web_base_url, selenium):
 def test_ibook_availability(web_base_url, selenium):
     """Test that iBook copies are available."""
     # GIVEN: a user viewing the book details page
-    subjects = Subjects(selenium, web_base_url).open()
+    home = WebHome(selenium, web_base_url).open()
+    subjects = home.web_nav.subjects.view_all()
     book = subjects.select_random_book(_from=Library.ITUNES)
 
     ibooks = len(book.sidebar.ibooks)
@@ -271,7 +286,8 @@ def test_ibook_availability(web_base_url, selenium):
 def test_kindle_availability(web_base_url, selenium):
     """Test that Amazon Kindle copies are available."""
     # GIVEN: a user viewing the book details page
-    subjects = Subjects(selenium, web_base_url).open()
+    home = WebHome(selenium, web_base_url).open()
+    subjects = home.web_nav.subjects.view_all()
     book = subjects.select_random_book(_from=Library.KINDLE)
 
     # WHEN: they click on the "Download for Kindle" link
@@ -295,7 +311,8 @@ def test_kindle_availability(web_base_url, selenium):
 def test_page_links_to_the_interest_form(web_base_url, selenium):
     """Test the interest form link."""
     # GIVEN: a user viewing the book details page
-    subjects = Subjects(selenium, web_base_url).open()
+    home = WebHome(selenium, web_base_url).open()
+    subjects = home.web_nav.subjects.view_all()
     book = subjects.select_random_book(_from=Library.OPENSTAX)
 
     # WHEN: they click on the "Sign up to learn more" link
@@ -316,7 +333,8 @@ def test_page_links_to_the_interest_form(web_base_url, selenium):
 def test_page_links_to_the_adoption_form(web_base_url, selenium):
     """Test the adoption form link."""
     # GIVEN: a user viewing the book details page
-    subjects = Subjects(selenium, web_base_url).open()
+    home = WebHome(selenium, web_base_url).open()
+    subjects = home.web_nav.subjects.view_all()
     book = subjects.select_random_book(_from=Library.OPENSTAX)
 
     # WHEN: they click on the "Using this book? Let us know." link
@@ -337,7 +355,8 @@ def test_page_links_to_the_adoption_form(web_base_url, selenium):
 def test_the_book_details_pane(web_base_url, selenium):
     """Test for the presence of a summary, authors, publish date and ISBN."""
     # GIVEN: a user viewing the book details page
-    subjects = Subjects(selenium, web_base_url).open()
+    home = WebHome(selenium, web_base_url).open()
+    subjects = home.web_nav.subjects.view_all()
     book = subjects.select_random_book(_from=Library.OPENSTAX)
 
     # WHEN:
@@ -350,7 +369,8 @@ def test_the_book_details_pane(web_base_url, selenium):
     # AND:  a license is present
     assert(book.details.is_displayed())
     assert(len(book.details.summary) > 10)
-    assert(book.details.senior_authors)
+    if book.details.has_senior_authors:
+        assert(book.details.senior_authors)
     if book.details.has_nonsenior_authors:
         assert(book.details.nonsenior_authors)
     assert(book.details.published_on)
@@ -394,7 +414,8 @@ def test_the_book_details_pane(web_base_url, selenium):
 def test_current_book_editions_have_an_errata_section(web_base_url, selenium):
     """Test that the current edition of a book has an errata section."""
     # GIVEN: a user viewing the subjects page
-    subjects = Subjects(selenium, web_base_url).open()
+    home = WebHome(selenium, web_base_url).open()
+    subjects = home.web_nav.subjects.view_all()
 
     # WHEN: they click a current edition book tile
     book = subjects.select_random_book(_from=Library.CURRENT)
@@ -411,7 +432,8 @@ def test_current_book_editions_have_an_errata_section(web_base_url, selenium):
 def test_an_old_version_does_not_have_errata(web_base_url, selenium):
     """Test that the current edition of a book has an errata section."""
     # GIVEN: a user viewing the subjects page
-    subjects = Subjects(selenium, web_base_url).open()
+    home = WebHome(selenium, web_base_url).open()
+    subjects = home.web_nav.subjects.view_all()
 
     # WHEN: they click a current edition book tile
     book = subjects.select_random_book(_from=Library.SUPERSEDED)
@@ -431,7 +453,8 @@ def test_users_may_view_the_current_list_of_errata_for_a_book(
     """Test any user may view the current errata list for a current book."""
     # GIVEN: a user viewing a current edition book details page
     # AND:   are not logged into the website
-    subjects = Subjects(selenium, web_base_url).open()
+    home = WebHome(selenium, web_base_url).open()
+    subjects = home.web_nav.subjects.view_all()
     book = subjects.select_random_book(_from=Library.OPENSTAX,
                                        filter_current=True)
     book_title = book.title
@@ -466,9 +489,10 @@ def test_logged_in_users_may_view_the_errata_submission_form(
     """Test a logged in user may view the errata submission form."""
     # GIVEN: a user viewing a current edition book details page
     # AND:   are logged into the website
-    subjects = Subjects(selenium, web_base_url).open()
-    subjects.web_nav.login.log_in(*teacher, destination=Subjects)
-    subjects.web_nav.login.training_wheel.close_modal()
+    home = WebHome(selenium, web_base_url).open()
+    home.web_nav.login.log_in(*teacher, destination=WebHome, url=web_base_url)
+    home.web_nav.login.training_wheel.close_modal()
+    subjects = home.web_nav.subjects.view_all()
     book = subjects.select_random_book(_from=Library.OPENSTAX,
                                        filter_current=True)
     book_title = book.title
@@ -505,7 +529,8 @@ def test_non_logged_in_users_are_directed_to_log_in_to_view_the_errata_form(
     # GIVEN: a user viewing a current edition book details page
     # AND:   have a valid login and password
     # AND:   are not logged into the website
-    subjects = Subjects(selenium, web_base_url).open()
+    home = WebHome(selenium, web_base_url).open()
+    subjects = home.web_nav.subjects.view_all()
     book = subjects.select_random_book(_from=Library.OPENSTAX,
                                        filter_current=True)
     book_title = book.title
@@ -519,11 +544,12 @@ def test_non_logged_in_users_are_directed_to_log_in_to_view_the_errata_form(
     assert('accounts' in accounts.location)
 
     # WHEN: they log into Accounts
-    accounts.service_log_in(*teacher)
+    errata_form = accounts.service_log_in(
+        *teacher,
+        destination=ErrataForm, url=web_base_url, book=book_errata)
 
     # THEN: the errata form is displayed
     # AND:  the subject is prefilled in
-    errata_form = ErrataForm(selenium, web_base_url, book=book_errata)
     assert(errata_form.is_displayed())
     assert(errata_form.subject == book_title)
 
@@ -538,9 +564,11 @@ def test_non_logged_in_users_on_mobile_are_directed_to_log_in_for_errata_form(
     # AND:  have a valid login and password
     # AND:  are not logged into the website
     # AND:  the screen width is 600 pixels
-    subjects = Subjects(selenium, web_base_url)
-    subjects.resize_window(width=600)
-    subjects.open()
+    home = WebHome(selenium, web_base_url)
+    home.resize_window(width=600)
+    home.open()
+    home.web_nav.meta.toggle_menu()
+    subjects = home.web_nav.subjects.view_all()
     book = subjects.select_random_book(_from=Library.OPENSTAX,
                                        filter_current=True)
     book_title = book.title
@@ -556,11 +584,12 @@ def test_non_logged_in_users_on_mobile_are_directed_to_log_in_for_errata_form(
     assert('accounts' in accounts.location)
 
     # WHEN: they log into Accounts
-    accounts.service_log_in(*teacher)
+    errata_form = accounts.service_log_in(
+        *teacher,
+        destination=ErrataForm, url=web_base_url, book=book_errata)
 
     # THEN: the errata form is displayed
     # AND:  the subject is prefilled in
-    errata_form = ErrataForm(selenium, web_base_url, book=book_errata)
     assert(errata_form.is_displayed())
     assert(errata_form.subject == book_title)
 
@@ -574,8 +603,9 @@ def test_teachers_are_asked_to_sign_up_to_access_locked_content(
     # GIVEN: a user viewing the book details page
     # AND:  are not logged into the website
     # AND:  the book has instructor resources
-    subjects = Subjects(selenium, web_base_url).open()
-    book = subjects.select_random_book(_from=Library.OPENSTAX)
+    home = WebHome(selenium, web_base_url).open()
+    subjects = home.web_nav.subjects.view_all()
+    book = subjects.select_random_book(_from=Library.HAS_I_LOCK)
 
     # WHEN: they click on the "Sign up" link
     book.select_tab(Web.INSTRUCTOR_RESOURCES)
@@ -611,15 +641,16 @@ def test_pending_instructors_see_access_pending_for_locked_resources(
         news=False, phone=Utility.random_phone(),
         webpage='https://openstax.org/', subjects=subject_list(2), students=10,
         use=Signup.ADOPTED)
-    subjects = Subjects(selenium, web_base_url).open()
-    book = subjects.select_random_book(_from=Library.OPENSTAX)
+    home = WebHome(selenium, web_base_url).open()
+    subjects = home.web_nav.subjects.view_all()
+    book = subjects.select_random_book(_from=Library.HAS_I_LOCK)
 
     # WHEN: they click on the "Instructor resources" tab
     book.select_tab(Web.INSTRUCTOR_RESOURCES)
 
     # THEN: locked resources show "Access pending"
     for option in book.instructor.resources:
-        assert(option.status_message == Web.PENDING), (
+        assert(option.status_message in Web.ACCESS_OK), (
             '{resource} ("{status}") not pending authorization or available'
             .format(resource=option.title, status=option.status_message))
 
@@ -634,8 +665,9 @@ def test_verified_instructors_may_access_locked_resources(
     # AND:  they have a valid instructor login and password
     # AND:  they are not logged into the website
     # AND:  the book has locked instructor resources
-    subjects = Subjects(selenium, web_base_url).open()
-    book = subjects.select_random_book(_from=Library.OPENSTAX)
+    home = WebHome(selenium, web_base_url).open()
+    subjects = home.web_nav.subjects.view_all()
+    book = subjects.select_random_book(_from=Library.HAS_I_LOCK)
 
     # WHEN: they click on the "Instructor resources" tab
     # AND:  click on the "Click here to unlock" link
@@ -652,8 +684,7 @@ def test_verified_instructors_may_access_locked_resources(
     assert('login' in accounts.location)
 
     # WHEN: they log into Accounts
-    accounts.service_log_in(*teacher)
-    book.wait_for_page_to_load()
+    accounts.service_log_in(*teacher, destination=Book, url=web_base_url)
 
     # THEN: the instructor resources tab on the book details page is displayed
     # AND:  the resource is no longer locked
@@ -661,6 +692,71 @@ def test_verified_instructors_may_access_locked_resources(
     option = book.instructor.resource_by_name(option_title)
     assert(not option.is_locked), \
         '{option} is still locked'.format(option=option.title)
+
+
+@test_case('C210411')
+@nondestructive
+@web
+def test_verified_instructors_may_request_a_comped_ibook(
+        web_base_url, selenium, teacher):
+    """Test verified instructors may request a complimentary iBook copy."""
+    # GIVEN: a user viewing the book details page
+    # AND:  the book has comp copies available
+    home = WebHome(selenium, web_base_url).open()
+    subjects = home.web_nav.subjects.view_all()
+    book = subjects.select_random_book(_from=Library.COMP_COPY)
+    book.web_nav.login.log_in(*teacher, destination=Book, url=web_base_url)
+    if book.web_nav.login.modal_displayed:
+        book.web_nav.login.training_wheel.close_modal()
+
+    # WHEN: they click on the "Instructor resources" tab
+    # AND:  click on the "iBooks Comp Copy" tile
+    book.select_tab(Web.INSTRUCTOR_RESOURCES)
+    comp_copy = book.instructor.resource_by_name('iBooks Comp Copy').select()
+
+    # THEN: the comp copy modal is displayed
+    assert(comp_copy.is_displayed())
+
+    # WHEN: they click "Request iBook"
+    comp_copy.submit()
+
+    # THEN: a "Please enter a number." pop up appears below
+    #       the "How many students will be using <book>
+    #       this semester?" input box
+    assert(comp_copy.get_error() in
+           ['Please enter a number.',
+            'Please fill out this field.',
+            'Fill out this field'])
+
+    # WHEN: they click on the "Cancel" button
+    comp_copy.cancel()
+
+    # THEN: the comp copy modal is closed
+    assert(not comp_copy.is_displayed())
+
+    # WHEN: they click on the "iBooks Comp Copy" tile
+    # AND:  click on the 'X' icon
+    comp_copy = book.instructor.resource_by_name('iBooks Comp Copy').select()
+    comp_copy.close()
+
+    # THEN: the comp copy modal is closed
+    assert(not comp_copy.is_displayed())
+
+    # WHEN: they click on the "iBooks Comp Copy" tile
+    # AND:  enter a zero or greater number in the input box
+    # AND:  click on the "Request iBook" button
+    comp_copy = book.instructor.resource_by_name('iBooks Comp Copy').select()
+    comp_copy.students = Utility.random()
+    comp_copy_receipt = comp_copy.submit()
+
+    # THEN: "Your request was submitted!" is displayed
+    assert('Your request was submitted!' in comp_copy_receipt.text)
+
+    # WHEN: they click on the "Close" button
+    comp_copy_receipt.close()
+
+    # THEN: the comp copy modal is closed
+    assert(not comp_copy_receipt.is_displayed())
 
 
 def subject_list(size=1):

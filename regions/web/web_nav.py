@@ -39,8 +39,12 @@ class WebNavMenu(Region):
     def open(self):
         """Select the menu."""
         sleep(0.5)
-        is_expanded = self.find_element(*self._menu_expand_locator) \
-            .get_attribute('aria-expanded') == 'true'
+        try:
+            is_expanded = self.find_element(*self._menu_expand_locator) \
+                .get_attribute('aria-expanded') == 'true'
+        except WebDriverException as ex:
+            print(self.driver.current_url, str(ex))
+            is_expanded = False
         if not is_expanded:
             target = (
                 self._open_menu_locator[0],
@@ -66,7 +70,7 @@ class WebNavMenu(Region):
 class WebNav(Region):
     """Website navbar region."""
 
-    _root_locator = (By.CLASS_NAME, 'nav')
+    _root_locator = (By.CSS_SELECTOR, '.nav')
     _openstax_logo_locator = (By.CSS_SELECTOR, '.os-logo > a')
     _slogan_locator = (By.CSS_SELECTOR, '.logo-quote')
     _subjects_dropdown_locator = (By.CLASS_NAME, 'subjects-dropdown')
@@ -439,18 +443,18 @@ class WebNav(Region):
             return self.login.is_displayed()
 
         def log_in(self, user=None, password=None,
-                   do_not_log_in=False, destination=None):
+                   do_not_log_in=False, destination=None, url=None):
             """Log a user into the website."""
             Utility.wait_for_overlay_then(self.login.click)
             from pages.accounts.home import AccountsHome
             if do_not_log_in:
-                return go_to_(AccountsHome(self.driver))
+                return go_to_(AccountsHome(self.driver, url))
             else:
                 AccountsHome(self.driver).service_log_in(user, password)
             if destination:
-                return go_to_(destination(self.driver))
+                return go_to_(destination(self.driver, url))
             from pages.web.home import WebHome as Home
-            return go_to_(Home(self.driver))
+            return go_to_(Home(self.driver, url))
 
         @property
         def logged_in(self):

@@ -33,23 +33,31 @@ class Web(object):
     OPENSTAX_PARTNERS = 1
 
     # Book page tabs
+    partner_resources_are_split = False
     BOOK_DETAILS = 0
     INSTRUCTOR_RESOURCES = 1
-    PARTNER_RESOURCES = 2
-    STUDENT_RESOURCES = 3
+    PARTNER_RESOURCES = 2 if partner_resources_are_split else None
+    STUDENT_RESOURCES = 2 if not PARTNER_RESOURCES else 3
 
     # Book page order modals
     INDIVIDUAL = 0
     BOOKSTORES = 1
 
     # Book page resource status options
+    ACCESS = "Access on OpenStax's YouTube Channel"
+    CODE = 'Request your comp code'
+    COMING_SOON = 'Coming soon!'
     DOWNLOAD = 'Download'
     EXTERNAL = 'Go'
     LOCKED = 'Click here to unlock'
     PENDING = 'Access pending'
+    REQUEST = 'Request your copy'
     TRANSITION = 'Transition Guide'
 
-    ACCESS_OK = [DOWNLOAD, EXTERNAL, PENDING, TRANSITION]
+    ACCESS_OK = [
+        ACCESS, CODE, DOWNLOAD, EXTERNAL, PENDING,
+        REQUEST, TRANSITION
+    ]
 
     # Matching strings
     ABOUT = 'about'
@@ -270,9 +278,14 @@ class Library():
     ALL_BOOKS = 'all'
     BOOKSHARE = 'bookshare'
     CATEGORY = 'subject'
+    COMP_COPY = 'comp_copy'
     CURRENT = 'current'
     DETAILS = 'details'
     ENGLISH = 'English'
+    HAS_I_LOCK = 'instructor_locked'
+    HAS_I_UNLOCK = 'instructor_unlocked'
+    HAS_S_LOCK = 'student_locked'
+    HAS_S_UNLOCK = 'student_unlocked'
     INTEREST = ADOPTION
     IS_AP = 'is_ap?'
     ITUNES = 'itunes'
@@ -280,6 +293,7 @@ class Library():
     LANGUAGE = 'language'
     OPENSTAX = 'openstax'
     POLISH = 'Polish'
+    PRINT_COPY = 'print'
     SHORT_NAME = 'short_name'
     SUPERSEDED = 'not_current'
 
@@ -304,403 +318,637 @@ class Library():
             self.ETHICS: {
                 self.BOOKSHARE: False,
                 self.CATEGORY: [self.ALL, self.BUSINESS],
+                self.COMP_COPY: False,
                 self.DETAILS: 'business-ethics',
+                self.HAS_I_LOCK: False,
+                self.HAS_I_UNLOCK: True,
+                self.HAS_S_LOCK: False,
+                self.HAS_S_UNLOCK: False,
                 self.INTEREST: 'Business%20Ethics',
                 self.IS_AP: False,
                 self.ITUNES: False,
                 self.KINDLE: False,
                 self.LANGUAGE: self.ENGLISH,
+                self.PRINT_COPY: False,
                 self.SHORT_NAME: 'Business Ethics', },
             self.BUSINESS: {
                 self.BOOKSHARE: False,
                 self.CATEGORY: [self.ALL, self.BUSINESS],
+                self.COMP_COPY: False,
                 self.DETAILS: 'introduction-business',
+                self.HAS_I_LOCK: True,
+                self.HAS_I_UNLOCK: True,
+                self.HAS_S_LOCK: False,
+                self.HAS_S_UNLOCK: True,
                 self.INTEREST: 'Intro%20to%20Business',
                 self.IS_AP: False,
                 self.ITUNES: False,
                 self.KINDLE: False,
                 self.LANGUAGE: self.ENGLISH,
+                self.PRINT_COPY: False,
                 self.SHORT_NAME: 'Introduction to Business', },
 
             # Humanities
             self.US_HISTORY: {
                 self.BOOKSHARE: True,
                 self.CATEGORY: [self.ALL, self.HUMANITIES],
+                self.COMP_COPY: True,
                 self.DETAILS: 'us-history',
+                self.HAS_I_LOCK: True,
+                self.HAS_I_UNLOCK: True,
+                self.HAS_S_LOCK: False,
+                self.HAS_S_UNLOCK: True,
                 self.INTEREST: 'US%20History',
                 self.IS_AP: False,
                 self.ITUNES: True,
                 self.KINDLE: True,
                 self.LANGUAGE: self.ENGLISH,
+                self.PRINT_COPY: True,
                 self.SHORT_NAME: 'U.S. History', },
 
             # Math
             self.ALGEBRA_TRIG: {
                 self.BOOKSHARE: False,
                 self.CATEGORY: [self.ALL, self.MATH],
+                self.COMP_COPY: False,
                 self.DETAILS: 'algebra-and-trigonometry',
+                self.HAS_I_LOCK: True,
+                self.HAS_I_UNLOCK: True,
+                self.HAS_S_LOCK: False,
+                self.HAS_S_UNLOCK: True,
                 self.INTEREST: 'Algebra%20and%20Trigonometry',
                 self.IS_AP: False,
                 self.ITUNES: False,
                 self.KINDLE: True,
                 self.LANGUAGE: self.ENGLISH,
+                self.PRINT_COPY: True,
                 self.SHORT_NAME: 'Algebra and Trigonometry', },
             self.CALCULUS_1: {
                 self.BOOKSHARE: False,
                 self.CATEGORY: [self.ALL, self.MATH],
+                self.COMP_COPY: False,
                 self.DETAILS: 'calculus-volume-1',
+                self.HAS_I_LOCK: True,
+                self.HAS_I_UNLOCK: True,
+                self.HAS_S_LOCK: False,
+                self.HAS_S_UNLOCK: True,
                 self.INTEREST: 'Calculus',
                 self.IS_AP: False,
                 self.ITUNES: False,
                 self.KINDLE: True,
                 self.LANGUAGE: self.ENGLISH,
+                self.PRINT_COPY: True,
                 self.SHORT_NAME: 'Calculus', },
             self.CALCULUS_2: {
                 self.BOOKSHARE: False,
                 self.CATEGORY: [self.ALL, self.MATH],
+                self.COMP_COPY: False,
                 self.DETAILS: 'calculus-volume-2',
+                self.HAS_I_LOCK: True,
+                self.HAS_I_UNLOCK: True,
+                self.HAS_S_LOCK: False,
+                self.HAS_S_UNLOCK: True,
                 self.INTEREST: 'Calculus',
                 self.IS_AP: False,
                 self.ITUNES: False,
                 self.KINDLE: True,
                 self.LANGUAGE: self.ENGLISH,
+                self.PRINT_COPY: True,
                 self.SHORT_NAME: 'Calculus', },
             self.CALCULUS_3: {
                 self.BOOKSHARE: False,
                 self.CATEGORY: [self.ALL, self.MATH],
+                self.COMP_COPY: False,
                 self.DETAILS: 'calculus-volume-3',
+                self.HAS_I_LOCK: True,
+                self.HAS_I_UNLOCK: True,
+                self.HAS_S_LOCK: False,
+                self.HAS_S_UNLOCK: True,
                 self.INTEREST: 'Calculus',
                 self.IS_AP: False,
                 self.ITUNES: False,
                 self.KINDLE: True,
                 self.LANGUAGE: self.ENGLISH,
+                self.PRINT_COPY: True,
                 self.SHORT_NAME: 'Calculus', },
             self.ALGEBRA: {
                 self.BOOKSHARE: False,
                 self.CATEGORY: [self.ALL, self.MATH],
+                self.COMP_COPY: False,
                 self.DETAILS: 'college-algebra',
+                self.HAS_I_LOCK: True,
+                self.HAS_I_UNLOCK: True,
+                self.HAS_S_LOCK: False,
+                self.HAS_S_UNLOCK: True,
                 self.INTEREST: 'College%20Algebra',
                 self.IS_AP: False,
                 self.ITUNES: False,
                 self.KINDLE: True,
                 self.LANGUAGE: self.ENGLISH,
+                self.PRINT_COPY: True,
                 self.SHORT_NAME: 'College Algebra', },
             self.ELEM_ALGEBRA: {
                 self.BOOKSHARE: False,
                 self.CATEGORY: [self.ALL, self.MATH],
+                self.COMP_COPY: False,
                 self.DETAILS: 'elementary-algebra',
+                self.HAS_I_LOCK: True,
+                self.HAS_I_UNLOCK: True,
+                self.HAS_S_LOCK: False,
+                self.HAS_S_UNLOCK: True,
                 self.INTEREST: 'Elementary%20Algebra',
                 self.IS_AP: False,
                 self.ITUNES: False,
                 self.KINDLE: True,
                 self.LANGUAGE: self.ENGLISH,
+                self.PRINT_COPY: True,
                 self.SHORT_NAME: 'Elementary Algebra', },
             self.INTER_ALGEBRA: {
                 self.BOOKSHARE: False,
                 self.CATEGORY: [self.ALL, self.MATH],
+                self.COMP_COPY: False,
                 self.DETAILS: 'intermediate-algebra',
+                self.HAS_I_LOCK: True,
+                self.HAS_I_UNLOCK: True,
+                self.HAS_S_LOCK: False,
+                self.HAS_S_UNLOCK: True,
                 self.INTEREST: 'Intermediate%20Algebra',
                 self.IS_AP: False,
                 self.ITUNES: False,
                 self.KINDLE: True,
                 self.LANGUAGE: self.ENGLISH,
+                self.PRINT_COPY: True,
                 self.SHORT_NAME: 'Intermediate Algebra', },
             self.BUSINESS_STATS: {
                 self.BOOKSHARE: False,
                 self.CATEGORY: [self.ALL, self.MATH],
+                self.COMP_COPY: False,
                 self.DETAILS: 'introductory-business-statistics',
+                self.HAS_I_LOCK: True,
+                self.HAS_I_UNLOCK: True,
+                self.HAS_S_LOCK: False,
+                self.HAS_S_UNLOCK: True,
                 self.INTEREST: 'Business%20Statistics',
                 self.IS_AP: False,
                 self.ITUNES: False,
                 self.KINDLE: True,
                 self.LANGUAGE: self.ENGLISH,
+                self.PRINT_COPY: True,
                 self.SHORT_NAME: 'Introductory Business Statistics', },
             self.INTRO_STATS: {
                 self.BOOKSHARE: True,
                 self.CATEGORY: [self.ALL, self.MATH],
+                self.COMP_COPY: True,
                 self.DETAILS: 'introductory-statistics',
+                self.HAS_I_LOCK: True,
+                self.HAS_I_UNLOCK: True,
+                self.HAS_S_LOCK: False,
+                self.HAS_S_UNLOCK: True,
                 self.INTEREST: 'Introductory%20Statistics',
                 self.IS_AP: False,
                 self.ITUNES: True,
                 self.KINDLE: True,
                 self.LANGUAGE: self.ENGLISH,
+                self.PRINT_COPY: True,
                 self.SHORT_NAME: 'Introductory Statistics', },
             self.PREALGEBRA: {
                 self.BOOKSHARE: False,
                 self.CATEGORY: [self.ALL, self.MATH],
+                self.COMP_COPY: False,
                 self.DETAILS: 'prealgebra',
+                self.HAS_I_LOCK: True,
+                self.HAS_I_UNLOCK: True,
+                self.HAS_S_LOCK: False,
+                self.HAS_S_UNLOCK: True,
                 self.INTEREST: 'Prealgebra',
                 self.IS_AP: False,
                 self.ITUNES: False,
                 self.KINDLE: True,
                 self.LANGUAGE: self.ENGLISH,
+                self.PRINT_COPY: True,
                 self.SHORT_NAME: 'Prealgebra', },
             self.PRECALCULUS: {
                 self.BOOKSHARE: False,
                 self.CATEGORY: [self.ALL, self.MATH],
+                self.COMP_COPY: True,
                 self.DETAILS: 'precalculus',
+                self.HAS_I_LOCK: True,
+                self.HAS_I_UNLOCK: True,
+                self.HAS_S_LOCK: False,
+                self.HAS_S_UNLOCK: True,
                 self.INTEREST: 'Precalc',
                 self.IS_AP: False,
                 self.ITUNES: True,
                 self.KINDLE: True,
                 self.LANGUAGE: self.ENGLISH,
+                self.PRINT_COPY: True,
                 self.SHORT_NAME: 'Precalculus', },
 
             # Science
             self.ANATOMY_PHYS: {
                 self.BOOKSHARE: True,
                 self.CATEGORY: [self.ALL, self.SCIENCE],
+                self.COMP_COPY: False,
                 self.DETAILS: 'anatomy-and-physiology',
+                self.HAS_I_LOCK: True,
+                self.HAS_I_UNLOCK: True,
+                self.HAS_S_LOCK: False,
+                self.HAS_S_UNLOCK: True,
                 self.INTEREST: 'Anatomy%20%26%20Physiology',
                 self.IS_AP: False,
                 self.ITUNES: True,
                 self.KINDLE: True,
                 self.LANGUAGE: self.ENGLISH,
+                self.PRINT_COPY: True,
                 self.SHORT_NAME: 'Anatomy & Physiology', },
             self.ASTRONOMY: {
                 self.BOOKSHARE: False,
                 self.CATEGORY: [self.ALL, self.SCIENCE],
+                self.COMP_COPY: True,
                 self.DETAILS: 'astronomy',
+                self.HAS_I_LOCK: True,
+                self.HAS_I_UNLOCK: True,
+                self.HAS_S_LOCK: False,
+                self.HAS_S_UNLOCK: True,
                 self.INTEREST: 'Astronomy',
                 self.IS_AP: False,
                 self.ITUNES: True,
                 self.KINDLE: True,
                 self.LANGUAGE: self.ENGLISH,
+                self.PRINT_COPY: True,
                 self.SHORT_NAME: 'Astronomy', },
             self.BIOLOGY: {
                 self.BOOKSHARE: True,
                 self.CATEGORY: [self.ALL, self.SCIENCE],
+                self.COMP_COPY: False,
                 self.DETAILS: 'biology',
+                self.HAS_I_LOCK: True,
+                self.HAS_I_UNLOCK: True,
+                self.HAS_S_LOCK: False,
+                self.HAS_S_UNLOCK: True,
                 self.INTEREST: 'Biology',
                 self.IS_AP: False,
                 self.ITUNES: True,
                 self.KINDLE: True,
                 self.LANGUAGE: self.ENGLISH,
+                self.PRINT_COPY: False,
                 self.SHORT_NAME: 'Biology', },
             self.BIOLOGY_2E: {
                 self.BOOKSHARE: False,
                 self.CATEGORY: [self.ALL, self.SCIENCE],
+                self.COMP_COPY: True,
                 self.DETAILS: 'biology-2e',
+                self.HAS_I_LOCK: True,
+                self.HAS_I_UNLOCK: True,
+                self.HAS_S_LOCK: False,
+                self.HAS_S_UNLOCK: True,
                 self.INTEREST: 'Biology',
                 self.IS_AP: False,
                 self.ITUNES: True,
                 self.KINDLE: True,
                 self.LANGUAGE: self.ENGLISH,
+                self.PRINT_COPY: True,
                 self.SHORT_NAME: 'Biology', },
             self.AP_BIO: {
                 self.BOOKSHARE: False,
                 self.CATEGORY: [self.ALL, self.AP, self.SCIENCE],
+                self.COMP_COPY: False,
                 self.DETAILS: 'biology-ap-courses',
+                self.HAS_I_LOCK: True,
+                self.HAS_I_UNLOCK: True,
+                self.HAS_S_LOCK: False,
+                self.HAS_S_UNLOCK: True,
                 self.INTEREST: 'AP%20Bio',
                 self.IS_AP: True,
                 self.ITUNES: False,
                 self.KINDLE: True,
                 self.LANGUAGE: self.ENGLISH,
+                self.PRINT_COPY: False,
                 self.SHORT_NAME: 'AP Biology', },
             self.CHEMISTRY: {
                 self.BOOKSHARE: False,
                 self.CATEGORY: [self.ALL, self.SCIENCE],
+                self.COMP_COPY: False,
                 self.DETAILS: 'chemistry',
+                self.HAS_I_LOCK: True,
+                self.HAS_I_UNLOCK: True,
+                self.HAS_S_LOCK: False,
+                self.HAS_S_UNLOCK: True,
                 self.INTEREST: 'Chemistry',
                 self.IS_AP: False,
                 self.ITUNES: False,
                 self.KINDLE: True,
                 self.LANGUAGE: self.ENGLISH,
+                self.PRINT_COPY: True,
                 self.SHORT_NAME: 'Chemistry', },
             self.CHEM_ATOMS: {
                 self.BOOKSHARE: False,
                 self.CATEGORY: [self.ALL, self.SCIENCE],
+                self.COMP_COPY: True,
                 self.DETAILS: 'chemistry-atoms-first',
+                self.HAS_I_LOCK: True,
+                self.HAS_I_UNLOCK: True,
+                self.HAS_S_LOCK: False,
+                self.HAS_S_UNLOCK: True,
                 self.INTEREST: 'Chem%3A%20Atoms%20First',
                 self.IS_AP: False,
                 self.ITUNES: True,
                 self.KINDLE: True,
                 self.LANGUAGE: self.ENGLISH,
+                self.PRINT_COPY: True,
                 self.SHORT_NAME: 'Chemistry: Atoms First', },
             self.PHYSICS: {
                 self.BOOKSHARE: True,
                 self.CATEGORY: [self.ALL, self.SCIENCE],
+                self.COMP_COPY: True,
                 self.DETAILS: 'college-physics',
+                self.HAS_I_LOCK: True,
+                self.HAS_I_UNLOCK: True,
+                self.HAS_S_LOCK: False,
+                self.HAS_S_UNLOCK: True,
                 self.INTEREST: 'College%20Physics%20(Algebra)',
                 self.IS_AP: False,
                 self.ITUNES: True,
                 self.KINDLE: True,
                 self.LANGUAGE: self.ENGLISH,
+                self.PRINT_COPY: True,
                 self.SHORT_NAME: 'College Physics', },
             self.AP_PHYS: {
                 self.BOOKSHARE: False,
                 self.CATEGORY: [self.ALL, self.AP, self.SCIENCE],
+                self.COMP_COPY: True,
                 self.DETAILS: 'college-physics-ap-courses',
+                self.HAS_I_LOCK: True,
+                self.HAS_I_UNLOCK: True,
+                self.HAS_S_LOCK: False,
+                self.HAS_S_UNLOCK: True,
                 self.INTEREST: 'AP%20Physics',
                 self.IS_AP: True,
                 self.ITUNES: True,
                 self.KINDLE: True,
                 self.LANGUAGE: self.ENGLISH,
+                self.PRINT_COPY: True,
                 self.SHORT_NAME: 'AP Physics', },
             self.BIO_CONCEPTS: {
                 self.BOOKSHARE: True,
                 self.CATEGORY: [self.ALL, self.SCIENCE],
+                self.COMP_COPY: False,
                 self.DETAILS: 'concepts-biology',
+                self.HAS_I_LOCK: True,
+                self.HAS_I_UNLOCK: True,
+                self.HAS_S_LOCK: False,
+                self.HAS_S_UNLOCK: True,
                 self.INTEREST: 'Concepts%20of%20Bio%20(non-majors)',
                 self.IS_AP: False,
                 self.ITUNES: True,
                 self.KINDLE: True,
                 self.LANGUAGE: self.ENGLISH,
+                self.PRINT_COPY: True,
                 self.SHORT_NAME: 'Concepts of Biology', },
             self.FIZYKA_1: {
                 self.BOOKSHARE: False,
                 self.CATEGORY: [self.ALL, self.SCIENCE],
+                self.COMP_COPY: False,
                 self.DETAILS: ('fizyka-dla-szk%C3%B3%C5%82-wy%C5%BCszych'
                                '-tom-1'),
+                self.HAS_I_LOCK: False,
+                self.HAS_I_UNLOCK: False,
+                self.HAS_S_LOCK: False,
+                self.HAS_S_UNLOCK: False,
                 self.INTEREST: None,
                 self.IS_AP: False,
                 self.ITUNES: False,
                 self.KINDLE: False,
                 self.LANGUAGE: self.POLISH,
+                self.PRINT_COPY: False,
                 self.SHORT_NAME: None, },
             self.FIZYKA_2: {
                 self.BOOKSHARE: False,
                 self.CATEGORY: [self.ALL, self.SCIENCE],
+                self.COMP_COPY: False,
                 self.DETAILS: ('fizyka-dla-szk%C3%B3%C5%82-wy%C5%BCszych'
                                '-tom-2'),
+                self.HAS_I_LOCK: False,
+                self.HAS_I_UNLOCK: False,
+                self.HAS_S_LOCK: False,
+                self.HAS_S_UNLOCK: False,
                 self.INTEREST: None,
                 self.IS_AP: False,
                 self.ITUNES: False,
                 self.KINDLE: False,
                 self.LANGUAGE: self.POLISH,
+                self.PRINT_COPY: False,
                 self.SHORT_NAME: None, },
             self.FIZYKA_3: {
                 self.BOOKSHARE: False,
                 self.CATEGORY: [self.ALL, self.SCIENCE],
+                self.COMP_COPY: False,
                 self.DETAILS: ('fizyka-dla-szk%C3%B3%C5%82-wy%C5%BCszych'
                                '-tom-3'),
+                self.HAS_I_LOCK: False,
+                self.HAS_I_UNLOCK: False,
+                self.HAS_S_LOCK: False,
+                self.HAS_S_UNLOCK: False,
                 self.INTEREST: None,
                 self.IS_AP: False,
                 self.ITUNES: False,
                 self.KINDLE: False,
                 self.LANGUAGE: self.POLISH,
+                self.PRINT_COPY: False,
                 self.SHORT_NAME: None, },
             self.MICROBIOLOGY: {
                 self.BOOKSHARE: False,
                 self.CATEGORY: [self.ALL, self.SCIENCE],
+                self.COMP_COPY: True,
                 self.DETAILS: 'microbiology',
+                self.HAS_I_LOCK: True,
+                self.HAS_I_UNLOCK: True,
+                self.HAS_S_LOCK: False,
+                self.HAS_S_UNLOCK: True,
                 self.INTEREST: 'Microbiology',
                 self.IS_AP: False,
                 self.ITUNES: True,
                 self.KINDLE: True,
                 self.LANGUAGE: self.ENGLISH,
+                self.PRINT_COPY: True,
                 self.SHORT_NAME: 'Microbiology', },
             self.U_PHYS_1: {
                 self.BOOKSHARE: False,
                 self.CATEGORY: [self.ALL, self.SCIENCE],
+                self.COMP_COPY: True,
                 self.DETAILS: 'university-physics-volume-1',
+                self.HAS_I_LOCK: True,
+                self.HAS_I_UNLOCK: True,
+                self.HAS_S_LOCK: False,
+                self.HAS_S_UNLOCK: True,
                 self.INTEREST: 'University%20Physics%20(Calc)',
                 self.IS_AP: False,
                 self.ITUNES: True,
                 self.KINDLE: True,
                 self.LANGUAGE: self.ENGLISH,
+                self.PRINT_COPY: True,
                 self.SHORT_NAME: 'University Physics', },
             self.U_PHYS_2: {
                 self.BOOKSHARE: False,
                 self.CATEGORY: [self.ALL, self.SCIENCE],
+                self.COMP_COPY: True,
                 self.DETAILS: 'university-physics-volume-2',
+                self.HAS_I_LOCK: True,
+                self.HAS_I_UNLOCK: True,
+                self.HAS_S_LOCK: False,
+                self.HAS_S_UNLOCK: True,
                 self.INTEREST: 'University%20Physics%20(Calc)',
                 self.IS_AP: False,
                 self.ITUNES: True,
                 self.KINDLE: True,
                 self.LANGUAGE: self.ENGLISH,
+                self.PRINT_COPY: True,
                 self.SHORT_NAME: 'University Physics', },
             self.U_PHYS_3: {
                 self.BOOKSHARE: False,
                 self.CATEGORY: [self.ALL, self.SCIENCE],
+                self.COMP_COPY: True,
                 self.DETAILS: 'university-physics-volume-3',
+                self.HAS_I_LOCK: True,
+                self.HAS_I_UNLOCK: True,
+                self.HAS_S_LOCK: False,
+                self.HAS_S_UNLOCK: True,
                 self.INTEREST: 'University%20Physics%20(Calc)',
                 self.IS_AP: False,
                 self.ITUNES: True,
                 self.KINDLE: True,
                 self.LANGUAGE: self.ENGLISH,
+                self.PRINT_COPY: True,
                 self.SHORT_NAME: 'University Physics', },
 
             # Social Sciences
             self.GOVERNMENT: {
                 self.BOOKSHARE: False,
                 self.CATEGORY: [self.ALL, self.SOCIAL],
+                self.COMP_COPY: True,
                 self.DETAILS: 'american-government',
+                self.HAS_I_LOCK: True,
+                self.HAS_I_UNLOCK: True,
+                self.HAS_S_LOCK: False,
+                self.HAS_S_UNLOCK: True,
                 self.INTEREST: 'American%20Government',
                 self.IS_AP: False,
                 self.ITUNES: True,
                 self.KINDLE: True,
                 self.LANGUAGE: self.ENGLISH,
+                self.PRINT_COPY: True,
                 self.SHORT_NAME: 'American Government', },
             self.SOCIOLOGY: {
                 self.BOOKSHARE: False,
                 self.CATEGORY: [self.ALL, self.SOCIAL],
+                self.COMP_COPY: True,
                 self.DETAILS: 'introduction-sociology-2e',
+                self.HAS_I_LOCK: True,
+                self.HAS_I_UNLOCK: True,
+                self.HAS_S_LOCK: False,
+                self.HAS_S_UNLOCK: True,
                 self.INTEREST: 'Introduction%20to%20Sociology',
                 self.IS_AP: False,
                 self.ITUNES: True,
                 self.KINDLE: True,
                 self.LANGUAGE: self.ENGLISH,
+                self.PRINT_COPY: True,
                 self.SHORT_NAME: 'Introduction to Sociology 2e', },
             self.PRINCIPLES_ECON: {
                 self.BOOKSHARE: False,
                 self.CATEGORY: [self.ALL, self.SOCIAL],
+                self.COMP_COPY: True,
                 self.DETAILS: 'principles-economics-2e',
+                self.HAS_I_LOCK: True,
+                self.HAS_I_UNLOCK: True,
+                self.HAS_S_LOCK: False,
+                self.HAS_S_UNLOCK: True,
                 self.INTEREST: 'Economics',
                 self.IS_AP: False,
                 self.ITUNES: True,
                 self.KINDLE: True,
                 self.LANGUAGE: self.ENGLISH,
+                self.PRINT_COPY: True,
                 self.SHORT_NAME: 'Principles of Economics', },
             self.PRINCIPLES_MACRO: {
                 self.BOOKSHARE: False,
                 self.CATEGORY: [self.ALL, self.SOCIAL],
+                self.COMP_COPY: True,
                 self.DETAILS: 'principles-macroeconomics-2e',
+                self.HAS_I_LOCK: True,
+                self.HAS_I_UNLOCK: True,
+                self.HAS_S_LOCK: False,
+                self.HAS_S_UNLOCK: True,
                 self.INTEREST: 'Macro%20Econ',
                 self.IS_AP: False,
                 self.ITUNES: True,
                 self.KINDLE: True,
                 self.LANGUAGE: self.ENGLISH,
+                self.PRINT_COPY: True,
                 self.SHORT_NAME: 'Principles of Macroeconomics', },
             self.AP_MACRO: {
                 self.BOOKSHARE: False,
                 self.CATEGORY: [self.ALL, self.AP, self.SOCIAL],
+                self.COMP_COPY: False,
                 self.DETAILS: 'principles-macroeconomics-ap-courses-2e',
+                self.HAS_I_LOCK: True,
+                self.HAS_I_UNLOCK: True,
+                self.HAS_S_LOCK: False,
+                self.HAS_S_UNLOCK: True,
                 self.INTEREST: 'AP%20Macro%20Econ',
                 self.IS_AP: True,
                 self.ITUNES: False,
                 self.KINDLE: True,
                 self.LANGUAGE: self.ENGLISH,
+                self.PRINT_COPY: False,
                 self.SHORT_NAME: 'AP Macro Econ', },
             self.PRINCIPLES_MICRO: {
                 self.BOOKSHARE: False,
                 self.CATEGORY: [self.ALL, self.SOCIAL],
+                self.COMP_COPY: True,
                 self.DETAILS: 'principles-microeconomics-2e',
+                self.HAS_I_LOCK: True,
+                self.HAS_I_UNLOCK: True,
+                self.HAS_S_LOCK: False,
+                self.HAS_S_UNLOCK: True,
                 self.INTEREST: 'Micro%20Econ',
                 self.IS_AP: False,
                 self.ITUNES: True,
                 self.KINDLE: True,
                 self.LANGUAGE: self.ENGLISH,
+                self.PRINT_COPY: True,
                 self.SHORT_NAME: 'Principles of Microeconomics', },
             self.AP_MICRO: {
                 self.BOOKSHARE: False,
                 self.CATEGORY: [self.ALL, self.AP, self.SOCIAL],
+                self.COMP_COPY: False,
                 self.DETAILS: 'principles-microeconomics-ap-courses-2e',
+                self.HAS_I_LOCK: True,
+                self.HAS_I_UNLOCK: True,
+                self.HAS_S_LOCK: False,
+                self.HAS_S_UNLOCK: True,
                 self.INTEREST: 'AP%20Micro%20Econ',
                 self.IS_AP: True,
                 self.ITUNES: False,
                 self.KINDLE: True,
                 self.LANGUAGE: self.ENGLISH,
+                self.PRINT_COPY: False,
                 self.SHORT_NAME: 'AP Micro Econ', },
             self.PSYCHOLOGY: {
                 self.BOOKSHARE: False,
                 self.CATEGORY: [self.ALL, self.SOCIAL],
+                self.COMP_COPY: False,
                 self.DETAILS: 'psychology',
+                self.HAS_I_LOCK: True,
+                self.HAS_I_UNLOCK: True,
+                self.HAS_S_LOCK: False,
+                self.HAS_S_UNLOCK: True,
                 self.INTEREST: 'Psychology',
                 self.IS_AP: False,
                 self.ITUNES: True,
                 self.KINDLE: True,
                 self.LANGUAGE: self.ENGLISH,
+                self.PRINT_COPY: True,
                 self.SHORT_NAME: 'Psychology', },
         }
 
@@ -725,6 +973,12 @@ class Library():
     def business(self):
         """Return the business books."""
         return self.get_by_category(self.BUSINESS)
+
+    @property
+    def comp_copy(self):
+        """Return books with available complimentary copies."""
+        return [(book, self.get(book)) for book in self.books
+                if self.get(book, self.COMP_COPY)]
 
     @property
     def current(self):
@@ -756,6 +1010,18 @@ class Library():
                 if self.get(book, self.KINDLE)]
 
     @property
+    def locked_instructor(self):
+        """Return the books with locked instructor resources."""
+        return [(book, self.get(book)) for book in self.books
+                if self.get(book, self.HAS_I_LOCK)]
+
+    @property
+    def locked_student(self):
+        """Return the books with locked student resources."""
+        return [(book, self.get(book)) for book in self.books
+                if self.get(book, self.HAS_S_LOCK)]
+
+    @property
     def math(self):
         """Return the math books."""
         return self.get_by_category(self.MATH)
@@ -765,6 +1031,12 @@ class Library():
         """Return the OpenStax books."""
         return [(book, self.get(book)) for book in self.books
                 if self.get(book, self.LANGUAGE) == self.ENGLISH]
+
+    @property
+    def print(self):
+        """Return the books offering a print edition."""
+        return [(book, self.get(book)) for book in self.books
+                if self.get(book, self.PRINT_COPY)]
 
     @property
     def science(self):
@@ -788,6 +1060,18 @@ class Library():
         return [(book, self.get(book)) for book in self.books
                 if book in self.OLD_EDITIONS]
 
+    @property
+    def unlocked_instructor(self):
+        """Return the books with unlocked instructor resources."""
+        return [(book, self.get(book)) for book in self.books
+                if self.get(book, self.HAS_I_UNLOCK)]
+
+    @property
+    def unlocked_student(self):
+        """Return the books with unlocked student resources."""
+        return [(book, self.get(book)) for book in self.books
+                if self.get(book, self.HAS_S_UNLOCK)]
+
     def get_titles(self, group=None):
         """Return a list of book titles."""
         collection = group if group else self.books
@@ -799,9 +1083,10 @@ class Library():
 
     def get(self, book, field=None):
         """Return the field or fields for a specific book."""
+        return_book = self.books.get(book)
         if field:
-            return self.books.get(book).get(field)
-        return self.books.get(book)
+            return return_book.get(field)
+        return return_book
 
     def get_by_category(self, category):
         """Return the books within a specific category."""

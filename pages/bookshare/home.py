@@ -10,15 +10,17 @@ class Bookshare(Page):
 
     URL_TEMPLATE = 'https://www.bookshare.org/'
 
+    _book_details_locator = ('class name', 'bookDetail')
+
     @property
     def loaded(self):
         """Return True if Bookshare is in the current URL."""
-        return 'bookshare' in self.location
+        return ('bookshare' in self.location and
+                'openstax' in self.driver.page_source.lower())
 
     def is_displayed(self):
         """Return True if the main content is loaded."""
-        return ('openstax' in self.driver.page_source.lower() and
-                self.loaded)
+        return self.find_element(*self._book_details_locator).is_displayed()
 
     def close_tab(self):
         """Close the current tab and switch to the remaining one.
