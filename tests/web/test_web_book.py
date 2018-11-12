@@ -161,8 +161,6 @@ def test_links_to_purchase_a_print_copy(web_base_url, selenium):
     home = WebHome(selenium, web_base_url).open()
     subjects = home.web_nav.subjects.view_all()
     book = subjects.select_random_book(_from=Library.PRINT_COPY)
-    import logging
-    logging.debug(str(book))
 
     # WHEN: they click on the "Order a print copy" link
     # AND:  click on the "Order on Amazon" button
