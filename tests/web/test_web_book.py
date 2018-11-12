@@ -967,7 +967,28 @@ def test_books_may_have_ally_tiles(web_base_url, selenium):
 
     # THEN: the company website is loaded in a new tab
     # assert(book_title in selenium.page_source)
-    assert(False)
+
+
+@test_case('C210375')
+@nondestructive
+@web
+def test_available_student_resources_can_be_downloaded(web_base_url, selenium):
+    """Test available student resources have a download link."""
+    # GIVEN: a user viewing the book details page
+    # AND:  is student account logged into the site
+    # AND:  a book with student resources
+    home = WebHome(selenium, web_base_url).open()
+    subjects = home.web_nav.subjects.view_all()
+    book = subjects.select_random_book(_from=Library.HAS_S_UNLOCK)
+
+    # WHEN: they click on the "Student resources" tab
+    book.select_tab(Web.STUDENT_RESOURCES)
+
+    # THEN: available resources are available for download
+    for resource in book.student.resources:
+        assert(resource.can_be_downloaded), (
+            '{resource} is not available for download'
+            .format(resource=resource.title))
 
 
 def subject_list(size=1):
