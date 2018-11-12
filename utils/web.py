@@ -33,7 +33,7 @@ class Web(object):
     OPENSTAX_PARTNERS = 1
 
     # Book page tabs
-    partner_resources_are_split = False
+    partner_resources_are_split = True
     BOOK_DETAILS = 0
     INSTRUCTOR_RESOURCES = 1
     PARTNER_RESOURCES = 2 if partner_resources_are_split else None
@@ -226,7 +226,7 @@ class Library():
 
     # Business
     ETHICS = 'Business Ethics'
-    BUSINESS = 'Introduction to Business'
+    INTRO_BUSINESS = 'Introduction to Business'
 
     # Humanities
     US_HISTORY = 'U.S. History'
@@ -331,7 +331,7 @@ class Library():
                 self.LANGUAGE: self.ENGLISH,
                 self.PRINT_COPY: False,
                 self.SHORT_NAME: 'Business Ethics', },
-            self.BUSINESS: {
+            self.INTRO_BUSINESS: {
                 self.BOOKSHARE: False,
                 self.CATEGORY: [self.ALL, self.BUSINESS],
                 self.COMP_COPY: False,
@@ -1072,11 +1072,6 @@ class Library():
         return [(book, self.get(book)) for book in self.books
                 if self.get(book, self.HAS_S_UNLOCK)]
 
-    def get_titles(self, group=None):
-        """Return a list of book titles."""
-        collection = group if group else self.books
-        return [book[0] for book in collection]
-
     def book_passthrough(self, using):
         """Return the Subjects book name and form append for a book set."""
         return [(book, self.get(book, self.INTEREST)) for book in using]
@@ -1105,6 +1100,11 @@ class Library():
                 using[0][1].get(self.SHORT_NAME),
                 [key for key in using[0]][0],
                 using[0][1].get(self.DETAILS))
+
+    def get_titles(self, group=None):
+        """Return a list of book titles."""
+        collection = group if group else self.books
+        return [book[0] for book in collection]
 
     def random_book(self, number=1, short_name=True):
         """Return a list of random book short names."""

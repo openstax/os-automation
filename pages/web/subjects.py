@@ -152,9 +152,19 @@ class Subjects(WebBase):
                 for book in self.find_elements(*self._book_locator)]
 
     @property
+    def ap_books(self):
+        """Select active AP books."""
+        return self._selection_helper(Library().ap)
+
+    @property
     def bookshare_books(self):
         """Select active books available through Bookshare."""
         return self._selection_helper(Library().bookshare)
+
+    @property
+    def business_books(self):
+        """Select active business books."""
+        return self._selection_helper(Library().business)
 
     @property
     def comp_copy(self):
@@ -165,6 +175,11 @@ class Subjects(WebBase):
     def current_books(self):
         """Select the current editions of each book."""
         return self._selection_helper(Library().current)
+
+    @property
+    def humanities_books(self):
+        """Select active humanities books."""
+        return self._selection_helper(Library().humanities)
 
     @property
     def kindle_books(self):
@@ -185,6 +200,11 @@ class Subjects(WebBase):
     def locked_student(self):
         """Select active books with locked student resources."""
         return self._selection_helper(Library().locked_student)
+
+    @property
+    def math_books(self):
+        """Select active math books."""
+        return self._selection_helper(Library().math)
 
     @property
     def old_book_editions(self):
@@ -209,6 +229,16 @@ class Subjects(WebBase):
         return self._selection_helper(Library().print)
 
     @property
+    def science_books(self):
+        """Select active science books."""
+        return self._selection_helper(Library().science)
+
+    @property
+    def social_sciences_books(self):
+        """Select active social science books."""
+        return self._selection_helper(Library().social_sciences)
+
+    @property
     def unlocked_instructor(self):
         """Select active books with unlocked instructor resources."""
         return self._selection_helper(Library().unlocked_instructor)
@@ -222,18 +252,24 @@ class Subjects(WebBase):
         """Return a random book from the active list."""
         using = {
             Library.ALL_BOOKS: self._active_books,
+            Library.AP: self.ap_books,
             Library.BOOKSHARE: self.bookshare_books,
+            Library.BUSINESS: self.business_books,
             Library.COMP_COPY: self.comp_copy,
             Library.CURRENT: self.current_books,
             Library.HAS_I_LOCK: self.locked_instructor,
             Library.HAS_I_UNLOCK: self.unlocked_instructor,
             Library.HAS_S_LOCK: self.locked_student,
             Library.HAS_S_UNLOCK: self.unlocked_student,
+            Library.HUMANITIES: self.humanities_books,
             Library.ITUNES: self.itunes_books,
             Library.KINDLE: self.kindle_books,
+            Library.MATH: self.math_books,
             Library.OPENSTAX: self.openstax_books,
             Library.POLISH: self.polish_books,
             Library.PRINT_COPY: self.print_books,
+            Library.SCIENCE: self.science_books,
+            Library.SOCIAL: self.social_sciences_books,
             Library.SUPERSEDED: self.old_book_editions,
         }.get(_from)
         if filter_current:

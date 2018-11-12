@@ -14,7 +14,7 @@ from tests.markers import accounts, nondestructive, skip_if_headless  # NOQA
 from tests.markers import skip_test, test_case, web  # NOQA
 from utils.accounts import Accounts
 from utils.email import RestMail
-from utils.utilities import Utility
+from utils.utilities import Actions, Utility
 from utils.web import Library, Web
 
 
@@ -903,6 +903,71 @@ def test_users_may_see_the_upcoming_webinar_schedule(web_base_url, selenium):
     # THEN: the webinars blog post is displayed
     assert(webinar.is_displayed())
     assert('webinars hosted by OpenStax' in selenium.page_source)
+
+
+@test_case('C210374')
+@nondestructive
+@web
+def test_books_may_have_ally_tiles(web_base_url, selenium):
+    """Books have ally tiles and each tile has a name, description and link."""
+    # GIVEN: a user viewing the book details page
+    home = WebHome(selenium, web_base_url).open()
+    subjects = home.web_nav.subjects.view_all()
+    book = subjects.select_random_book(_from=Library.OPENSTAX)
+    # book_title = book.title
+
+    # WHEN: they click on the "Instructor resources" tab
+    book.select_tab(Web.INSTRUCTOR_RESOURCES)
+
+    # THEN: there may be an Allies section with one or more
+    #       Ally tiles with the company name on the tile
+    assert(book.instructor.partners)
+
+    # WHEN: the cursor hovers over a tile
+    random_tile = Utility.random(0, len(book.instructor.partners) - 1)
+    tile = book.instructor.partners[random_tile]
+    tile_name = tile.name
+    Utility.scroll_to(selenium, element=tile.root)
+    print(tile_name)
+    is_safari = selenium.capabilities.get('browserName').lower() == 'safari'
+    if not is_safari:
+        text_seen = (
+            Actions(selenium)
+            .move_to_element(tile.to_hover)
+            .wait(1.0)
+            .get_js_data(
+                element=tile.hover, data_type='opacity', expected='1'))
+
+        # THEN: the company name is replaced by the company
+        #       description
+        assert(text_seen)
+
+    # WHEN: the screen is reduced to 600 pixels
+    # AND:  the cursor hovers over a tile
+    book.resize_window(width=600)
+    book.instructor.toggle()
+    for partner in book.instructor.partners:
+        if partner.name == tile_name:
+            tile = partner
+            break
+    if not is_safari:
+        Utility.scroll_to(selenium, element=tile.root)
+        text_seen = (
+            Actions(selenium)
+            .move_to_element(tile.root)
+            .wait(1.0)
+            .get_js_data(element=tile.root, data_type='opacity', expected='0'))
+
+        # THEN: the company name is not replaced by the company
+        #       description
+        assert(not text_seen)
+
+    # WHEN: they click on the tile
+    tile.view_partner()
+
+    # THEN: the company website is loaded in a new tab
+    # assert(book_title in selenium.page_source)
+    assert(False)
 
 
 def subject_list(size=1):

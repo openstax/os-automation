@@ -51,7 +51,9 @@ class WebNavMenu(Region):
                 '.{parent} {menu_locator}'.format(
                     parent='.'.join(self.root.get_attribute('class').split()),
                     menu_locator=self._open_menu_locator[1]))
-            Utility.safari_exception_click(self.driver, locator=target)
+            Utility.safari_exception_click(driver=self.driver,
+                                           locator=target,
+                                           force_js_click=True)
         sleep(0.25)
         return self
 
@@ -60,9 +62,13 @@ class WebNavMenu(Region):
         self.open()
         sleep(0.5)
         if new_tab:
-            Utility.switch_to(self.driver, link_locator=locator)
+            Utility.switch_to(driver=self.driver,
+                              link_locator=locator,
+                              force_js_click=True)
         else:
-            Utility.safari_exception_click(self.driver, locator=locator)
+            Utility.safari_exception_click(driver=self.driver,
+                                           locator=locator,
+                                           force_js_click=True)
         sleep(1.0)
         return go_to_(destination(self.driver))
 

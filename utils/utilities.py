@@ -238,12 +238,15 @@ class Utility(object):
         return new_set
 
     @classmethod
-    def safari_exception_click(cls, driver, locator=None, element=None):
+    def safari_exception_click(cls, driver, locator=None, element=None,
+                               force_js_click=False):
         """Click on elements which cause Safari 500 errors."""
         element = element if element else driver.find_element(*locator)
         Utility.scroll_to(driver=driver, element=element, shift=-80)
         sleep(0.5)
         try:
+            if force_js_click:
+                raise WebDriverException()
             element.click()
         except WebDriverException:
             for _ in range(10):
@@ -289,14 +292,19 @@ class Utility(object):
             .text
 
     @classmethod
-    def switch_to(cls, driver, link_locator=None, element=None, action=None):
+    def switch_to(cls, driver, link_locator=None, element=None, action=None,
+                  force_js_click=False):
         """Switch to the other window handle."""
         current = driver.current_window_handle
         data = None
         if link_locator:
-            Utility.safari_exception_click(driver, link_locator)
+            Utility.safari_exception_click(driver=driver,
+                                           locator=link_locator,
+                                           force_js_click=force_js_click)
         elif element:
-            Utility.safari_exception_click(driver, element=element)
+            Utility.safari_exception_click(driver=driver,
+                                           element=element,
+                                           force_js_click=force_js_click)
         else:
             data = action()
         sleep(1)
@@ -412,26 +420,67 @@ def go_to_(destination):
 class Actions(ActionChains):
     """Add a javascript retrieval action and a data return perform."""
 
-    def get_js_data(self, css_selector, data_type, expected):
+    def get_js_data(self, css_selector=None, data_type=None, expected=None,
+                    element=None, new_script=None):
         """Trigger a style lookup."""
-        self._actions.append(
-            lambda: self.data_read(css_selector, data_type, expected))
+        if element:
+            self._actions.append(
+                lambda: self.data_read(element=element,
+                                       data_type=data_type,
+                                       expected=expected))
+        elif new_script:
+            self._actions.append(
+                lambda: self.data_read(new_script=new_script,
+                                       element=element,
+                                       expected=expected))
+        else:
+            self._actions.append(
+                lambda: self.data_read(css_selector=css_selector,
+                                       data_type=data_type,
+                                       expected=expected))
         result = None
         if self._driver.w3c:
-            self.w3c_actions.perform()
-            result = self.data_read(css_selector, data_type, expected)
+            try:
+                self.w3c_actions.perform()
+            except TypeError:
+                pass
+            if element:
+                result = self.data_read(element=element,
+                                        data_type=data_type,
+                                        expected=expected)
+            elif new_script:
+                result = self.data_read(new_script=new_script,
+                                        element=element,
+                                        expected=expected)
+            else:
+                result = self.data_read(css_selector=css_selector,
+                                        data_type=data_type,
+                                        expected=expected)
         else:
             for action in self._actions:
                 result = action()
-        sleep(1.0)
+        sleep(1)
         return result
 
-    def data_read(self, css_selector, data_type, expected):
-        """Compare the computed height to an expected value."""
-        element_height = (
-            'return window.getComputedStyle(document.querySelector'
-            '("{selector}"))["{data_type}"]'
-        ).format(selector=css_selector, data_type=data_type)
-        val = self._driver.execute_script(element_height)
-        print(val, val == expected)
+    def data_read(self, css_selector=None, data_type=None, expected=None,
+                  element=None, new_script=None):
+        """Compare the script return to an expected value."""
+        if new_script:
+            script = new_script
+        elif element:
+            script = (
+                'return window.getComputedStyle(arguments[0])["{data_type}"]'
+            ).format(data_type=data_type)
+        else:
+            script = (
+                'return window.getComputedStyle(document.querySelector'
+                '("{selector}"))["{data_type}"]'
+            ).format(selector=css_selector, data_type=data_type)
+        val = self._driver.execute_script(script, element)
+        print(val, expected, val == expected)
         return val == expected
+
+    def wait(self, seconds: float):
+        """Sleep for a specified number of seconds within an ActionChain."""
+        self._actions.append(lambda: sleep(seconds))
+        return self

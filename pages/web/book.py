@@ -79,6 +79,8 @@ class Accordion(Region):
 
     def toggle(self):
         """Click on a toggle bar to open or close the menu."""
+        toggle_bar = self.find_element(*self._toggle_locator)
+        Utility.scroll_to(self.driver, element=toggle_bar, shift=-80)
         self.find_element(*self._toggle_locator).click()
         sleep(0.5)
         return self
@@ -183,6 +185,7 @@ class Book(WebBase):
 
     def select_tab(self, tab):
         """Select a specific resource tab."""
+        Utility.scroll_to(self.driver, element=self.tabs[tab], shift=-80)
         self.tabs[tab].click()
         sleep(0.5)
         return self
@@ -499,6 +502,7 @@ class Book(WebBase):
         _account_signup_locator = (By.CSS_SELECTOR, '.free-stuff-blurb a')
         _oer_commons_locator = (By.CSS_SELECTOR, '.resource-box.double')
         _webinar_link_locator = (By.CSS_SELECTOR, '.webinars')
+        _partner_resource_locator = (By.CSS_SELECTOR, '.ally-box')
 
         def is_displayed(self):
             """Return True if the instructor resources content is visible."""
@@ -524,6 +528,13 @@ class Book(WebBase):
             Utility.safari_exception_click(self.driver, element=webinar)
             from pages.web.blog import Article
             return go_to_(Article(self.driver, article=article_url))
+
+        @property
+        def partners(self):
+            """Return a list of available resources."""
+            return [Partner(self, box)
+                    for box in self.find_elements(
+                        *self._partner_resource_locator)]
 
     class PartnerResources(ResourceTab):
         """The partner resources tab."""
@@ -1015,6 +1026,7 @@ class Partner(Region):
 
     _name_locator = (By.CSS_SELECTOR, 'img')
     _description_locator = (By.CSS_SELECTOR, '.hover-blurb')
+    _hover_top_locator = (By.CSS_SELECTOR, '.top')
 
     @property
     def name(self):
@@ -1023,9 +1035,19 @@ class Partner(Region):
                 .get_attribute('alt').strip())
 
     @property
+    def to_hover(self):
+        """Return the top element."""
+        return self.find_element(*self._hover_top_locator)
+
+    @property
+    def hover(self):
+        """Return the description element."""
+        return self.find_element(*self._description_locator)
+
+    @property
     def description(self):
         """Return the partner's short bio."""
-        return self.find_element(*self._description_locator).text
+        return self.hover.text
 
     @property
     def url(self):
@@ -1034,8 +1056,14 @@ class Partner(Region):
 
     def view_partner(self):
         """Click on the partner resource box and return the new URL."""
-        Utility.safari_exception_click(self.driver, element=self.root)
-        return self.driver.current_url
+        url = self.url
+        Utility.switch_to(self.driver, element=self.root)
+        self.wait.until(
+            lambda _: bool(self.driver.find_element(By.TAG_NAME, 'body')))
+        images = self.wait.until(
+            lambda _: bool(self.driver.find_elements(By.TAG_NAME, 'img')))
+        Utility.is_image_visible(self.driver, image=images)
+        return url
 
 
 class Chapter(Region):

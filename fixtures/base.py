@@ -1,6 +1,7 @@
 """Pytest fixture primary control."""
 
 import pytest
+from bs4 import BeautifulSoup
 
 __all__ = ['selenium', 'chrome_options', 'firefox_options']
 
@@ -14,15 +15,21 @@ def selenium(request, selenium, pytestconfig):
     selenium.set_window_size(width=1024, height=768)
     yield selenium
     # request.node is an "item" because we use the default "function" scope
-    if (pytestconfig.getoption('--print-page-source-on-failure') and
-       request.node.rep_setup.passed and
-       request.node.rep_call.failed):
-        # print page source on failure
-        print('\n------------------------------- Begin Page Source'
-              '-------------------------------')
-        print(selenium.page_source)
-        print('------------------------------- End Page Source'
-              '-------------------------------')
+    if request.node.rep_setup.passed and request.node.rep_call.failed:
+        # print the current driver URL for failures to assist debugging
+        print('URL: {url}'.format(url=selenium.current_url))
+
+        if pytestconfig.getoption('--print-page-source-on-failure'):
+            # print page source on failure
+            soup = BeautifulSoup(selenium.page_source, 'html5lib')
+            print('\n'
+                  '------------------------------- Begin Page Source'
+                  '-------------------------------')
+            # the page source may be a mess so use a parser to clean it up
+            print(soup.prettify())
+            print('------------------------------- End Page Source'
+                  '-------------------------------'
+                  '\n')
 
 
 @pytest.fixture
