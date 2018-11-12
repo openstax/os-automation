@@ -1,6 +1,7 @@
 """Pytest fixture primary control."""
 
 import pytest
+from bs4 import BeautifulSoup
 
 __all__ = ['selenium', 'chrome_options', 'firefox_options']
 
@@ -14,15 +15,21 @@ def selenium(request, selenium, pytestconfig):
     selenium.set_window_size(width=1024, height=768)
     yield selenium
     # request.node is an "item" because we use the default "function" scope
-    if (pytestconfig.getoption('--print-page-source-on-failure') and
-       request.node.rep_setup.passed and
-       request.node.rep_call.failed):
-        # print page source on failure
-        print('\n------------------------------- Begin Page Source'
-              '-------------------------------')
-        print(selenium.page_source)
-        print('------------------------------- End Page Source'
-              '-------------------------------')
+    if request.node.rep_setup.passed and request.node.rep_call.failed:
+        # print the current driver URL for failures to assist debugging
+        print('URL: {url}'.format(url=selenium.current_url))
+
+        if pytestconfig.getoption('--print-page-source-on-failure'):
+            # print page source on failure
+            soup = BeautifulSoup(selenium.page_source, 'html5lib')
+            print('\n'
+                  '------------------------------- Begin Page Source'
+                  '-------------------------------')
+            # the page source may be a mess so use a parser to clean it up
+            print(soup.prettify())
+            print('------------------------------- End Page Source'
+                  '-------------------------------'
+                  '\n')
 
 
 @pytest.fixture
@@ -60,9 +67,9 @@ def firefox_options(firefox_options, pytestconfig):
     """Set Firefox options."""
     if pytestconfig.getoption('--headless'):
         firefox_options.headless = True
-    firefox62 = ('Mozilla/5.0 (Macintosh; Intel Mac OS X 10.13; rv:62.0) '
-                 'Gecko/20100101 Firefox/62.0')
+    firefox63 = ('Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:63.0) '
+                 'Gecko/20100101 Firefox/63.0')
     firefox_options.add_argument('--user-agent={agent}'
-                                 .format(agent=firefox62))
+                                 .format(agent=firefox63))
 
     return firefox_options

@@ -39,15 +39,21 @@ class WebNavMenu(Region):
     def open(self):
         """Select the menu."""
         sleep(0.5)
-        is_expanded = self.find_element(*self._menu_expand_locator) \
-            .get_attribute('aria-expanded') == 'true'
+        try:
+            is_expanded = self.find_element(*self._menu_expand_locator) \
+                .get_attribute('aria-expanded') == 'true'
+        except WebDriverException as ex:
+            print(self.driver.current_url, str(ex))
+            is_expanded = False
         if not is_expanded:
             target = (
                 self._open_menu_locator[0],
                 '.{parent} {menu_locator}'.format(
                     parent='.'.join(self.root.get_attribute('class').split()),
                     menu_locator=self._open_menu_locator[1]))
-            Utility.safari_exception_click(self.driver, locator=target)
+            Utility.safari_exception_click(driver=self.driver,
+                                           locator=target,
+                                           force_js_click=True)
         sleep(0.25)
         return self
 
@@ -56,9 +62,13 @@ class WebNavMenu(Region):
         self.open()
         sleep(0.5)
         if new_tab:
-            Utility.switch_to(self.driver, link_locator=locator)
+            Utility.switch_to(driver=self.driver,
+                              link_locator=locator,
+                              force_js_click=True)
         else:
-            Utility.safari_exception_click(self.driver, locator=locator)
+            Utility.safari_exception_click(driver=self.driver,
+                                           locator=locator,
+                                           force_js_click=True)
         sleep(1.0)
         return go_to_(destination(self.driver))
 
@@ -66,7 +76,7 @@ class WebNavMenu(Region):
 class WebNav(Region):
     """Website navbar region."""
 
-    _root_locator = (By.CLASS_NAME, 'nav')
+    _root_locator = (By.CSS_SELECTOR, '.nav')
     _openstax_logo_locator = (By.CSS_SELECTOR, '.os-logo > a')
     _slogan_locator = (By.CSS_SELECTOR, '.logo-quote')
     _subjects_dropdown_locator = (By.CLASS_NAME, 'subjects-dropdown')
@@ -438,16 +448,19 @@ class WebNav(Region):
             """Return True if the log in link or user's name is displayed."""
             return self.login.is_displayed()
 
-        def log_in(self, user=None, password=None, do_not_log_in=False):
+        def log_in(self, user=None, password=None,
+                   do_not_log_in=False, destination=None, url=None):
             """Log a user into the website."""
             Utility.wait_for_overlay_then(self.login.click)
             from pages.accounts.home import AccountsHome
             if do_not_log_in:
-                return go_to_(AccountsHome(self.driver))
+                return go_to_(AccountsHome(self.driver, url))
             else:
                 AccountsHome(self.driver).service_log_in(user, password)
-                from pages.web.home import WebHome as Home
-            return go_to_(Home(self.driver))
+            if destination:
+                return go_to_(destination(self.driver, url))
+            from pages.web.home import WebHome as Home
+            return go_to_(Home(self.driver, url))
 
         @property
         def logged_in(self):

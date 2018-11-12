@@ -182,8 +182,10 @@ class Adoption(WebBase):
             """Select a user type from the user drop down menu."""
             self.find_element(*self._user_select_locator).click()
             sleep(0.25)
-            [option for option in self.options
-             if option.get_attribute('data-value') == user_type][0].click()
+            result = [option for option in self.options
+                      if option.get_attribute('data-value') == user_type][0]
+            Utility.scroll_to(self.driver, element=result, shift=-80)
+            result.click()
             return self
 
         @property
@@ -198,11 +200,13 @@ class Adoption(WebBase):
                        .split('<')[0])
             return message
 
-        def go_back(self):
+        def go_back(self, destination=WebBase, url=None):
             """Click the student GO BACK button."""
-            self.find_element(*self._go_back_button_locator).click()
-            sleep(1.0)
-            return go_to_(WebBase(self.driver))
+            back_button = self.find_element(*self._go_back_button_locator)
+            Utility.safari_exception_click(self.driver, element=back_button)
+            if url:
+                return go_to_(destination(self.driver, url=url))
+            return go_to_(destination(self.driver))
 
         @property
         def first_name(self):

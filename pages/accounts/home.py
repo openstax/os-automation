@@ -9,7 +9,7 @@ from selenium.webdriver.support import expected_conditions as expect
 
 from pages.accounts.base import AccountsBase
 from pages.salesforce.home import Salesforce
-from utils.utilities import Utility
+from utils.utilities import Utility, go_to_
 
 
 class AccountsHome(AccountsBase):
@@ -26,9 +26,11 @@ class AccountsHome(AccountsBase):
         """Log into the site with a specific user."""
         return self.login.login(user, password)
 
-    def service_log_in(self, user, password):
+    def service_log_in(self, user, password,
+                       destination=None, url=None, **kwargs):
         """Log into the site with a specific user from another service."""
-        return self.Login(self).service_login(user, password)
+        return (self.Login(self)
+                .service_login(user, password, destination, url, **kwargs))
 
     @property
     def logged_in(self):
@@ -123,7 +125,8 @@ class AccountsHome(AccountsBase):
             from pages.accounts.profile import Profile
             return Profile(self.driver)
 
-        def service_login(self, user, password):
+        def service_login(self, user, password,
+                          destination=None, url=None, **kwargs):
             """Log into the site with a specific user from another service."""
             self.user = user
             self.next()
@@ -135,6 +138,8 @@ class AccountsHome(AccountsBase):
                 Utility.scroll_to(self.driver, element=self.agreement_checkbox)
                 self.agreement_checkbox.click()
                 self.next()
+            if destination:
+                return go_to_(destination(self.driver, url, **kwargs))
 
         def facebook_login(self, user, facebook_user, password):
             """Log into the site with facebook."""

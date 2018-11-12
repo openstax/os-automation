@@ -87,8 +87,7 @@ def test_the_donation_banner_is_not_displayed_after_repeat_reloads(
 def test_the_openstax_nav_is_displayed(web_base_url, selenium):
     """Test the visibility of the OpenStax nav for full and mobile users."""
     # GIVEN: a user viewing the Web home page
-    home = Home(selenium, web_base_url)
-    home.open()
+    home = Home(selenium, web_base_url).open()
 
     # WHEN:
 
@@ -534,13 +533,12 @@ def test_able_to_view_subjects_using_the_nav_menu(web_base_url, selenium):
 def test_subject_menu_options_load_filtered_views(web_base_url, selenium):
     """Each subject menu option loads the filtered subject page."""
     # GIVEN: a user viewing the Web home page
-    home = Home(selenium, web_base_url)
+    home = Home(selenium, web_base_url).open()
     for device in ['desktop', 'mobile']:
         if device == 'mobile':
             home.resize_window(width=900)
         # for each specific subject area (ignore View All)
         for index, _ in enumerate(Web.FILTERS):
-            home.open()
 
             # WHEN: they open the "Subjects" menu in the website nav
             # AND:  click on the subject category menu option

@@ -2,12 +2,13 @@
 
 from pages.accounts.home import AccountsHome as Home
 from pages.accounts.signup import Signup
-from tests.markers import accounts, social, test_case
+from tests.markers import accounts, smoke_test, social, test_case
 from utils.email import RestMail
 from utils.utilities import Utility
 
 
 @test_case('C195549')
+@smoke_test
 @accounts
 def test_sign_up_as_a_student_user(accounts_base_url, selenium, student):
     """Test student user signup."""
@@ -51,6 +52,7 @@ def test_sign_up_as_a_student_user(accounts_base_url, selenium, student):
 
 
 @test_case('C205362')
+@smoke_test
 @accounts
 def test_sign_up_as_an_instructor(accounts_base_url, selenium, teacher):
     """Test non-student user signup."""

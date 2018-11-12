@@ -3,11 +3,14 @@
 from time import sleep
 
 from pypom import Region
+from pypom.exception import UsageError
+from selenium.common.exceptions import WebDriverException
 from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
 
 from pages.web.base import WebBase
 from utils.utilities import Utility, go_to_
-from utils.web import Web
+from utils.web import Library, Web
 
 
 class Subjects(WebBase):
@@ -56,6 +59,27 @@ class Subjects(WebBase):
             Utility.is_image_visible(self.driver,
                                      locator=self._image_locators) and
             (sleep(1.0) or True))
+
+    def wait_for_page_to_load(self):
+        """Override the page wait."""
+        WebDriverWait(self.driver, 15).until(
+            lambda _: self.loaded)
+        self.pm.hook.pypom_after_wait_for_page_to_load(page=self)
+        return self
+
+    def open(self):
+        """Open the page."""
+        if self.seed_url:
+            tries = 0
+            while tries < 1:
+                try:
+                    self.driver_adapter.open(self.seed_url)
+                    self.wait_for_page_to_load()
+                    break
+                except WebDriverException:
+                    tries = tries + 1
+            return self
+        raise UsageError("Set a base URL or URL_TEMPLATE to open this page.")
 
     def is_displayed(self):
         """Return True if the subjects page is displayed."""
@@ -128,28 +152,146 @@ class Subjects(WebBase):
                 for book in self.find_elements(*self._book_locator)]
 
     @property
-    def openstax_books(self):
+    def ap_books(self):
+        """Select active AP books."""
+        return self._selection_helper(Library().ap)
+
+    @property
+    def bookshare_books(self):
+        """Select active books available through Bookshare."""
+        return self._selection_helper(Library().bookshare)
+
+    @property
+    def business_books(self):
+        """Select active business books."""
+        return self._selection_helper(Library().business)
+
+    @property
+    def comp_copy(self):
+        """Select the current editions of each book."""
+        return self._selection_helper(Library().comp_copy)
+
+    @property
+    def current_books(self):
+        """Select the current editions of each book."""
+        return self._selection_helper(Library().current)
+
+    @property
+    def humanities_books(self):
+        """Select active humanities books."""
+        return self._selection_helper(Library().humanities)
+
+    @property
+    def kindle_books(self):
+        """Select active books with a Kindle edition available."""
+        return self._selection_helper(Library().kindle)
+
+    @property
+    def itunes_books(self):
+        """Select active books with an iBook eddition available."""
+        return self._selection_helper(Library().itunes)
+
+    @property
+    def locked_instructor(self):
+        """Select active books with locked instructor resources."""
+        return self._selection_helper(Library().locked_instructor)
+
+    @property
+    def locked_student(self):
+        """Select active books with locked student resources."""
+        return self._selection_helper(Library().locked_student)
+
+    @property
+    def math_books(self):
+        """Select active math books."""
+        return self._selection_helper(Library().math)
+
+    @property
+    def old_book_editions(self):
+        """Select the books with a newer editions available."""
+        return self._selection_helper(Library().superseded)
+
+    @property
+    def openstax_books(self, filter_current=False):
         """Select active books while excluding Polish versions."""
         return [book for book in self._active_books
-                if book.language == 'English']
+                if book.language == Library.ENGLISH]
 
     @property
     def polish_books(self):
         """Select active books in Polish."""
         return [book for book in self._active_books
-                if book.language == 'Polish']
+                if book.language == Library.POLISH]
 
-    def select_random_book(self, all_books=False):
+    @property
+    def print_books(self):
+        """Select the books with a current print edition available."""
+        return self._selection_helper(Library().print)
+
+    @property
+    def science_books(self):
+        """Select active science books."""
+        return self._selection_helper(Library().science)
+
+    @property
+    def social_sciences_books(self):
+        """Select active social science books."""
+        return self._selection_helper(Library().social_sciences)
+
+    @property
+    def unlocked_instructor(self):
+        """Select active books with unlocked instructor resources."""
+        return self._selection_helper(Library().unlocked_instructor)
+
+    @property
+    def unlocked_student(self):
+        """Select active books with unlocked student resources."""
+        return self._selection_helper(Library().unlocked_student)
+
+    def select_random_book(self, _from=Library.OPENSTAX, filter_current=False):
         """Return a random book from the active list."""
-        using = self._active_books if all_books else self.openstax_books
-        total = len(using) - 1
-        book = Utility.random(0, total)
+        using = {
+            Library.ALL_BOOKS: self._active_books,
+            Library.AP: self.ap_books,
+            Library.BOOKSHARE: self.bookshare_books,
+            Library.BUSINESS: self.business_books,
+            Library.COMP_COPY: self.comp_copy,
+            Library.CURRENT: self.current_books,
+            Library.HAS_I_LOCK: self.locked_instructor,
+            Library.HAS_I_UNLOCK: self.unlocked_instructor,
+            Library.HAS_S_LOCK: self.locked_student,
+            Library.HAS_S_UNLOCK: self.unlocked_student,
+            Library.HUMANITIES: self.humanities_books,
+            Library.ITUNES: self.itunes_books,
+            Library.KINDLE: self.kindle_books,
+            Library.MATH: self.math_books,
+            Library.OPENSTAX: self.openstax_books,
+            Library.POLISH: self.polish_books,
+            Library.PRINT_COPY: self.print_books,
+            Library.SCIENCE: self.science_books,
+            Library.SOCIAL: self.social_sciences_books,
+            Library.SUPERSEDED: self.old_book_editions,
+        }.get(_from)
+        if filter_current:
+            using = list(filter(
+                lambda book: book.title not in Library.OLD_EDITIONS, using))
+        total = len(using)
+        assert(total > 0), 'No books are available for selection'
+        book = Utility.random(0, total - 1)
         selected = using[book]
+        print(selected.title)
         destination = selected.url_append
         selected.select()
         sleep(1.0)
         from pages.web.book import Book as Details
-        return Details(self.driver, book_name=destination)
+        return go_to_(Details(self.driver, book_name=destination))
+
+    def _selection_helper(self, modifier):
+        """Return a list of books for a modified collection."""
+        library = Library()
+        collection = library.get_titles(modifier)
+        return [book for book in self._active_books
+                if book.title in collection]
 
     def view_about_our_textbooks(self):
         """Scroll to the textbook blurbs."""
