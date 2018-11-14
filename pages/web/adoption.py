@@ -40,14 +40,16 @@ class Adoption(WebBase):
         """Return True if the adoption form is displayed."""
         return self.find_element(*self._drop_down_menu_locator).is_displayed()
 
-    def go_to_interest(self):
+    def go_to_interest(self, link=None):
         """Switch to the interest form."""
+        locator = link if link else self._interest_form_link_locator
+        from pages.web.interest import Interest
+        destination = Interest if not link else Adoption
         self.wait.until(
-            lambda _: self.find_element(*self._interest_form_link_locator)
+            lambda _: self.find_element(*locator)
         ).click()
         sleep(1.0)
-        from pages.web.interest import Interest
-        return go_to_(Interest(self.driver))
+        return go_to_(destination(driver=self.driver, base_url=self.base_url))
 
     def submit_adoption(self,
                         user_type, first, last, email, phone, school,
@@ -115,7 +117,7 @@ class Adoption(WebBase):
         if TechProviders.OTHER in tech_providers:
             self.form.usage.other = other_provider
         self.form.submit()
-        return go_to_(AdoptionConfirmation(self.driver))
+        return go_to_(AdoptionConfirmation(self.driver, self.base_url))
 
     @property
     def form(self):
@@ -259,6 +261,16 @@ class Adoption(WebBase):
             self.school.send_keys(school_name)
 
         @property
+        def school_suggestions(self):
+            """Return a list of school name suggestions.
+
+            Based on a filter of the text in the school name input box.
+            """
+            return [self.School(self, suggestion)
+                    for suggestion
+                    in self.find_elements(*self._suggestion_locator)]
+
+        @property
         def get_user_errors(self):
             """Return the error messages."""
             errors = {}
@@ -290,6 +302,7 @@ class Adoption(WebBase):
             for book in self.books:
                 if book.title in book_list and not book.checked:
                     book.select()
+                    sleep(0.25)
             return self
 
         @property
@@ -376,6 +389,19 @@ class Adoption(WebBase):
             button.click()
             sleep(1.0)
             return self
+
+        class School(Region):
+            """A suggested school name."""
+
+            @property
+            def name(self):
+                """Return the school name."""
+                return self.root.text.strip()
+
+            def select(self):
+                """Click on the school name to select it."""
+                Utility.safari_exception_click(self.driver, element=self.root)
+                return self.page
 
         class Book(Region):
             """A book checkbox option."""
@@ -538,7 +564,7 @@ class AdoptionConfirmation(WebBase):
     def report_another(self):
         """Click on the 'Report another ...' link."""
         Utility.safari_exception_click(self.driver, element=self.another)
-        return go_to_(Adoption(self.driver))
+        return go_to_(Adoption(self.driver, self.base_url))
 
     @property
     def survey_available(self):
