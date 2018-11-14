@@ -11,7 +11,7 @@ from pages.web.book import Book
 from pages.web.errata import ErrataForm
 from pages.web.home import WebHome
 from tests.markers import accounts, nondestructive, skip_if_headless  # NOQA
-from tests.markers import skip_test, test_case, web  # NOQA
+from tests.markers import skip_test, smoke_test, test_case, web  # NOQA
 from utils.accounts import Accounts
 from utils.email import RestMail
 from utils.utilities import Actions, Utility
@@ -19,6 +19,7 @@ from utils.web import Library, Web
 
 
 @test_case('C210348', 'C210349')
+@smoke_test
 @nondestructive
 @web
 def test_for_book_details_and_user_resource_pages(web_base_url, selenium):
@@ -53,6 +54,7 @@ def test_for_book_details_and_user_resource_pages(web_base_url, selenium):
 
 
 @test_case('C210350')
+@smoke_test
 @nondestructive
 @web
 def test_the_availability_of_the_table_of_contents(web_base_url, selenium):
@@ -104,6 +106,7 @@ def test_the_availability_of_the_table_of_contents(web_base_url, selenium):
 
 
 @test_case('C210351')
+@smoke_test
 @nondestructive
 @web
 def test_webview_for_a_book_is_avaialble(web_base_url, selenium):
@@ -132,6 +135,7 @@ def test_webview_for_a_book_is_avaialble(web_base_url, selenium):
 
 
 @test_case('C210352')
+@smoke_test
 @nondestructive
 @skip_if_headless
 @web
@@ -153,6 +157,7 @@ def test_details_pdf_is_downloadable(web_base_url, selenium):
 
 
 @test_case('C210353')
+@smoke_test
 @nondestructive
 @web
 def test_links_to_purchase_a_print_copy(web_base_url, selenium):
@@ -189,6 +194,7 @@ def test_links_to_purchase_a_print_copy(web_base_url, selenium):
 
 
 @test_case('C210354')
+@smoke_test
 @nondestructive
 @web
 def test_mobile_links_to_purchase_a_print_copy(web_base_url, selenium):
@@ -229,6 +235,7 @@ def test_mobile_links_to_purchase_a_print_copy(web_base_url, selenium):
 
 
 @test_case('C210355')
+@smoke_test
 @nondestructive
 @web
 def test_bookshare_availability(web_base_url, selenium):
@@ -254,6 +261,7 @@ def test_bookshare_availability(web_base_url, selenium):
 
 
 @test_case('C210356')
+@smoke_test
 @nondestructive
 @web
 def test_ibook_availability(web_base_url, selenium):
@@ -281,6 +289,7 @@ def test_ibook_availability(web_base_url, selenium):
 
 
 @test_case('C210357')
+@smoke_test
 @nondestructive
 @web
 def test_kindle_availability(web_base_url, selenium):
@@ -306,6 +315,7 @@ def test_kindle_availability(web_base_url, selenium):
 
 
 @test_case('C210358')
+@smoke_test
 @nondestructive
 @web
 def test_page_links_to_the_interest_form(web_base_url, selenium):
@@ -328,6 +338,7 @@ def test_page_links_to_the_interest_form(web_base_url, selenium):
 
 
 @test_case('C210359')
+@smoke_test
 @nondestructive
 @web
 def test_page_links_to_the_adoption_form(web_base_url, selenium):
@@ -350,6 +361,7 @@ def test_page_links_to_the_adoption_form(web_base_url, selenium):
 
 
 @test_case('C210360')
+@smoke_test
 @nondestructive
 @web
 def test_the_book_details_pane(web_base_url, selenium):
@@ -446,6 +458,7 @@ def test_an_old_version_does_not_have_errata(web_base_url, selenium):
 
 
 @test_case('C210363')
+@smoke_test
 @nondestructive
 @web
 def test_users_may_view_the_current_list_of_errata_for_a_book(
@@ -521,6 +534,7 @@ def test_logged_in_users_may_view_the_errata_submission_form(
 
 
 @test_case('C210365')
+@smoke_test
 @nondestructive
 @web
 def test_non_logged_in_users_are_directed_to_log_in_to_view_the_errata_form(
@@ -555,6 +569,7 @@ def test_non_logged_in_users_are_directed_to_log_in_to_view_the_errata_form(
 
 
 @test_case('C210366')
+@smoke_test
 @nondestructive
 @web
 def test_non_logged_in_users_on_mobile_are_directed_to_log_in_for_errata_form(
@@ -595,6 +610,7 @@ def test_non_logged_in_users_on_mobile_are_directed_to_log_in_for_errata_form(
 
 
 @test_case('C210367')
+@smoke_test
 @nondestructive
 @web
 def test_teachers_are_asked_to_sign_up_to_access_locked_content(
@@ -656,6 +672,7 @@ def test_pending_instructors_see_access_pending_for_locked_resources(
 
 
 @test_case('C210369')
+@smoke_test
 @accounts
 @web
 def test_verified_instructors_may_access_locked_resources(
@@ -695,6 +712,7 @@ def test_verified_instructors_may_access_locked_resources(
 
 
 @test_case('C210411')
+@smoke_test
 @nondestructive
 @web
 def test_verified_instructors_may_request_a_comped_ibook(
@@ -904,6 +922,7 @@ def test_users_may_see_the_upcoming_webinar_schedule(web_base_url, selenium):
 
 
 @test_case('C210374')
+@smoke_test
 @nondestructive
 @web
 def test_books_may_have_ally_tiles(web_base_url, selenium):
