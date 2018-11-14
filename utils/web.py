@@ -120,6 +120,55 @@ class Web(object):
     STUDENT_MIN = 1
     STUDENT_MAX = 999
 
+    BY_COLLEAGUE = 'Colleague'
+    BY_CONFERENCE = 'Conference'
+    BY_EMAIL = 'Email'
+    BY_FACEBOOK = 'Facebook'
+    BY_PARTNER = 'Partner organization'
+    BY_TWITTER = 'Twitter'
+    BY_WEBINAR = 'Webinar'
+    BY_WEB_SEARCH = 'Web search'
+    COURSEWARE = 'Adaptive courseware partners'
+    HOMEWORK = 'Online homework partners'
+    TOOLS = 'Customization tool partners'
+
+    ADDITIONAL = [
+        HOMEWORK,
+        COURSEWARE,
+        TOOLS
+    ]
+    HEARD_BY = [
+        BY_WEB_SEARCH,
+        BY_COLLEAGUE,
+        BY_CONFERENCE,
+        BY_EMAIL,
+        BY_FACEBOOK,
+        BY_TWITTER,
+        BY_WEBINAR,
+        BY_PARTNER
+    ]
+
+    @classmethod
+    def resources(cls, options=1, randomize=True, get_partner_resources=True):
+        """Return a list of additional resource options."""
+        option_list = (Web.ADDITIONAL if get_partner_resources
+                       else Web.HEARD_BY)
+        if options >= len(option_list):
+            return option_list
+        if randomize:
+            options = Utility.random(options, len(option_list))
+        from random import sample
+        random_options = sample(option_list, len(option_list))
+        while len(random_options) > options:
+            random_options.pop()
+        return random_options
+
+    @classmethod
+    def heard_by(cls, options=1, randomize=True):
+        """Return a list of heard by options."""
+        return Web.resources(
+            options, randomize=randomize, get_partner_resources=False)
+
     # Expected lists
     ACCESSIBILITY = [
         'Accessibility',

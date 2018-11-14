@@ -285,9 +285,8 @@ def test_adoption_form_requires_at_least_one_book_selection(
         'The book error was not displayed')
 
 
-@skip_test(reason='Not written')
+@skip_test(reason='Salesforce API not written')
 @test_case('C210394')
-@nondestructive
 @web
 def test_book_use_questions_are_included_for_each_selected_book(
         web_base_url, selenium):
@@ -307,8 +306,7 @@ def test_book_use_questions_are_included_for_each_selected_book(
     # AND:  the question pair for the first book are still displayed
 
 
-@skip_test(reason='Not written')
-@skip_test(reason='Need Salesforce API control for verification')
+@skip_test(reason='Salesforce API not written')
 @test_case('C210395')
 @web
 def test_adoption_form_fields_are_sent_to_one_salesforce_lead(
@@ -323,7 +321,7 @@ def test_adoption_form_fields_are_sent_to_one_salesforce_lead(
     # THEN: the form data is present in an adoption lead in Salesforce
 
 
-@skip_test(reason='Need Salesforce API control for verification')
+@skip_test(reason='Salesforce API not written')
 @test_case('C210396')
 @web
 def test_each_adopted_book_creates_a_separate_salesforce_lead(
@@ -338,7 +336,7 @@ def test_each_adopted_book_creates_a_separate_salesforce_lead(
     # THEN: two adoption leads are sent to Salesforce
 
 
-@skip_test(reason='Need Salesforce API control for verification')
+@skip_test(reason='Salesforce API not written')
 @test_case('C210397')
 @web
 def test_all_tech_options_are_included_on_each_adoption_lead(
