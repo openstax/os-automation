@@ -4,7 +4,7 @@ from time import sleep
 
 from selenium.webdriver.common.by import By
 
-from pages.web.adoption import Adoption, AdoptionConfirmation, ERROR
+from pages.web.adoption import ERROR, Adoption, AdoptionConfirmation
 from utils.utilities import Utility, go_to_
 from utils.web import TechProviders
 
@@ -156,7 +156,7 @@ class InterestConfirmation(AdoptionConfirmation):
 
     @property
     def subjects(self):
-        """The 'Back to the books' link element."""
+        """Return the 'Back to the books' link."""
         return self.find_element(*self._back_to_books_locator)
 
     def back_to_books(self):
