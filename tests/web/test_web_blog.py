@@ -87,7 +87,7 @@ def test_load_a_blog_entry(web_base_url, selenium):
 
     # THEN: the full article is displayed
     assert(article.is_displayed())
-    assert(not article.location.endswith('blog')), \
+    assert(not article.location.endswith('/blog')), \
         'Still viewing the blog page ({url})'.format(url=article.location)
 
 
