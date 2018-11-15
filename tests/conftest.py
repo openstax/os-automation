@@ -203,7 +203,6 @@ def pytest_collection_modifyitems(config, items):
     """Runtime test options."""
     # Runtime markers
     run_smoke_tests = config.getoption('--smoke-test')
-    mark_not_for_smoke = pytest.mark.skip(reason='Skipping non-smoke tests.')
 
     run_social = config.getoption('--run-social')
     mark_run_social = pytest.mark.skip(reason='Skipping non-social tests.')
@@ -224,12 +223,19 @@ def pytest_collection_modifyitems(config, items):
     mark_skip_if_headless = pytest.mark.skip(
                                     reason='Not run during headless testing')
 
+    # Throw out other tests out if running smoke tests
+    if run_smoke_tests:
+        item_list = []
+        for index, item in enumerate(items):
+            if 'smoke_test' not in item.keywords:
+                item_list.append(index)
+        if item_list:
+            item_list.reverse()
+            for index in item_list:
+                items.pop(index)
+
     # Apply runtime markers
     for item in items:
-        if run_smoke_tests and 'smoke_test' not in item.keywords:
-            item.add_marker(mark_not_for_smoke)
-            continue
-
         if skip_social and 'social' in item.keywords:
             item.add_marker(mark_skip_social)
         if run_social and 'social' not in item.keywords:
