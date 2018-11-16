@@ -5,7 +5,7 @@ import pytest
 from pages.web.adoption import Adoption, AdoptionConfirmation
 from pages.web.book import Book
 from pages.web.home import WebHome
-from tests.markers import nondestructive, skip_test, test_case, web
+from tests.markers import nondestructive, skip_test, smoke_test, test_case, web
 from utils.email import RestMail
 from utils.utilities import Utility
 from utils.web import Library, TechProviders, Web
@@ -338,6 +338,7 @@ def test_each_adopted_book_creates_a_separate_salesforce_lead(
 
 @skip_test(reason='Salesforce API not written')
 @test_case('C210397')
+@smoke_test
 @web
 def test_all_tech_options_are_included_on_each_adoption_lead(
         web_base_url, selenium):

@@ -5,7 +5,7 @@ import pytest
 from pages.web.book import Book
 from pages.web.home import WebHome
 from pages.web.interest import Interest, InterestConfirmation
-from tests.markers import nondestructive, skip_test, test_case, web
+from tests.markers import nondestructive, skip_test, smoke_test, test_case, web
 from utils.email import RestMail
 from utils.utilities import Utility
 from utils.web import Library, Web
@@ -314,6 +314,7 @@ def test_all_fields_are_sent_to_a_salesforce_lead(web_base_url, selenium):
 
 @skip_test(reason='Salesforce API not written')
 @test_case('C210518')
+@smoke_test
 @web
 def test_multiple_book_selection_generates_one_lead(web_base_url, selenium):
     """Test selecting multiple books generates one Salesforce lead."""

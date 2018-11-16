@@ -9,7 +9,7 @@ from pages.accounts.signup import Signup
 from pages.web.home import WebHome as Home
 from pages.web.impact import OurImpact
 from tests.markers import accounts, expected_failure, nondestructive  # NOQA
-from tests.markers import test_case, web  # NOQA
+from tests.markers import smoke_test, test_case, web  # NOQA
 from utils.accounts import Accounts
 from utils.email import RestMail
 from utils.utilities import Utility
@@ -111,6 +111,7 @@ def test_the_openstax_nav_is_displayed(web_base_url, selenium):
 
 
 @test_case('C210299')
+@smoke_test
 @nondestructive
 @web
 def test_mobile_menu_navigation(web_base_url, selenium):
@@ -268,6 +269,7 @@ def test_nav_blog_loads_the_openstax_blog(web_base_url, selenium):
 
 
 @test_case('C210303')
+@smoke_test
 @nondestructive
 @web
 def test_nav_give_loads_the_donation_page(web_base_url, selenium):
@@ -295,6 +297,7 @@ def test_nav_give_loads_the_donation_page(web_base_url, selenium):
 
 
 @test_case('C210304')
+@smoke_test
 @nondestructive
 @web
 def test_nav_help_loads_the_salesforce_support_site(web_base_url, selenium):
@@ -329,6 +332,7 @@ def test_nav_help_loads_the_salesforce_support_site(web_base_url, selenium):
 
 
 @test_case('C210305')
+@smoke_test
 @nondestructive
 @web
 def test_nav_rice_logo_loads_the_rice_university_home_page(
@@ -444,6 +448,7 @@ def test_the_openstax_slogan_is_displayed_by_the_logo(web_base_url, selenium):
 
 
 @test_case('C210309')
+@smoke_test
 @nondestructive
 @web
 def test_able_to_view_subjects_using_the_nav_menu(web_base_url, selenium):
@@ -587,6 +592,7 @@ def test_subject_menu_options_load_filtered_views(web_base_url, selenium):
 
 
 @test_case('C210312', 'C210313')
+@smoke_test
 @nondestructive
 @web
 def test_technology_menu_options_load_the_corresponding_pages(
@@ -645,6 +651,7 @@ def test_technology_menu_options_load_the_corresponding_pages(
 
 
 @test_case('C210314', 'C210315')
+@smoke_test
 @nondestructive
 @web
 def test_what_we_do_menu_options_load_corresponding_pages(
@@ -704,8 +711,8 @@ def test_what_we_do_menu_options_load_corresponding_pages(
         assert(research.is_displayed())
 
 
-@expected_failure(reason='Web logout does not show in user menu')
 @test_case('C210316', 'C210322')
+@smoke_test
 @web
 def test_able_to_log_into_the_web_site(web_base_url, selenium, student):
     """Test a student logging into the web site."""
@@ -742,7 +749,6 @@ def test_able_to_log_into_the_web_site(web_base_url, selenium, student):
     assert('Login' in home.web_nav.login.name), 'User still shown as logged in'
 
 
-@expected_failure(reason='Web logout does not show in user menu')
 @test_case('C210317', 'C210323')
 @web
 def test_able_to_log_into_the_web_site_using_the_mobile_display(
@@ -829,6 +835,7 @@ def test_user_menu_profile_link_loads_accounts_profile_for_the_student(
 
 
 @test_case('C210319')
+@smoke_test
 @nondestructive
 @web
 def test_go_to_the_users_openstax_tutor_dashboard(
@@ -863,6 +870,7 @@ def test_go_to_the_users_openstax_tutor_dashboard(
 
 
 @test_case('C210320')
+@smoke_test
 @accounts
 @web
 def test_instructor_access_application(
@@ -1344,6 +1352,7 @@ def test_the_github_link_in_the_footer(web_base_url, selenium):
 
 
 @test_case('C210337')
+@smoke_test
 @nondestructive
 @web
 def test_the_contact_us_link_in_the_footer_opens_the_contact_form(
