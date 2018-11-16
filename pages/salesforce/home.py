@@ -19,6 +19,15 @@ class Salesforce(Page):
         """Override the basic loader."""
         return self.find_element(*self._loader_locator)
 
+    def is_displayed(self):
+        """Return True if the Salesforce help page is displayed."""
+        return self.at_salesforce and self.loaded.is_displayed()
+
+    @property
+    def location(self):
+        """Return the current URL."""
+        return self.driver.current_url
+
     @property
     def at_salesforce(self):
         """Return True if at the OpenStax Salesforce help page."""

@@ -38,7 +38,7 @@ class Blog(WebBase):
             return False
         for article in articles:
             Utility.scroll_to(self.driver, element=article)
-            sleep(0.15)
+            sleep(0.2)
         Utility.scroll_top(self.driver)
         test = Utility.load_background_images(
             driver=self.driver,
