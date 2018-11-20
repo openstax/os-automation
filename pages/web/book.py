@@ -502,6 +502,7 @@ class Book(WebBase):
         _account_signup_locator = (By.CSS_SELECTOR, '.free-stuff-blurb a')
         _oer_commons_locator = (By.CSS_SELECTOR, '.resource-box.double')
         _webinar_link_locator = (By.CSS_SELECTOR, '.webinars')
+        _slogan_locator = (By.CSS_SELECTOR, '.ally-blurb h2')
         _partner_resource_locator = (By.CSS_SELECTOR, '.ally-box')
 
         def is_displayed(self):
@@ -528,6 +529,11 @@ class Book(WebBase):
             Utility.safari_exception_click(self.driver, element=webinar)
             from pages.web.blog import Article
             return go_to_(Article(self.driver, article=article_url))
+
+        @property
+        def tech_options(self):
+            """Return the partners heading element."""
+            return self.find_element(*self._slogan_locator)
 
         @property
         def partners(self):

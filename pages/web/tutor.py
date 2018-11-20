@@ -17,6 +17,7 @@ class TutorMarketing(WebHome):
     _canvas_locator = (By.CSS_SELECTOR, '#particles canvas')
     _mountains_locator = (By.CLASS_NAME, 'middle-image')
     _image_locators = (By.CSS_SELECTOR, '#main img')
+    _how_it_works_locator = (By.CSS_SELECTOR, '#how-it-works h2')
 
     @property
     def loaded(self):
@@ -32,3 +33,8 @@ class TutorMarketing(WebHome):
         if self.URL_TEMPLATE not in self.location:
             return False
         return self.loaded
+
+    @property
+    def how_it_works(self):
+        """Return the 'How it works' subheading element."""
+        return self.find_element(*self._how_it_works_locator)

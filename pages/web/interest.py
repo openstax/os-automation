@@ -74,7 +74,8 @@ class Interest(Adoption):
         self.form.next()
         book_error = self.form.get_book_error
         assert(not book_error), \
-            'Book error - {book}'.format(book=book_error)
+            'Book error - {book}\n{source}'.format(
+                book=book_error, source=self.driver.page_source)
         using_error = self.form.using_error
         assert(not using_error), \
             'Using error - {using}'.format(using=using_error)
@@ -92,6 +93,7 @@ class Interest(Adoption):
                         By.CSS_SELECTOR, '[name=Partner_Category_Interest__c]')
         _heard_locator = (By.CSS_SELECTOR, '[name=How_did_you_Hear__c]')
         _student_error_locator = (By.CSS_SELECTOR, _student_locator[1] + ERROR)
+        _selected_locator = (By.CSS_SELECTOR, '.checked')
 
         @property
         def students(self):
@@ -125,6 +127,11 @@ class Interest(Adoption):
         def using_error(self):
             """Return the student section error message."""
             return self.find_element(*self._student_error_locator).text
+
+        @property
+        def selected_books(self):
+            """Return a list of selected book elements."""
+            return self.find_elements(*self._selected_locator)
 
         def _selection_helper(self, selected, options_locator, _type):
             """Click checkboxes for selected options."""

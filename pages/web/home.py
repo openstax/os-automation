@@ -48,7 +48,7 @@ class Link(Region):
         if destination.endswith(Support.IMPACT):
             from pages.web.impact import OurImpact as Destination
         elif destination.endswith(Support.PARTNERS):
-            from pages.web.technology import Technology as Destination
+            from pages.web.partners import Partners as Destination
         elif destination.endswith(Support.SUBJECTS):
             from pages.web.subjects import Subjects as Destination
         elif destination.endswith(Support.TECHNOLOGY):

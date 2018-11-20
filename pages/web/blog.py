@@ -5,6 +5,7 @@ from time import sleep
 from pypom import Region
 from selenium.common.exceptions import WebDriverException
 from selenium.webdriver.common.by import By
+from selenium.webdriver.support import expected_conditions as expect
 
 from pages.web.base import WebBase
 from utils.utilities import Utility, go_to_
@@ -38,12 +39,12 @@ class Blog(WebBase):
             return False
         for article in articles:
             Utility.scroll_to(self.driver, element=article)
-            sleep(0.2)
+            sleep(0.25)
         Utility.scroll_top(self.driver)
         test = Utility.load_background_images(
             driver=self.driver,
             locator=self._initial_image_locators)
-        sleep(1.0)
+        sleep(3.0)
         return test
 
     def is_displayed(self):
@@ -112,7 +113,8 @@ class Blog(WebBase):
         @property
         def image(self):
             """Return the tile picture element."""
-            return self.find_element(*self._image_locator)
+            return self.wait.until(
+                expect.presence_of_element_located(self._image_locator))
 
         @property
         def title(self):
@@ -143,7 +145,8 @@ class Blog(WebBase):
 
         def view(self):
             """Open the article."""
-            link = self.find_element(*self._read_more_locator)
+            link = self.wait.until(
+                expect.visibility_of_element_located(self._read_more_locator))
             article = link.get_attribute('href').split('/')[-1]
             Utility.safari_exception_click(self.driver, element=link)
             return go_to_(
@@ -176,7 +179,12 @@ class Article(Blog):
 
     def is_displayed(self):
         """Return True if the blog article banner image is displayed."""
-        return self.find_element(*self._hero_banner_locator).is_displayed()
+        return (
+            self.wait.until(expect.visibility_of_element_located(
+                self._hero_banner_locator)).is_displayed() and
+            self.wait.until(
+                expect.presence_of_element_located(self._disqus_locator)
+            ).is_displayed())
 
     @property
     def title(self):
@@ -190,6 +198,7 @@ class Article(Blog):
 
     def view_comments(self):
         """Scroll to the Disqus comment section."""
+        self.wait.until(lambda _: self.disqus.is_displayed())
         Utility.scroll_to(self.driver, element_locator=self._disqus_locator)
         return self
 

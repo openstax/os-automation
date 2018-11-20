@@ -1145,18 +1145,26 @@ class Library():
         """
         using = (self.get(book) if book else
                  self.random_book(short_name=False))
-        return (using[0],
-                using[0][1].get(self.SHORT_NAME),
-                [key for key in using[0]][0],
-                using[0][1].get(self.DETAILS))
+        if isinstance(using, list):
+            using = using[0][1]
+        return (using,
+                using.get(self.SHORT_NAME),
+                book,
+                using.get(self.DETAILS))
 
     def get_titles(self, group=None):
         """Return a list of book titles."""
         collection = group if group else self.books
         return [book[0] for book in collection]
 
-    def random_book(self, number=1, short_name=True):
+    def random_book(self, number=1, short_name=True, full_name=False):
         """Return a list of random book short names."""
-        if short_name:
+        if short_name and not full_name:
             return Utility.random_set(self.short_names, number)
+        if full_name:
+            group = Utility.random_set(self.openstax, number)
+            names = []
+            for book in group:
+                names.append(book[0])
+            return names[0] if len(names) == 1 else names
         return Utility.random_set(self.openstax, number)

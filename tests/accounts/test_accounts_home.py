@@ -60,12 +60,7 @@ def test_attempt_to_log_in_with_a_blank_user(accounts_base_url, selenium):
     with pytest.raises(AssertionError):
         page.log_in(user, password)
 
-    # THEN: the input box is shaded
-    # AND: an error message "Username or email can't be blank" is displayed
-    shade = page.login.get_error_color()
-    expected_color = 'rgba(241, 218, 218, 1)'
-    assert(Utility.compare_colors(shade, expected_color)), \
-        'Wrong color ({color}) used'.format(color=shade)
+    # THEN: an error message "Username or email can't be blank" is displayed
     assert(page.login.get_login_error() ==
            "Username or email can't be blank"), \
         'Incorrect error message'
@@ -86,13 +81,8 @@ def test_attempt_to_log_in_with_an_invalid_user(accounts_base_url, selenium):
     with pytest.raises(AssertionError):
         page.log_in(user, password)
 
-    # THEN: the input box is shaded
-    # AND: an error message "We don't recognize this username.
-    #      Please try again or use your email address instead." is displayed
-    shade = page.login.get_error_color()
-    expected_color = 'rgba(241, 218, 218, 1)'
-    assert(Utility.compare_colors(shade, expected_color)), \
-        'Wrong color ({color}) used'.format(color=shade)
+    # THEN: an error message "We don't recognize this username.
+    #       Please try again or use your email address instead." is displayed
     assert('We don’t recognize this username.' in
            page.login.get_login_error()), \
         'Incorrect error message'
@@ -113,13 +103,8 @@ def test_attempt_to_log_in_with_an_invalid_email(accounts_base_url, selenium):
     with pytest.raises(AssertionError):
         page.log_in(user, password)
 
-    # THEN: the input box is shaded
-    # AND: an error message "We don't recognize this email. Please try again."
-    #      is displayed
-    shade = page.login.get_error_color()
-    expected_color = 'rgba(241, 218, 218, 1)'
-    assert(Utility.compare_colors(shade, expected_color)), \
-        'Wrong color ({color}) used'.format(color=shade)
+    # THEN: an error message "We don't recognize this email. Please try again."
+    #       is displayed
     assert('We don’t recognize this email.' in
            page.login.get_login_error()), \
         'Incorrect error message'
@@ -143,13 +128,8 @@ def test_attempt_to_log_in_with_an_invalid_password(
     with pytest.raises(AssertionError):
         page.log_in(user, password)
 
-    # THEN: the input box is shaded
-    # AND: an error message "The password you provided is incorrect."
-    #      is displayed# Enter a valid user but invalid password (blank)
-    shade = page.login.get_error_color()
-    expected_color = 'rgba(241, 218, 218, 1)'
-    assert(Utility.compare_colors(shade, expected_color)), \
-        'Wrong color ({color}) used'.format(color=shade)
+    # THEN: an error message "The password you provided is incorrect."
+    #       is displayed# Enter a valid user but invalid password (blank)
     assert(page.login.get_login_error() ==
            'The password you provided is incorrect.'), \
         'Incorrect error message'
