@@ -157,13 +157,17 @@ class Adoption(WebBase):
         # Book information
         _books_locator = (By.CSS_SELECTOR, '[data-book-checkbox]')
         _book_selector_error = (
-                By.CSS_SELECTOR, '.book-selector .invalid-message')
+            By.CSS_SELECTOR, '.book-selector .invalid-message')
+        _book_checkbox_locator = (
+            By.CSS_SELECTOR, '.book-selector .book-checkbox')
 
         # Book usage information
+        _using_root_locator = (By.CSS_SELECTOR, '.page-2 .how-using')
         _using_locator = (By.CSS_SELECTOR, '.how-using > div')
 
         # Technology utilization information
         _tech_locator = (By.CSS_SELECTOR, '.book-checkbox')
+        _other_option_locator = (By.CSS_SELECTOR, '[name*=Other]')
 
         # Form controls
         _next_button_locator = (By.CSS_SELECTOR, '.next')
@@ -299,8 +303,11 @@ class Adoption(WebBase):
 
         def select_books(self, book_list):
             """Select the checkboxes for submitted book list."""
+            self.wait.until(lambda _:
+                            self.find_elements(*self._book_checkbox_locator))
             for book in self.books:
                 if book.title in book_list and not book.checked:
+                    print(book)
                     book.select()
                     sleep(0.25)
             return self
@@ -363,8 +370,18 @@ class Adoption(WebBase):
                 if tech.company in providers and not tech.checked:
                     tech.select()
             if TechProviders.OTHER in providers:
-                self.technology.other = other
+                self.other = other
             return self
+
+        @property
+        def other(self):
+            """Return the other option input box."""
+            return self.find_element(*self._other_option_locator)
+
+        @other.setter
+        def other(self, value):
+            """Send the other technology provider to the form."""
+            self.find_element(*self._other_option_locator).send_keys(value)
 
         def next(self):
             """Click the Next button."""
@@ -411,6 +428,17 @@ class Adoption(WebBase):
             _title_locator = (By.CSS_SELECTOR, 'label')
             _checkbox_locator = (By.CSS_SELECTOR, '[role=checkbox]')
 
+            def __str__(self):
+                """Print the book attributes."""
+                book = ('Title: {title}\nImage: {has_image} - {image}\n'
+                        'Checked: {checked}\n')
+                return book.format(
+                    title=self.title,
+                    has_image=self.has_image,
+                    image=(self.image.get_attribute('src')
+                           if self.has_image else ''),
+                    checked=self.checked)
+
             @property
             def has_image(self):
                 """Return True if the book check option has an image."""
@@ -431,9 +459,8 @@ class Adoption(WebBase):
 
             def select(self):
                 """Click the checkbox."""
-                Utility.scroll_to(self.driver, element=self.root, shift=-80)
-                self.find_element(*self._checkbox_locator).click()
-                sleep(1.0)
+                checkbox = self.find_element(*self._checkbox_locator)
+                Utility.safari_exception_click(self.driver, element=checkbox)
                 return self.page
 
             @property
@@ -466,14 +493,16 @@ class Adoption(WebBase):
 
             def adopted(self):
                 """Select the 'Fully adopted' option."""
-                self.find_element(*self._adopted_locator).click()
-                sleep(1.0)
+                Utility.safari_exception_click(
+                    self.driver,
+                    element=self.find_element(*self._adopted_locator))
                 return self.page
 
             def recommend(self):
                 """Select the 'Recommending the book' option."""
-                self.find_element(*self._recommended_locator).click()
-                sleep(1.0)
+                Utility.safari_exception_click(
+                    self.driver,
+                    element=self.find_element(*self._recommended_locator))
                 return self.page
 
             @property
@@ -509,7 +538,6 @@ class Adoption(WebBase):
 
             _name_locator = (By.CSS_SELECTOR, 'label')
             _checkbox_locator = (By.CSS_SELECTOR, '.indicator')
-            _other_option_locator = (By.CSS_SELECTOR, '[name*=Other]')
 
             @property
             def company(self):
@@ -526,16 +554,6 @@ class Adoption(WebBase):
             def checked(self):
                 """Return True if the company option is checked."""
                 return 'checked' in self.root.get_attribute('class')
-
-            @property
-            def other(self):
-                """Return the other option input box."""
-                return self.find_element(*self._other_option_locator)
-
-            @other.setter
-            def other(self, value):
-                """Send the other technology provider to the form."""
-                self.find_element(*self._other_option_locator).send_keys(value)
 
 
 class AdoptionConfirmation(WebBase):

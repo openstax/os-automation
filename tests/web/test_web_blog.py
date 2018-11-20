@@ -2,6 +2,7 @@
 
 from pages.web.blog import Blog
 from tests.markers import nondestructive, smoke_test, test_case, web
+from utils.utilities import Utility
 
 
 @test_case('C210401')
@@ -122,6 +123,8 @@ def test_other_blog_entry_tiles_are_below_a_full_article(
 
     # THEN: the other blog post tiles are displayed
     # AND:  the current blog post's tile is not displayed
+    current_title = article.title
     for entry in article.other_posts:
+        Utility.scroll_to(selenium, element=entry.root, shift=-80)
         assert(entry.is_displayed())
-        assert(entry.title != article.title)
+        assert(entry.title != current_title)

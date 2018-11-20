@@ -55,7 +55,7 @@ query-string==1.0.2
 request==1.0.2
 requests==2.19.1
 rsa==3.4.2
-selenium==3.14.1
+selenium==3.141.0
 simplejson==3.14.0
 six==1.11.0
 snowballstemmer==1.2.1

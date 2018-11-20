@@ -114,6 +114,61 @@ class Utility(object):
         return driver.execute_script(auto)
 
     @classmethod
+    def in_viewport(cls, driver, locator=None, element=None,
+                    display_marks=False):
+        """Return True if the element boundry completely lies in view."""
+        LEFT, TOP, RIGHT, BOTTOM = range(4)
+        target = element if element else driver.find_element(*locator)
+        rect = driver.execute_script(
+            'return arguments[0].getBoundingClientRect();', target)
+        page_x = (
+            driver.execute_script('return window.pageXOffset;') or
+            driver.execute_script('return document.documentElement.scrollTop;')
+        )
+        page_y = (
+            driver.execute_script('return window.pageYOffset;') or
+            driver.execute_script(
+                                'return document.documentElement.scrollLeft;')
+        )
+        target_boundry = (
+            rect.get('left') + page_x,
+            rect.get('top') + page_y,
+            rect.get('right') + page_x,
+            rect.get('bottom') + page_y)
+        window_width = driver.execute_script(
+            'return document.documentElement.clientWidth;')
+        window_height = driver.execute_script(
+            'return document.documentElement.clientHeight;')
+        page_boundry = (
+            page_x,
+            page_y,
+            page_x + window_width,
+            page_y + window_height)
+        if display_marks:
+            base = '{side} {result} - Element ({element}) {sign} Page ({page})'
+            print(base.format(
+                side='Left', sign='>=', page=page_boundry[LEFT],
+                result=target_boundry[LEFT] >= page_boundry[LEFT],
+                element=target_boundry[LEFT]))
+            print(base.format(
+                side='Top', sign='>=', page=page_boundry[TOP],
+                result=target_boundry[TOP] >= page_boundry[TOP],
+                element=target_boundry[TOP]))
+            print(base.format(
+                side='Right', sign='<=', page=page_boundry[RIGHT],
+                result=target_boundry[RIGHT] <= page_boundry[RIGHT],
+                element=target_boundry[RIGHT]))
+            print(base.format(
+                side='Bottom', sign='<=', page=page_boundry[BOTTOM]),
+                result=target_boundry[BOTTOM] <= page_boundry[BOTTOM],
+                element=target_boundry[BOTTOM])
+        return (
+            target_boundry[LEFT] >= page_boundry[LEFT] and
+            target_boundry[TOP] >= page_boundry[TOP] and
+            target_boundry[RIGHT] <= page_boundry[RIGHT] and
+            target_boundry[BOTTOM] <= page_boundry[BOTTOM])
+
+    @classmethod
     def is_image_visible(cls, driver, image=None, locator=None):
         """Return True if an image is rendered."""
         if image:
