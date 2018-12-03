@@ -121,7 +121,6 @@ def test_the_tutor_methodology_is_outlined(web_base_url, selenium):
         assert(box.title in tiles)
 
 
-@skip_test(reason='Need control code for video playing')
 @test_case('C210495')
 @nondestructive
 @web
@@ -132,14 +131,16 @@ def test_videos_and_images_show_the_student_experience(web_base_url, selenium):
     tutor_marketing = home.web_nav.technology.view_tutor()
     tutor_marketing.sidebar.view_what_students_get()
 
-    # WHEN: they click on the "Late assignments" tile
+    for option, _ in \
+            enumerate(tutor_marketing.what_students_get.tutor.options):
+        # WHEN: they click on the a tile
+        tutor_marketing.what_students_get.tutor.view(option)
 
-    # THEN: the display box shows the red clock icon with highlight image
-
-    # WHEN: they click on "Two-step questions"
-
-    # THEN: the display box shows the 3rd from Sociology reading video
-    # AND:  the video automatically starts playing
+        # THEN: the image or video is prsented in the
+        #       viewport
+        description = tutor_marketing.what_students_get.tutor.description
+        assert(tutor_marketing.what_students_get.tutor.media_ready), \
+            '{0} was not ready'.format(description)
 
 
 @test_case('C210496')

@@ -347,7 +347,7 @@ class TutorMarketing(WebHome):
     class WhatStudentsGet(Section):
         """The 'What Students Get' section."""
 
-        _carousel_locator = (By.CSS_SELECTOR)
+        _carousel_locator = (By.CSS_SELECTOR, '.carousel')
 
         @property
         def tutor(self):
@@ -362,6 +362,9 @@ class TutorMarketing(WebHome):
             SET_BAR = 'arguments[0].scrollLeft = {left}'
 
             _viewport_locator = (By.CSS_SELECTOR, '.viewport')
+            _media_locator = (
+                By.CSS_SELECTOR,
+                '{0} > video, {0} > img'.format(_viewport_locator[1]))
             _description_locator = (
                                 By.CSS_SELECTOR, '[data-html$=description]')
             _option_container_locator = (By.CSS_SELECTOR, '.thumbnails')
@@ -395,7 +398,7 @@ class TutorMarketing(WebHome):
                 elif option:
                     _x = (self.driver
                           .execute_script(self.RECT, self.options[option])
-                          ) - 16
+                          ).get('x') - 16
                 else:
                     _x = x
                 self.driver.execute_script(self.SET_BAR.format(left=_x),
@@ -411,7 +414,17 @@ class TutorMarketing(WebHome):
                 Utility.scroll_to(self.driver,
                                   element=self.viewport,
                                   shift=-80)
+                sleep(1)
                 return self.page.page
+
+            @property
+            def media_ready(self):
+                """Return True if the current media is ready."""
+                media = self.find_element(*self._media_locator)
+                if media.tag_name.lower() == 'img':
+                    return Utility.is_image_visible(self.driver, media)
+                return self.driver.execute_script(
+                    'return arguments[0].duration;', media) > 0
 
     class FeatureMatrix(Section):
         """The available features list."""
