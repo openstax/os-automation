@@ -9,7 +9,7 @@ class Instagram(Page):
 
     URL_TEMPLATE = 'https://www.instagram.com/openstax/'
 
-    _username_locator = (By.CSS_SELECTOR, 'h1[title]')
+    _username_locator = (By.CSS_SELECTOR, 'h1')
 
     @property
     def loaded(self):

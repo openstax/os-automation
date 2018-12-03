@@ -12,7 +12,7 @@ from utils.utilities import Utility
 @smoke_test
 @nondestructive
 @accounts
-def test_open_the_Accounts_home_page(accounts_base_url, selenium):
+def test_open_the_accounts_home_page(accounts_base_url, selenium):
     """Basic start test."""
     # GIVEN: A web browser
 

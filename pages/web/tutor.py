@@ -18,9 +18,14 @@ class Section(Region):
     _description_locator = (By.CSS_SELECTOR, 'div[data-html] p')
 
     @property
+    def section(self):
+        """Return the section header element."""
+        return self.find_element(*self._heading_locator)
+
+    @property
     def heading(self):
         """Return the heading text."""
-        return self.find_element(*self._heading_locator).text
+        return self.section.text
 
     @property
     def description(self):
@@ -34,7 +39,6 @@ class TutorMarketing(WebHome):
     URL_TEMPLATE = '/openstax-tutor'
 
     _image_locators = (By.CSS_SELECTOR, '#main img')
-    _how_it_works_heading_locator = (By.CSS_SELECTOR, '#how-it-works h2')
 
     _floating_tools_locator = (By.CSS_SELECTOR, '.floating-tools')
     _sticky_footer_locator = (By.CSS_SELECTOR, '.sticky-footer')
@@ -63,11 +67,6 @@ class TutorMarketing(WebHome):
         return self.loaded
 
     @property
-    def how_it_works(self):
-        """Return the 'How it works' subheading element."""
-        return self.find_element(*self._how_it_works_heading_locator)
-
-    @property
     def sidebar(self):
         """Access the sidebar navigation."""
         sidebar_root = self.find_element(*self._floating_tools_locator)
@@ -84,6 +83,69 @@ class TutorMarketing(WebHome):
         footer_root = self.find_element(*self._sticky_footer_locator)
         return self.StickyFooter(self, footer_root)
 
+    @property
+    def introduction(self):
+        """Access the 'New Frontier' section."""
+        frontier_root = self.find_element(*self._new_frontier_locator)
+        return self.NewFrontier(self, frontier_root)
+
+    @property
+    def how_it_works(self):
+        """Access the 'How It Works' section."""
+        how_it_works_root = self.find_element(*self._how_it_works_locator)
+        return self.HowItWorks(self, how_it_works_root)
+
+    @property
+    def what_students_get(self):
+        """Access the 'What Students Get' section."""
+        what_students_get_root = self.find_element(
+                                            *self._what_students_get_locator)
+        return self.WhatStudentsGet(self, what_students_get_root)
+
+    @property
+    def features(self):
+        """Access the 'Feature Matrix' section."""
+        features_root = self.find_element(*self._feature_matrix_locator)
+        return self.FeatureMatrix(self, features_root)
+
+    @property
+    def where_money_goes(self):
+        """Access the 'Where Money Goes' section."""
+        money_root = self.find_element(*self._where_money_goes_locator)
+        return self.WhereMoneyGoes(self, money_root)
+
+    @property
+    def science(self):
+        """Access the 'Science' section."""
+        science_root = self.find_element(*self._science_locator)
+        return self.Science(self, science_root)
+
+    @property
+    def faq(self):
+        """Access the frequently asked questions section."""
+        faq_root = self.find_element(*self._faq_locator)
+        return self.FAQ(self, faq_root)
+
+    @property
+    def learn_more(self):
+        """Access the 'Learn More' section."""
+        more_root = self.find_element(*self._learn_more_locator)
+        return self.LearnMore(self, more_root)
+
+    @property
+    def sections(self):
+        """Return a list of available sections."""
+        return [
+            self.introduction,
+            self.how_it_works,
+            self.what_students_get,
+            self.features,
+            self.where_money_goes,
+            self.science,
+            self.faq,
+            self.learn_more
+        ]
+
     class Sidebar(Region):
         """The marketing page sidebar navigation."""
 
@@ -91,10 +153,19 @@ class TutorMarketing(WebHome):
         _pulse_dot_locator = (By.CSS_SELECTOR, '.pulsing-dot')
         _alert_text_locator = (By.CSS_SELECTOR, '.pulsing-dot p')
 
+        def is_displayed(self):
+            """Return True if the sidebar has height."""
+            return self.driver.execute_script(
+                'return arguments[0].clientHeight != 0', self.root)
+
         @property
         def nav(self):
             """Return the navigation dots."""
             return self.find_elements(*self._nav_dot_locator)
+
+        def select(self, nav):
+            """Select a nav dot."""
+            return self._go_to(element=nav)
 
         def view_new_frontier(self):
             """Jump to the New Frontier section."""
@@ -136,10 +207,11 @@ class TutorMarketing(WebHome):
             """Return the alert message text."""
             return self.find_element(*self._alert_text_locator).text
 
-        def _go_to(self, destination):
+        def _go_to(self, destination=None, element=None):
             """Select a nav dot."""
-            Utility.safari_exception_click(self.driver,
-                                           element=self.nav[destination])
+            target = self.nav[destination] if destination else element
+            Utility.safari_exception_click(self.driver, element=target)
+            sleep(0.75)
             return self.page
 
     class StickyFooter(Region):
@@ -224,18 +296,24 @@ class TutorMarketing(WebHome):
             Utility.safari_exception_click(
                 self.driver,
                 element=self.find_element(*self._how_it_works_locator))
+            sleep(0.75)
             return self.page
 
     class HowItWorks(Section):
         """The 'How It Works' section."""
 
         _subheading_locator = (By.CSS_SELECTOR, 'h2')
-        _box_locator = (By.CSS_SELECTOR, '.blurb-table blurb')
+        _box_locator = (By.CSS_SELECTOR, '.blurb-table .blurb')
 
         @property
         def subheading(self):
+            """Return the subheading element."""
+            return self.find_element(*self._subheading_locator)
+
+        @property
+        def how_it_works(self):
             """Return the subheading text."""
-            return self.find_element(*self._subheading_locator).text.strip()
+            return self.subheading.text.strip()
 
         @property
         def boxes(self):
@@ -338,15 +416,16 @@ class TutorMarketing(WebHome):
     class FeatureMatrix(Section):
         """The available features list."""
 
-        _feature_locator = (By.CSS_SELECTOR, '.flexrow:not(.caption) div')
+        _feature_locator = (By.CSS_SELECTOR, '.flexrow:not(.caption)')
         _new_feature_locator = (By.CSS_SELECTOR, '.future-text p')
 
         @property
         def features(self):
             """Return the current features."""
-            return list([feature.text.strip()
+            return list([feature.find_element_by_tag_name('div').text.strip()
                         for feature
-                        in self.find_elements(*self._feature_locator)])
+                        in self.find_elements(*self._feature_locator)
+                        if 'false' not in feature.get_attribute('innerHTML')])
 
         @property
         def new_features(self):
@@ -356,15 +435,32 @@ class TutorMarketing(WebHome):
             text = inner_html.replace('<br>', '|')[1:-1].split('||')
             return text
 
+        @property
+        def planned_features(self):
+            """Return the list of planned features."""
+            return list([feature.find_element_by_tag_name('div').text.strip()
+                         for feature
+                         in self.find_elements(*self._feature_locator)
+                         if 'false' in feature.get_attribute('innerHTML')])
+
     class WhereMoneyGoes(Section):
         """The 'Where the Money Goes' section."""
 
         _breakdown_locator = (By.CSS_SELECTOR, '#breakdown-description')
+        _large_image_locator = (By.CSS_SELECTOR, 'img.boxed')
+        _small_image_locator = (By.CSS_SELECTOR, '.boxed img')
 
         @property
         def breakdown(self):
             """Return the cost breakdown text."""
             return self.find_element(*self._breakdown_locator).text.strip()
+
+        @property
+        def breakdown_image(self):
+            """Return the breakdown image element for any screen size."""
+            if self.driver.get_window_size().get('width') < Web.PHONE:
+                return self.find_element(*self._small_image_locator)
+            return self.find_element(*self._large_image_locator)
 
     class Science(Section):
         """The 'Science behind OpenStax Tutor Beta' section."""
@@ -379,7 +475,7 @@ class TutorMarketing(WebHome):
     class FAQ(Section):
         """The 'Frequently Asked Questions' section."""
 
-        _question_locator = (By.CSS_SELECTOR, '.qna')
+        _question_locator = (By.CSS_SELECTOR, '.qna:not(.see-more)')
         _support_locator = (By.CSS_SELECTOR, '[href$=help]')
 
         @property
@@ -428,7 +524,7 @@ class TutorMarketing(WebHome):
 
             @property
             def answer(self):
-                """"Return the answer if the answer is visible."""
+                """Return the answer if the answer is visible."""
                 assert(self.is_open), 'The question is closed.'
                 return self.find_element(*self._answer_locator).text.strip()
 

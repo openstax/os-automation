@@ -95,7 +95,8 @@ def test_the_learn_more_button_loads_the_tutor_marketing_page_how_it_works(
     # THEN: the "How it works" section on the Tutor
     #       marketing page is displayed
     assert(marketing.is_displayed())
-    assert(Utility.in_viewport(selenium, element=marketing.how_it_works)), \
+    assert(Utility.in_viewport(selenium,
+                               element=marketing.how_it_works.subheading)), \
         'Subheading not in the browser window'
 
 

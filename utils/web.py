@@ -148,6 +148,19 @@ class Web(object):
         BY_PARTNER
     ]
 
+    # Tutor Marketing sections
+    NEW_FRONTIER = 0
+    HOW_IT_WORKS = 1
+    WHAT_STUDENTS_GET = 2
+    FEATURE_MATRIX = 3
+    WHERE_MONEY_GOES = 4
+    THE_SCIENCE = 5
+    TUTOR_FAQ = 6
+    LEARN_MORE = 7
+
+    GET_STARTED = 0
+    JOIN_A_WEBINAR = 1
+
     @classmethod
     def resources(cls, options=1, randomize=True, get_partner_resources=True):
         """Return a list of additional resource options."""

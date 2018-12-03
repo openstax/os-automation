@@ -4,14 +4,14 @@ from time import sleep
 from urllib.parse import urlparse
 
 from pypom import Region
-from selenium.common.exceptions import TimeoutException
+from selenium.common.exceptions import TimeoutException, WebDriverException
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 
 from pages.accounts import home, profile
 from pages.accounts.base import AccountsBase
 from utils.email import GmailReader, GuerrillaMail, RestMail
-from utils.utilities import Utility
+from utils.utilities import Utility, go_to_
 
 
 class Signup(AccountsBase):
@@ -47,15 +47,20 @@ class Signup(AccountsBase):
         ('anatomy_physiology', 'Anatomy and Physiology'),
         ('astronomy', 'Astronomy'),
         ('biology', 'Biology'),
+        # ('ap_biology', 'AP Biology'),
         ('calculus', 'Calculus'),
         ('chemistry', 'Chemistry'),
         ('chem_atoms_first', 'Chemistry: Atoms First'),
         ('college_algebra', 'College Algebra'),
         ('college_physics_algebra', 'College Physics'),
         ('concepts_of_bio_non_majors', 'Concepts of Biology'),
+        # ('elementary_algebra', 'Elementary Algebra'),
+        # ('intermediate_algebra', 'Intermediate Algebra'),
         ('introduction_to_business', 'Introduction to Business'),
         ('introduction_to_sociology', 'Introduction to Sociology 2e'),
         ('introductory_statistics', 'Introductory Statistics'),
+        # ('introductory_business_statistics',
+        #  'Introductory Business Statistics'),
         ('microbiology', 'Microbiology'),
         ('pre_algebra', 'Prealgebra'),
         ('precalc', 'Precalculus'),
@@ -72,6 +77,10 @@ class Signup(AccountsBase):
     ]
 
     _next_button_locator = (By.CSS_SELECTOR, '[type=submit]')
+    _next_page_button_locator = (
+                            By.CSS_SELECTOR, '[data-bind="click:nextPage"]')
+    _form_submit_locator = (By.CSS_SELECTOR, '[value="Create Account"]')
+    _error_locator = (By.CSS_SELECTOR, '.alert')
 
     def subject_list(self, size=1):
         """Return a list of subjects for an elevated signup."""
@@ -153,6 +162,7 @@ class Signup(AccountsBase):
         self.user_type.role = _type
         self.user_type.email = email
         self.next()
+        assert(not self.error), '{0}'.format(self.error)
         if non_student_role and not email.endswith('edu'):
             self.next()
 
@@ -197,6 +207,7 @@ class Signup(AccountsBase):
             self.password.password = password
             self.password.confirmation = password
             self.next()
+            assert(not self.error), '{0}'.format(self.error)
         elif kwargs.get('social') == 'facebook':
             # use Facebook
             self.password.use_social_login() \
@@ -218,34 +229,39 @@ class Signup(AccountsBase):
         if 'social' not in kwargs:
             self.user.first_name = kwargs.get('name')[Signup.FIRST]
             self.user.last_name = kwargs.get('name')[Signup.LAST]
-            self.user.suffix = kwargs.get('name')[Signup.SUFFIX]
         self.user.school = kwargs.get('school')
         # elevated users
         if non_student_role:
             self.instructor.phone = kwargs.get('phone')
             self.instructor.webpage = kwargs.get('webpage')
-            subjects_to_select = []
-            for subject, name in Signup.SUBJECTS:
-                if name in kwargs.get('subjects'):
-                    subjects_to_select.append(name)
-            self.instructor.subjects = subjects_to_select
         # instructor-only
         if instructor:
-            self.instructor.students = kwargs.get('students')
             self.instructor.using = kwargs.get('use')
+            sleep(0.25)
+        self.next()
         # completion
+        subjects_to_select = []
+        for subject, name in Signup.SUBJECTS:
+            if name in kwargs.get('subjects', []):
+                subjects_to_select.append(name)
+        if subjects_to_select:
+            self.instructor.select_subjects(subjects_to_select)
+        if instructor:
+            self.instructor.students = kwargs.get('students')
         if not kwargs.get('news'):
             self.user.toggle_news()
         self.user.agree_to_terms()
         sleep(0.25)
         self.next()
+        if non_student_role:
+            assert(not self.error), '{0}'.format(self.error)
 
         # request e-mail confirmation for an elevated account
         if non_student_role:
             self.notice.get_confirmation_email()
             self.next()
 
-        return profile.Profile(self.driver)
+        return go_to_(profile.Profile(self.driver, self.base_url))
 
     def instructor_access(self, role, school_email, phone_number, school,
                           webpage, students=None, using=None, interests=None,
@@ -351,12 +367,21 @@ class Signup(AccountsBase):
         """Request notice when instructor access is authorized."""
         return self.InstructorNotice(self)
 
-    def next(self):
+    def next(self, locator=None):
         """Proceed to the next step in the process."""
-        Utility.scroll_to(self.selenium, self._next_button_locator)
-        self.find_element(*self._next_button_locator).click()
-        sleep(1)
+        if not locator:
+            locator = self._next_button_locator
+        button = self.find_element(*locator)
+        Utility.safari_exception_click(self.driver, element=button)
         return self
+
+    @property
+    def error(self):
+        """Return the error message if present."""
+        try:
+            return self.find_element(*self._error_locator).text.strip()
+        except WebDriverException:
+            return ''
 
     class UserType(Region):
         """Initial signup pane for type selection."""
@@ -506,7 +531,6 @@ class Signup(AccountsBase):
 
         _first_name_locator = (By.ID, 'profile_first_name')
         _last_name_locator = (By.ID, 'profile_last_name')
-        _suffix_locator = (By.ID, 'profile_suffix')
         _school_locator = (By.ID, 'profile_school')
         _news_locator = (By.ID, 'profile_newsletter')
         _policy_agreement_locator = (By.ID, 'profile_i_agree')
@@ -531,17 +555,6 @@ class Signup(AccountsBase):
         def last_name(self, last):
             """Send the user's surname."""
             self.last_name.send_keys(last)
-            return self
-
-        @property
-        def suffix(self):
-            """Return the suffix field."""
-            return self.find_element(*self._suffix_locator)
-
-        @suffix.setter
-        def suffix(self, suffix):
-            """Send the user's suffix."""
-            self.suffix.send_keys(suffix)
             return self
 
         @property
@@ -658,10 +671,11 @@ class Signup(AccountsBase):
             return [self.Subject(self, el) for
                     el in self.find_elements(*self._subject_option_locator)]
 
-        @subjects.setter
-        def subjects(self, subject_list):
+        def select_subjects(self, subject_list):
             """Mark each interested subject."""
+            print(subject_list)
             for subject in self.subjects:
+                print(subject, subject.title, subject.title in subject_list)
                 if subject.title in subject_list:
                     subject.select()
             return self
@@ -669,7 +683,7 @@ class Signup(AccountsBase):
         class Subject(Region):
             """Book subject."""
 
-            _book_title_locator = (By.TAG_NAME, 'label')
+            _book_title_locator = (By.CSS_SELECTOR, 'label')
             _checkbox_locator = (By.CSS_SELECTOR, '[type=checkbox]')
 
             @property
@@ -679,8 +693,8 @@ class Signup(AccountsBase):
 
             def select(self):
                 """Select a book."""
-                self.find_element(*self._checkbox_locator).click()
-                sleep(1)
+                box = self.find_element(*self._checkbox_locator)
+                Utility.safari_exception_click(self.driver, element=box)
                 return self
 
     class InstructorNotice(Region):

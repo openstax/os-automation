@@ -36,7 +36,9 @@ class ErrataBase(Region):
     def view_errata(self):
         """View the errata item in detail."""
         Utility.safari_exception_click(self.driver, element=self.errata)
-        return go_to_(ErrataDetail(self.driver, _id=self.errata_id))
+        return go_to_(ErrataDetail(self.driver,
+                                   base_url=self.base_url,
+                                   _id=self.errata_id))
 
     @property
     def source(self):
@@ -324,7 +326,7 @@ class ErrataDetail(WebBase):
         """Return to the book's errata list."""
         book = self.errata_list.get_attribute('href').split('=')[-1]
         Utility.safari_exception_click(self.driver, self.errata_list)
-        return go_to_(Errata(self.driver, book=book))
+        return go_to_(Errata(self.driver, base_url=self.base_url, book=book))
 
 
 class ErrataForm(WebBase):

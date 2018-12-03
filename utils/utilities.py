@@ -115,21 +115,16 @@ class Utility(object):
 
     @classmethod
     def in_viewport(cls, driver, locator=None, element=None,
-                    display_marks=False):
+                    ignore_bottom=False, display_marks=False):
         """Return True if the element boundry completely lies in view."""
         LEFT, TOP, RIGHT, BOTTOM = range(4)
         target = element if element else driver.find_element(*locator)
         rect = driver.execute_script(
             'return arguments[0].getBoundingClientRect();', target)
-        page_x = (
-            driver.execute_script('return window.pageXOffset;') or
-            driver.execute_script('return document.documentElement.scrollTop;')
-        )
-        page_y = (
-            driver.execute_script('return window.pageYOffset;') or
-            driver.execute_script(
-                                'return document.documentElement.scrollLeft;')
-        )
+        if display_marks:
+            print('Rectangle: {0}'.format(rect))
+        page_x = driver.execute_script('return window.pageXOffset;')
+        page_y = driver.execute_script('return window.pageYOffset;')
         target_boundry = (
             rect.get('left') + page_x,
             rect.get('top') + page_y,
@@ -146,6 +141,9 @@ class Utility(object):
             page_y + window_height)
         if display_marks:
             base = '{side} {result} - Element ({element}) {sign} Page ({page})'
+            bottom = (
+                'Bottom {result} - [Element ({element}) {sign} '
+                'Page ({page})] or [Skip Bottom ({skip})]')
             print(base.format(
                 side='Left', sign='>=', page=page_boundry[LEFT],
                 result=target_boundry[LEFT] >= page_boundry[LEFT],
@@ -158,15 +156,18 @@ class Utility(object):
                 side='Right', sign='<=', page=page_boundry[RIGHT],
                 result=target_boundry[RIGHT] <= page_boundry[RIGHT],
                 element=target_boundry[RIGHT]))
-            print(base.format(
-                side='Bottom', sign='<=', page=page_boundry[BOTTOM]),
-                result=target_boundry[BOTTOM] <= page_boundry[BOTTOM],
-                element=target_boundry[BOTTOM])
+            print(bottom.format(
+                sign='<=', page=page_boundry[BOTTOM],
+                result=(
+                    target_boundry[BOTTOM] <= page_boundry[BOTTOM] or
+                    ignore_bottom),
+                element=target_boundry[BOTTOM], skip=ignore_bottom))
         return (
             target_boundry[LEFT] >= page_boundry[LEFT] and
             target_boundry[TOP] >= page_boundry[TOP] and
             target_boundry[RIGHT] <= page_boundry[RIGHT] and
-            target_boundry[BOTTOM] <= page_boundry[BOTTOM])
+            (target_boundry[BOTTOM] <= page_boundry[BOTTOM] or
+             ignore_bottom))
 
     @classmethod
     def is_image_visible(cls, driver, image=None, locator=None):
@@ -312,6 +313,13 @@ class Utility(object):
                     sleep(1.0)
 
     @classmethod
+    def scroll_bottom(cls, driver):
+        """Scroll to the bottom of the browser screen."""
+        driver.execute_script(
+            'window.scrollTo(0, document.body.scrollHeight);')
+        sleep(0.75)
+
+    @classmethod
     def scroll_to(
             cls, driver, element_locator=None, element=None, shift=0):
         """Scroll the screen to the element.
@@ -333,6 +341,7 @@ class Utility(object):
     def scroll_top(cls, driver):
         """Scroll to the top of the browser screen."""
         driver.execute_script('window.scrollTo(0, 0);')
+        sleep(0.75)
 
     @classmethod
     def select(cls, driver, element_locator, label):
