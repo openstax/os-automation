@@ -25,7 +25,7 @@ class Adoption(WebBase):
     _drop_down_menu_locator = (By.CSS_SELECTOR, '.proxy-select')
     _interest_form_link_locator = (By.CSS_SELECTOR, '[href$=interest]')
     _form_root_locator = (By.CSS_SELECTOR, '.role-selector')
-    _book_selection_locator = (By.CSS_SELECTOR, '.book-selector')
+    _book_selection_locator = (By.CSS_SELECTOR, '.book-checkbox')
     _image_locator = (By.CSS_SELECTOR, '.has-image img')
 
     @property

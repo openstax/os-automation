@@ -145,7 +145,7 @@ def test_a_book_is_preselected_when_a_book_details_interest_link_is_used(
     _, first_name, last_name, _ = Utility.random_name()
     email = RestMail(
         '{first}.{last}.{rand}'
-        .format(first=first_name, last=last_name, rand=Utility.random_hex(3))
+        .format(first=first_name, last=last_name, rand=Utility.random_hex(4))
         .lower())
     phone = Utility.random_phone(713, False)
     school = 'Automation'
@@ -269,7 +269,7 @@ def test_interest_form_requires_at_least_one_book_selection(
     _, first_name, last_name, _ = Utility.random_name()
     email = RestMail(
         '{first}.{last}.{rand}'
-        .format(first=first_name, last=last_name, rand=Utility.random_hex(3))
+        .format(first=first_name, last=last_name, rand=Utility.random_hex(5))
         .lower())
     phone = Utility.random_phone(713, False)
     school = 'Automation'

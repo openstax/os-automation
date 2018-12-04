@@ -8,7 +8,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as expect
 from selenium.webdriver.support.ui import WebDriverWait
 
-from tests.markers import nondestructive, test_case
+from tests.markers import nondestructive, skip_test, social, test_case
 from utils.email import EmailVerificationError, GoogleBase  # NOQA
 from utils.email import GuerrillaMail, RestMail, SendMail  # NOQA
 
@@ -29,6 +29,7 @@ GOOGLE = ('smtp.gmail.com', 587, 10)
 
 
 @test_case('C195537')
+@social
 @nondestructive
 def test_google_mail_user_has_pin_emails(google_signup, selenium):
     """Test a Google Gmail user."""
@@ -60,6 +61,7 @@ def test_google_mail_user_has_pin_emails(google_signup, selenium):
 
 
 @test_case('C195538')
+@skip_test(reason='Avoid GuerrillaMail')
 def test_guerrilla_mail_received_pin_email(selenium):
     """Test a Guerrilla Mail user."""
     # GIVEN: A new Guerrilla Mail session

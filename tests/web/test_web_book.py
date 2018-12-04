@@ -120,10 +120,14 @@ def test_webview_for_a_book_is_avaialble(web_base_url, selenium):
     # WHEN: they click on the "View online" link
     webview = book.sidebar.view_online()
 
-    # THEN: the webview version of the book is loaded in a new tab
+    # THEN: the webview version of the book is loaded in a
+    #       new tab
     assert(webview.is_displayed())
     assert('cnx' in webview.location)
-    assert(book_title == webview.title)
+    # AP Physics is viewed as a collection, not a book, so
+    # ignore the title test for it
+    if book_title != 'The AP Physics Collection':
+        assert(book_title == webview.title)
 
     # WHEN: they close the new tab
     # AND:  switch back to the original tab
@@ -842,7 +846,7 @@ def test_unverified_users_sent_to_faculty_verification_for_locked_resources(
     # AND:  are logged into the site
     name = Utility.random_name()
     email = RestMail('{first}.{last}.{tag}'.format(
-        first=name[1], last=name[2], tag=Utility.random_hex(3)).lower())
+        first=name[1], last=name[2], tag=Utility.random_hex(4)).lower())
     email.empty()
     address = email.address
     password = teacher[1]

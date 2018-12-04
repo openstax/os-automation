@@ -15,6 +15,7 @@ class Profile(AccountsHome):
     URL_TEMPLATE = '/profile'
 
     _title_locator = (By.CLASS_NAME, 'title')
+    _name_locator = (By.CSS_SELECTOR, '.row.name')
     _log_out_locator = (By.CLASS_NAME, 'sign-out')
     _edit_clear_locator = (By.CLASS_NAME, 'editable-clear-x')
     _edit_submit_locator = (By.CLASS_NAME, 'editable-submit')
@@ -24,6 +25,13 @@ class Profile(AccountsHome):
     _popup_console_body_locator = (By.ID, 'admin_console_dialog')
     _full_console_locator = (By.CSS_SELECTOR,
                              '#upper-corner-console a:nth-last-child(2)')
+
+    @property
+    def loaded(self):
+        """Override the loaded method for the account profile."""
+        return (
+            self.title and
+            self.find_element(*self._name_locator))
 
     @property
     def title(self):

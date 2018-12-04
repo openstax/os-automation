@@ -12,7 +12,7 @@ from utils.utilities import Utility
 @smoke_test
 @nondestructive
 @accounts
-def test_open_the_Accounts_home_page(accounts_base_url, selenium):
+def test_open_the_accounts_home_page(accounts_base_url, selenium):
     """Basic start test."""
     # GIVEN: A web browser
 
@@ -145,7 +145,7 @@ def test_reset_a_users_password(accounts_base_url, selenium, student):
     name = Utility.random_name()
     email = RestMail(
         '{first}.{last}.{tag}'
-        .format(first=name[1], last=name[2], tag=Utility.random_hex(3))
+        .format(first=name[1], last=name[2], tag=Utility.random_hex(6))
         .lower()
     )
     email.empty()

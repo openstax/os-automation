@@ -1,8 +1,8 @@
 """Test the Accounts signup process."""
 
 from pages.accounts.home import AccountsHome as Home
-from pages.accounts.signup import Signup
 from tests.markers import accounts, smoke_test, social, test_case
+from utils.accounts import Accounts
 from utils.email import RestMail
 from utils.utilities import Utility
 
@@ -40,8 +40,9 @@ def test_sign_up_as_a_student_user(accounts_base_url, selenium, student):
     page.login.go_to_signup.account_signup(
         email=address,
         password=password,
-        _type='Student',
-        provider='restmail',
+        _type=Accounts.STUDENT,
+        role=Accounts.STUDENT,
+        provider=Accounts.RESTMAIL,
         name=name,
         school='Automation',
         news=False)
@@ -61,7 +62,7 @@ def test_sign_up_as_an_instructor(accounts_base_url, selenium, teacher):
     name = Utility.random_name()
     email = RestMail(
         '{first}.{last}.{tag}'
-        .format(first=name[1], last=name[2], tag=Utility.random_hex(3))
+        .format(first=name[1], last=name[2], tag=Utility.random_hex(4))
         .lower()
     )
     email.empty()
@@ -87,8 +88,9 @@ def test_sign_up_as_an_instructor(accounts_base_url, selenium, teacher):
     page.login.go_to_signup.account_signup(
         email=address,
         password=password,
-        _type='Instructor',
-        provider='restmail',
+        _type=Accounts.INSTRUCTOR,
+        role=Accounts.INSTRUCTOR,
+        provider=Accounts.RESTMAIL,
         name=name,
         school='Automation',
         news=False,
@@ -96,7 +98,8 @@ def test_sign_up_as_an_instructor(accounts_base_url, selenium, teacher):
         webpage='https://openstax.org/',
         subjects=subject_list(2),
         students=10,
-        use='Fully adopted and using it as the primary textbook')
+        use=Accounts.ADOPTED,
+        access_notice=True)
 
     # THEN: the Account Profile page is loaded
     assert(page.current_url == accounts_base_url + '/profile'), \
@@ -112,7 +115,7 @@ def test_sign_up_as_a_nonstudent_user(accounts_base_url, selenium, teacher):
     name = Utility.random_name()
     email = RestMail(
         '{first}.{last}.{tag}'
-        .format(first=name[1], last=name[2], tag=Utility.random_hex(3))
+        .format(first=name[1], last=name[2], tag=Utility.random_hex(5))
         .lower()
     )
     email.empty()
@@ -138,14 +141,16 @@ def test_sign_up_as_a_nonstudent_user(accounts_base_url, selenium, teacher):
     page.login.go_to_signup.account_signup(
         email=address,
         password=password,
-        _type='Other',
-        provider='restmail',
+        _type=Accounts.OTHER,
+        role=Accounts.OTHER,
+        provider=Accounts.RESTMAIL,
         name=name,
         school='Automation',
         news=False,
         phone=Utility.random_phone(),
         webpage='https://openstax.org/',
-        subjects=subject_list(3))
+        subjects=subject_list(3),
+        access_notice=False)
 
     # THEN: the Account Profile page is loaded
     assert(page.current_url == accounts_base_url + '/profile'), \
@@ -163,7 +168,7 @@ def test_sign_up_as_a_facebook_user(
     name = Utility.random_name()
     email = RestMail(
         '{first}.{last}.{tag}'
-        .format(first=name[1], last=name[2], tag=Utility.random_hex(3))
+        .format(first=name[1], last=name[2], tag=Utility.random_hex(6))
         .lower()
     )
     email.empty()
@@ -187,11 +192,12 @@ def test_sign_up_as_a_facebook_user(
     page = page.account_signup(
         email=address,
         password=password,
-        _type='Student',
-        provider='restmail',
+        _type=Accounts.STUDENT,
+        role=Accounts.STUDENT,
+        provider=Accounts.RESTMAIL,
         news=True,
         school='Automation',
-        social='facebook',
+        social=Accounts.FACEBOOK,
         social_login=facebook_signup[0],
         social_password=facebook_signup[1]
     )
@@ -244,7 +250,7 @@ def test_sign_up_as_a_google_user(
     name = Utility.random_name()
     email = RestMail(
         '{first}.{last}.{tag}'
-        .format(first=name[1], last=name[2], tag=Utility.random_hex(3))
+        .format(first=name[1], last=name[2], tag=Utility.random_hex(7))
         .lower()
     )
     email.empty()
@@ -267,11 +273,12 @@ def test_sign_up_as_a_google_user(
     page = page.login.go_to_signup.account_signup(
         email=address,
         password=password,
-        _type='Student',
-        provider='restmail',
+        _type=Accounts.STUDENT,
+        role=Accounts.STUDENT,
+        provider=Accounts.RESTMAIL,
         news=True,
         school='Automation',
-        social='google',
+        social=Accounts.GOOGLE,
         social_login=google_signup[0],
         social_password=google_signup[1]
     )
@@ -315,13 +322,18 @@ def test_sign_up_as_a_google_user(
 
 def subject_list(size=1):
     """Return a list of subjects for an elevated signup."""
-    subjects = len(Signup.SUBJECTS)
+    subjects = len(Accounts.SUBJECTS)
     if size > subjects:
         size = subjects
     book = ''
-    group = []
+    group = [] if Accounts.accounts_old else {}
     while len(group) < size:
-        book = (Signup.SUBJECTS[Utility.random(0, subjects - 1)])[1]
+        book = (Accounts.SUBJECTS[Utility.random(0, subjects - 1)])[1]
         if book not in group:
-            group.append(book)
+            if Accounts.accounts_old:
+                group.append(book)
+            else:
+                group[book] = {
+                    'status': Accounts.randomized_use(),
+                    'students': Utility.random(), }
     return group

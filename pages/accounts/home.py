@@ -123,7 +123,7 @@ class AccountsHome(AccountsBase):
             self.service_login(user, password)
             self.wait.until(lambda _: self.logged_in)
             from pages.accounts.profile import Profile
-            return Profile(self.driver)
+            return go_to_(Profile(self.driver, self.page.base_url))
 
         def service_login(self, user, password,
                           destination=None, url=None, **kwargs):
@@ -161,7 +161,7 @@ class AccountsHome(AccountsBase):
                 self.find_element(*self._fb_safari_specific_locator).click()
             sleep(2.0)
             from pages.accounts.profile import Profile
-            return Profile(self.driver)
+            return go_to_(Profile(self.driver, self.page.base_url))
 
         def google_login(self, user, google_user, password):
             """Log into the site with google."""
@@ -180,7 +180,7 @@ class AccountsHome(AccountsBase):
             self.find_element(*self._google_pass_next_locator).click()
             sleep(2.0)
             from pages.accounts.profile import Profile
-            return Profile(self.driver)
+            return go_to_(Profile(self.driver, self.page.base_url))
 
         def trigger_reset(self, user):
             """Start a password reset for a user."""
@@ -199,7 +199,7 @@ class AccountsHome(AccountsBase):
             self.find_element(*self._password_reset_submit).click()
             sleep(1.0)
             from pages.accounts.profile import Profile
-            return Profile(self.driver)
+            return go_to_(Profile(self.driver, self.page.base_url))
 
         @property
         def is_help_shown(self):
@@ -225,7 +225,7 @@ class AccountsHome(AccountsBase):
             if len(self.driver.window_handles) > 1:
                 self.driver.switch_to.window(
                     self.driver.window_handles[new_handle])
-            return Salesforce(self.driver)
+            return go_to_(Salesforce(self.driver))
 
         def get_login_error(self):
             """Return Account log in error message."""
@@ -256,5 +256,9 @@ class AccountsHome(AccountsBase):
             """Go to user signup."""
             self.find_element(*self._signup_locator).click()
             sleep(1)
-            from pages.accounts.signup import Signup
-            return Signup(self.driver, self.page.seed_url)
+            from utils.accounts import Accounts
+            if Accounts.accounts_old:
+                from pages.accounts.signup import Signup
+            else:
+                from pages.accounts.signup_two import Signup
+            return go_to_(Signup(self.driver, self.page.seed_url))

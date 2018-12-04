@@ -21,11 +21,11 @@ class TutorBase(Page):
     @property
     def loaded(self):
         """Override the default loaded function."""
-        return self.find_element(*self._root_locator).is_displayed()
+        return self.find_element(*self._root_locator)
 
     def is_displayed(self):
         """Return True when the Tutor page is loaded."""
-        return self.loaded
+        return self.loaded.is_displayed()
 
     @property
     def location(self):
