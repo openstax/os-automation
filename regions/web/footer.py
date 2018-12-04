@@ -76,35 +76,39 @@ class Footer(Region):
             Utility.safari_exception_click(
                 self.driver, locator=self._license_locator)
             from pages.web.legal import License
-            return go_to_(License(self.driver))
+            return go_to_(License(self.driver,
+                                  base_url=self.page.page.base_url))
 
         def view_the_terms_of_use(self):
             """View the terms of use."""
             Utility.safari_exception_click(
                 self.driver, locator=self._terms_of_use_locator)
             from pages.web.legal import Terms
-            return go_to_(Terms(self.driver))
+            return go_to_(Terms(self.driver, base_url=self.page.page.base_url))
 
         def view_the_privacy_policy(self):
             """View the privacy policy."""
             Utility.safari_exception_click(
                 self.driver, locator=self._privacy_policy_locator)
             from pages.web.legal import PrivacyPolicy
-            return go_to_(PrivacyPolicy(self.driver))
+            return go_to_(PrivacyPolicy(self.driver,
+                                        base_url=self.page.page.base_url))
 
         def view_the_accessibility_statement(self):
             """View the accessibility statement."""
             Utility.safari_exception_click(
                 self.driver, locator=self._accessibility_statement_locator)
             from pages.web.accessibility import Accessibility
-            return go_to_(Accessibility(self.driver))
+            return go_to_(Accessibility(self.driver,
+                                        base_url=self.page.page.base_url))
 
         def view_openstax_career_opportunities(self):
             """View the careers page."""
             Utility.safari_exception_click(
                 self.driver, locator=self._careers_locator)
             from pages.web.careers import Careers
-            return go_to_(Careers(self.driver))
+            return go_to_(Careers(self.driver,
+                                  base_url=self.page.page.base_url))
 
         def view_the_code(self):
             """Open GitHub and view the OpenStax repositories."""
@@ -118,14 +122,15 @@ class Footer(Region):
             Utility.safari_exception_click(
                 self.driver, locator=self._contact_us_locator)
             from pages.web.contact import Contact
-            return go_to_(Contact(self.driver))
+            return go_to_(Contact(self.driver,
+                                  base_url=self.page.page.base_url))
 
         def view_press_releases(self):
             """View the press page."""
             Utility.safari_exception_click(
                 self.driver, locator=self._press_locator)
             from pages.web.press import Press
-            return go_to_(Press(self.driver))
+            return go_to_(Press(self.driver, base_url=self.page.page.base_url))
 
         def go_to_the_newsletter_signup_form(self):
             """Go to the newsletter signup."""
