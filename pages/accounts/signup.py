@@ -202,6 +202,7 @@ class Signup(AccountsBase):
             if not self.pin.pin_failure:
                 not_verified = False
 
+        sleep(1.0)
         if 'social' not in kwargs:
             # set the initial password
             self.password.password = password

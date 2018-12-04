@@ -35,6 +35,7 @@ class WebBase(Page):
                 return super(WebBase, self).open()
             except TimeoutException:
                 print('Attempt: {0}'.format(attempt))
+                sleep(1)
 
     @property
     def sticky_note(self):
