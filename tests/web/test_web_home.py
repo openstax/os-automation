@@ -1,6 +1,7 @@
 """Tests for the OpenStax Web home page."""
 
-import pytest
+from time import sleep
+
 from selenium.common.exceptions import NoSuchElementException
 
 from pages.accounts.admin.users import Search
@@ -880,7 +881,7 @@ def test_instructor_access_application(
     # AND:   logged into the Web home page
     name = Utility.random_name()
     email = RestMail('{first}.{last}.{tag}'.format(
-        first=name[1], last=name[2], tag=Utility.random_hex(3)).lower())
+        first=name[1], last=name[2], tag=Utility.random_hex(4)).lower())
     email.empty()
     address = email.address
     password = teacher[1]
@@ -935,13 +936,18 @@ def test_instructor_access_application(
         interests=Signup(selenium).subject_list(Utility.random(2, 4)),
         get_newsletter=False
     )
-    home.open()
-    home.web_nav.login.open()
 
     # THEN: "Request instructor access" is no longer
-    #       visible in the user menu
-    with pytest.raises(NoSuchElementException):
-        home.web_nav.login.instructor_access.is_displayed()
+    #       visible in the user menu after the next user API call
+    for _ in range(20):
+        home.open()
+        home.web_nav.login.open()
+        try:
+            home.web_nav.login.instructor_access.is_displayed()
+            sleep(1.0)
+        except NoSuchElementException:
+            return
+    assert(False), 'Instructor access menu item is still available'
 
 
 @test_case('C210321')
@@ -955,7 +961,7 @@ def test_instructor_access_application_on_mobile(
     # AND:   the screen width is 960 pixels or less
     name = Utility.random_name()
     email = RestMail('{first}.{last}.{tag}'.format(
-        first=name[1], last=name[2], tag=Utility.random_hex(3)).lower())
+        first=name[1], last=name[2], tag=Utility.random_hex(7)).lower())
     email.empty()
     address = email.address
     password = teacher[1]
@@ -1018,9 +1024,17 @@ def test_instructor_access_application_on_mobile(
     home.web_nav.login.open()
 
     # THEN: "Request instructor access" is no longer
-    #       visible in the user menu
-    with pytest.raises(NoSuchElementException):
-        home.web_nav.login.instructor_access.is_displayed()
+    #       visible in the user menu after the next user API call
+    for _ in range(20):
+        home.open()
+        home.web_nav.meta.toggle_menu()
+        home.web_nav.login.open()
+        try:
+            home.web_nav.login.instructor_access.is_displayed()
+            sleep(1.0)
+        except NoSuchElementException:
+            return
+    assert(False), 'Instructor access menu item is still available'
 
 
 @test_case('C210324')

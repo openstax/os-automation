@@ -145,7 +145,7 @@ def test_reset_a_users_password(accounts_base_url, selenium, student):
     name = Utility.random_name()
     email = RestMail(
         '{first}.{last}.{tag}'
-        .format(first=name[1], last=name[2], tag=Utility.random_hex(3))
+        .format(first=name[1], last=name[2], tag=Utility.random_hex(6))
         .lower()
     )
     email.empty()

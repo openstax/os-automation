@@ -17,7 +17,7 @@ def test_sign_up_as_a_student_user(accounts_base_url, selenium, student):
     name = Utility.random_name()
     email = RestMail(
         '{first}.{last}.{tag}'
-        .format(first=name[1], last=name[2], tag=Utility.random_hex(3))
+        .format(first=name[1], last=name[2], tag=Utility.random_hex(6))
         .lower()
     )
     email.empty()
@@ -62,7 +62,7 @@ def test_sign_up_as_an_instructor(accounts_base_url, selenium, teacher):
     name = Utility.random_name()
     email = RestMail(
         '{first}.{last}.{tag}'
-        .format(first=name[1], last=name[2], tag=Utility.random_hex(3))
+        .format(first=name[1], last=name[2], tag=Utility.random_hex(6))
         .lower()
     )
     email.empty()
@@ -115,7 +115,7 @@ def test_sign_up_as_a_nonstudent_user(accounts_base_url, selenium, teacher):
     name = Utility.random_name()
     email = RestMail(
         '{first}.{last}.{tag}'
-        .format(first=name[1], last=name[2], tag=Utility.random_hex(3))
+        .format(first=name[1], last=name[2], tag=Utility.random_hex(6))
         .lower()
     )
     email.empty()
@@ -168,7 +168,7 @@ def test_sign_up_as_a_facebook_user(
     name = Utility.random_name()
     email = RestMail(
         '{first}.{last}.{tag}'
-        .format(first=name[1], last=name[2], tag=Utility.random_hex(3))
+        .format(first=name[1], last=name[2], tag=Utility.random_hex(6))
         .lower()
     )
     email.empty()
@@ -250,7 +250,7 @@ def test_sign_up_as_a_google_user(
     name = Utility.random_name()
     email = RestMail(
         '{first}.{last}.{tag}'
-        .format(first=name[1], last=name[2], tag=Utility.random_hex(3))
+        .format(first=name[1], last=name[2], tag=Utility.random_hex(6))
         .lower()
     )
     email.empty()

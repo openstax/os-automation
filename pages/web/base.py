@@ -3,7 +3,8 @@
 from time import sleep
 
 from pypom import Page
-from selenium.common.exceptions import StaleElementReferenceException
+from selenium.common.exceptions import StaleElementReferenceException  # NOQA
+from selenium.common.exceptions import TimeoutException  # NOQA
 from selenium.webdriver.common.by import By
 
 from regions.web.footer import Footer
@@ -26,6 +27,14 @@ class WebBase(Page):
     def loaded(self):
         """Return True when the page-loaded class is added to the body tag."""
         return self.find_element(*self._root_locator).is_displayed()
+
+    def open(self):
+        """Open the page."""
+        for attempt in range(3):
+            try:
+                return super(WebBase, self).open()
+            except TimeoutException:
+                print('Attempt: {0}'.format(attempt))
 
     @property
     def sticky_note(self):
