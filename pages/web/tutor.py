@@ -209,7 +209,11 @@ class TutorMarketing(WebHome):
 
         def _go_to(self, destination=None, element=None):
             """Select a nav dot."""
-            target = self.nav[destination] if destination else element
+            try:
+                target = self.nav[destination] if destination else element
+            except IndexError:
+                sleep(1.0)
+                target = self.nav[destination] if destination else element
             Utility.safari_exception_click(self.driver, element=target)
             sleep(0.75)
             return self.page

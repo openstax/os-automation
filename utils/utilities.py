@@ -76,7 +76,9 @@ class Utility(object):
         what-is-the-correct-way-to-select-an-option-using-seleniums-
         python-webdriver#answer-2258'
         """
-        select = Select(driver.find_element(*element_locator))
+        menu = driver.find_element(*element_locator)
+        Utility.scroll_to(driver, element=menu)
+        select = Select(menu)
         for label in labels:
             select.select_by_visible_text(label)
         return select

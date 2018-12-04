@@ -224,6 +224,7 @@ class Signup(AccountsBase):
         # make sure we're actually back on Accounts
         self.wait.until(
             lambda _: 'accounts' in urlparse(self.selenium.current_url).netloc)
+        sleep(1.0)
         # enter user details in group order
         # all users
         if 'social' not in kwargs:
