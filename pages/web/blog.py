@@ -66,7 +66,8 @@ class Blog(WebBase):
     def get_rss(self):
         """Click the RSS feed icon."""
         Utility.switch_to(self.driver, self._rss_locator)
-        self.wait.until(lambda _: 'about:blank' not in self.location)
+        if self.driver.capabilities.get('browser').lower() != 'safari':
+            self.wait.until(lambda _: 'about:blank' not in self.location)
         return self.driver
 
     def view_post(self, title=None, index=None):
