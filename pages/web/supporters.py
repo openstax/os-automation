@@ -10,14 +10,31 @@ class Supporters(WebBase):
 
     URL_TEMPLATE = '/foundation'
 
-    _root_locator = (By.TAG_NAME, 'main')
-    _hero_locator = (By.CSS_SELECTOR, '.hero h1')
+    _title_locator = (By.CSS_SELECTOR, '.hero h1')
+    _blurb_locator = (By.CSS_SELECTOR, '.hero p')
+    _supporter_locator = (By.CSS_SELECTOR, '.funder h2')
 
     @property
     def loaded(self):
         """Return whether the hero banner is found."""
-        return self.find_element(*self._hero_locator)
+        return self.find_element(*self._title_locator)
 
     def is_displayed(self):
         """Return True if the supporters page is displayed."""
-        return self.find_element(*self._hero_locator).is_displayed()
+        return self.find_element(*self._title_locator).is_displayed()
+
+    @property
+    def title(self):
+        """Return the banner title."""
+        return self.find_element(*self._title_locator).text.strip()
+
+    @property
+    def blurb(self):
+        """Return the subheading text."""
+        return self.find_element(*self._blurb_locator).text.strip()
+
+    @property
+    def supporters(self):
+        """Return the list of funders."""
+        return [funder.text.strip()
+                for funder in self.find_elements(*self._supporter_locator)]

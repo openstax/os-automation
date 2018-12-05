@@ -29,28 +29,28 @@ class OpenStaxNav(Region):
         self._click(self._our_impact_locator)
         sleep(1.0)
         from pages.web.impact import OurImpact
-        return go_to_(OurImpact(self.driver))
+        return go_to_(OurImpact(self.driver, base_url=self.page.base_url))
 
     def view_supporters(self):
         """Go to the supporters page."""
         self._click(self._supporters_locator)
         sleep(1.0)
         from pages.web.supporters import Supporters
-        return go_to_(Supporters(self.driver))
+        return go_to_(Supporters(self.driver, base_url=self.page.base_url))
 
     def view_the_blog(self):
         """Go to the blog."""
         self._click(self._blog_locator)
         sleep(1.0)
         from pages.web.blog import Blog
-        return go_to_(Blog(self.driver))
+        return go_to_(Blog(self.driver, base_url=self.page.base_url))
 
     def view_donation_options(self):
         """Go to the donation page."""
         self._click(self._give_locator)
         sleep(1.0)
         from pages.web.donation import Give
-        return go_to_(Give(self.driver))
+        return go_to_(Give(self.driver, base_url=self.page.base_url))
 
     def view_help_articles(self):
         """Go to the Salesforce help site."""
