@@ -32,6 +32,17 @@ class Web(object):
     OUR_IMPACT = 0
     OPENSTAX_PARTNERS = 1
 
+    # Team page tabs
+    OPENSTAX_TEAM = 0
+    STRATEGIC_ADVISORS = 1
+    ADVISORY_BOARD = 2
+
+    TEAM_GROUPS = [
+        'OpenStax Team',
+        'Strategic Advisors',
+        'Faculty Advisory Board'
+    ]
+
     # Book page tabs
     partner_resources_are_split = True
     BOOK_DETAILS = 0
