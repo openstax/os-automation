@@ -22,7 +22,8 @@ def test_the_openstax_team_is_split_into_three_groups(web_base_url, selenium):
     assert(team.is_displayed())
     assert('team' in team.location)
     for tab in team.tabs:
-        assert(tab.name in Web.TEAM_GROUPS)
+        assert(tab.name in Web.TEAM_GROUPS), \
+            '"{0}" not in the expected group list'.format(tab.name)
 
 
 @test_case('C210456')
@@ -34,13 +35,15 @@ def test_selecting_a_team_member_opens_their_bio(web_base_url, selenium):
     home = WebHome(selenium, web_base_url).open()
     team = home.web_nav.openstax.view_team()
 
-    # WHEN: they click on an OpenStax team member
+    # WHEN: they click on an OpenStax team member with a biography
     person = team.people[Utility.random(end=len(team.people) - 1)]
+    while(not person.has_bio):
+        person = team.people[Utility.random(end=len(team.people) - 1)]
     person.select()
+    print(person.name)
 
     # THEN: a pop out pane displays the team member's bio
-    if person.has_bio:
-        assert(person.bio)
+    assert(person.bio), 'Biography missing'
 
     # WHEN: they click on the team member again
     person.select()
@@ -100,25 +103,33 @@ def test_mobile_users_are_presented_bard(web_base_url, selenium):
     home = WebHome(selenium, web_base_url)
     home.resize_window(width=600)
     home.open()
+    home.web_nav.meta.toggle_menu()
     team = home.web_nav.openstax.view_team()
 
-    for position, group in enumerate(team.bar):
-        # WHEN: they click on the "OpenStax Team" bar
+    for position, group in enumerate(team.bars):
+        print(position, group.name)
+        # WHEN: they click on the group bar
         group.toggle()
 
         # THEN: the team member tiles are displayed
         assert(group.is_open)
         if position == Web.OPENSTAX_TEAM:
-            assert(team.people[0].is_visible)
+            person = Utility.random(end=len(team.people) - 1)
+            team.people[person].view()
+            assert(team.people[person].is_visible)
         elif position == Web.STRATEGIC_ADVISORS:
-            assert(team.advisors[0].is_visible)
+            person = Utility.random(end=len(team.advisors) - 1)
+            team.advisors[person].view()
+            assert(team.advisors[person].is_visible)
         elif position == Web.ADVISORY_BOARD:
-            assert(team.fab[0].is_visible)
+            person = Utility.random(end=len(team.fab) - 1)
+            team.fab[person].view()
+            assert(team.fab[person].is_visible)
         else:
             assert(False), \
-                '"{0}"" is not a recognized group'.format(group.name)
+                '"{0}" is not a recognized group'.format(group.name)
 
-        # WHEN: they click on the "OpenStax Team" bar
+        # WHEN: they click on the group bar
         group.toggle()
 
         # THEN: the team member section is closed
