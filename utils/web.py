@@ -32,6 +32,14 @@ class Web(object):
     OUR_IMPACT = 0
     OPENSTAX_PARTNERS = 1
 
+    # Research page tabs
+    ALUMNI = 0
+    CURRENT_MEMBERS = 1
+    EXTERNAL_COLLABORATORS = 2
+    AUTHOR = 0
+    TITLE = 2
+    YEAR = 1
+
     # Team page tabs
     OPENSTAX_TEAM = 0
     STRATEGIC_ADVISORS = 1

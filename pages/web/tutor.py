@@ -424,7 +424,10 @@ class TutorMarketing(WebHome):
             @property
             def media_ready(self):
                 """Return True if the current media is ready."""
-                media = self.find_element(*self._media_locator)
+                from selenium.webdriver.support import expected_conditions
+                media = self.wait.until(
+                    expected_conditions.presence_of_element_located(
+                        self._media_locator))
                 if media.tag_name.lower() == 'img':
                     return Utility.is_image_visible(self.driver, media)
                 return self.driver.execute_script(
