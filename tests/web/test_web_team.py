@@ -10,7 +10,11 @@ from utils.web import Web
 @nondestructive
 @web
 def test_the_openstax_team_is_split_into_three_groups(web_base_url, selenium):
-    """."""
+    """The three group tabs are available.
+
+    Note: FAB is currently missing and will be readded when
+    the content is completed.
+    """
     # GIVEN: a user viewing the team page
     home = WebHome(selenium, web_base_url).open()
     team = home.web_nav.openstax.view_team()
@@ -30,7 +34,7 @@ def test_the_openstax_team_is_split_into_three_groups(web_base_url, selenium):
 @nondestructive
 @web
 def test_selecting_a_team_member_opens_their_bio(web_base_url, selenium):
-    """."""
+    """Test clicking on a staff member's card."""
     # GIVEN: a user viewing the team page
     home = WebHome(selenium, web_base_url).open()
     team = home.web_nav.openstax.view_team()
@@ -56,7 +60,7 @@ def test_selecting_a_team_member_opens_their_bio(web_base_url, selenium):
 @nondestructive
 @web
 def test_strategic_advisors_are_listed_with_their_bio(web_base_url, selenium):
-    """."""
+    """Strategic advisors are listed with a short bio."""
     # GIVEN: a user viewing the team page
     home = WebHome(selenium, web_base_url).open()
     team = home.web_nav.openstax.view_team()
@@ -77,7 +81,7 @@ def test_strategic_advisors_are_listed_with_their_bio(web_base_url, selenium):
 @web
 def test_advisory_board_members_are_listed_with_their_school(
         web_base_url, selenium):
-    """."""
+    """FAB members are listed with their school affiliation."""
     # GIVEN: a user viewing the team page
     home = WebHome(selenium, web_base_url).open()
     team = home.web_nav.openstax.view_team()
@@ -96,8 +100,8 @@ def test_advisory_board_members_are_listed_with_their_school(
 @test_case('C210459')
 @nondestructive
 @web
-def test_mobile_users_are_presented_bard(web_base_url, selenium):
-    """."""
+def test_mobile_users_are_presented_bars(web_base_url, selenium):
+    """On mobile, group tabs are replaced by accordion menus."""
     # GIVEN: a user viewing the team page
     # AND:  the screen width is 600 pixels
     home = WebHome(selenium, web_base_url)

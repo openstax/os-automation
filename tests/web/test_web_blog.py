@@ -48,7 +48,7 @@ def test_able_to_retrieve_the_rss_feed(web_base_url, selenium):
     blog.get_rss()
 
     # THEN: the XML feed is downloaded
-    if selenium.capabilities.get('browser').lower() == 'safari':
+    if selenium.capabilities.get('browserName').lower() == 'safari':
         assert('about:blank') in selenium.current_url
     else:
         assert('blog-feed' in selenium.current_url)
