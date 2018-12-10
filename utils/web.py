@@ -32,6 +32,20 @@ class Web(object):
     OUR_IMPACT = 0
     OPENSTAX_PARTNERS = 1
 
+    # Privacy policy section headings
+    PRIVACY = [
+        'About this Privacy Policy',
+        'Definitions',
+        'Modifications',
+        'Information We Collect',
+        'How We Use Your Information',
+        'Sharing Your Information',
+        'Accuracy of Data, Storage',
+        'Links to Other Websites',
+        ('Security and Liability for Theft and/or Disclosure'
+         ' of Login Credentials')
+    ]
+
     # Research page tabs
     ALUMNI = 0
     CURRENT_MEMBERS = 1

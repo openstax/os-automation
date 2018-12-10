@@ -5,7 +5,7 @@ from time import sleep
 from selenium.webdriver.common.by import By
 
 from pages.web.base import WebBase
-from utils.utilities import Utility
+from utils.utilities import Utility, go_to_
 
 
 class LegalBase(WebBase):
@@ -65,3 +65,34 @@ class PrivacyPolicy(LegalBase):
     """The OpenStax.org terms of use."""
 
     URL_TEMPLATE = '/privacy-policy'
+
+    _section_title_locator = (By.CSS_SELECTOR, 'h3')
+    _privacy_content_locator = (By.CSS_SELECTOR, '[data-html=content] p')
+    _gdpr_locator = (By.CSS_SELECTOR, '[href$=gdpr]')
+
+    @property
+    def sections(self):
+        """Access the section headings."""
+        return [section.text.strip().split('. ', 1)[-1]
+                for section
+                in self.find_elements(*self._section_title_locator)]
+
+    @property
+    def privacy_content(self):
+        """Return the privacy policy content."""
+        return [subsection.text.strip()
+                for subsection
+                in self.find_elements(*self._privacy_content_locator)
+                if len(subsection.text.strip()) > 0]
+
+    def view(self, section):
+        """Scroll to the selected section heading."""
+        target = self.find_elements(*self._section_title_locator)[section]
+        Utility.scroll_to(self.driver, element=target, shift=-80)
+        return self
+
+    def view_gdpr(self):
+        """View the Rice GDPR policy."""
+        Utility.switch_to(self.driver, link_locator=self._gdpr_locator)
+        from pages.rice.gdpr import GeneralDataPrivacyRegulation
+        return go_to_(GeneralDataPrivacyRegulation(self.driver))
