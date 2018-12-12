@@ -6,7 +6,24 @@ from utils.utilities import Utility
 from utils.web import TechProviders, Web
 
 
-@test_case('C210445')
+@test_case('C210443')
+@nondestructive
+@web
+def test_the_openstax_ally_logo_is_available(web_base_url, selenium):
+    """An OpenStax Ally is identified by the Ally logo."""
+    # GIVEN: a user viewing the partners page
+    home = WebHome(selenium, web_base_url).open()
+    partners = home.web_nav.technology.view_partners()
+
+    # WHEN:
+
+    # THEN: the OpenStax Ally logo is displayed
+    assert(partners.is_displayed())
+    assert(partners.logo.is_displayed())
+    assert(Utility.is_image_visible(selenium, image=partners.logo))
+
+
+@test_case('C210444', 'C210445')
 @nondestructive
 @web
 def test_able_to_filter_partners_by_category(web_base_url, selenium):
