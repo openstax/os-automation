@@ -45,13 +45,12 @@ def test_able_to_retrieve_the_rss_feed(web_base_url, selenium):
     blog = Blog(selenium, web_base_url).open()
 
     # WHEN: they click on the RSS icon
-    blog.get_rss()
+    rss = blog.test_rss_feed()
 
     # THEN: the XML feed is downloaded
-    if selenium.capabilities.get('browserName').lower() == 'safari':
-        assert('about:blank') in selenium.current_url
-    else:
-        assert('blog-feed' in selenium.current_url)
+    if not rss.ok:
+        Utility.test_url_and_warn(code=rss.status_code,
+                                  message='RSS feed')
 
 
 @test_case('C210404')

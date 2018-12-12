@@ -12,6 +12,7 @@ from regions.web.openstax_nav import OpenStaxNav
 from regions.web.sticky_note import StickyNote
 from regions.web.web_nav import WebNav
 from utils.utilities import Utility
+from utils.web import Web
 
 
 class WebBase(Page):
@@ -105,3 +106,8 @@ class WebBase(Page):
         """
         self.driver.set_window_size(width, height)
         sleep(1.5)
+
+    @property
+    def is_phone(self):
+        """Return True if the browser window is within the phone width."""
+        return self.driver.get_window_size().get('width') <= Web.PHONE

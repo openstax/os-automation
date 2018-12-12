@@ -32,6 +32,31 @@ class Web(object):
     OUR_IMPACT = 0
     OPENSTAX_PARTNERS = 1
 
+    # Press mobile section options
+    PRESS_RELEASES = 'Press releases'
+    NEWS_MENTIONS = 'News mentions'
+    PRESS_INQUIRIES = 'Press inquiries'
+    BOOKING = 'Booking'
+
+    PRESS_OPTIONS = [
+        PRESS_RELEASES,
+        NEWS_MENTIONS,
+        PRESS_INQUIRIES,
+        BOOKING
+    ]
+
+    # Press social media accounts
+    FACEBOOK = 'facebook'
+    INSTAGRAM = 'instagram'
+    LINKEDIN = 'linkedin'
+    TWITTER = 'twitter'
+    MEDIA = {
+        FACEBOOK: 'Facebook',
+        INSTAGRAM: 'Instagram',
+        LINKEDIN: 'LinkedIn',
+        TWITTER: 'Twitter',
+    }
+
     # Privacy policy section headings
     PRIVACY = [
         'About this Privacy Policy',
