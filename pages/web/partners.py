@@ -1,8 +1,13 @@
 """OpenStax Partners."""
 
+from time import sleep
+
+from pypom import Region
 from selenium.webdriver.common.by import By
 
 from pages.web.base import WebBase
+from utils.utilities import Utility
+from utils.web import TechProviders, Web
 
 
 class Partners(WebBase):
@@ -10,13 +15,174 @@ class Partners(WebBase):
 
     URL_TEMPLATE = '/partners'
 
-    _banner_locator = (By.CSS_SELECTOR, '.container h1')
+    _title_locator = (By.CSS_SELECTOR, '.hero h1')
+    _image_locator = (By.CSS_SELECTOR, 'img')
+    _description_locator = (
+        By.CSS_SELECTOR, '.hero .text-content p:nth-child(2)')
+    _logo_locator = (By.CSS_SELECTOR, '.ally-logo')
+    _logo_description_locator = (By.CSS_SELECTOR, '.logo-text')
+    _filter_button_locator = (By.CSS_SELECTOR, '.filter-button')
+    _current_filter_locator = (By.CSS_SELECTOR, '[aria-pressed=true]')
+    _company_locator = (By.CSS_SELECTOR, '.icons .logo:not(.spacer)')
+    _summary_locator = (By.CSS_SELECTOR, '.text[id$=blurb]')
 
     @property
     def loaded(self):
-        """Return True if the hero banner is found."""
-        return 'OpenStax Partners' in self.driver.page_source
+        """Return True if the title is set and images are visible."""
+        return ('OpenStax Partners' in self.title and
+                Utility.is_image_visible(self.driver,
+                                         locator=self._image_locator))
 
     def is_displayed(self):
         """Return True if the hero banner is displayed."""
-        return self.find_element(*self._banner_locator).is_displayed()
+        return self.banner.is_displayed()
+
+    @property
+    def banner(self):
+        """Return the page heading object."""
+        return self.find_element(*self._title_locator)
+
+    @property
+    def title(self):
+        """Return the banner text."""
+        return self.banner.text
+
+    @property
+    def description(self):
+        """Return the subheading."""
+        return self.find_element(*self._description_locator).text
+
+    @property
+    def logo(self):
+        """Return the OpenStax Ally logo."""
+        return self.find_element(*self._logo_locator)
+
+    @property
+    def logo_description(self):
+        """Return the ally logo meaning."""
+        return self.find_element(*self._logo_description_locator).text
+
+    def filter_by(self, option):
+        """Filter allies by a subject."""
+        if option != self.current_filter:
+            Utility.safari_exception_click(self.driver, element=self.filter)
+            Utility.safari_exception_click(
+                self.driver,
+                element=self.filter_buttons[Web.PARTNER_FILTERS.get(option)])
+        return self
+
+    @property
+    def filter(self):
+        """Return the currently selected filter button."""
+        return self.find_element(*self._current_filter_locator)
+
+    @property
+    def current_filter(self):
+        """Return the current filter."""
+        return self.filter.text
+
+    @property
+    def filter_buttons(self):
+        """Access the subject filter buttons."""
+        return self.find_elements(*self._filter_button_locator)
+
+    @property
+    def companies(self):
+        """Access the OpenStax Ally companies by their logos."""
+        return [self.Company(self, logo)
+                for logo in self.find_elements(*self._company_locator)]
+
+    @property
+    def summaries(self):
+        """Access the OpenStax Ally company summaries."""
+        return [self.Summary(self, company)
+                for company in self.find_elements(*self._summary_locator)]
+
+    def summary_by_name(self, name):
+        """Return the summary for a particular company name."""
+        for summary in self.summaries:
+            if summary.name == name:
+                return summary
+        raise(ValueError('"{0}" not in the company summary list'.format(name)))
+
+    class Company(Region):
+        """A company logo and summary link."""
+
+        _logo_locator = (By.CSS_SELECTOR, 'img')
+        _link_locator = (By.CSS_SELECTOR, 'a')
+
+        @property
+        def name(self):
+            """Return the company name."""
+            return self.logo.get_attribute('alt')
+
+        @property
+        def logo(self):
+            """Return the company logo."""
+            return self.find_element(*self._logo_locator)
+
+        @property
+        def link(self):
+            """Return the anchor link to the company's summary."""
+            return self.find_element(*self._link_locator)
+
+        def view(self):
+            """Click the company logo."""
+            Utility.safari_exception_click(self.driver, element=self.link)
+            sleep(1.5)
+            return self.page
+
+    class Summary(Region):
+        """An OpenStax Ally company summary."""
+
+        _name_locator = (By.CSS_SELECTOR, 'h3')
+        _description_locator = (By.CSS_SELECTOR, '[data-html$=description] p')
+        _availability_locator = (By.CSS_SELECTOR, 'a')
+        _return_locator = (By.CSS_SELECTOR, '.to-top')
+
+        @property
+        def name(self):
+            """Return the company name."""
+            return self.header.text
+
+        @property
+        def header(self):
+            """Return the company name object."""
+            return self.find_element(*self._name_locator)
+
+        @property
+        def description_segments(self):
+            """Return the pared list of description paragraphs."""
+            return [paragraph
+                    for paragraph
+                    in self.find_elements(*self._description_locator)
+                    if paragraph.text.strip()]
+
+        @property
+        def description(self):
+            """Return the full company description."""
+            return '\n'.join(list(
+                [paragraph.text for paragraph in self.description_segments]))
+
+        @property
+        def availability(self):
+            """Return the links to the resources available for an ally."""
+            if self.name == TechProviders.OPEN_TEXTBOOK_NETWORK:
+                return []
+            return [link
+                    for link
+                    in (self.description_segments[-1]
+                        .find_elements(*self._availability_locator))
+                    if 'openstax' in link.get_attribute('href')]
+
+        @property
+        def return_to_top_link(self):
+            """Return the 'Return to top' link element."""
+            return self.find_element(*self._return_locator)
+
+        def return_to_top(self):
+            """Click the 'Return to top' link."""
+            Utility.safari_exception_click(self.driver,
+                                           element=self.return_to_top_link)
+            sleep(1.5)
+            return self.page

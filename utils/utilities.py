@@ -120,7 +120,7 @@ class Utility(object):
 
     @classmethod
     def in_viewport(cls, driver, locator=None, element=None,
-                    ignore_bottom=False, display_marks=False):
+                    ignore_bottom=False, display_marks=True):
         """Return True if the element boundry completely lies in view."""
         LEFT, TOP, RIGHT, BOTTOM = range(4)
         target = element if element else driver.find_element(*locator)

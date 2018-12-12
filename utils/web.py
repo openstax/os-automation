@@ -9,8 +9,9 @@ class Web(object):
     """Website shared variables."""
 
     # Sizing
-    PHONE = 601
-    TABLET = 961
+    PHONE = 600
+    TABLET = 960
+    FULL = 1024
 
     # RegEx matchers
     FILENAME_MATCHER = re.compile(r'url\([\w\-\:\/\.]*\)\;')
@@ -269,6 +270,15 @@ class Web(object):
         VIEW_ALL,
         *FILTERS
     ]
+    PARTNER_FILTERS = {
+        VIEW_ALL: 0,
+        VIEW_MATH: 1,
+        VIEW_SCIENCE: 2,
+        VIEW_SOCIAL_SCIENCES: 3,
+        VIEW_HUMANITIES: 4,
+        VIEW_BUSINESS: 5,
+        VIEW_AP: 6,
+    }
     MENU_TECHNOLOGY = [
         VIEW_TECHNOLOGY,
         VIEW_TUTOR,
@@ -290,6 +300,7 @@ class TechProviders():
     BLUPOINT = 'BluPoint'
     CARNEGIE = 'Carnegie Learning'
     CAROLINA_LEARNING = 'Carolina Distance Learning'
+    CENGAGE = 'Cengage'
     CHEGG = 'Chegg'
     CHEGG_STUDY = 'Chegg Study'
     CHEGG_TUTORS = 'Chegg Tutors'
@@ -298,17 +309,22 @@ class TechProviders():
     COGBOOKS = 'CogBooks'
     CONNECT = 'Connect For Education'
     COPIA = 'Copia'
+    CRITICAL_CHEM = 'Critical Chemistry'
     EMATH = 'eMath'
     EXPERT_TA = 'Expert TA'
     EXPERT_TA_ASSESS = 'Expert TA Assess'
     EXPERT_TA_STUDY = 'Expert TA Study'
     GRAPHLOCK = 'GraphLock'
+    HAWKES = 'Hawkes Learning'
     JUNCTION = 'Junction'
     KNEWTON = 'Knewton'
     LRNR = 'Lrnr'
+    LUMEN = 'Lumen'
+    LYRYX = 'Lyryx Learning'
     MCGRAW_HILL = 'McGraw-Hill Education'
-    MEMORY_SCIENCE = 'Memory Science'
     ODIGIA = 'Odigia'
+    OPEN_TEXTBOOK_NETWORK = 'Open Textbook Network'
+    OPENNOW = 'OpenNow'
     TUTOR = 'OpenStax Tutor Beta'
     PANOPEN = 'panOpen'
     PERLEGO = 'Perlego'
@@ -316,7 +332,9 @@ class TechProviders():
     REALIZEIT = 'Realizeit'
     RICE_ONLINE = 'Rice Online Learning'
     SAPLING = 'Sapling Learning'
+    MACMILLAN = 'Sapling Learning / Macmillan Learning'
     SIMBIO = 'SimBio'
+    STUDY_EDGE = 'Study Edge'
     TOP_HAT = 'Top Hat'
     VISIBLE_BODY = 'Visible Body'
     WEBASSIGN = 'WebAssign'
@@ -327,18 +345,47 @@ class TechProviders():
 
     tech_list = [
         AMBASSADOR, BARNES_AND_NOBLE, BLENDING_EDUCATION, BLUPOINT,
-        CARNEGIE, CAROLINA_LEARNING, CHEGG, CHEGG_STUDY, CHEGG_TUTORS,
-        CHEM101, CLASSAVO, COGBOOKS, CONNECT, COPIA, EMATH, EXPERT_TA,
-        EXPERT_TA_ASSESS, EXPERT_TA_STUDY, GRAPHLOCK, JUNCTION, KNEWTON,
-        LRNR, MCGRAW_HILL, MEMORY_SCIENCE, ODIGIA, TUTOR, PANOPEN, PERLEGO,
-        PERUSALL, REALIZEIT, RICE_ONLINE, SAPLING, SIMBIO, TOP_HAT,
-        VISIBLE_BODY, WEBASSIGN, WILEY, XYZ, ZYBOOKS, OTHER
+        CARNEGIE, CAROLINA_LEARNING, CENGAGE, CHEGG, CHEGG_STUDY, CHEGG_TUTORS,
+        CHEM101, CLASSAVO, COGBOOKS, CONNECT, COPIA, CRITICAL_CHEM, EMATH,
+        EXPERT_TA, EXPERT_TA_ASSESS, EXPERT_TA_STUDY, GRAPHLOCK, HAWKES,
+        JUNCTION, KNEWTON, LRNR, LUMEN, LYRYX, MCGRAW_HILL, ODIGIA,
+        OPEN_TEXTBOOK_NETWORK, OPENNOW, TUTOR, PANOPEN, PERLEGO, PERUSALL,
+        REALIZEIT, RICE_ONLINE, SAPLING, MACMILLAN, SIMBIO, STUDY_EDGE,
+        TOP_HAT, VISIBLE_BODY, WEBASSIGN, WILEY, XYZ, ZYBOOKS, OTHER
+    ]
+
+    full_catalog = [
+        AMBASSADOR,
+        BLENDING_EDUCATION,
+        BLUPOINT,
+        COPIA,
+        ODIGIA,
+        PERUSALL,
+        REALIZEIT
+    ]
+
+    math_titles = [
+        GRAPHLOCK
+    ]
+
+    no_titles = [
+        CHEGG_STUDY,
+        CHEGG_TUTORS,
+        OPEN_TEXTBOOK_NETWORK
     ]
 
     @classmethod
-    def get_tech(self, number=1):
+    def book_selection(cls):
+        """Return a list of providers offering services for specific books."""
+        return [provider for provider in cls.tech_list
+                if (provider not in cls.full_catalog and
+                    provider not in cls.math_titles and
+                    provider not in cls.no_titles)]
+
+    @classmethod
+    def get_tech(cls, number=1):
         """Return a subset of the tech list for the forms."""
-        return Utility.random_set(self.tech_list, number)
+        return Utility.random_set(cls.tech_list, number)
 
 
 class Library():
