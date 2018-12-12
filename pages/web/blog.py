@@ -70,6 +70,12 @@ class Blog(WebBase):
             self.wait.until(lambda _: 'about:blank' not in self.location)
         return self.driver
 
+    def test_rss_feed(self):
+        """Query the RSS feed URL."""
+        from requests import head
+        return head(self.find_element(*self._rss_locator)
+                    .get_attribute('href'))
+
     def view_post(self, title=None, index=None):
         """Open a blog entry to view the full article."""
         if title:

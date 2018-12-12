@@ -433,7 +433,7 @@ class Press(WebBase):
 
         def is_displayed(self):
             """Return True if the portrait is loaded and in the frame."""
-            Utility.scroll_to(self.driver, element=self.portrait)
+            Utility.scroll_to(self.driver, element=self.portrait, shift=-20)
             card = self.find_element(*self._card_locator)
             return (Utility.is_image_visible(
                         self.driver, image=self.portrait) and
