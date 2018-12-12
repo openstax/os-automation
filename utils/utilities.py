@@ -1,10 +1,13 @@
 """Helper functions for OpenStax Pages."""
 
+from http.client import responses
 from platform import system
 from random import randint
 from time import sleep
+from warnings import warn
 
 from faker import Faker
+from requests import head
 from selenium.common.exceptions import ElementClickInterceptedException  # NOQA
 from selenium.common.exceptions import WebDriverException  # NOQA
 from selenium.webdriver.common.action_chains import ActionChains
@@ -379,6 +382,20 @@ class Utility(object):
             driver.switch_to.window(driver.window_handles[new_handle])
         if data:
             return data
+
+    @classmethod
+    def test_url_and_warn(cls, code=None, url=None, message=''):
+        """Query a URL and return a warning if the code is not a success."""
+        if url:
+            test = head(url)
+            code = test.status_code
+        if code >= 400:
+            # the test ran into a problem with the URL query
+            status = ('<{code} {reason}>'
+                      .format(code=code, reason=responses.get(code)))
+            warn(UserWarning(
+                '"{article}" returned a {status}'
+                .format(article=message, status=status)))
 
     @classmethod
     def wait_for_overlay(cls, driver, locator):
