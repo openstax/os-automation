@@ -384,10 +384,13 @@ class Utility(object):
             return data
 
     @classmethod
-    def test_url_and_warn(cls, code=None, url=None, message=''):
+    def test_url_and_warn(cls, code=None, url=None, link=None, message=''):
         """Query a URL and return a warning if the code is not a success."""
         if url:
             test = head(url)
+            code = test.status_code
+        elif link:
+            test = head(link.get_attribute('href'))
             code = test.status_code
         if code >= 400:
             # the test ran into a problem with the URL query

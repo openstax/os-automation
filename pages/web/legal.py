@@ -1,5 +1,6 @@
 """The legal / intellectual property frequently asked questions page."""
 
+import re
 from time import sleep
 
 from selenium.webdriver.common.by import By
@@ -53,6 +54,57 @@ class License(LegalBase):
     URL_TEMPLATE = '/license'
 
     _heading_locator = (By.CSS_SELECTOR, '#maincontent h2')
+    _cc_locator = (By.CSS_SELECTOR, '[href$="commons.org/"]')
+    _ccby_4_locator = (By.CSS_SELECTOR, '[href*="by/4.0"]')
+
+    @property
+    def creative_commons(self):
+        """Return the Creative Commons link."""
+        return self.find_element(*self._cc_locator)
+
+    def view_creative_commons(self):
+        """Click on the Creative Commons link."""
+        Utility.switch_to(self.driver, element=self.creative_commons)
+        from pages.creative_commons.home import CreativeCommons
+        return go_to_(CreativeCommons(self.driver))
+
+    @property
+    def attribution_license(self):
+        """Return the Attribution 4.0 license link."""
+        return self.find_element(*self._ccby_4_locator)
+
+    def view_attribution_license(self):
+        """Click on the CCBY 4.0 license link."""
+        Utility.switch_to(self.driver, element=self.attribution_license)
+        from pages.creative_commons.cc_by import CCBY4
+        return go_to_(CCBY4(self.driver))
+
+    @property
+    def questions(self):
+        """Access the questions and their answers."""
+        content = self.content.get_attribute('innerHTML')
+        split = content.split('<h3>')[1:]
+        return [self.Question(question)
+                for question in split]
+
+    class Question():
+        """A question and answer pair."""
+
+        def __init__(self, question):
+            """Initialize the question and answer pair."""
+            self._q, answer = question[:-4].split('</h3>')
+            answer = re.sub(r'(<\/?a[ \w\d=":\-_\/\.]*>)|(<p>)', '', answer)
+            self._a = answer.replace('</p>', '\n')
+
+        @property
+        def question(self):
+            """Return the question text."""
+            return self._q
+
+        @property
+        def answer(self):
+            """Return the answer text."""
+            return self._a
 
 
 class Terms(LegalBase):
