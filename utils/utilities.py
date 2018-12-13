@@ -128,22 +128,22 @@ class Utility(object):
             'return arguments[0].getBoundingClientRect();', target)
         if display_marks:
             print('Rectangle: {0}'.format(rect))
-        page_x = driver.execute_script('return window.pageXOffset;')
-        page_y = driver.execute_script('return window.pageYOffset;')
+        page_x_offset = driver.execute_script('return window.pageXOffset;')
+        page_y_offset = driver.execute_script('return window.pageYOffset;')
         target_boundry = (
-            rect.get('left') + page_x,
-            rect.get('top') + page_y,
-            rect.get('right') + page_x,
-            rect.get('bottom') + page_y)
+            rect.get('left') + page_x_offset,
+            rect.get('top') + page_y_offset,
+            rect.get('right') + page_x_offset,
+            rect.get('bottom') + page_y_offset)
         window_width = driver.execute_script(
             'return document.documentElement.clientWidth;')
         window_height = driver.execute_script(
             'return document.documentElement.clientHeight;')
         page_boundry = (
-            page_x,
-            page_y,
-            page_x + window_width,
-            page_y + window_height)
+            page_x_offset,
+            page_y_offset,
+            page_x_offset + window_width,
+            page_y_offset + window_height)
         if display_marks:
             base = '{side} {result} - Element ({element}) {sign} Page ({page})'
             bottom = (
@@ -561,7 +561,7 @@ class Actions(ActionChains):
             ).format(selector=css_selector, data_type=data_type)
         val = self._driver.execute_script(script, element)
         print(val, expected, val == expected)
-        return val == expected
+        return [val == expected, val, expected]
 
     def wait(self, seconds: float):
         """Sleep for a specified number of seconds within an ActionChain."""

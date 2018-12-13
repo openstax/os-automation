@@ -10,6 +10,7 @@ class Web(object):
 
     # Sizing
     PHONE = 600
+    SMALL_TABLET = 760
     TABLET = 960
     FULL = 1024
 
