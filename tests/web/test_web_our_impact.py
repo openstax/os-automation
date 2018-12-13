@@ -23,8 +23,8 @@ def test_the_our_impact_banner(web_base_url, selenium):
     #       the banner title
     assert(impact.is_displayed())
     assert('impact' in impact.location)
-    assert('We measure our success in access.' in impact.banner)
-    assert('OpenStax ha saved students' in impact.description)
+    assert('We measure our success in access.' in impact.title)
+    assert('OpenStax has saved students' in impact.description)
 
     # WHEN: the window is reduced to 760 pixels wide
     impact.resize_window(width=Web.SMALL_TABLET)
@@ -88,4 +88,4 @@ def test_users_may_view_adopting_institutions(web_base_url, selenium):
     # THEN: the adopters page is displayed
     assert(adopters.is_displayed())
     assert('adopters' in adopters.location)
-    assert(adopters.institutions)
+    assert(adopters.adopters)

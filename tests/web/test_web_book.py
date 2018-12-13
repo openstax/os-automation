@@ -94,7 +94,7 @@ def test_the_availability_of_the_table_of_contents(web_base_url, selenium):
 
     # WHEN: the screen width is reduced to 600 pixels
     # AND:  click on the "Table of contents" toggle
-    book.resize_window(width=600)
+    book.resize_window(width=Web.PHONE)
     book.table_of_contents.toggle()
 
     # THEN: the table of contents pane is displayed
@@ -208,7 +208,7 @@ def test_mobile_links_to_purchase_a_print_copy(web_base_url, selenium):
     # GIVEN: a user viewing the book details page
     # AND:  the screen is 600 pixel or fewer wide
     home = WebHome(selenium, web_base_url)
-    home.resize_window(width=600)
+    home.resize_window(width=Web.PHONE)
     home.open()
     home.web_nav.meta.toggle_menu()
     subjects = home.web_nav.subjects.view_all()
@@ -401,7 +401,7 @@ def test_the_book_details_pane(web_base_url, selenium):
 
     # WHEN: the screen is reduced to 600 pixels
     # AND:  they click on the "Book details" bar
-    book.resize_window(width=600)
+    book.resize_window(width=Web.PHONE)
     book.details.toggle()
 
     # THEN: the summary is displayed
@@ -493,7 +493,7 @@ def test_users_may_view_the_current_list_of_errata_for_a_book(
     # AND:  click on the "Report errata" bar
     # AND:  click on the "Errata list" button
     errata.back()
-    book.resize_window(width=600)
+    book.resize_window(width=Web.PHONE)
     errata = book.phone.errata.view_errata()
 
     # THEN: an errata list for the book is displayed
@@ -531,7 +531,7 @@ def test_logged_in_users_may_view_the_errata_submission_form(
     # AND:  click on the "Report errata" bar
     # AND:  click on the "Suggest a correction" button
     errata_form.back()
-    book.resize_window(width=600)
+    book.resize_window(width=Web.PHONE)
     book.phone.errata.toggle()
     errata_form = book.phone.errata.submit_errata()
 
@@ -588,7 +588,7 @@ def test_non_logged_in_users_on_mobile_are_directed_to_log_in_for_errata_form(
     # AND:  are not logged into the website
     # AND:  the screen width is 600 pixels
     home = WebHome(selenium, web_base_url)
-    home.resize_window(width=600)
+    home.resize_window(width=Web.PHONE)
     home.open()
     home.web_nav.meta.toggle_menu()
     subjects = home.web_nav.subjects.view_all()
@@ -830,7 +830,7 @@ def test_resources_have_a_title_description_and_access_type(
         assert(resource.status_message in Web.ACCESS_OK)
 
     # WHEN: the screen is reduced to 600 pixels
-    book.resize_window(width=600)
+    book.resize_window(width=Web.PHONE)
 
     # THEN: the description is not displayed
     for resource in book.student.resources_by_status(Web.ACCESS_OK):
@@ -965,12 +965,14 @@ def test_books_may_have_ally_tiles(web_base_url, selenium):
 
         # THEN: the company name is replaced by the company
         #       description
-        if not text_seen:
-            warnings.warn(UserWarning('"{0}" displayed'.format(text_seen)))
+        if not text_seen[0]:
+            warnings.warn(UserWarning(
+                'On hover text for the tile "{0}"'.format(tile_name) +
+                ' failed to hide: {0}, {1}, {2}'.format(*text_seen)))
 
     # WHEN: the screen is reduced to 600 pixels
     # AND:  the cursor hovers over a tile
-    book.resize_window(width=600)
+    book.resize_window(width=Web.PHONE)
     book.instructor.toggle()
     for partner in book.instructor.partners:
         if partner.name == tile_name:
@@ -986,8 +988,10 @@ def test_books_may_have_ally_tiles(web_base_url, selenium):
 
         # THEN: the company name is not replaced by the company
         #       description
-        if not text_seen:
-            warnings.warn(UserWarning('"{0}" displayed'.format(text_seen)))
+        if not text_seen[0]:
+            warnings.warn(UserWarning(
+                'On hover text for the tile "{0}"'.format(tile_name) +
+                ' failed to hide: {0}, {1}, {2}'.format(*text_seen)))
 
     # WHEN: they click on the tile
     tile.view_partner()

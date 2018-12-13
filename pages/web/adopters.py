@@ -10,14 +10,16 @@ class Adopters(WebBase):
 
     URL_TEMPLATE = '/adopters'
 
-    _loaded_locator = (By.CLASS_NAME, 'page-loaded')
     _institution_locator = (By.CSS_SELECTOR, 'main li')
 
     @property
     def loaded(self):
         """Wait until the institution list is displayed."""
-        return (self.find_element(*self._loaded_locator).is_displayed() and
-                self.find_element(*self._institution_locator).is_displayed())
+        return len(self.adopters) > 0
+
+    def is_displayed(self):
+        """Return True if the adopters page is loaded."""
+        return self.loaded
 
     @property
     def adopters(self):

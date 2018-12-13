@@ -12,6 +12,7 @@ class Contact(WebBase):
 
     _hero_quote_locator = (By.CSS_SELECTOR, '.hero h1')
     _form_locator = (By.CSS_SELECTOR, '.form')
+    _topic_locator = (By.CSS_SELECTOR, '.form .item')
 
     @property
     def loaded(self):
@@ -21,3 +22,8 @@ class Contact(WebBase):
     def is_displayed(self):
         """Return True if the heading is displayed."""
         return self.find_element(*self._hero_quote_locator).is_displayed()
+
+    @property
+    def topic(self):
+        """Return the currently selected contact topic."""
+        return self.find_element(*self._topic_locator).text
