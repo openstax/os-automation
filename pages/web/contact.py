@@ -17,7 +17,8 @@ class Contact(WebBase):
     @property
     def loaded(self):
         """Return the form when it is found."""
-        return self.find_element(*self._form_locator)
+        return (self.find_element(*self._form_locator) and
+                self.find_element(*self._topic_locator))
 
     def is_displayed(self):
         """Return True if the heading is displayed."""

@@ -34,6 +34,12 @@ class Web(object):
     OUR_IMPACT = 0
     OPENSTAX_PARTNERS = 1
 
+    # Donation page values
+    MIN_DONATION = 5
+    DOLLAR_OPTIONS = [
+        10, 25, 50, 100, 500, 1000, 'Other'
+    ]
+
     # Press mobile section options
     PRESS_RELEASES = 'Press releases'
     NEWS_MENTIONS = 'News mentions'
