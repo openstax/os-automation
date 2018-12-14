@@ -111,3 +111,8 @@ class WebBase(Page):
     def is_phone(self):
         """Return True if the browser window is within the phone width."""
         return self.driver.get_window_size().get('width') <= Web.PHONE
+
+    @property
+    def is_safari(self):
+        """Return True if the browser in use is Safari."""
+        return self.driver.capabilities.get('browserName').lower() == 'safari'

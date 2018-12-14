@@ -25,6 +25,36 @@ JQUERY = 'https://code.jquery.com/jquery-3.3.1.slim.min.js'
 WAIT_FOR_IMAGE = ('https://cdnjs.cloudflare.com/ajax/libs/'
                   'jquery.waitforimages/1.5.0/jquery.waitforimages.min.js')
 
+STATE_PROV = [
+    ('AL', 'Alabama'), ('AK', 'Alaska'), ('AZ', 'Arizona'),
+    ('AR', 'Arkansas'), ('CA', 'California'), ('CO', 'Colorado'),
+    ('CT', 'Connecticut'), ('DE', 'Delaware'), ('FL', 'Florida'),
+    ('GA', 'Georgia'), ('HI', 'Hawaii'), ('ID', 'Idaho'),
+    ('IL', 'Illinois'), ('IN', 'Indiana'), ('IA', 'Iowa'),
+    ('KS', 'Kansas'), ('KY', 'Kentucky'), ('LA', 'Louisiana'),
+    ('ME', 'Maine'), ('MD', 'Maryland'), ('MA', 'Massachusetts'),
+    ('MI', 'Michigan'), ('MN', 'Minnesota'), ('MO', 'Missouri'),
+    ('MS', 'Mississippi'), ('MT', 'Montana'), ('NE', 'Nebraska'),
+    ('NV', 'Nevada'), ('NH', 'New Hampshire'), ('NJ', 'New Jersey'),
+    ('NM', 'New Mexico'), ('NY', 'New York'), ('NC', 'North Carolina'),
+    ('ND', 'North Dakota'), ('OH', 'Ohio'), ('OK', 'Oklahoma'),
+    ('OR', 'Oregon'), ('PA', 'Pennsylvania'), ('RI', 'Rhode Island'),
+    ('SC', 'South Carolina'), ('SD', 'South Dakota'), ('TN', 'Tennessee'),
+    ('TX', 'Texas'), ('UT', 'Utah'), ('VT', 'Vermont'), ('VA', 'Virginia'),
+    ('WA', 'Washington'), ('WV', 'West Virginia'), ('WI', 'Wisconsin'),
+    ('WY', 'Wyoming'), ('AS', 'American Samoa'),
+    ('DC', 'District of Columbia'), ('FM', 'Federated States of Micronesia'),
+    ('GU', 'Guam'), ('MP', 'Northern Mariana Islands'), ('PW', 'Palau'),
+    ('PR', 'Puerto Rico'), ('VI', 'Virgin Islands'),
+    ('AA', 'Armed Forces Americas'), ('AE', 'Armed Forces Europe'),
+    ('AP', 'Armed Forces Pacific'), ('AB', 'Alberta'),
+    ('BC', 'British Columbia'), ('MB', 'Manitoba'), ('NB', 'New Brunswick'),
+    ('NF', 'Newfoundland'), ('NT', 'Northwest Territories'),
+    ('NS', 'Nova Scotia'), ('ON', 'Ontario'), ('PE', 'Prince Edward Island'),
+    ('PQ', 'Province du Quebec'), ('SK', 'Saskatchewan'),
+    ('YT', 'Yukon Territory')
+]
+
 
 class Utility(object):
     """Helper functions for various Pages actions."""
@@ -244,6 +274,18 @@ class Utility(object):
         if start >= end:
             return start
         return randint(start, end)
+
+    @classmethod
+    def random_address(cls, string=False):
+        """Return a fake mailing address."""
+        fake = Faker()
+        address = ['', '', '', '']
+        use_abrev = randint(0, 1)
+        address[0] = fake.street_address()
+        address[1] = fake.city()
+        address[2] = STATE_PROV[randint(0, len(STATE_PROV) - 1)][use_abrev]
+        address[3] = fake.postcode().split('-')[0]
+        return address
 
     @classmethod
     def random_hex(cls, length=20, lower=False):

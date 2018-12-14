@@ -20,3 +20,8 @@ class EBank(Page):
     def is_displayed(self):
         """Return True if the amount header is displayed."""
         return self.find_element(*self._amount_header_locator).is_displayed()
+
+    @property
+    def location(self):
+        """Return the current URL."""
+        return self.driver.current_url

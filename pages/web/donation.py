@@ -7,7 +7,7 @@ from selenium.common.exceptions import WebDriverException
 from selenium.webdriver.common.by import By
 
 from pages.web.base import WebBase
-from util.utilities import Utility, go_to_
+from utils.utilities import Utility, go_to_
 
 
 class Give(WebBase):
@@ -23,13 +23,15 @@ class Give(WebBase):
     _other_heading_locator = (By.CSS_SELECTOR, '.text-content h2')
     _options_locator = (By.CSS_SELECTOR, '.col')
     _contact_locator = (By.CSS_SELECTOR, '[href*=contact]')
+    _amount_box_locator = (By.CSS_SELECTOR, '.box-row [role=button]')
 
     @property
     def loaded(self):
         """Return True when the banner heading is loaded."""
         return (self.banner.is_displayed() and
-                Utility.load_background_images(self.driver,
-                                               self._give_background_selector))
+                Utility.load_background_images(
+                    self.driver, self._give_background_selector) and
+                len(self.find_elements(*self._amount_box_locator)) > 0)
 
     def is_displayed(self):
         """Return True if the heading and other give options are displayed."""
@@ -91,6 +93,12 @@ class Give(WebBase):
             """Return the other amount box."""
             return self.find_element(*self._other_locator)
 
+        @other.setter
+        def other(self, amount):
+            """Set a specific donation amount."""
+            self.other.send_keys(amount)
+            return self
+
         @boxes.setter
         def boxes(self, amount):
             """Set the donation amount."""
@@ -100,7 +108,7 @@ class Give(WebBase):
                     driver=self.driver,
                     element=self.boxes[set_options.get(amount)])
             else:
-                self.other.send_keys(amount)
+                self.other = amount
             return self
 
         @property
@@ -350,39 +358,29 @@ class Donate(WebBase):
         """Return the donation amount field."""
         return self.find_element(*self._amount_locator)
 
+    @property
+    def current_amount(self):
+        """Return the current donation value."""
+        return int(self.amount.get_attribute('value'))
+
     @amount.setter
     def amount(self, value):
         """Set the donation amount field."""
         return self._set_value(self.amount, value)
 
-    def _set_value(self, field, value):
-        """Set a field value."""
-        Utility.scroll_to(self.driver, element=field, shift=-80)
-        field.send_keys(value)
-        sleep(0.5)
-        return self
+    @property
+    def continue_button(self):
+        """Return the continue button."""
+        return self.find_element(*self._continue_button_locator)
 
-    def _set_pull_down_menu(self, field, option):
-        """Set a pull down menu field."""
-        Utility.scroll_to(self.driver, element=field, shift=-80)
-        if 'open' not in field.get_attribute('class'):
-            Utility.safari_exception_click(self.driver, element=field)
-        if len(option) > 2:
-            # received a full option name
-            locator = (By.XPATH, '//li[text()="{0}"]'.format(option))
-        else:
-            locator = (By.CSS_SELECTOR, '[data-value={0}]'.format(option))
-        # find out how far we need to scroll to see the selected option
-        offset = self.driver.execute_script(
-            'return arguments[0].offsetTop;',
-            field.find_element(*locator))
-        # then scroll the option list to that position
-        self.driver.execute_script(
-            'arguments[0].scrollTop = {0}'.format(offset),
-            field.find_element(*self._options_locator))
+    def submit(self):
+        """Click the Continue button."""
         Utility.safari_exception_click(self.driver,
-                                       field.find_element(*locator))
-        return self
+                                       element=self.continue_button)
+        if not self.get_errors:
+            from pages.rice.ebank import EBank
+            sleep(2)
+            return go_to_(EBank(self.driver))
 
     def get_errors(self):
         """Return a list of validation errors found."""
@@ -407,3 +405,32 @@ class Donate(WebBase):
             except WebDriverException:
                 pass
         return errors
+
+    def _set_value(self, field, value):
+        """Set a field value."""
+        Utility.scroll_to(self.driver, element=field, shift=-80)
+        field.send_keys(value)
+        sleep(0.5)
+        return self
+
+    def _set_pull_down_menu(self, field, option):
+        """Set a pull down menu field."""
+        Utility.scroll_to(driver=self.driver, element=field, shift=-80)
+        if 'open' not in field.get_attribute('class'):
+            Utility.safari_exception_click(self.driver, element=field)
+        if len(option) > 2:
+            # received a full option name
+            locator = (By.XPATH, '//li[text()="{0}"]'.format(option))
+        else:
+            locator = (By.CSS_SELECTOR, '[data-value={0}]'.format(option))
+        # find out how far we need to scroll to see the selected option
+        offset = self.driver.execute_script(
+            'return arguments[0].offsetTop;',
+            field.find_element(*locator))
+        # then scroll the option list to that position
+        self.driver.execute_script(
+            'arguments[0].scrollTop = {0}'.format(offset),
+            field.find_element(*self._options_locator))
+        Utility.safari_exception_click(driver=self.driver,
+                                       element=field.find_element(*locator))
+        return self
