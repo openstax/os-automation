@@ -195,7 +195,7 @@ class WebHome(WebBase):
 
         def get(self, index):
             """Return a particular quote box."""
-            return self.quote[index]
+            return self.quotes[index]
 
         class Quote(Region):
             """A single quote box."""

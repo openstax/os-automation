@@ -34,6 +34,14 @@ class Web(object):
     OUR_IMPACT = 0
     OPENSTAX_PARTNERS = 1
 
+    # Bookstore supplier cards
+    INDICO = 0
+    MBS_TEXTBOOK = 1
+    TRILITERAL = 2
+    XANEDU = 0
+    LAD_CUSTOM = 1
+    MONTEZUMA = 2
+
     # Donation page values
     MIN_DONATION = 5
     DOLLAR_OPTIONS = [
