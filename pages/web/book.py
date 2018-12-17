@@ -125,7 +125,7 @@ class Book(WebBase):
         for tab in self.tabs:
             tabs = tabs + ' "' + tab.text + '"'
         return ('Book:    {title}\n'.format(title=self.title) +
-                'Tabs:   {tabs}\n'.format(tabs=tabs) +
+                'Tabs:    {tabs}\n'.format(tabs=tabs) +
                 'Sidebar: {sidebar}\n'.format(sidebar=self.sidebar.options) +
                 'Details: {details}\n'.format(details=self.details.options))
 

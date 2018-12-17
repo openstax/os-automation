@@ -441,6 +441,8 @@ class Utility(object):
             warn(UserWarning(
                 '"{article}" returned a {status}'
                 .format(article=message, status=status)))
+            return False
+        return True
 
     @classmethod
     def wait_for_overlay(cls, driver, locator):
