@@ -90,9 +90,6 @@ def test_the_openstax_mailing_address_is_displayed(web_base_url, selenium):
     # WHEN:
 
     # THEN: the OpenStax mailing address is displayed
-    print('***********************************************\n')
-    print(selenium.find_element('id', 'main').get_attribute('outerHTML'))
-    print('\n***********************************************\n')
     assert(contact.address), 'The mailing address is not visible.'
 
 
