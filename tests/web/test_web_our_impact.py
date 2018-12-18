@@ -52,7 +52,7 @@ def test_organizations_are_directed_to_the_contact_form_for_more_information(
     assert(contact.is_displayed())
     assert('contact' in contact.location)
     assert('Partnerships' in contact.location)
-    assert('Partnerships' in contact.topic)
+    assert('Partnerships' in contact.form.topic)
 
 
 @test_case('C210441')

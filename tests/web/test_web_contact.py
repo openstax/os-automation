@@ -3,13 +3,12 @@
 from autochomsky import chomsky
 
 from pages.web.home import WebHome
-from tests.markers import expected_failure, nondestructive, test_case, web
+from tests.markers import nondestructive, test_case, web
 from utils.email import RestMail
 from utils.utilities import Utility
 from utils.web import Web
 
 
-@expected_failure
 @test_case('C210413', 'C210417')
 @web
 def test_a_user_may_submit_a_message(web_base_url, selenium):
@@ -20,6 +19,7 @@ def test_a_user_may_submit_a_message(web_base_url, selenium):
     email = RestMail('{first}.{last}.{id}'
                      .format(first=first, last=last, id=Utility.random_hex(5))
                      .lower())
+    email.empty()
     message = chomsky(Utility.random(1, 3))
     home = WebHome(selenium, web_base_url).open()
     contact = home.footer.directory.go_to_the_contact_form()
@@ -41,8 +41,13 @@ def test_a_user_may_submit_a_message(web_base_url, selenium):
     #       received
     assert(confirmation.is_displayed())
     assert('confirmation' in confirmation.location)
+    ''' auto-emails are disabled in the TutorQA sandbox
+    email.wait_for_mail(60)
+    assert('Thank you for contacting OpenStax!'
+           in email.get_mail[-1].subject)'''
 
-    # WHEN: they click on the "Check out our subjects" button
+    # WHEN: they click on the "Check out our subjects"
+    #       button
     subjects = confirmation.view_subjects()
 
     # THEN: the subjects page is displayed
@@ -67,7 +72,7 @@ def test_all_contact_form_fields_are_required(web_base_url, selenium):
     fields = ['Name', 'Email', 'Message']
     error_text = ': {0}ill out this field{1}'.format(
         *(('F', '') if contact.is_safari else ('Please f', '.')))
-    errors = contact.form.get_errors
+    errors = contact.form.errors
     for field in fields:
         assert((field + error_text) in errors), \
             '{0} not in {1}'.format(field, str(error_text))
@@ -85,6 +90,9 @@ def test_the_openstax_mailing_address_is_displayed(web_base_url, selenium):
     # WHEN:
 
     # THEN: the OpenStax mailing address is displayed
+    print('***********************************************\n')
+    print(selenium.find_element('id', 'main').get_attribute('outerHTML'))
+    print('\n***********************************************\n')
     assert(contact.address), 'The mailing address is not visible.'
 
 
@@ -101,6 +109,7 @@ def test_users_seeking_help_are_directed_to_the_support_page(
     # WHEN: they click on the "SUPPORT CENTER" link
     support = contact.visit_the_support_center()
 
-    # THEN: the OpenStax Support page is displayed in a new tab
+    # THEN: the OpenStax Support page is displayed in a new
+    #       tab
     assert(support.is_displayed())
     assert('force.com' in support.location)
