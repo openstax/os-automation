@@ -145,4 +145,4 @@ def test_users_with_questions_are_directed_to_the_contact_form(
     assert(contact.is_displayed())
     assert('contact' in contact.location)
     assert('Donations' in contact.location)
-    assert('Donations' in contact.topic)
+    assert('Donations' in contact.form.topic)

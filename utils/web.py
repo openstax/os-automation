@@ -17,6 +17,8 @@ class Web(object):
     # RegEx matchers
     FILENAME_MATCHER = re.compile(r'url\([\w\-\:\/\.]*\)\;')
 
+    # *** HOME PAGE, NAV BARS, and FOOTER ***
+
     # Web banner carousel options
     FREE_BOOKS_NO_CATCH = 0
     EDUCATION_OVER_PROFIT = 1
@@ -34,6 +36,21 @@ class Web(object):
     OUR_IMPACT = 0
     OPENSTAX_PARTNERS = 1
 
+    # *** BOOK DETAILS ***
+
+    # Book page tabs
+    partner_resources_are_split = True
+    BOOK_DETAILS = 0
+    INSTRUCTOR_RESOURCES = 1
+    PARTNER_RESOURCES = 2 if partner_resources_are_split else None
+    STUDENT_RESOURCES = 2 if not PARTNER_RESOURCES else 3
+
+    # Book page order modals
+    INDIVIDUAL = 0
+    BOOKSTORES = 1
+
+    # *** BOOKSTORE SUPPLIERS ***
+
     # Bookstore supplier cards
     INDICO = 0
     MBS_TEXTBOOK = 1
@@ -42,11 +59,31 @@ class Web(object):
     LAD_CUSTOM = 1
     MONTEZUMA = 2
 
+    # *** CONTACT US ***
+
+    ABOUT_GENERAL = 'General'
+    ABOUT_ADOPTION = 'Adopting OpenStax Textbooks'
+    ABOUT_TUTOR = 'OpenStax Tutor Support'
+    ABOUT_CNX = 'OpenStax CNX'
+    ABOUT_DONATIONS = 'Donations'
+    ABOUT_PARTNERSHIP = 'College/University Partnerships'
+    ABOUT_MEDIA = 'Media Inquiries'
+    ABOUT_FOUNDATION = 'Foundational Support'
+
+    TOPICS = [
+        ABOUT_GENERAL, ABOUT_ADOPTION, ABOUT_TUTOR, ABOUT_CNX,
+        ABOUT_DONATIONS, ABOUT_PARTNERSHIP, ABOUT_MEDIA, ABOUT_FOUNDATION
+    ]
+
+    # *** DONATIONS ***
+
     # Donation page values
     MIN_DONATION = 5
     DOLLAR_OPTIONS = [
         10, 25, 50, 100, 500, 1000, 'Other'
     ]
+
+    # *** PRESS ***
 
     # Press mobile section options
     PRESS_RELEASES = 'Press releases'
@@ -73,6 +110,8 @@ class Web(object):
         TWITTER: 'Twitter',
     }
 
+    # *** PRIVACY POLICY ***
+
     # Privacy policy section headings
     PRIVACY = [
         'About this Privacy Policy',
@@ -87,6 +126,8 @@ class Web(object):
          ' of Login Credentials')
     ]
 
+    # *** OPENSTAX RESEARCH ***
+
     # Research page tabs
     ALUMNI = 0
     CURRENT_MEMBERS = 1
@@ -94,6 +135,8 @@ class Web(object):
     AUTHOR = 0
     TITLE = 2
     YEAR = 1
+
+    # *** OPENSTAX TEAM ***
 
     # Team page tabs
     OPENSTAX_TEAM = 0
@@ -106,16 +149,20 @@ class Web(object):
         'Faculty Advisory Board'
     ]
 
-    # Book page tabs
-    partner_resources_are_split = True
-    BOOK_DETAILS = 0
-    INSTRUCTOR_RESOURCES = 1
-    PARTNER_RESOURCES = 2 if partner_resources_are_split else None
-    STUDENT_RESOURCES = 2 if not PARTNER_RESOURCES else 3
+    # *** TUTOR MARKETING ***
 
-    # Book page order modals
-    INDIVIDUAL = 0
-    BOOKSTORES = 1
+    # Tutor Marketing sections
+    NEW_FRONTIER = 0
+    HOW_IT_WORKS = 1
+    WHAT_STUDENTS_GET = 2
+    FEATURE_MATRIX = 3
+    WHERE_MONEY_GOES = 4
+    THE_SCIENCE = 5
+    TUTOR_FAQ = 6
+    LEARN_MORE = 7
+
+    GET_STARTED = 0
+    JOIN_A_WEBINAR = 1
 
     # Book page resource status options
     ACCESS = "Access on OpenStax's YouTube Channel"
@@ -221,19 +268,6 @@ class Web(object):
         BY_WEBINAR,
         BY_PARTNER
     ]
-
-    # Tutor Marketing sections
-    NEW_FRONTIER = 0
-    HOW_IT_WORKS = 1
-    WHAT_STUDENTS_GET = 2
-    FEATURE_MATRIX = 3
-    WHERE_MONEY_GOES = 4
-    THE_SCIENCE = 5
-    TUTOR_FAQ = 6
-    LEARN_MORE = 7
-
-    GET_STARTED = 0
-    JOIN_A_WEBINAR = 1
 
     @classmethod
     def resources(cls, options=1, randomize=True, get_partner_resources=True):
