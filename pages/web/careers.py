@@ -25,7 +25,9 @@ class Careers(WebBase):
         """Return True when text content is found."""
         return (
             len(self.find_element(*self._careers_content_locator)
-                .text.strip()) > 0 and (sleep(1) or True))
+                .text.strip()) > 0 and
+            (sleep(1) or True) and
+            self.find_element(*self._banner_locator))
 
     def is_displayed(self):
         """Return True if the heading is displayed."""

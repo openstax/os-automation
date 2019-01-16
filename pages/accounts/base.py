@@ -18,9 +18,10 @@ class AccountsBase(Page):
     @property
     def loaded(self):
         """Override the default loaded function."""
-        return (bool(self.find_element(*self._root_locator)
-                     .get_attribute('class'))
-                and 'accounts' in self.driver.current_url)
+        return (self.find_element(*self._root_locator) and
+                Utility.load_background_images(self.driver,
+                                               self._root_locator) and
+                'accounts' in self.driver.current_url)
 
     def is_displayed(self):
         """Return True when Accounts is loaded."""

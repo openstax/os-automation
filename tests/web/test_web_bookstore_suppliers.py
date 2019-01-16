@@ -37,7 +37,8 @@ def test_book_suppliers_has_a_pdf_of_openstax_isbn_numbers(
     #       numbers" button
     isbn_pdf_passed = Utility.test_url_and_warn(
         link=suppliers.isbn_list,
-        message='OpenStax ISBN PDF')
+        message='OpenStax ISBN PDF',
+        driver=selenium)
 
     # THEN: the file is downloaded
     assert(isbn_pdf_passed)
@@ -56,19 +57,22 @@ def test_there_are_three_book_fulfillment_companies(web_base_url, selenium):
     # THEN: the indiCo site is verified
     indico_passed = Utility.test_url_and_warn(
         link=suppliers.fulfillment[Web.INDICO].button,
-        message='indiCo')
+        message='indiCo',
+        driver=selenium)
 
     # WHEN: they test the "Order from MBS" button
     # THEN: the MBS Textbook Exchange site is verified
     mbs_passed = Utility.test_url_and_warn(
         link=suppliers.fulfillment[Web.MBS_TEXTBOOK].button,
-        message='MBS Textbook Exchange')
+        message='MBS Textbook Exchange',
+        driver=selenium)
 
     # WHEN: they the "Order from TriLiteral" button
     # THEN: the TriLiteral site is verified
     triliteral_passed = Utility.test_url_and_warn(
         link=suppliers.fulfillment[Web.TRILITERAL].button,
-        message='TriLiteral')
+        message='TriLiteral',
+        driver=selenium)
 
     assert(indico_passed and mbs_passed and triliteral_passed)
 
@@ -86,18 +90,21 @@ def test_there_are_three_book_publishers(web_base_url, selenium):
     # THEN: the XanEdu site is verified
     xanedu_passed = Utility.test_url_and_warn(
         link=suppliers.publishers[Web.XANEDU].button,
-        message='XanEdu')
+        message='XanEdu',
+        driver=selenium)
 
     # WHEN: they test the "Order from LAD" button
     # THEN: the LAD Custom Publishing site is verified
     lad_passed = Utility.test_url_and_warn(
         link=suppliers.publishers[Web.LAD_CUSTOM].button,
-        message='LAD Custom Publishing')
+        message='LAD Custom Publishing',
+        driver=selenium)
 
     # WHEN: they test the "Order from Montezuma" button
     # THEN: the Montezuma Publishing site is verified
     montezuma_passed = Utility.test_url_and_warn(
         link=suppliers.publishers[Web.MONTEZUMA].button,
-        message='Montezuma Publishing')
+        message='Montezuma Publishing',
+        driver=selenium)
 
     assert(xanedu_passed and lad_passed and montezuma_passed)

@@ -8,9 +8,8 @@ from pages.accounts.admin.users import Search
 from pages.accounts.home import AccountsHome
 from pages.accounts.signup import Signup
 from pages.web.home import WebHome as Home
-from pages.web.impact import OurImpact
 from tests.markers import accounts, expected_failure, nondestructive  # NOQA
-from tests.markers import smoke_test, test_case, web  # NOQA
+from tests.markers import skip_test, smoke_test, test_case, web  # NOQA
 from utils.accounts import Accounts
 from utils.email import RestMail
 from utils.utilities import Utility
@@ -187,6 +186,7 @@ def test_mobile_menu_navigation(web_base_url, selenium):
     assert(not home.web_nav.meta.is_open)
 
 
+@skip_test(reason='Impact page replaced by Annual Report')
 @test_case('C210300')
 @nondestructive
 @web
@@ -212,6 +212,34 @@ def test_nav_our_impact_loads_the_impact_page(web_base_url, selenium):
 
     # THEN: the impact webpage is displayed
     assert(impact.is_displayed())
+
+
+@skip_test(reason='Waiting on the Annual Report page content')
+# @test_case('')
+@nondestructive
+@web
+def test_nav_our_impact_loads_the_annual_report(web_base_url, selenium):
+    """Test the OpenStax nav link to Our Impact."""
+    # GIVEN: a user viewing the Web home page
+    home = Home(selenium, web_base_url).open()
+
+    # WHEN: they click the "Our Impact" link in the OpenStax nav
+    annual = home.openstax_nav.view_our_impact()
+
+    # THEN: the annual report webpage is displayed
+    assert(annual.is_displayed())
+
+    # WHEN: the user returns to the home page
+    # AND:  the screen is reduced to 960 pixels or less
+    # AND:  they click on the menu toggle
+    # AND:  click the "Our Impact" link
+    home.open()
+    home.resize_window(width=900)
+    home.web_nav.meta.toggle_menu()
+    annual = home.openstax_nav.view_our_impact()
+
+    # THEN: the annual report webpage is displayed
+    assert(annual.is_displayed())
 
 
 @test_case('C210301')
@@ -405,23 +433,25 @@ def test_web_nav_is_displayed(web_base_url, selenium):
 @web
 def test_openstax_logo_loads_the_home_page(web_base_url, selenium):
     """Test clicking the OpenStax logo opens the home page."""
-    # GIVEN: a user viewing the impact webpage
-    impact = OurImpact(selenium, web_base_url).open()
+    # GIVEN: a user viewing the supporters webpage
+    home = Home(selenium, web_base_url).open()
+    supporters = home.openstax_nav.view_supporters()
 
     # WHEN: they click the OpenStax logo in the website nav
-    home = impact.web_nav.go_home()
+    home = supporters.web_nav.go_home()
 
     # THEN: the Web home page is displayed
     assert(home.is_displayed())
 
-    # WHEN: they go to the impact webpage
+    # WHEN: they go to the supporters webpage
     # AND:  the screen is reduced to 960 pixels or less
     # AND:  they click on the menu toggle
     # AND:  click the OpenStax logo
-    impact.open()
-    impact.resize_window(width=900)
-    impact.web_nav.meta.toggle_menu()
-    home = impact.web_nav.go_home()
+    home.open()
+    supporters = home.openstax_nav.view_supporters()
+    supporters.resize_window(width=900)
+    supporters.web_nav.meta.toggle_menu()
+    home = supporters.web_nav.go_home()
 
     # THEN: the Web home page is displayed
     assert(home.is_displayed())
@@ -1203,6 +1233,7 @@ def test_the_home_page_education_section(web_base_url, selenium):
     assert('technology' in technology.location)
 
 
+@expected_failure
 @test_case('C210329')
 @nondestructive
 @web
@@ -1216,18 +1247,25 @@ def test_the_home_page_information_bars(web_base_url, selenium):
 
     # THEN: they are presented 2 boxes
     # AND:  the first discusses the OpenStax impact
-    assert(home.information.box[Web.OUR_IMPACT].is_displayed())
+    ''' assert(home.information.box[Web.OUR_IMPACT].is_displayed())'''
+    assert(home.information.box[Web.ANNUAL_REPORT].is_displayed())
     assert(home.information.box[Web.OPENSTAX_PARTNERS].is_displayed())
     assert('Wolchonok has saved students' in
-           home.information.box[Web.OUR_IMPACT].text)
-    assert(home.information.box[Web.OUR_IMPACT].has_image)
+           # home.information.box[Web.OUR_IMPACT].text)
+           home.information.box[Web.ANNUAL_REPORT].text)
+    ''' assert(home.information.box[Web.OUR_IMPACT].has_image)'''
+    assert(home.information.box[Web.ANNUAL_REPORT].has_image)
 
     # WHEN: the user clicks the "See our impact" button
-    impact = home.information.box[Web.OUR_IMPACT].click()
+    ''' impact = home.information.box[Web.OUR_IMPACT].click()'''
+    annual = home.information.box[Web.ANNUAL_REPORT].click()
 
-    # THEN: the impact page is displayed
-    assert(impact.is_displayed())
-    assert('impact' in impact.location)
+    ''' # THEN: the impact page is displayed
+        assert(impact.is_displayed())
+        assert('impact' in impact.location)'''
+    # THEN: the annual report page is displayed
+    assert(annual.is_displayed())
+    assert('annual-report' in annual.location)
 
     # WHEN: the user opens the Web home page
     # AND:  scroll to the information bars

@@ -1,11 +1,12 @@
 """Test the impact page."""
 
 from pages.web.home import WebHome
-from tests.markers import nondestructive, test_case, web
+from tests.markers import nondestructive, skip_test, test_case, web
 from utils.utilities import Utility
 from utils.web import Web
 
 
+@skip_test(reason='Impact page replaced by Annual Report')
 @test_case('C210437', 'C210438', 'C210439')
 @nondestructive
 @web
@@ -13,7 +14,7 @@ def test_the_our_impact_banner(web_base_url, selenium):
     """Test the features of the Our Impact banner region."""
     # GIVEN: a user viewing the impact page
     home = WebHome(selenium, web_base_url).open()
-    impact = home.openstax_nav.view_our_impact()
+    impact = home.information.box[Web.OUR_IMPACT].click()
 
     # WHEN:
 
@@ -34,6 +35,7 @@ def test_the_our_impact_banner(web_base_url, selenium):
     assert(not impact.subheading.is_displayed())
 
 
+@skip_test(reason='Impact page replaced by Annual Report')
 @test_case('C210440')
 @nondestructive
 @web
@@ -42,7 +44,7 @@ def test_organizations_are_directed_to_the_contact_form_for_more_information(
     """Organizations are directed to the contact form to receive more info."""
     # GIVEN: a user viewing the impact page
     home = WebHome(selenium, web_base_url).open()
-    impact = home.openstax_nav.view_our_impact()
+    impact = home.information.box[Web.OUR_IMPACT].click()
 
     # WHEN: the click on the "CONTACT US TO LEARN MORE" button
     contact = impact.contact_us()
@@ -55,6 +57,7 @@ def test_organizations_are_directed_to_the_contact_form_for_more_information(
     assert('Partnerships' in contact.form.topic)
 
 
+@skip_test(reason='Impact page replaced by Annual Report')
 @test_case('C210441')
 @nondestructive
 @web
@@ -62,7 +65,7 @@ def test_institutional_partner_logos_are_displayed(web_base_url, selenium):
     """Institutional Partner logos are presented."""
     # GIVEN: a user viewing the impact page
     home = WebHome(selenium, web_base_url).open()
-    impact = home.openstax_nav.view_our_impact()
+    impact = home.information.box[Web.OUR_IMPACT].click()
 
     # WHEN: they scroll below the banner
     impact.view_partners()
@@ -72,6 +75,7 @@ def test_institutional_partner_logos_are_displayed(web_base_url, selenium):
         assert(Utility.is_image_visible(selenium, image=partner.logo))
 
 
+@skip_test(reason='Impact page replaced by Annual Report')
 @test_case('C210442')
 @nondestructive
 @web
@@ -79,7 +83,7 @@ def test_users_may_view_adopting_institutions(web_base_url, selenium):
     """Users may view the list of institutions using OpenStax material."""
     # GIVEN: a user viewing the impact page
     home = WebHome(selenium, web_base_url).open()
-    impact = home.openstax_nav.view_our_impact()
+    impact = home.information.box[Web.OUR_IMPACT].click()
 
     # WHEN: they click on the "SEE A FULL LIST OF
     #       INSTITUTIONS THAT HAVE ADOPTED OPENSTAX" link

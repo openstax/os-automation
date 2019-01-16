@@ -34,6 +34,7 @@ class Web(object):
     BOOKS = 0
     TECH = 1
     OUR_IMPACT = 0
+    ANNUAL_REPORT = 0
     OPENSTAX_PARTNERS = 1
 
     # *** BOOK DETAILS ***
@@ -182,6 +183,7 @@ class Web(object):
 
     # Matching strings
     ABOUT = 'about'
+    ANNUAL_REPORT = 'annual-report'
     BOOKSTORE = 'bookstore-suppliers'
     GIVE = 'give'
     IMPACT = 'impact'

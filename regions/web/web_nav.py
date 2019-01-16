@@ -108,7 +108,7 @@ class WebNav(Region):
         Utility.safari_exception_click(self.driver,
                                        locator=self._openstax_logo_locator)
         from pages.web.home import WebHome
-        return go_to_(WebHome(self.driver))
+        return go_to_(WebHome(self.driver, self.page.base_url))
 
     @property
     def slogan(self):

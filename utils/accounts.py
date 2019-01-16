@@ -46,7 +46,7 @@ class Accounts(object):
     ADOPTED = 'Fully adopted and using it as the primary textbook'
     RECOMMENDED = 'Recommending the book – my students buy a different book'
     INTEREST = 'Interested in using OpenStax in the future'
-    NOT_USING = 'Not using OpenStax'
+    NOT_USING = 'Not using openstax'
 
     USE = [ADOPTED, RECOMMENDED, INTEREST]
 

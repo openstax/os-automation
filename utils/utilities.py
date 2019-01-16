@@ -6,8 +6,8 @@ from random import randint
 from time import sleep
 from warnings import warn
 
+import requests
 from faker import Faker
-from requests import head
 from selenium.common.exceptions import ElementClickInterceptedException  # NOQA
 from selenium.common.exceptions import WebDriverException  # NOQA
 from selenium.webdriver.common.action_chains import ActionChains
@@ -426,14 +426,46 @@ class Utility(object):
             return data
 
     @classmethod
-    def test_url_and_warn(cls, code=None, url=None, link=None, message=''):
+    def test_url_and_warn(cls, _head=True, code=None, url=None, link=None,
+                          message='', driver=None):
         """Query a URL and return a warning if the code is not a success."""
-        if url:
-            test = head(url)
+        if driver:
+            browser = driver.capabilities.get('browserName', '').lower()
+        agent = {
+            'chrome': {
+                'User-Agent': (
+                    'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_1)'
+                    ' AppleWebKit/537.36 (KHTML, like Gecko) '
+                    'Chrome/70.0.3538.110 Safari/537.36'), },
+            'firefox': {
+                'User-Agent': (
+                    'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14;'
+                    ' rv:64.0) Gecko/20100101 Firefox/64.0'), },
+            'safari': {
+                'User-Agent': (
+                    'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_1)'
+                    ' AppleWebKit/605.1.15 (KHTML, like Gecko)'
+                    ' Version/12.0.1 Safari/605.1.15'), },
+            '': {},
+        }
+        if link:
+            url = link.get_attribute('href')
+        test = requests.head(url) if _head \
+            else requests.get(url, headers=agent.get(browser))
+        code = test.status_code
+        if code == 403 and _head:
+            _head = False
+            test = requests.get(url, headers=agent.get(browser))
             code = test.status_code
-        elif link:
-            test = head(link.get_attribute('href'))
-            code = test.status_code
+        if code == 503 or \
+                'Error from cloudfront' in test.headers.get('X-Cache', ''):
+            for _ in range(20):
+                sleep(3)
+                test = requests.head(url) if _head \
+                    else requests.get(url, headers=agent.get(browser))
+                code = test.status_code
+                if code != 503:
+                    break
         if code >= 400:
             # the test ran into a problem with the URL query
             status = ('<{code} {reason}>'
@@ -441,6 +473,8 @@ class Utility(object):
             warn(UserWarning(
                 '"{article}" returned a {status}'
                 .format(article=message, status=status)))
+            if 'Error from cloudfront' in test.headers.get('X-Cache', ''):
+                return True
             return False
         return True
 

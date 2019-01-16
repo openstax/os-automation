@@ -105,7 +105,7 @@ class Blog(WebBase):
         """A blog entry overview tile."""
 
         _image_locator = (By.CSS_SELECTOR, 'a.img')
-        _title_locator = (By.CSS_SELECTOR, 'h2')
+        _title_locator = (By.CSS_SELECTOR, 'h2 a')
         _subheading_locator = (By.CSS_SELECTOR, 'h3')
         _excerpt_locator = (By.CSS_SELECTOR, '.body div')
         _read_more_locator = (By.CSS_SELECTOR, '.go-to')
@@ -114,6 +114,10 @@ class Blog(WebBase):
 
         def is_displayed(self):
             """Return True if the tile has children."""
+            print('Title title:    {0}'.format(self.title))
+            print('Root displayed: {0}'.format(self.root.is_displayed()))
+            print(
+                'Has children:   {0}'.format(Utility.has_children(self.root)))
             return (
                 self.root.is_displayed() and
                 Utility.has_children(self.root))
@@ -127,7 +131,9 @@ class Blog(WebBase):
         @property
         def title(self):
             """Return the article title."""
-            return self.find_element(*self._title_locator).text.strip()
+            return self.wait.until(
+                expect.presence_of_element_located(self._title_locator)
+                ).text.strip()
 
         @property
         def excerpt(self):
@@ -144,8 +150,9 @@ class Blog(WebBase):
         @property
         def body(self):
             """Return the article text."""
-            text = (self.find_element(*self._excerpt_locator)
-                    .get_attribute('innerHTML'))
+            text = self.wait.until(
+                expect.presence_of_element_located(self._excerpt_locator)
+                ).get_attribute('innerHTML')
             import re
             text = re.sub(r'\<p[^<>]*\>', '\n', text)
             text = re.sub(r'(\<\/?[^<>]{1,}\>)', '', text)
@@ -184,6 +191,13 @@ class Article(Blog):
     _hero_banner_locator = (By.CSS_SELECTOR, '.hero')
     _article_title_locator = (By.CSS_SELECTOR, 'article > h1')
     _disqus_locator = (By.CSS_SELECTOR, '#disqus_thread')
+
+    def wait_for_page_to_load(self):
+        """Override the page load function."""
+        super(Blog, self).wait_for_page_to_load()
+        self.wait.until(
+            lambda _: (self.find_element(*self._hero_banner_locator)
+                       .is_displayed()))
 
     def is_displayed(self):
         """Return True if the blog article banner image is displayed."""

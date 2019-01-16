@@ -231,35 +231,64 @@ class Signup(AccountsBase):
         if 'social' not in kwargs:
             self.user.first_name = kwargs.get('name')[Signup.FIRST]
             self.user.last_name = kwargs.get('name')[Signup.LAST]
-        self.user.school = kwargs.get('school')
-        # elevated users
         if non_student_role:
             self.instructor.phone = kwargs.get('phone')
+        self.user.school = kwargs.get('school')
+        if non_student_role:
             self.instructor.webpage = kwargs.get('webpage')
         # instructor-only
+        from utils.accounts import Accounts
         if instructor:
-            self.instructor.using = kwargs.get('use')
+            self.instructor.using = [
+                Accounts.NOT_USING,
+                Accounts.ADOPTED
+            ][Utility.random(0, 1)]
             sleep(0.25)
-        self.next()
+        self.next((By.CSS_SELECTOR, '[data-bind~="click:nextPage"]'))
         # completion
+        sleep(1)
         subjects_to_select = []
-        for subject, name in Signup.SUBJECTS:
-            if name in kwargs.get('subjects', []):
-                subjects_to_select.append(name)
-        if subjects_to_select:
-            self.instructor.select_subjects(subjects_to_select)
+        if non_student_role and _type != Signup.OTHER:
+            for _, name in Signup.SUBJECTS:
+                if name in kwargs.get('subjects', []):
+                    subjects_to_select.append(name)
+        if subjects_to_select and _type != Signup.OTHER:
+            # self.instructor.select_subjects(subjects_to_select)
+            for subject in subjects_to_select:
+                book = self.find_element(
+                    By.XPATH,
+                    '//label[text()="{subject}"]/following-sibling::div'
+                    .format(subject=subject))
+                Utility.safari_exception_click(self.driver, element=book)
         if instructor:
-            self.instructor.students = kwargs.get('students')
+            if kwargs.get('use') == Accounts.NOT_USING:
+                self.instructor.students = kwargs.get('students')
+            else:
+                for group in self.find_elements(
+                        By.CSS_SELECTOR, '.form-group input[type=number]'):
+                    Utility.scroll_to(self.driver, element=group, shift=-80)
+                    group.send_keys(kwargs.get('students'))
+                radios = self.find_elements(
+                    By.CSS_SELECTOR,
+                    '.form-group div input[data-bind*="how_using"]')
+                group = zip(radios[0::2], radios[1::2])
+                for adopted, recommend in group:
+                    if kwargs.get('use') == Accounts.ADOPTED:
+                        option = adopted
+                    else:
+                        option = recommend
+                    Utility.safari_exception_click(self.driver, element=option)
+
         if not kwargs.get('news'):
             self.user.toggle_news()
         self.user.agree_to_terms()
         sleep(0.25)
         self.next()
-        if non_student_role:
+        if instructor:
             assert(not self.error), '{0}'.format(self.error)
 
         # request e-mail confirmation for an elevated account
-        if non_student_role:
+        if instructor:
             self.notice.get_confirmation_email()
             self.next()
 
@@ -572,7 +601,9 @@ class Signup(AccountsBase):
 
         def toggle_news(self):
             """Toggle between receiving and not receiving news."""
-            self.find_element(*self._news_locator).click()
+            news = self.find_element(*self._news_locator)
+            Utility.scroll_to(self.driver, element=news, shift=-80)
+            news.click()
             sleep(1)
             return self
 
@@ -637,11 +668,13 @@ class Signup(AccountsBase):
         @property
         def students(self):
             """Return the student count field."""
+            print(self.find_element(By.CSS_SELECTOR, '#application-body')
+                  .get_attribute('innerHTML'))
             return self.find_element(*self._student_number_locator)
 
         @students.setter
         def students(self, students):
-            """Send the yearly course student count."""
+            """Send the semester course student count."""
             self.students.send_keys(str(students))
             return self
 
@@ -664,8 +697,26 @@ class Signup(AccountsBase):
         @using.setter
         def using(self, status):
             """Set the instructor's intent for using OpenStax."""
-            Utility.select(self.driver, self._using_openstax_locator, status)
-            return self
+            # Utility.select(self.driver, self._using_openstax_locator, status)
+            # return self
+            return self.using_openstax(status)
+
+        # Use signup_two's <using> setter
+        def using_openstax(self, method):
+            """Select the current using state."""
+            from utils.accounts import Accounts
+            _adopted_locator = (
+                By.CSS_SELECTOR,
+                '#profile_using_openstax_confirmed_adoption_won')
+            _not_using_locator = (
+                By.CSS_SELECTOR,
+                '#profile_using_openstax_not_using')
+            if method == Accounts.ADOPTED:
+                option = self.find_element(*_adopted_locator)
+            elif method == Accounts.NOT_USING:
+                option = self.find_element(*_not_using_locator)
+            Utility.safari_exception_click(self.driver, element=option)
+            return self.page
 
         @property
         def subjects(self):

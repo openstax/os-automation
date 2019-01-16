@@ -58,7 +58,7 @@ class TutorMarketing(WebHome):
         visible = Utility.is_image_visible(
             self.driver,
             locator=self._image_locators)
-        return visible
+        return visible and self.find_element(*self._new_frontier_locator)
 
     def is_displayed(self):
         """Return True if the marketing page is displayed."""

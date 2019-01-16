@@ -13,7 +13,8 @@ class OpenStaxNav(Region):
     """OpenStax's website shared navigational control."""
 
     _root_locator = (By.CLASS_NAME, 'meta-nav')
-    _our_impact_locator = (By.CSS_SELECTOR, '[href$=impact]')
+    # _our_impact_locator = (By.CSS_SELECTOR, '[href$=impact]')
+    _our_impact_locator = (By.CSS_SELECTOR, '[href*=annual]')
     _supporters_locator = (By.CSS_SELECTOR, '[href$=foundation]')
     _blog_locator = (By.CSS_SELECTOR, '[href$=blog]')
     _give_locator = (By.CSS_SELECTOR, '[href$=give]')
@@ -25,11 +26,14 @@ class OpenStaxNav(Region):
         return self.root.is_displayed()
 
     def view_our_impact(self):
-        """Go to the impact page."""
+        """Go to the impact or annual report page."""
         self._click(self._our_impact_locator)
         sleep(1.0)
-        from pages.web.impact import OurImpact
-        return go_to_(OurImpact(self.driver, base_url=self.page.base_url))
+        if 'impact' in self._our_impact_locator[1]:
+            from pages.web.impact import OurImpact as Destination
+        else:
+            from pages.web.annual import AnnualReport as Destination
+        return go_to_(Destination(self.driver, base_url=self.page.base_url))
 
     def view_supporters(self):
         """Go to the supporters page."""

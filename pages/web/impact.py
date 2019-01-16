@@ -28,7 +28,8 @@ class OurImpact(WebBase):
             Utility.load_background_images(self.driver,
                                            self._student_locator) and
             Utility.is_image_visible(self.driver,
-                                     locator=self._partners_locator))
+                                     locator=self._partners_locator) and
+            len(self.find_element(*self._description_locator)).text > 0)
 
     def is_displayed(self):
         """Return True if the heading statement is displayed."""

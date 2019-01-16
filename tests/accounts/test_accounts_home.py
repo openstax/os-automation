@@ -298,8 +298,9 @@ def test_go_to_account_signup(accounts_base_url, selenium):
     verify = page.login.go_to_signup
 
     # THEN: the "Sign up for an OpenStax account" page is displayed
-    from pages.accounts.signup import Signup
-    assert(isinstance(verify, Signup)), \
-        'Signup object not returned'
+    from pages.accounts.signup import Signup as SignupOld
+    from pages.accounts.signup_two import Signup as SignupNew
+    assert(isinstance(verify, SignupOld) or isinstance(verify, SignupNew)), \
+        'Signup object not returned ("{0}")'.format(type(verify))
     assert('signup' in verify.driver.current_url), \
-        'Not at sign up page'
+        'Not at sign up page: {0}'.format(verify.driver.current_url)

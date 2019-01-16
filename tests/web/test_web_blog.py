@@ -1,6 +1,6 @@
 """Test the website blog app."""
 
-from pages.web.blog import Blog
+from pages.web.home import WebHome
 from tests.markers import nondestructive, smoke_test, test_case, web
 from utils.utilities import Utility
 
@@ -11,7 +11,8 @@ from utils.utilities import Utility
 def test_one_blog_entry_is_pinned(web_base_url, selenium):
     """Test one blog entry is pinned to the top of the blog page."""
     # GIVEN: a user viewing the blog page
-    blog = Blog(selenium, web_base_url).open()
+    home = WebHome(selenium, web_base_url).open()
+    blog = home.openstax_nav.view_the_blog()
 
     # WHEN:
 
@@ -26,7 +27,8 @@ def test_one_blog_entry_is_pinned(web_base_url, selenium):
 def test_able_to_view_the_newsletter_sign_up_form(web_base_url, selenium):
     """Test the newsletter sign up form is available."""
     # GIVEN: a user viewing the blog page
-    blog = Blog(selenium, web_base_url).open()
+    home = WebHome(selenium, web_base_url).open()
+    blog = home.openstax_nav.view_the_blog()
 
     # WHEN: they click on the "Sign Up" button
     sign_up = blog.get_newsletter()
@@ -42,7 +44,8 @@ def test_able_to_view_the_newsletter_sign_up_form(web_base_url, selenium):
 def test_able_to_retrieve_the_rss_feed(web_base_url, selenium):
     """Test the ability to download the raw OpenStax RSS feed."""
     # GIVEN: a user viewing the blog page
-    blog = Blog(selenium, web_base_url).open()
+    home = WebHome(selenium, web_base_url).open()
+    blog = home.openstax_nav.view_the_blog()
 
     # WHEN: they click on the RSS icon
     rss = blog.test_rss_feed()
@@ -50,7 +53,8 @@ def test_able_to_retrieve_the_rss_feed(web_base_url, selenium):
     # THEN: the XML feed is downloaded
     if not rss.ok:
         Utility.test_url_and_warn(code=rss.status_code,
-                                  message='RSS feed')
+                                  message='RSS feed',
+                                  driver=selenium)
 
 
 @test_case('C210404')
@@ -61,7 +65,8 @@ def test_each_blog_entry_has_an_image_title_excerpt_author_and_date(
         web_base_url, selenium):
     """Test for the attributes of each blog entry tile."""
     # GIVEN: a user viewing the blog page
-    blog = Blog(selenium, web_base_url).open()
+    home = WebHome(selenium, web_base_url).open()
+    blog = home.openstax_nav.view_the_blog()
 
     # WHEN:
 
@@ -69,11 +74,17 @@ def test_each_blog_entry_has_an_image_title_excerpt_author_and_date(
     #       excerpt, one or more authors, and a date when
     #       the post was published
     for entry in blog.articles:
-        assert(entry.image.is_displayed())
-        assert(entry.title)
-        assert(entry.excerpt)
-        assert(entry.authors)
-        assert(entry.date)
+        message = '%s - {0}' % entry.title
+        assert(entry.image.is_displayed()), \
+            message.format('image not displayed')
+        assert(entry.title), \
+            message.format('title not found')
+        assert(entry.excerpt), \
+            message.format('excerpt not found')
+        assert(entry.authors), \
+            message.format('author(s) not found')
+        assert(entry.date), \
+            message.format('entry date not found')
 
 
 @test_case('C210405')
@@ -82,7 +93,8 @@ def test_each_blog_entry_has_an_image_title_excerpt_author_and_date(
 def test_load_a_blog_entry(web_base_url, selenium):
     """Test select a random blog entry to view the full article."""
     # GIVEN: a user viewing the blog page
-    blog = Blog(selenium, web_base_url).open()
+    home = WebHome(selenium, web_base_url).open()
+    blog = home.openstax_nav.view_the_blog()
 
     # WHEN: they click on a linked resource
     article = blog.view_post()
@@ -99,7 +111,8 @@ def test_load_a_blog_entry(web_base_url, selenium):
 def test_disqus_loads_below_the_full_article(web_base_url, selenium):
     """Test Disqus's comment section loads below a full blog article."""
     # GIVEN: a user viewing a blog post
-    blog = Blog(selenium, web_base_url).open()
+    home = WebHome(selenium, web_base_url).open()
+    blog = home.openstax_nav.view_the_blog()
     article = blog.view_post()
 
     # WHEN: they scroll below the body text
@@ -116,7 +129,8 @@ def test_other_blog_entry_tiles_are_below_a_full_article(
         web_base_url, selenium):
     """Test for the presence of other blog tiles below a full article."""
     # GIVEN: a user viewing a blog post
-    blog = Blog(selenium, web_base_url).open()
+    home = WebHome(selenium, web_base_url).open()
+    blog = home.openstax_nav.view_the_blog()
     article = blog.view_post()
 
     # WHEN: they scroll below the Disqus frame
@@ -127,5 +141,7 @@ def test_other_blog_entry_tiles_are_below_a_full_article(
     current_title = article.title
     for entry in article.other_posts:
         Utility.scroll_to(selenium, element=entry.root, shift=-80)
-        assert(entry.is_displayed())
-        assert(entry.title != current_title)
+        assert(entry.is_displayed()), \
+            '{0} is not displayed'.format(entry.title)
+        assert(entry.title != current_title), \
+            'Article "{0}" found in other articles'.format(current_title)

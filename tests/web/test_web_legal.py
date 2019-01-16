@@ -26,11 +26,13 @@ def test_each_intellectual_property_question_has_an_answer(
 
     # THEN: the Creative Commons website is available
     Utility.test_url_and_warn(link=license.creative_commons,
-                              message='Creative Commons')
+                              message='Creative Commons',
+                              driver=selenium)
 
     # WHEN: they click on the "Attribution license" link
 
     # THEN: the "Attribution 4.0 International" license
     #       overview is available
     Utility.test_url_and_warn(link=license.attribution_license,
-                              message='CC BY 4.0 license')
+                              message='CC BY 4.0 license',
+                              driver=selenium)
