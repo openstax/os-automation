@@ -8,6 +8,7 @@ biglearn = pytest.mark.biglearn
 exercises = pytest.mark.exercises
 hypothesis = pytest.mark.hypothesis
 payments = pytest.mark.payments
+support = pytest.mark.support
 tutor = pytest.mark.tutor
 web = pytest.mark.web
 

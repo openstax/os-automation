@@ -3,13 +3,14 @@
 from selenium.webdriver.common.by import By
 
 from pages.accounts.home import AccountsHome as Home
-from tests.markers import accounts, nondestructive, test_case
+from tests.markers import accounts, nondestructive, support, test_case
 from utils.utilities import Status, Utility
 
 
 @test_case('C195539')
 @nondestructive
 @accounts
+@support
 def test_menu_select(accounts_base_url, selenium):
     """Basic start test."""
     page = Home(selenium, accounts_base_url).open()
@@ -23,6 +24,7 @@ def test_menu_select(accounts_base_url, selenium):
 
 @test_case('C195540')
 @nondestructive
+@support
 def test_random():
     """Get a random number between 0 and 50, inclusive, 10 times."""
     for _ in range(10):
@@ -32,6 +34,7 @@ def test_random():
 
 @test_case('C195541')
 @nondestructive
+@support
 def test_random_name():
     """Test the random name generator list."""
     for _ in range(25):
@@ -52,6 +55,7 @@ def test_random_name():
 @test_case('C200528')
 @nondestructive
 @accounts
+@support
 def test_browser_tab_open(accounts_base_url, selenium):
     """Test opening a second browser tab."""
     Home(selenium, accounts_base_url).open()
@@ -61,6 +65,7 @@ def test_browser_tab_open(accounts_base_url, selenium):
 
 @test_case('C210267')
 @nondestructive
+@support
 def test_card_retrieval_from_braintree():
     """Test retrieving dummy credit cards from the processor."""
     get_card = Utility.get_test_credit_card()
