@@ -162,8 +162,10 @@ class Signup(AccountsBase):
         self.user_type.role = _type
         self.user_type.email = email
         self.next()
+        sleep(0.5)
         assert(not self.error), '{0}'.format(self.error)
         if non_student_role and not email.endswith('edu'):
+            # sleep(3)
             self.next()
 
         # verify the pin
