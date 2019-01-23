@@ -74,18 +74,15 @@ def test_the_availability_of_the_table_of_contents(web_base_url, selenium):
     assert(book.table_of_contents.is_displayed())
 
     # WHEN: they click on the "View online" button
-    webview = book.table_of_contents.view_online()
+    webview = book.table_of_contents.view_online(get_url=True)
 
     # THEN: the webview version of the book is loaded in a new tab
-    assert('cnx' in webview.location)
-    assert(book_title == webview.title), (
-        'Not viewing the correct book: "{book}" != "{web}"'
-        .format(book=book_title, web=webview.title))
+    Utility.test_url_and_warn(
+        url=webview,
+        message='Webview not available for {0}'.format(book_title),
+        driver=selenium)
 
-    # WHEN: they close the new tab
-    # AND:  switch back to the original tab
-    # AND:  click on the "X"
-    webview.close_tab()
+    # WHEN: they click on the "X"
     book.table_of_contents.close()
 
     # THEN: the table of contents pane is closed
@@ -120,24 +117,13 @@ def test_webview_for_a_book_is_avaialble(web_base_url, selenium):
     book_title = book.title
 
     # WHEN: they click on the "View online" link
-    webview = book.sidebar.view_online()
+    webview = book.sidebar.view_online(get_url=True)
 
-    # THEN: the webview version of the book is loaded in a
-    #       new tab
-    assert(webview.is_displayed())
-    assert('cnx' in webview.location)
-    # AP Physics is viewed as a collection, not a book, so
-    # ignore the title test for it
-    if book_title != 'The AP Physics Collection':
-        assert(book_title == webview.title)
-
-    # WHEN: they close the new tab
-    # AND:  switch back to the original tab
-    webview.close_tab()
-
-    # THEN: the book details page is displayed
-    assert(book.is_displayed())
-    assert('openstax.org' in selenium.current_url)
+    # THEN: the webview for the book is available
+    Utility.test_url_and_warn(
+        url=webview,
+        message='Webview not available for {0}'.format(book_title),
+        driver=selenium)
 
 
 @test_case('C210352')
@@ -727,7 +713,8 @@ def test_verified_instructors_may_request_a_comped_ibook(
 
     # WHEN: they click on the "iBooks Comp Copy" tile
     # AND:  click on the 'X' icon
-    comp_copy = book.instructor.resource_by_name('iBooks Comp Copy').select()
+    comp_copy = book.instructor.resource_by_name(
+                'Apple iBooks Comp Copy').select()
     comp_copy.close()
 
     # THEN: the comp copy modal is closed
@@ -736,7 +723,8 @@ def test_verified_instructors_may_request_a_comped_ibook(
     # WHEN: they click on the "iBooks Comp Copy" tile
     # AND:  enter a zero or greater number in the input box
     # AND:  click on the "Request iBook" button
-    comp_copy = book.instructor.resource_by_name('iBooks Comp Copy').select()
+    comp_copy = book.instructor.resource_by_name(
+                'Apple iBooks Comp Copy').select()
     comp_copy.students = Utility.random()
     comp_copy_receipt = comp_copy.submit()
 

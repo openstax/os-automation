@@ -101,13 +101,12 @@ def test_the_ten_most_recent_new_mentions_are_shown(web_base_url, selenium):
 
     # WHEN: they click on a news article title
     article = press.mentions[Utility.random(end=len(press.mentions) - 1)]
-    check = article.check_article()
+    url = article.url
+    headline = article.headline
 
     # THEN: the full article exists
-    if not check.ok:
-        Utility.test_url_and_warn(code=check.status_code,
-                                  message='"{0}"'.format(article.headline),
-                                  driver=selenium)
+    Utility.test_url_and_warn(
+        url=url, message='"{0}"'.format(headline), driver=selenium)
 
 
 @test_case('C210472')

@@ -364,7 +364,12 @@ class Press(WebBase):
 
         def check_article(self):
             """Check the HEAD request for the article URL."""
-            return head(self.headline_element.get_attribute('href'))
+            return head(self.url)
+
+        @property
+        def url(self):
+            """Return the article URL."""
+            return self.headline_element.get_attribute('href')
 
     class Contact(Region):
         """An OpenStax MarComm point of contact."""

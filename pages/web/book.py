@@ -277,9 +277,11 @@ class Book(WebBase):
                                            locator=self._toc_locator)
             return self.table_of_contents
 
-        def view_online(self):
+        def view_online(self, get_url=False):
             """View the book on CNX.org."""
             link = self.find_element(*self._online_view_locator)
+            if get_url:
+                return link.get_attribute('href')
             Utility.switch_to(self.driver, element=link)
             from pages.cnx.contents import Webview
             return go_to_(Webview(self.driver))
@@ -1161,9 +1163,12 @@ class TableOfContents(Modal):
             Utility.scroll_to(self.driver, element=target, shift=-80)
         return target
 
-    def view_online(self):
+    def view_online(self, get_url=False):
         """View the book on CNX.org."""
         button = self.find_element(*self._online_view_locator)
+        url = button.get_attribute('href')
+        if get_url:
+            return url
         Utility.switch_to(self.driver, element=button)
         from pages.cnx.contents import Webview
         return go_to_(Webview(self.driver))
