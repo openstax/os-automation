@@ -17,7 +17,8 @@ class Careers(WebBase):
     _banner_locator = (By.CSS_SELECTOR, 'h1')
     _subheading_locator = (
         By.CSS_SELECTOR, '[data-html=content] p:first-child')
-    _careers_content_locator = (By.CSS_SELECTOR, '[data-html=content]')
+    _careers_content_locator = (
+                    By.CSS_SELECTOR, '#main [data-html=content] p:first-child')
     _job_list_locator = (By.CSS_SELECTOR, '[data-html=content] p:nth-child(5)')
 
     @property
