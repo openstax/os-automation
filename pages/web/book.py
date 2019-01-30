@@ -1121,7 +1121,8 @@ class Modal(Region):
     def root(self):
         """Override the root variable."""
         return self.driver.execute_script(
-            'return document.querySelector("#dialog");')
+            'return document.querySelector("{0}");'
+            .format(self._root_locator[1]))
 
     def is_displayed(self):
         """Return True if the order modal is currently active."""
@@ -1131,8 +1132,8 @@ class Modal(Region):
     def close(self):
         """Close the order form."""
         assert(self.is_displayed), 'Order options are not visible'
-        Utility.safari_exception_click(self.driver,
-                                       locator=self._close_locator)
+        close = self.find_element(*self._close_locator)
+        Utility.safari_exception_click(self.driver, element=close)
         return self.page
 
 

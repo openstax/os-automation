@@ -955,9 +955,8 @@ def test_available_student_resources_can_be_downloaded(web_base_url, selenium):
 
     # THEN: available resources are available for download
     for resource in book.student.resources:
-        assert(resource.can_be_downloaded), (
-            '{resource} is not available for download'
-            .format(resource=resource.title))
+        assert(resource.can_be_downloaded or resource.is_external), \
+            '{resource} is not available'.format(resource=resource.title)
 
 
 def subject_list(size=1):
