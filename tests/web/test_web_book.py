@@ -39,7 +39,8 @@ def test_for_book_details_and_user_resource_pages(web_base_url, selenium):
     assert('details' in book.location)
     assert(book.details.is_displayed())
     assert(book.tabs[Web.INSTRUCTOR_RESOURCES].is_displayed())
-    assert(book.tabs[Web.STUDENT_RESOURCES].is_displayed())
+    if book.title != Library.ACCOUNTING:
+        assert(book.tabs[Web.STUDENT_RESOURCES].is_displayed())
 
     # WHEN: they select a Polish book tile
     home.open()

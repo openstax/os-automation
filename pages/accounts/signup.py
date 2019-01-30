@@ -232,36 +232,42 @@ class Signup(AccountsBase):
         if 'social' not in kwargs:
             self.user.first_name = kwargs.get('name')[Signup.FIRST]
             self.user.last_name = kwargs.get('name')[Signup.LAST]
+            self.user.suffix = kwargs.get('name')[Signup.SUFFIX]
         if non_student_role:
             self.instructor.phone = kwargs.get('phone')
         self.user.school = kwargs.get('school')
+        if instructor:
+            self.instructor.students = kwargs.get('students')
         if non_student_role:
             self.instructor.webpage = kwargs.get('webpage')
         # instructor-only
-        from utils.accounts import Accounts
         if instructor:
-            self.instructor.using = [
+            # from utils.accounts import Accounts
+            self.instructor.using = kwargs.get('use')
+            '''self.instructor.using = [
                 Accounts.NOT_USING,
                 Accounts.ADOPTED
-            ][Utility.random(0, 1)]
+            ][Utility.random(0, 1)]'''
             sleep(0.25)
-        self.next((By.CSS_SELECTOR, '[data-bind~="click:nextPage"]'))
+        # self.next((By.CSS_SELECTOR, '[data-bind~="click:nextPage"]'))
+        '''if not non_student_role:
+            self.next()'''
         # completion
-        sleep(1)
+        # sleep(1)
         subjects_to_select = []
         if non_student_role and _type != Signup.OTHER:
             for _, name in Signup.SUBJECTS:
                 if name in kwargs.get('subjects', []):
                     subjects_to_select.append(name)
         if subjects_to_select and _type != Signup.OTHER:
-            # self.instructor.select_subjects(subjects_to_select)
-            for subject in subjects_to_select:
+            self.instructor.select_subjects(subjects_to_select)
+            '''for subject in subjects_to_select:
                 book = self.find_element(
                     By.XPATH,
                     '//label[text()="{subject}"]/following-sibling::div'
                     .format(subject=subject))
-                Utility.safari_exception_click(self.driver, element=book)
-        if instructor:
+                Utility.safari_exception_click(self.driver, element=book)'''
+        '''if instructor:
             if kwargs.get('use') == Accounts.NOT_USING:
                 self.instructor.students = kwargs.get('students')
             else:
@@ -279,7 +285,7 @@ class Signup(AccountsBase):
                     else:
                         option = recommend
                     Utility.safari_exception_click(self.driver, element=option)
-
+        '''
         if not kwargs.get('news'):
             self.user.toggle_news()
         self.user.agree_to_terms()
@@ -698,9 +704,9 @@ class Signup(AccountsBase):
         @using.setter
         def using(self, status):
             """Set the instructor's intent for using OpenStax."""
-            # Utility.select(self.driver, self._using_openstax_locator, status)
-            # return self
-            return self.using_openstax(status)
+            Utility.select(self.driver, self._using_openstax_locator, status)
+            return self
+            # return self.using_openstax(status)
 
         # Use signup_two's <using> setter
         def using_openstax(self, method):

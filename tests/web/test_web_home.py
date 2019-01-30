@@ -1233,7 +1233,6 @@ def test_the_home_page_education_section(web_base_url, selenium):
     assert('technology' in technology.location)
 
 
-@expected_failure
 @test_case('C210329')
 @nondestructive
 @web
@@ -1247,25 +1246,25 @@ def test_the_home_page_information_bars(web_base_url, selenium):
 
     # THEN: they are presented 2 boxes
     # AND:  the first discusses the OpenStax impact
-    ''' assert(home.information.box[Web.OUR_IMPACT].is_displayed())'''
-    assert(home.information.box[Web.ANNUAL_REPORT].is_displayed())
+    assert(home.information.box[Web.OUR_IMPACT].is_displayed())
+    # assert(home.information.box[Web.REPORT].is_displayed())
     assert(home.information.box[Web.OPENSTAX_PARTNERS].is_displayed())
     assert('Wolchonok has saved students' in
-           # home.information.box[Web.OUR_IMPACT].text)
-           home.information.box[Web.ANNUAL_REPORT].text)
-    ''' assert(home.information.box[Web.OUR_IMPACT].has_image)'''
-    assert(home.information.box[Web.ANNUAL_REPORT].has_image)
+           home.information.box[Web.OUR_IMPACT].text)
+    #        home.information.box[Web.ANNUAL_REPORT].text)
+    assert(home.information.box[Web.OUR_IMPACT].has_image)
+    # assert(home.information.box[Web.ANNUAL_REPORT].has_image)
 
     # WHEN: the user clicks the "See our impact" button
-    ''' impact = home.information.box[Web.OUR_IMPACT].click()'''
-    annual = home.information.box[Web.ANNUAL_REPORT].click()
+    impact = home.information.box[Web.OUR_IMPACT].click()
+    # annual = home.information.box[Web.ANNUAL_REPORT].click()
 
-    ''' # THEN: the impact page is displayed
-        assert(impact.is_displayed())
-        assert('impact' in impact.location)'''
+    # THEN: the impact page is displayed
+    assert(impact.is_displayed())
+    assert('impact' in impact.location)
     # THEN: the annual report page is displayed
-    assert(annual.is_displayed())
-    assert('annual-report' in annual.location)
+    # assert(annual.is_displayed())
+    # assert('annual-report' in annual.location)
 
     # WHEN: the user opens the Web home page
     # AND:  scroll to the information bars
