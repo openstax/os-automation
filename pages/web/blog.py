@@ -114,10 +114,6 @@ class Blog(WebBase):
 
         def is_displayed(self):
             """Return True if the tile has children."""
-            print('Title title:    {0}'.format(self.title))
-            print('Root displayed: {0}'.format(self.root.is_displayed()))
-            print(
-                'Has children:   {0}'.format(Utility.has_children(self.root)))
             return (
                 self.root.is_displayed() and
                 Utility.has_children(self.root))
