@@ -41,39 +41,39 @@ class Signup(AccountsBase):
     NOT_USING = 'Not using OpenStax'
 
     SUBJECTS = [
-        ('accounting', 'Accounting'),
+        # ('accounting', 'Accounting'),
         ('algebra_and_trigonometry', 'Algebra and Trigonometry'),
         ('american_government', 'American Government'),
-        ('anatomy_physiology', 'Anatomy and Physiology'),
+        ('anatomy_physiology', 'Anatomy & Physiology'),
         ('astronomy', 'Astronomy'),
         ('biology', 'Biology'),
-        # ('ap_biology', 'AP Biology'),
+        ('ap_biology', 'AP Biology'),
         ('calculus', 'Calculus'),
         ('chemistry', 'Chemistry'),
         ('chem_atoms_first', 'Chemistry: Atoms First'),
         ('college_algebra', 'College Algebra'),
         ('college_physics_algebra', 'College Physics'),
         ('concepts_of_bio_non_majors', 'Concepts of Biology'),
-        # ('elementary_algebra', 'Elementary Algebra'),
-        # ('intermediate_algebra', 'Intermediate Algebra'),
-        ('introduction_to_business', 'Introduction to Business'),
+        ('elementary_algebra', 'Elementary Algebra'),
+        ('intermediate_algebra', 'Intermediate Algebra'),
+        # ('introduction_to_business', 'Introduction to Business'),
         ('introduction_to_sociology', 'Introduction to Sociology 2e'),
         ('introductory_statistics', 'Introductory Statistics'),
-        # ('introductory_business_statistics',
-        #  'Introductory Business Statistics'),
+        ('introductory_business_statistics',
+         'Introductory Business Statistics'),
         ('microbiology', 'Microbiology'),
         ('pre_algebra', 'Prealgebra'),
         ('precalc', 'Precalculus'),
         ('economics', 'Principles of Economics'),
         ('macro_econ', 'Principles of Macroeconomics'),
-        ('ap_macro_econ', 'Principles of Macroeconomics for AP® Courses'),
+        ('ap_macro_econ', 'AP Macro Econ'),
         ('micro_econ', 'Principles of Microeconomics'),
-        ('ap_micro_econ', 'Principles of Microeconomics for AP® Courses'),
+        ('ap_micro_econ', 'AP Micro Econ'),
         ('psychology', 'Psychology'),
-        ('ap_physics', 'The AP Physics Collection'),
+        ('ap_physics', 'AP Physics'),
         ('us_history', 'U.S. History'),
-        ('university_physics_calc', 'University Physics'),
-        ('not_listed', 'Not Listed')
+        ('university_physics_calc', 'University Physics')
+        # ('not_listed', 'Not Listed')
     ]
 
     _next_button_locator = (By.CSS_SELECTOR, '[type=submit]')
@@ -162,6 +162,7 @@ class Signup(AccountsBase):
         self.user_type.role = _type
         self.user_type.email = email
         self.next()
+        sleep(0.5)
         assert(not self.error), '{0}'.format(self.error)
         if non_student_role and not email.endswith('edu'):
             self.next()
@@ -231,35 +232,70 @@ class Signup(AccountsBase):
         if 'social' not in kwargs:
             self.user.first_name = kwargs.get('name')[Signup.FIRST]
             self.user.last_name = kwargs.get('name')[Signup.LAST]
-        self.user.school = kwargs.get('school')
-        # elevated users
+            self.user.suffix = kwargs.get('name')[Signup.SUFFIX]
         if non_student_role:
             self.instructor.phone = kwargs.get('phone')
+        self.user.school = kwargs.get('school')
+        if instructor:
+            self.instructor.students = kwargs.get('students')
+        if non_student_role:
             self.instructor.webpage = kwargs.get('webpage')
         # instructor-only
         if instructor:
+            # from utils.accounts import Accounts
             self.instructor.using = kwargs.get('use')
+            '''self.instructor.using = [
+                Accounts.NOT_USING,
+                Accounts.ADOPTED
+            ][Utility.random(0, 1)]'''
             sleep(0.25)
-        self.next()
+        # self.next((By.CSS_SELECTOR, '[data-bind~="click:nextPage"]'))
+        '''if not non_student_role:
+            self.next()'''
         # completion
+        # sleep(1)
         subjects_to_select = []
-        for subject, name in Signup.SUBJECTS:
-            if name in kwargs.get('subjects', []):
-                subjects_to_select.append(name)
-        if subjects_to_select:
+        if non_student_role and _type != Signup.OTHER:
+            for _, name in Signup.SUBJECTS:
+                if name in kwargs.get('subjects', []):
+                    subjects_to_select.append(name)
+        if subjects_to_select and _type != Signup.OTHER:
             self.instructor.select_subjects(subjects_to_select)
-        if instructor:
-            self.instructor.students = kwargs.get('students')
+            '''for subject in subjects_to_select:
+                book = self.find_element(
+                    By.XPATH,
+                    '//label[text()="{subject}"]/following-sibling::div'
+                    .format(subject=subject))
+                Utility.safari_exception_click(self.driver, element=book)'''
+        '''if instructor:
+            if kwargs.get('use') == Accounts.NOT_USING:
+                self.instructor.students = kwargs.get('students')
+            else:
+                for group in self.find_elements(
+                        By.CSS_SELECTOR, '.form-group input[type=number]'):
+                    Utility.scroll_to(self.driver, element=group, shift=-80)
+                    group.send_keys(kwargs.get('students'))
+                radios = self.find_elements(
+                    By.CSS_SELECTOR,
+                    '.form-group div input[data-bind*="how_using"]')
+                group = zip(radios[0::2], radios[1::2])
+                for adopted, recommend in group:
+                    if kwargs.get('use') == Accounts.ADOPTED:
+                        option = adopted
+                    else:
+                        option = recommend
+                    Utility.safari_exception_click(self.driver, element=option)
+        '''
         if not kwargs.get('news'):
             self.user.toggle_news()
         self.user.agree_to_terms()
         sleep(0.25)
         self.next()
-        if non_student_role:
+        if instructor:
             assert(not self.error), '{0}'.format(self.error)
 
         # request e-mail confirmation for an elevated account
-        if non_student_role:
+        if instructor:
             self.notice.get_confirmation_email()
             self.next()
 
@@ -572,7 +608,9 @@ class Signup(AccountsBase):
 
         def toggle_news(self):
             """Toggle between receiving and not receiving news."""
-            self.find_element(*self._news_locator).click()
+            news = self.find_element(*self._news_locator)
+            Utility.scroll_to(self.driver, element=news, shift=-80)
+            news.click()
             sleep(1)
             return self
 
@@ -637,11 +675,13 @@ class Signup(AccountsBase):
         @property
         def students(self):
             """Return the student count field."""
+            print(self.find_element(By.CSS_SELECTOR, '#application-body')
+                  .get_attribute('innerHTML'))
             return self.find_element(*self._student_number_locator)
 
         @students.setter
         def students(self, students):
-            """Send the yearly course student count."""
+            """Send the semester course student count."""
             self.students.send_keys(str(students))
             return self
 
@@ -666,6 +706,24 @@ class Signup(AccountsBase):
             """Set the instructor's intent for using OpenStax."""
             Utility.select(self.driver, self._using_openstax_locator, status)
             return self
+            # return self.using_openstax(status)
+
+        # Use signup_two's <using> setter
+        def using_openstax(self, method):
+            """Select the current using state."""
+            from utils.accounts import Accounts
+            _adopted_locator = (
+                By.CSS_SELECTOR,
+                '#profile_using_openstax_confirmed_adoption_won')
+            _not_using_locator = (
+                By.CSS_SELECTOR,
+                '#profile_using_openstax_not_using')
+            if method == Accounts.ADOPTED:
+                option = self.find_element(*_adopted_locator)
+            elif method == Accounts.NOT_USING:
+                option = self.find_element(*_not_using_locator)
+            Utility.safari_exception_click(self.driver, element=option)
+            return self.page
 
         @property
         def subjects(self):

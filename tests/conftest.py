@@ -66,6 +66,16 @@ def pytest_addoption(parser):
         action='store_true',
         default=False,
         help='Run deployment smoke tests;\noption overrides other flags.')
+    selenium_options.addoption(
+        '--randomize',
+        action='store_true',
+        default=False,
+        help='Randomize the test ordering.')
+    selenium_options.addoption(
+        '--strip-flake',
+        action='store_true',
+        default=False,
+        help='Strip Flake8 and generic test_case tests from the run.')
 
     # Base URL options
     url_options.addoption(
@@ -192,17 +202,22 @@ def pytest_addoption(parser):
         nargs='+',
         default=[
             'accounts', 'biglearn', 'exercises',
-            'hypothesis', 'payments', 'tutor', 'web'],
+            'hypothesis', 'payments', 'support',
+            'tutor', 'web'],
         help=(
             'Systems under test\n'
             'Options: accounts, biglearn, exercises\n'
-            '         hypothesis, payments, tutor, web'))
+            '         hypothesis, payments, support,\n'
+            '         tutor, web'))
 
 
 def pytest_collection_modifyitems(config, items):
     """Runtime test options."""
     # Runtime markers
     run_smoke_tests = config.getoption('--smoke-test')
+    shuffle_tests = config.getoption('--randomize')
+    testrail = config.getoption('--testrail')
+    skip_flake = config.getoption('--strip-flake')
 
     run_social = config.getoption('--run-social')
     mark_run_social = pytest.mark.skip(reason='Skipping non-social tests.')
@@ -210,56 +225,71 @@ def pytest_collection_modifyitems(config, items):
     mark_skip_social = pytest.mark.skip(reason='Skipping social login tests.')
 
     run_systems = config.getoption('--systems')
-    mark_skip_accounts = pytest.mark.skip(reason='Skipping Accounts tests.')
-    mark_skip_biglearn = pytest.mark.skip(reason='Skipping BigLearn tests.')
-    mark_skip_exercises = pytest.mark.skip(reason='Skipping Exercises tests.')
-    mark_skip_hypothesis = pytest.mark.skip(
-                                        reason='Skipping Hypothesis tests.')
-    mark_skip_payments = pytest.mark.skip(reason='Skipping Payments tests.')
-    mark_skip_tutor = pytest.mark.skip(reason='Skipping Tutor tests.')
-    mark_skip_web = pytest.mark.skip(reason='Skipping Web tests.')
 
     headless_mode = config.getoption('--headless')
-    mark_skip_if_headless = pytest.mark.skip(
-                                    reason='Not run during headless testing')
 
-    # Throw out other tests out if running smoke tests
-    if run_smoke_tests:
-        item_list = []
-        for index, item in enumerate(items):
-            if 'smoke_test' not in item.keywords:
-                item_list.append(index)
-        if item_list:
-            item_list.reverse()
-            for index in item_list:
-                items.pop(index)
-
-    # Apply runtime markers
+    # Throw out other ignored tests
+    deselected = []
+    remaining = []
     for item in items:
+        if run_smoke_tests:
+            if 'smoke_test' not in item.keywords:
+                deselected.append(item)
+                continue
+        if testrail:
+            if 'testrail' not in item.keywords:
+                deselected.append(item)
+                continue
+        if skip_flake:
+            item_name = str(item)
+            if 'Function test_case' in item_name or 'Flake8Item' in item_name:
+                deselected.append(item)
+                continue
+        if run_systems:
+            if 'accounts' not in run_systems and 'accounts' in item.keywords:
+                deselected.append(item)
+                continue
+            if 'biglearn' not in run_systems and 'biglearn' in item.keywords:
+                deselected.append(item)
+                continue
+            if 'exercises' not in run_systems and 'exercises' in item.keywords:
+                deselected.append(item)
+                continue
+            if ('hypothesis' not in run_systems
+                    and 'hypothesis' in item.keywords):
+                deselected.append(item)
+                continue
+            if 'payments' not in run_systems and 'payments' in item.keywords:
+                deselected.append(item)
+                continue
+            if 'tutor' not in run_systems and 'tutor' in item.keywords:
+                deselected.append(item)
+                continue
+            if 'support' not in run_systems and 'support' in item.keywords:
+                deselected.append(item)
+                continue
+            if 'web' not in run_systems and 'web' in item.keywords:
+                deselected.append(item)
+                continue
+        if headless_mode and 'skip_if_headless' in item.keywords:
+            deselected.append(item)
+            continue
+        remaining.append(item)
+
+        # Apply runtime markers
         if skip_social and 'social' in item.keywords:
             item.add_marker(mark_skip_social)
         if run_social and 'social' not in item.keywords:
             item.add_marker(mark_run_social)
 
-        if run_systems:
-            if 'accounts' not in run_systems and 'accounts' in item.keywords:
-                item.add_marker(mark_skip_accounts)
-            if 'biglearn' not in run_systems and 'biglearn' in item.keywords:
-                item.add_marker(mark_skip_biglearn)
-            if 'exercises' not in run_systems and 'exercises' in item.keywords:
-                item.add_marker(mark_skip_exercises)
-            if ('hypothesis' not in run_systems
-                    and 'hypothesis' in item.keywords):
-                item.add_marker(mark_skip_hypothesis)
-            if 'payments' not in run_systems and 'payments' in item.keywords:
-                item.add_marker(mark_skip_payments)
-            if 'tutor' not in run_systems and 'tutor' in item.keywords:
-                item.add_marker(mark_skip_tutor)
-            if 'web' not in run_systems and 'web' in item.keywords:
-                item.add_marker(mark_skip_web)
+    if deselected:
+        config.hook.pytest_deselected(items=deselected)
+        items[:] = remaining
 
-        if headless_mode and 'skip_if_headless' in item.keywords:
-            item.add_marker(mark_skip_if_headless)
+    # If requested, shuffle the test list
+    if shuffle_tests:
+        from random import shuffle
+        shuffle(items)
 
 
 def pytest_collectreport(report):

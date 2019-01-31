@@ -1,7 +1,5 @@
 """Test the Accounts logged in profile page."""
 
-from functools import reduce
-
 import pytest
 
 from pages.accounts.home import AccountsHome
@@ -122,7 +120,7 @@ def test_get_and_set_a_username(accounts_base_url, selenium, student):
     home = AccountsHome(selenium, accounts_base_url).open()
     profile = home.log_in(*student)
     old_username = profile.username.username
-    new_username = Utility.random_hex()
+    new_username = Utility.random_hex(18, True)
 
     # WHEN: the username is clicked
     # AND: new text is entered in the input field
@@ -157,11 +155,10 @@ def test_get_current_emails_and_status(accounts_base_url, selenium, student):
     profile.emails.add_email(fake_email)
 
     # THEN: The new email is attached to the account
-    assert(reduce(lambda x, y:
-                  x or y.email_text == fake_email,
-                  profile.emails.emails,
-                  False)), \
-        'Email was not added'
+    status = False
+    for email in profile.emails.emails:
+        status = status or (email.email_text == fake_email)
+    assert(status), '"{0}" not added'.format(fake_email)
 
     # WHEN: The new email is deleted
     for email in profile.emails.emails:
@@ -170,10 +167,9 @@ def test_get_current_emails_and_status(accounts_base_url, selenium, student):
             break
 
     # THEN: The email is removed from the account
-    assert(not reduce(lambda x, y: x or y.email_text == fake_email,
-                      profile.emails.emails,
-                      False)), \
-        'Email did not deleted properly'
+    for email in profile.emails.emails:
+        assert(email.email_text != fake_email), \
+            '"{0}" not removed'.format(fake_email)
 
 
 @test_case('C195554')
@@ -184,7 +180,6 @@ def test_verify_an_email(accounts_base_url, selenium, student):
     # GIVEN: a student viewing their Accounts profile
     home = AccountsHome(selenium, accounts_base_url).open()
     profile = home.log_in(*student)
-    initial_email_count = len(profile.emails.emails)
 
     # WHEN: add an email without verifying the email
     # AND: clicks the email address
@@ -193,25 +188,33 @@ def test_verify_an_email(accounts_base_url, selenium, student):
     # AND: close the new tab showing "Thank you for confirming your email
     #      address."
     # AND: reload the profile page
-    name = Utility.random_hex()
+    name = Utility.random_hex(19, True)
     restmail = RestMail(name)
     restmail.empty()
     address = name + '@restmail.net'
     profile.emails.add_email(address)
-    profile.emails.emails[-1].resend_confirmation()
+    for email in profile.emails.emails:
+        if email.email_text == address:
+            email.resend_confirmation()
     restmail.wait_for_mail()
     restmail.wait_for_mail()[-1].confirm_email()
     profile.open()
 
     # THEN: the new email does not have "unconfirmed" to the right of it
-    assert(profile.emails.emails[-1].is_confirmed), 'Email unconfirmed'
+    for email in profile.emails.emails:
+        if email.email_text == address:
+            assert(email.is_confirmed), 'Email is still unconfirmed'
+            break
 
     # WHEN: delete the new email
-    profile.emails.emails[-1].delete()
+    for email in profile.emails.emails:
+        if email.email_text == address:
+            email.delete()
+            break
 
     # THEN: the email list is restored
-    assert(len(profile.emails.emails) == initial_email_count), \
-        'Email has not been removed'
+    for email in profile.emails.emails:
+        assert(email != address), 'Email was not been removed'
 
 
 @test_case('C195553')
@@ -228,7 +231,7 @@ def test_add_a_verified_email_to_profile(accounts_base_url, selenium, student):
     # AND: closes the new tab showing "Thank you for confirming your email
     #      address."
     # AND: reload the profile page
-    name = Utility.random_hex()
+    name = Utility.random_hex(20, True)
     restmail = RestMail(name)
     restmail.empty()
     address = name + '@restmail.net'
@@ -251,10 +254,8 @@ def test_add_a_verified_email_to_profile(accounts_base_url, selenium, student):
             email.delete()
 
     # THEN: the email list is restored
-    assert(not reduce(lambda x, y: x or y.email_text == address,
-                      profile.emails.emails,
-                      False)), \
-        'Email did not deleted properly'
+    for email in profile.emails.emails:
+        assert(email.email_text != address), 'Email was not been removed'
 
 
 @test_case('C195555')

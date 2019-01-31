@@ -101,12 +101,12 @@ def test_the_ten_most_recent_new_mentions_are_shown(web_base_url, selenium):
 
     # WHEN: they click on a news article title
     article = press.mentions[Utility.random(end=len(press.mentions) - 1)]
-    check = article.check_article()
+    url = article.url
+    headline = article.headline
 
     # THEN: the full article exists
-    if not check.ok:
-        Utility.test_url_and_warn(code=check.status_code,
-                                  message='"{0}"'.format(article.headline))
+    Utility.test_url_and_warn(
+        url=url, message='"{0}"'.format(headline), driver=selenium)
 
 
 @test_case('C210472')
@@ -156,7 +156,8 @@ def test_press_inquiry_options(web_base_url, selenium):
         #       new tab
         if not social_page.ok:
             Utility.test_url_and_warn(code=social_page.status_code,
-                                      message=social.name)
+                                      message=social.name,
+                                      driver=selenium)
 
     # WHEN: they close the new tab
     # AND:  switch to the original tab
@@ -166,7 +167,8 @@ def test_press_inquiry_options(web_base_url, selenium):
     # THEN: the press kit is available
     if not press_kit.ok:
         Utility.test_url_and_warn(code=press_kit.status_code,
-                                  message='Press kit download')
+                                  message='Press kit download',
+                                  driver=selenium)
 
 
 @test_case('C210474')

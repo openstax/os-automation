@@ -47,6 +47,8 @@ class Link(Region):
         Utility.wait_for_overlay_then(self.link.click)
         if destination.endswith(Support.IMPACT):
             from pages.web.impact import OurImpact as Destination
+        elif destination.endswith(Support.ANNUAL_REPORT):
+            from pages.web.annual import AnnualReport as Destination
         elif destination.endswith(Support.PARTNERS):
             from pages.web.partners import Partners as Destination
         elif destination.endswith(Support.SUBJECTS):

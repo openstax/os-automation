@@ -57,8 +57,7 @@ class Subjects(WebBase):
             self.find_element(*self._loader_locator) and
             self.find_element(*self._category_locator) and
             Utility.is_image_visible(self.driver,
-                                     locator=self._image_locators) and
-            (sleep(1.0) or True))
+                                     locator=self._image_locators))
 
     def wait_for_page_to_load(self):
         """Override the page wait."""

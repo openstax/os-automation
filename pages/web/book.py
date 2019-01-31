@@ -277,9 +277,11 @@ class Book(WebBase):
                                            locator=self._toc_locator)
             return self.table_of_contents
 
-        def view_online(self):
+        def view_online(self, get_url=False):
             """View the book on CNX.org."""
             link = self.find_element(*self._online_view_locator)
+            if get_url:
+                return link.get_attribute('href')
             Utility.switch_to(self.driver, element=link)
             from pages.cnx.contents import Webview
             return go_to_(Webview(self.driver))
@@ -306,9 +308,11 @@ class Book(WebBase):
                                            locator=self._print_copy_locator)
             return self.order_book
 
-        def view_bookshare(self):
+        def view_bookshare(self, url=False):
             """Open the Bookshare page for the textbook."""
             link = self.find_element(*self._bookshare_locator)
+            if url:
+                return link.get_attribute('href')
             Utility.switch_to(self.driver, element=link)
             from pages.bookshare.home import Bookshare
             return go_to_(Bookshare(self.driver))
@@ -318,18 +322,22 @@ class Book(WebBase):
             """Return the available iBook links."""
             return self.find_elements(*self._ibook_download_locator)
 
-        def view_ibook(self, book=1):
+        def view_ibook(self, book=1, url=False):
             """Open the iTunes store page for the iBook."""
             assert(book <= len(self.ibooks)), \
                 'iBook {number} not available.'.format(number=book)
             link = self.ibooks[book - 1]
+            if url:
+                return link.get_attribute('href')
             Utility.switch_to(self.driver, element=link)
             from pages.apple.itunes import ITunes
             return go_to_(ITunes(self.driver))
 
-        def view_kindle(self):
+        def view_kindle(self, url=False):
             """Open the Amazon store page for the Kindle ebook."""
             link = self.find_element(*self._kindle_download_locator)
+            if url:
+                return link.get_attribute('href')
             Utility.switch_to(self.driver, element=link)
             from pages.amazon.home import Amazon
             return go_to_(Amazon(self.driver))
@@ -1113,7 +1121,8 @@ class Modal(Region):
     def root(self):
         """Override the root variable."""
         return self.driver.execute_script(
-            'return document.querySelector("#dialog");')
+            'return document.querySelector("{0}");'
+            .format(self._root_locator[1]))
 
     def is_displayed(self):
         """Return True if the order modal is currently active."""
@@ -1123,8 +1132,8 @@ class Modal(Region):
     def close(self):
         """Close the order form."""
         assert(self.is_displayed), 'Order options are not visible'
-        Utility.safari_exception_click(self.driver,
-                                       locator=self._close_locator)
+        close = self.find_element(*self._close_locator)
+        Utility.safari_exception_click(self.driver, element=close)
         return self.page
 
 
@@ -1155,9 +1164,12 @@ class TableOfContents(Modal):
             Utility.scroll_to(self.driver, element=target, shift=-80)
         return target
 
-    def view_online(self):
+    def view_online(self, get_url=False):
         """View the book on CNX.org."""
         button = self.find_element(*self._online_view_locator)
+        url = button.get_attribute('href')
+        if get_url:
+            return url
         Utility.switch_to(self.driver, element=button)
         from pages.cnx.contents import Webview
         return go_to_(Webview(self.driver))
@@ -1211,13 +1223,15 @@ class BookOrder(Modal):
             except WebDriverException:
                 return ''
 
-        def select(self):
+        def select(self, url=True):
             """Click on the order option."""
             if self.root.tag_name.lower() == 'a':
                 target = self.root
             else:
                 target = self.find_element(*self._non_root_link_locator)
             if self.title == 'Individual':
+                if url:
+                    return target.get_attribute('href')
                 Utility.switch_to(self.driver, element=target)
                 from pages.amazon.home import Amazon
                 return go_to_(Amazon(self.driver))

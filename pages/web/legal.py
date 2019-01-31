@@ -148,3 +148,8 @@ class PrivacyPolicy(LegalBase):
         Utility.switch_to(self.driver, link_locator=self._gdpr_locator)
         from pages.rice.gdpr import GeneralDataPrivacyRegulation
         return go_to_(GeneralDataPrivacyRegulation(self.driver))
+
+    @property
+    def gdpr(self):
+        """Return the GDPR link."""
+        return self.find_element(*self._gdpr_locator)

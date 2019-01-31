@@ -27,4 +27,5 @@ def test_open_positions_are_available(web_base_url, selenium):
         assert(position.description)
         assert(position.url)
         assert(Utility.test_url_and_warn(url=position.url,
-                                         message=position.title))
+                                         message=position.title,
+                                         driver=selenium))

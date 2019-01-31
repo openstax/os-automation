@@ -3,7 +3,6 @@
 This assumes TouchNet's payment side is functioning.
 """
 
-from pages.web.donation import Give
 from pages.web.home import WebHome
 from tests.markers import nondestructive, test_case, web
 from utils.utilities import Utility
@@ -41,8 +40,8 @@ def test_the_preform_amount_is_passed_to_the_donation_form(
     # WHEN: they go back to the give page
     # AND:  enter a random amount (5 or greater)
     # AND:  click on the "donate!" button
-    donation.back()
-    give = Give(selenium, web_base_url).wait_for_page_to_load()
+    home = WebHome(selenium, web_base_url).open()
+    give = home.openstax_nav.view_donation_options()
     amount = Utility.random(start=Web.MIN_DONATION)
     give.form.other = amount
     donation = give.form.donate()

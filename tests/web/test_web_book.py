@@ -39,7 +39,8 @@ def test_for_book_details_and_user_resource_pages(web_base_url, selenium):
     assert('details' in book.location)
     assert(book.details.is_displayed())
     assert(book.tabs[Web.INSTRUCTOR_RESOURCES].is_displayed())
-    assert(book.tabs[Web.STUDENT_RESOURCES].is_displayed())
+    if book.title != Library.ACCOUNTING:
+        assert(book.tabs[Web.STUDENT_RESOURCES].is_displayed())
 
     # WHEN: they select a Polish book tile
     home.open()
@@ -74,18 +75,15 @@ def test_the_availability_of_the_table_of_contents(web_base_url, selenium):
     assert(book.table_of_contents.is_displayed())
 
     # WHEN: they click on the "View online" button
-    webview = book.table_of_contents.view_online()
+    webview = book.table_of_contents.view_online(get_url=True)
 
     # THEN: the webview version of the book is loaded in a new tab
-    assert('cnx' in webview.location)
-    assert(book_title == webview.title), (
-        'Not viewing the correct book: "{book}" != "{web}"'
-        .format(book=book_title, web=webview.title))
+    Utility.test_url_and_warn(
+        url=webview,
+        message='Webview not available for {0}'.format(book_title),
+        driver=selenium)
 
-    # WHEN: they close the new tab
-    # AND:  switch back to the original tab
-    # AND:  click on the "X"
-    webview.close_tab()
+    # WHEN: they click on the "X"
     book.table_of_contents.close()
 
     # THEN: the table of contents pane is closed
@@ -120,24 +118,13 @@ def test_webview_for_a_book_is_avaialble(web_base_url, selenium):
     book_title = book.title
 
     # WHEN: they click on the "View online" link
-    webview = book.sidebar.view_online()
+    webview = book.sidebar.view_online(get_url=True)
 
-    # THEN: the webview version of the book is loaded in a
-    #       new tab
-    assert(webview.is_displayed())
-    assert('cnx' in webview.location)
-    # AP Physics is viewed as a collection, not a book, so
-    # ignore the title test for it
-    if book_title != 'The AP Physics Collection':
-        assert(book_title == webview.title)
-
-    # WHEN: they close the new tab
-    # AND:  switch back to the original tab
-    webview.close_tab()
-
-    # THEN: the book details page is displayed
-    assert(book.is_displayed())
-    assert('openstax.org' in selenium.current_url)
+    # THEN: the webview for the book is available
+    Utility.test_url_and_warn(
+        url=webview,
+        message='Webview not available for {0}'.format(book_title),
+        driver=selenium)
 
 
 @test_case('C210352')
@@ -176,18 +163,11 @@ def test_links_to_purchase_a_print_copy(web_base_url, selenium):
     # WHEN: they click on the "Order a print copy" link
     # AND:  click on the "Order on Amazon" button
     book_order = book.sidebar.view_book_order_options()
-    amazon = book_order.boxes[Web.INDIVIDUAL].select()
+    amazon = book_order.boxes[Web.INDIVIDUAL].select(True)
 
-    # THEN: the book order page on Amazon is loaded in a new tab
-    assert(amazon.is_displayed())
-    assert('amazon' in amazon.location)
-
-    # WHEN: they close the new tab
-    # AND:  switch back to the original tab
-    amazon.close_tab()
-
-    # THEN: the book details page is displayed
-    assert(book.is_displayed())
+    # THEN: the book order page on Amazon is verified
+    assert(Utility.test_url_and_warn(
+        url=amazon, _head=False, message='Amazon book page', driver=selenium))
 
     # WHEN: they click on the "Order a print copy" link
     # AND:  click on the "Order options" button
@@ -217,18 +197,11 @@ def test_mobile_links_to_purchase_a_print_copy(web_base_url, selenium):
     # WHEN: they click on the "Order a print copy" link
     # AND:  click on the "Order on Amazon" button
     book_order = book.phone.view_book_order_options()
-    amazon = book_order.boxes[Web.INDIVIDUAL].select()
+    amazon = book_order.boxes[Web.INDIVIDUAL].select(True)
 
-    # THEN: the book order page on Amazon is loaded in a new tab
-    assert(amazon.is_displayed())
-    assert('amazon' in amazon.location)
-
-    # WHEN: they close the new tab
-    # AND:  switch back to the original tab
-    amazon.close_tab()
-
-    # THEN: the book details page is displayed
-    assert(book.is_displayed())
+    # THEN: the book order page on Amazon is verified
+    assert(Utility.test_url_and_warn(
+        url=amazon, _head=False, message='Amazon book page', driver=selenium))
 
     # WHEN: they click on the "Order a print copy" link
     # AND:  click on the "Order options" button
@@ -252,18 +225,11 @@ def test_bookshare_availability(web_base_url, selenium):
     book = subjects.select_random_book(_from=Library.BOOKSHARE)
 
     # WHEN: they click on the "Bookshare" link
-    bookshare = book.sidebar.view_bookshare()
+    bookshare = book.sidebar.view_bookshare(True)
 
     # THEN: the Bookshare book page is loaded in a new tab
-    assert(bookshare.is_displayed())
-    assert('bookshare' in bookshare.location)
-
-    # WHEN: they close the new tab
-    # AND:  switch back to the original tab
-    bookshare.close_tab()
-
-    # THEN: the book details page is displayed
-    assert(book.is_displayed())
+    assert(Utility.test_url_and_warn(
+        url=bookshare, message='Bookshare', driver=selenium))
 
 
 @test_case('C210356')
@@ -280,19 +246,12 @@ def test_ibook_availability(web_base_url, selenium):
     ibooks = len(book.sidebar.ibooks)
     for part in range(ibooks):
         # WHEN: they click on the "Download on iBooks" link
-        itunes = book.sidebar.view_ibook(part)
+        itunes = book.sidebar.view_ibook(part, url=True)
 
-        # THEN: the iTunes book page is loaded in a new tab
-        if not itunes.is_displayed():
-            warnings.warn(UserWarning('iTunes is not displayed'))
-        assert('itunes' in itunes.location)
-
-        # WHEN: they close the new tab
-        # AND:  switch back to the original tab
-        itunes.close_tab()
-
-        # THEN: the book details page is displayed
-        assert(book.is_displayed())
+        # THEN: the iBook page is verified
+        assert(Utility.test_url_and_warn(url=itunes,
+                                         message='iBook {0}'.format(part),
+                                         driver=selenium))
 
 
 @test_case('C210357')
@@ -307,19 +266,11 @@ def test_kindle_availability(web_base_url, selenium):
     book = subjects.select_random_book(_from=Library.KINDLE)
 
     # WHEN: they click on the "Download for Kindle" link
-    kindle = book.sidebar.view_kindle()
+    kindle = book.sidebar.view_kindle(True)
 
     # THEN: the eTextbook order page on Amazon is loaded in a new tab
-    if not kindle.is_displayed():
-        warnings.warn(UserWarning('Kindle order page is not displayed'))
-    assert('amazon' in kindle.location)
-
-    # WHEN: they close the new tab
-    # AND:  switch back to the original tab
-    kindle.close_tab()
-
-    # THEN: the book details page is displayed
-    assert(book.is_displayed())
+    assert(Utility.test_url_and_warn(
+        url=kindle, _head=False, message='Kindle', driver=selenium))
 
 
 @test_case('C210358')
@@ -738,7 +689,8 @@ def test_verified_instructors_may_request_a_comped_ibook(
     # WHEN: they click on the "Instructor resources" tab
     # AND:  click on the "iBooks Comp Copy" tile
     book.select_tab(Web.INSTRUCTOR_RESOURCES)
-    comp_copy = book.instructor.resource_by_name('iBooks Comp Copy').select()
+    comp_copy = book.instructor.resource_by_name(
+                'Apple iBooks Comp Copy').select()
 
     # THEN: the comp copy modal is displayed
     assert(comp_copy.is_displayed())
@@ -762,7 +714,8 @@ def test_verified_instructors_may_request_a_comped_ibook(
 
     # WHEN: they click on the "iBooks Comp Copy" tile
     # AND:  click on the 'X' icon
-    comp_copy = book.instructor.resource_by_name('iBooks Comp Copy').select()
+    comp_copy = book.instructor.resource_by_name(
+                'Apple iBooks Comp Copy').select()
     comp_copy.close()
 
     # THEN: the comp copy modal is closed
@@ -771,7 +724,8 @@ def test_verified_instructors_may_request_a_comped_ibook(
     # WHEN: they click on the "iBooks Comp Copy" tile
     # AND:  enter a zero or greater number in the input box
     # AND:  click on the "Request iBook" button
-    comp_copy = book.instructor.resource_by_name('iBooks Comp Copy').select()
+    comp_copy = book.instructor.resource_by_name(
+                'Apple iBooks Comp Copy').select()
     comp_copy.students = Utility.random()
     comp_copy_receipt = comp_copy.submit()
 
@@ -968,36 +922,21 @@ def test_books_may_have_ally_tiles(web_base_url, selenium):
         if not text_seen[0]:
             warnings.warn(UserWarning(
                 'On hover text for the tile "{0}"'.format(tile_name) +
-                ' failed to hide: {0}, {1}, {2}'.format(*text_seen)))
+                ' failed to show: {0}, {1}, {2}'.format(*text_seen)))
 
     # WHEN: the screen is reduced to 600 pixels
-    # AND:  the cursor hovers over a tile
+    # AND:  and the URL is tested
     book.resize_window(width=Web.PHONE)
     book.instructor.toggle()
     for partner in book.instructor.partners:
         if partner.name == tile_name:
             tile = partner
             break
-    if not is_safari:
-        Utility.scroll_to(selenium, element=tile.root)
-        text_seen = (
-            Actions(selenium)
-            .move_to_element(tile.root)
-            .wait(1.0)
-            .get_js_data(element=tile.root, data_type='opacity', expected='0'))
 
-        # THEN: the company name is not replaced by the company
-        #       description
-        if not text_seen[0]:
-            warnings.warn(UserWarning(
-                'On hover text for the tile "{0}"'.format(tile_name) +
-                ' failed to hide: {0}, {1}, {2}'.format(*text_seen)))
-
-    # WHEN: they click on the tile
-    tile.view_partner()
-
-    # THEN: the company website is loaded in a new tab
-    # assert(book_title in selenium.page_source)
+    # THEN: the company website is verified
+    assert(Utility.test_url_and_warn(url=tile.url,
+                                     message=tile.name,
+                                     driver=selenium))
 
 
 @test_case('C210375')
@@ -1017,9 +956,8 @@ def test_available_student_resources_can_be_downloaded(web_base_url, selenium):
 
     # THEN: available resources are available for download
     for resource in book.student.resources:
-        assert(resource.can_be_downloaded), (
-            '{resource} is not available for download'
-            .format(resource=resource.title))
+        assert(resource.can_be_downloaded or resource.is_external), \
+            '{resource} is not available'.format(resource=resource.title)
 
 
 def subject_list(size=1):

@@ -31,7 +31,8 @@ def test_the_privacy_policy_page(web_base_url, selenium):
         assert(heading in Web.PRIVACY)
 
     # WHEN: they click on the "gdpr.rice.edu" link
-    gdpr = privacy.view_gdpr()
+    gdpr = privacy.gdpr
 
     # THEN: the Rice GDPR page is displayed in a new tab
-    assert(gdpr.at_rice)
+    assert(Utility.test_url_and_warn(
+        link=gdpr, message='Rice GDPR page', driver=selenium))

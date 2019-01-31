@@ -34,6 +34,7 @@ class Web(object):
     BOOKS = 0
     TECH = 1
     OUR_IMPACT = 0
+    REPORT = 0
     OPENSTAX_PARTNERS = 1
 
     # *** BOOK DETAILS ***
@@ -182,6 +183,7 @@ class Web(object):
 
     # Matching strings
     ABOUT = 'about'
+    ANNUAL_REPORT = 'annual-report'
     BOOKSTORE = 'bookstore-suppliers'
     GIVE = 'give'
     IMPACT = 'impact'
@@ -443,6 +445,7 @@ class Library():
     # Business
     ETHICS = 'Business Ethics'
     INTRO_BUSINESS = 'Introduction to Business'
+    ACCOUNTING = 'Principles of Accounting, Volume 2: Managerial Accounting'
 
     # Humanities
     US_HISTORY = 'U.S. History'
@@ -509,6 +512,7 @@ class Library():
     LANGUAGE = 'language'
     OPENSTAX = 'openstax'
     POLISH = 'Polish'
+    PRE_RELEASE = 'Coming Soon'
     PRINT_COPY = 'print'
     SHORT_NAME = 'short_name'
     SUPERSEDED = 'not_current'
@@ -545,6 +549,7 @@ class Library():
                 self.ITUNES: False,
                 self.KINDLE: False,
                 self.LANGUAGE: self.ENGLISH,
+                self.PRE_RELEASE: False,
                 self.PRINT_COPY: False,
                 self.SHORT_NAME: 'Business Ethics', },
             self.INTRO_BUSINESS: {
@@ -561,8 +566,27 @@ class Library():
                 self.ITUNES: False,
                 self.KINDLE: False,
                 self.LANGUAGE: self.ENGLISH,
+                self.PRE_RELEASE: False,
                 self.PRINT_COPY: False,
                 self.SHORT_NAME: 'Introduction to Business', },
+            self.ACCOUNTING: {
+                self.BOOKSHARE: False,
+                self.CATEGORY: [self.ALL, self.BUSINESS],
+                self.COMP_COPY: False,
+                self.DETAILS: ('principles-accounting-'
+                               'volume-2-managerial-accounting'),
+                self.HAS_I_LOCK: False,
+                self.HAS_I_UNLOCK: False,
+                self.HAS_S_LOCK: False,
+                self.HAS_S_UNLOCK: False,
+                self.INTEREST: 'null',  # temp short URL
+                self.IS_AP: False,
+                self.ITUNES: False,
+                self.KINDLE: False,
+                self.LANGUAGE: self.ENGLISH,
+                self.PRE_RELEASE: True,
+                self.PRINT_COPY: False,
+                self.SHORT_NAME: 'Accounting', },  # not yet added to the list
 
             # Humanities
             self.US_HISTORY: {
@@ -579,6 +603,7 @@ class Library():
                 self.ITUNES: True,
                 self.KINDLE: True,
                 self.LANGUAGE: self.ENGLISH,
+                self.PRE_RELEASE: False,
                 self.PRINT_COPY: True,
                 self.SHORT_NAME: 'U.S. History', },
 
@@ -597,6 +622,7 @@ class Library():
                 self.ITUNES: False,
                 self.KINDLE: True,
                 self.LANGUAGE: self.ENGLISH,
+                self.PRE_RELEASE: False,
                 self.PRINT_COPY: True,
                 self.SHORT_NAME: 'Algebra and Trigonometry', },
             self.CALCULUS_1: {
@@ -613,6 +639,7 @@ class Library():
                 self.ITUNES: False,
                 self.KINDLE: True,
                 self.LANGUAGE: self.ENGLISH,
+                self.PRE_RELEASE: False,
                 self.PRINT_COPY: True,
                 self.SHORT_NAME: 'Calculus', },
             self.CALCULUS_2: {
@@ -629,6 +656,7 @@ class Library():
                 self.ITUNES: False,
                 self.KINDLE: True,
                 self.LANGUAGE: self.ENGLISH,
+                self.PRE_RELEASE: False,
                 self.PRINT_COPY: True,
                 self.SHORT_NAME: 'Calculus', },
             self.CALCULUS_3: {
@@ -645,6 +673,7 @@ class Library():
                 self.ITUNES: False,
                 self.KINDLE: True,
                 self.LANGUAGE: self.ENGLISH,
+                self.PRE_RELEASE: False,
                 self.PRINT_COPY: True,
                 self.SHORT_NAME: 'Calculus', },
             self.ALGEBRA: {
@@ -661,6 +690,7 @@ class Library():
                 self.ITUNES: False,
                 self.KINDLE: True,
                 self.LANGUAGE: self.ENGLISH,
+                self.PRE_RELEASE: False,
                 self.PRINT_COPY: True,
                 self.SHORT_NAME: 'College Algebra', },
             self.ELEM_ALGEBRA: {
@@ -677,6 +707,7 @@ class Library():
                 self.ITUNES: False,
                 self.KINDLE: True,
                 self.LANGUAGE: self.ENGLISH,
+                self.PRE_RELEASE: False,
                 self.PRINT_COPY: True,
                 self.SHORT_NAME: 'Elementary Algebra', },
             self.INTER_ALGEBRA: {
@@ -693,6 +724,7 @@ class Library():
                 self.ITUNES: False,
                 self.KINDLE: True,
                 self.LANGUAGE: self.ENGLISH,
+                self.PRE_RELEASE: False,
                 self.PRINT_COPY: True,
                 self.SHORT_NAME: 'Intermediate Algebra', },
             self.BUSINESS_STATS: {
@@ -709,6 +741,7 @@ class Library():
                 self.ITUNES: False,
                 self.KINDLE: True,
                 self.LANGUAGE: self.ENGLISH,
+                self.PRE_RELEASE: False,
                 self.PRINT_COPY: True,
                 self.SHORT_NAME: 'Introductory Business Statistics', },
             self.INTRO_STATS: {
@@ -725,6 +758,7 @@ class Library():
                 self.ITUNES: True,
                 self.KINDLE: True,
                 self.LANGUAGE: self.ENGLISH,
+                self.PRE_RELEASE: False,
                 self.PRINT_COPY: True,
                 self.SHORT_NAME: 'Introductory Statistics', },
             self.PREALGEBRA: {
@@ -741,6 +775,7 @@ class Library():
                 self.ITUNES: False,
                 self.KINDLE: True,
                 self.LANGUAGE: self.ENGLISH,
+                self.PRE_RELEASE: False,
                 self.PRINT_COPY: True,
                 self.SHORT_NAME: 'Prealgebra', },
             self.PRECALCULUS: {
@@ -757,6 +792,7 @@ class Library():
                 self.ITUNES: True,
                 self.KINDLE: True,
                 self.LANGUAGE: self.ENGLISH,
+                self.PRE_RELEASE: False,
                 self.PRINT_COPY: True,
                 self.SHORT_NAME: 'Precalculus', },
 
@@ -775,6 +811,7 @@ class Library():
                 self.ITUNES: True,
                 self.KINDLE: True,
                 self.LANGUAGE: self.ENGLISH,
+                self.PRE_RELEASE: False,
                 self.PRINT_COPY: True,
                 self.SHORT_NAME: 'Anatomy & Physiology', },
             self.ASTRONOMY: {
@@ -791,6 +828,7 @@ class Library():
                 self.ITUNES: True,
                 self.KINDLE: True,
                 self.LANGUAGE: self.ENGLISH,
+                self.PRE_RELEASE: False,
                 self.PRINT_COPY: True,
                 self.SHORT_NAME: 'Astronomy', },
             self.BIOLOGY: {
@@ -807,6 +845,7 @@ class Library():
                 self.ITUNES: True,
                 self.KINDLE: True,
                 self.LANGUAGE: self.ENGLISH,
+                self.PRE_RELEASE: False,
                 self.PRINT_COPY: False,
                 self.SHORT_NAME: 'Biology', },
             self.BIOLOGY_2E: {
@@ -823,6 +862,7 @@ class Library():
                 self.ITUNES: True,
                 self.KINDLE: True,
                 self.LANGUAGE: self.ENGLISH,
+                self.PRE_RELEASE: False,
                 self.PRINT_COPY: True,
                 self.SHORT_NAME: 'Biology', },
             self.AP_BIO: {
@@ -839,6 +879,7 @@ class Library():
                 self.ITUNES: False,
                 self.KINDLE: True,
                 self.LANGUAGE: self.ENGLISH,
+                self.PRE_RELEASE: False,
                 self.PRINT_COPY: False,
                 self.SHORT_NAME: 'AP Biology', },
             self.CHEMISTRY: {
@@ -855,6 +896,7 @@ class Library():
                 self.ITUNES: False,
                 self.KINDLE: True,
                 self.LANGUAGE: self.ENGLISH,
+                self.PRE_RELEASE: False,
                 self.PRINT_COPY: True,
                 self.SHORT_NAME: 'Chemistry', },
             self.CHEM_ATOMS: {
@@ -871,6 +913,7 @@ class Library():
                 self.ITUNES: True,
                 self.KINDLE: True,
                 self.LANGUAGE: self.ENGLISH,
+                self.PRE_RELEASE: False,
                 self.PRINT_COPY: True,
                 self.SHORT_NAME: 'Chemistry: Atoms First', },
             self.PHYSICS: {
@@ -887,6 +930,7 @@ class Library():
                 self.ITUNES: True,
                 self.KINDLE: True,
                 self.LANGUAGE: self.ENGLISH,
+                self.PRE_RELEASE: False,
                 self.PRINT_COPY: True,
                 self.SHORT_NAME: 'College Physics', },
             self.AP_PHYS: {
@@ -903,6 +947,7 @@ class Library():
                 self.ITUNES: True,
                 self.KINDLE: True,
                 self.LANGUAGE: self.ENGLISH,
+                self.PRE_RELEASE: False,
                 self.PRINT_COPY: True,
                 self.SHORT_NAME: 'AP Physics', },
             self.BIO_CONCEPTS: {
@@ -919,6 +964,7 @@ class Library():
                 self.ITUNES: True,
                 self.KINDLE: True,
                 self.LANGUAGE: self.ENGLISH,
+                self.PRE_RELEASE: False,
                 self.PRINT_COPY: True,
                 self.SHORT_NAME: 'Concepts of Biology', },
             self.FIZYKA_1: {
@@ -936,6 +982,7 @@ class Library():
                 self.ITUNES: False,
                 self.KINDLE: False,
                 self.LANGUAGE: self.POLISH,
+                self.PRE_RELEASE: False,
                 self.PRINT_COPY: False,
                 self.SHORT_NAME: None, },
             self.FIZYKA_2: {
@@ -953,6 +1000,7 @@ class Library():
                 self.ITUNES: False,
                 self.KINDLE: False,
                 self.LANGUAGE: self.POLISH,
+                self.PRE_RELEASE: False,
                 self.PRINT_COPY: False,
                 self.SHORT_NAME: None, },
             self.FIZYKA_3: {
@@ -970,6 +1018,7 @@ class Library():
                 self.ITUNES: False,
                 self.KINDLE: False,
                 self.LANGUAGE: self.POLISH,
+                self.PRE_RELEASE: False,
                 self.PRINT_COPY: False,
                 self.SHORT_NAME: None, },
             self.MICROBIOLOGY: {
@@ -986,6 +1035,7 @@ class Library():
                 self.ITUNES: True,
                 self.KINDLE: True,
                 self.LANGUAGE: self.ENGLISH,
+                self.PRE_RELEASE: False,
                 self.PRINT_COPY: True,
                 self.SHORT_NAME: 'Microbiology', },
             self.U_PHYS_1: {
@@ -1002,6 +1052,7 @@ class Library():
                 self.ITUNES: True,
                 self.KINDLE: True,
                 self.LANGUAGE: self.ENGLISH,
+                self.PRE_RELEASE: False,
                 self.PRINT_COPY: True,
                 self.SHORT_NAME: 'University Physics', },
             self.U_PHYS_2: {
@@ -1018,6 +1069,7 @@ class Library():
                 self.ITUNES: True,
                 self.KINDLE: True,
                 self.LANGUAGE: self.ENGLISH,
+                self.PRE_RELEASE: False,
                 self.PRINT_COPY: True,
                 self.SHORT_NAME: 'University Physics', },
             self.U_PHYS_3: {
@@ -1034,6 +1086,7 @@ class Library():
                 self.ITUNES: True,
                 self.KINDLE: True,
                 self.LANGUAGE: self.ENGLISH,
+                self.PRE_RELEASE: False,
                 self.PRINT_COPY: True,
                 self.SHORT_NAME: 'University Physics', },
 
@@ -1052,6 +1105,7 @@ class Library():
                 self.ITUNES: True,
                 self.KINDLE: True,
                 self.LANGUAGE: self.ENGLISH,
+                self.PRE_RELEASE: False,
                 self.PRINT_COPY: True,
                 self.SHORT_NAME: 'American Government', },
             self.SOCIOLOGY: {
@@ -1068,6 +1122,7 @@ class Library():
                 self.ITUNES: True,
                 self.KINDLE: True,
                 self.LANGUAGE: self.ENGLISH,
+                self.PRE_RELEASE: False,
                 self.PRINT_COPY: True,
                 self.SHORT_NAME: 'Introduction to Sociology 2e', },
             self.PRINCIPLES_ECON: {
@@ -1084,6 +1139,7 @@ class Library():
                 self.ITUNES: True,
                 self.KINDLE: True,
                 self.LANGUAGE: self.ENGLISH,
+                self.PRE_RELEASE: False,
                 self.PRINT_COPY: True,
                 self.SHORT_NAME: 'Principles of Economics', },
             self.PRINCIPLES_MACRO: {
@@ -1100,6 +1156,7 @@ class Library():
                 self.ITUNES: True,
                 self.KINDLE: True,
                 self.LANGUAGE: self.ENGLISH,
+                self.PRE_RELEASE: False,
                 self.PRINT_COPY: True,
                 self.SHORT_NAME: 'Principles of Macroeconomics', },
             self.AP_MACRO: {
@@ -1116,6 +1173,7 @@ class Library():
                 self.ITUNES: False,
                 self.KINDLE: True,
                 self.LANGUAGE: self.ENGLISH,
+                self.PRE_RELEASE: False,
                 self.PRINT_COPY: False,
                 self.SHORT_NAME: 'AP Macro Econ', },
             self.PRINCIPLES_MICRO: {
@@ -1132,6 +1190,7 @@ class Library():
                 self.ITUNES: True,
                 self.KINDLE: True,
                 self.LANGUAGE: self.ENGLISH,
+                self.PRE_RELEASE: False,
                 self.PRINT_COPY: True,
                 self.SHORT_NAME: 'Principles of Microeconomics', },
             self.AP_MICRO: {
@@ -1148,6 +1207,7 @@ class Library():
                 self.ITUNES: False,
                 self.KINDLE: True,
                 self.LANGUAGE: self.ENGLISH,
+                self.PRE_RELEASE: False,
                 self.PRINT_COPY: False,
                 self.SHORT_NAME: 'AP Micro Econ', },
             self.PSYCHOLOGY: {
@@ -1164,6 +1224,7 @@ class Library():
                 self.ITUNES: True,
                 self.KINDLE: True,
                 self.LANGUAGE: self.ENGLISH,
+                self.PRE_RELEASE: False,
                 self.PRINT_COPY: True,
                 self.SHORT_NAME: 'Psychology', },
         }
@@ -1189,6 +1250,12 @@ class Library():
     def business(self):
         """Return the business books."""
         return self.get_by_category(self.BUSINESS)
+
+    @property
+    def coming_soon(self):
+        """Return the pre-release books."""
+        return [(book, self.get(book)) for book in self.books
+                if self.get(book, self.PRE_RELEASE)]
 
     @property
     def comp_copy(self):

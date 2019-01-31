@@ -16,10 +16,8 @@ def web_base_url(request):
                 config.getini('instance')).lower()
     if instance and base_url:
         segments = base_url.split(SPLIT)
-        insert = ('' if instance == 'prod' or instance == 'production' else
-                  '{staging}cms-{instance}.'
-                  .format(staging='os' if instance == 'staging' else '',
-                          instance=instance))
+        insert = ('' if instance.startswith('prod') else
+                  'cms-{instance}.'.format(instance=instance))
         return '{0}{3}{2}{1}'.format(*segments, SPLIT, insert)
     if base_url is not None:
         return base_url
