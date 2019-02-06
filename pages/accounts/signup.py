@@ -255,11 +255,11 @@ class Signup(AccountsBase):
         # completion
         # sleep(1)
         subjects_to_select = []
-        if non_student_role and _type != Signup.OTHER:
+        if non_student_role:
             for _, name in Signup.SUBJECTS:
                 if name in kwargs.get('subjects', []):
                     subjects_to_select.append(name)
-        if subjects_to_select and _type != Signup.OTHER:
+        if subjects_to_select:
             self.instructor.select_subjects(subjects_to_select)
             '''for subject in subjects_to_select:
                 book = self.find_element(
@@ -291,11 +291,11 @@ class Signup(AccountsBase):
         self.user.agree_to_terms()
         sleep(0.25)
         self.next()
-        if instructor:
+        if non_student_role:
             assert(not self.error), '{0}'.format(self.error)
 
         # request e-mail confirmation for an elevated account
-        if instructor:
+        if non_student_role:
             self.notice.get_confirmation_email()
             self.next()
 

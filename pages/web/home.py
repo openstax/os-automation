@@ -63,10 +63,10 @@ class WebHome(WebBase):
 
     URL_TEMPLATE = ''
 
-    _banner_locator = (By.CLASS_NAME, 'book-banners')
-    _quote_locator = (By.CLASS_NAME, 'quote-buckets')
-    _education_locator = (By.ID, 'education')
-    _information_locator = (By.CLASS_NAME, 'buckets')
+    _banner_locator = (By.CSS_SELECTOR, '.banner-carousel')
+    _quote_locator = (By.CSS_SELECTOR, '.quotes')
+    _education_locator = (By.CSS_SELECTOR, '.education-banner')
+    _information_locator = (By.CSS_SELECTOR, '.buckets-section')
 
     @property
     def loaded(self):

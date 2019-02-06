@@ -3,8 +3,7 @@
 from time import sleep
 
 from pypom import Page
-from selenium.common.exceptions import StaleElementReferenceException  # NOQA
-from selenium.common.exceptions import TimeoutException  # NOQA
+from selenium.common.exceptions import StaleElementReferenceException, TimeoutException, WebDriverException  # NOQA
 from selenium.webdriver.common.by import By
 
 from regions.web.footer import Footer
@@ -35,8 +34,9 @@ class WebBase(Page):
             try:
                 return super(WebBase, self).open()
             except TimeoutException:
-                print('Attempt: {0}'.format(attempt))
+                print('Attempt: {0}'.format(attempt + 1))
                 sleep(1)
+        raise WebDriverException('Website failed to open or load')
 
     @property
     def sticky_note(self):
