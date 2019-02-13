@@ -55,7 +55,7 @@ class Contact(WebBase):
         Utility.switch_to(self.driver, self._support_locator,
                           force_js_click=self.is_safari)
         from pages.salesforce.home import Salesforce
-        return go_to_external_(Salesforce, self.driver, url)
+        return go_to_external_(Salesforce(self.driver), url)
 
     @property
     def form(self):

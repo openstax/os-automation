@@ -116,7 +116,7 @@ class Footer(Region):
             url = link.get_attribute('href')
             Utility.switch_to(self.driver, element=link)
             from pages.github.home import GitHub
-            return go_to_external_(GitHub, self.driver, url)
+            return go_to_external_(GitHub(self.driver), url)
 
         def go_to_the_contact_form(self):
             """Go to the contact form."""

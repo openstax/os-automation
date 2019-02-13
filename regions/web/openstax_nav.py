@@ -14,7 +14,6 @@ class OpenStaxNav(Region):
 
     _root_locator = (By.CLASS_NAME, 'meta-nav')
     _our_impact_locator = (By.CSS_SELECTOR, '[href$=impact]')
-    # _our_impact_locator = (By.CSS_SELECTOR, '[href*=annual]')
     _supporters_locator = (By.CSS_SELECTOR, '[href$=foundation]')
     _blog_locator = (By.CSS_SELECTOR, '[href$=blog]')
     _give_locator = (By.CSS_SELECTOR, '[href$=give]')
@@ -62,7 +61,7 @@ class OpenStaxNav(Region):
         url = link.get_attribute('href')
         Utility.switch_to(self.driver, element=link)
         from pages.salesforce.home import Salesforce
-        return go_to_external_(Salesforce, self.driver, url)
+        return go_to_external_(Salesforce(self.driver), url)
 
     def go_to_rice(self):
         """Go to the Rice University home page."""

@@ -177,7 +177,10 @@ class OurImpact(WebBase):
         @property
         def name(self):
             """Return the founder's name."""
-            return self.find_element(*self._name_locator).text[:-1]
+            line = self.find_element(*self._name_locator).text
+            if line.endswith(','):
+                return line[:-1]
+            return line
 
         @property
         def role(self):

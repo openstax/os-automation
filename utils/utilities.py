@@ -582,22 +582,22 @@ class Status(object):
 
 def go_to_(destination):
     """Follow a destination link and wait for the page to load."""
-    destination.wait_for_page_to_load()
-    return destination
+    return go_to_external_(destination, url=None, once_only=True)
 
 
-def go_to_external_(destination, driver, url):
+def go_to_external_(destination, url, once_only=False):
     """Follow an external destination link repeatedly waiting for page load."""
-    for _ in range(2):
-        try:
-            destination(driver).wait_for_page_to_load()
-            return destination(driver)
-        except TimeoutException:
-            driver.get(url)
-            sleep(1)
+    if not once_only:
+        for _ in range(2):
+            try:
+                destination.wait_for_page_to_load()
+                return destination
+            except TimeoutException:
+                destination.driver.get(url)
+                sleep(1)
     try:
-        destination(driver).wait_for_page_to_load()
-        return destination(driver)
+        destination.wait_for_page_to_load()
+        return destination
     except TimeoutException:
         raise TimeoutException('{0} did not load ({1})'
                                .format(type(destination).__name__, url))

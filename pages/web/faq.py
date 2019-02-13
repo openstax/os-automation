@@ -45,7 +45,7 @@ class FAQ(WebBase):
         url = link.get_attribute('href')
         Utility.switch_to(self.driver, element=link)
         from pages.salesforce.home import Salesforce
-        return go_to_external_(Salesforce, self.driver, url)
+        return go_to_external_(Salesforce(self.driver), url)
 
     @property
     def questions(self):
