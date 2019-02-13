@@ -582,12 +582,12 @@ class Status(object):
 
 def go_to_(destination):
     """Follow a destination link and wait for the page to load."""
-    return go_to_external_(destination, url=None, once_only=True)
+    return go_to_external_(destination)
 
 
-def go_to_external_(destination, url, once_only=False):
+def go_to_external_(destination, url=None):
     """Follow an external destination link repeatedly waiting for page load."""
-    if not once_only:
+    if url:
         for _ in range(2):
             try:
                 destination.wait_for_page_to_load()
