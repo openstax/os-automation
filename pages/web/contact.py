@@ -2,9 +2,10 @@
 
 from pypom import Region
 from selenium.webdriver.common.by import By
+from selenium.webdriver.support import expected_conditions as expect
 
 from pages.web.base import WebBase
-from utils.utilities import Utility, go_to_
+from utils.utilities import Utility, go_to_, go_to_external_
 from utils.web import Web
 
 
@@ -17,7 +18,7 @@ class Contact(WebBase):
     _topic_locator = (By.CSS_SELECTOR, '.select')
     _header_locator = (By.CSS_SELECTOR, '.hero h1')
     _address_locator = (By.CSS_SELECTOR, '[data-html=mailing_address] p')
-    _support_locator = (By.CSS_SELECTOR, '[data-html=customer_service] a')
+    _support_locator = (By.CSS_SELECTOR, '#main [href*=force]')
 
     @property
     def loaded(self):
@@ -44,13 +45,17 @@ class Contact(WebBase):
     @property
     def support(self):
         """Return the user support link."""
-        return self.find_element(*self._support_locator)
+        return self.wait.until(
+            expect.presence_of_element_located(self._support_locator))
 
     def visit_the_support_center(self):
         """Click on the support link."""
-        Utility.switch_to(self.driver, element=self.support)
+        link = self.find_element(*self._support_locator)
+        url = link.get_attribute('href')
+        Utility.switch_to(self.driver, self._support_locator,
+                          force_js_click=self.is_safari)
         from pages.salesforce.home import Salesforce
-        return go_to_(Salesforce(self.driver))
+        return go_to_external_(Salesforce(self.driver), url)
 
     @property
     def form(self):

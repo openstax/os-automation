@@ -3,6 +3,7 @@
 from time import sleep
 
 from pypom import Region
+from selenium.common.exceptions import WebDriverException
 from selenium.webdriver.common.by import By
 
 from pages.web.blog import Article
@@ -428,10 +429,14 @@ class TutorMarketing(WebHome):
                 media = self.wait.until(
                     expected_conditions.presence_of_element_located(
                         self._media_locator))
-                if media.tag_name.lower() == 'img':
+                media_type = media.tag_name.lower()
+                if media_type == 'img':
                     return Utility.is_image_visible(self.driver, media)
-                return self.driver.execute_script(
-                    'return arguments[0].duration;', media) > 0
+                elif media_type == 'video':
+                    return self.driver.execute_script(
+                        'return arguments[0].duration;', media) > 0
+                raise WebDriverException('Unknown media type: {0}'
+                                         .format(media_type))
 
     class FeatureMatrix(Section):
         """The available features list."""

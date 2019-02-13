@@ -84,6 +84,22 @@ class Web(object):
         10, 25, 50, 100, 500, 1000, 'Other'
     ]
 
+    # *** OUR IMPACT ***
+
+    # Sections
+    BANNER = 0
+    REVOLUTION = 1
+    FOUNDING = 2
+    REACH = 3
+    TESTIMONIALS = 4
+    SUSTAINABILITY = 5
+    DISRUPTION = 6
+    LOOKING_AHEAD = 7
+    MAP = 8
+    OS_TUTOR = 9
+    PHILANTHROPIC_PARTNERS = 10
+    DONATION = 11
+
     # *** PRESS ***
 
     # Press mobile section options

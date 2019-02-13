@@ -6,6 +6,7 @@ from time import sleep
 from pypom import Region
 from selenium.common.exceptions import WebDriverException
 from selenium.webdriver.common.by import By
+from selenium.webdriver.support import expected_conditions as expect
 
 from pages.accounts.home import AccountsHome
 from pages.web.base import WebBase
@@ -27,9 +28,8 @@ class ResourceTab(Region):
         By.CSS_SELECTOR, '.resource-box:not(.double):not(.ally-box)')
 
     def _displayed(self, tab):
-            """Return True if the resources content is visible."""
-            return self.driver.execute_script(
-                DISPLAY_TAB.format(tab=tab))
+        """Return True if the resources content is visible."""
+        return self.driver.execute_script(DISPLAY_TAB.format(tab=tab))
 
     @property
     def slogan(self):
@@ -533,7 +533,10 @@ class Book(WebBase):
         def view_webinars(self):
             """Click on the 'Find a webinar' link."""
             webinar = self.find_element(*self._webinar_link_locator)
-            article_url = webinar.get_attribute('href').split('/')[-1]
+            article_href = webinar.get_attribute('href')
+            assert(article_href), '{0} is missing its webinar link'.format(
+                self.page.title)
+            article_url = article_href.split('/')[-1]
             Utility.safari_exception_click(self.driver, element=webinar)
             from pages.web.blog import Article
             return go_to_(Article(self.driver, article=article_url))
@@ -698,7 +701,8 @@ class Book(WebBase):
         @property
         def errata(self):
             """Access the errata pane."""
-            errata_root = self.find_element(*self._errata_locator)
+            errata_root = self.wait.until(
+                expect.presence_of_element_located(self._errata_locator))
             return self.CompactErrata(self, errata_root)
 
         class CompactBookDetails(Accordion):

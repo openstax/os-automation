@@ -41,13 +41,13 @@ class Signup(AccountsBase):
     NOT_USING = 'Not using OpenStax'
 
     SUBJECTS = [
-        # ('accounting', 'Accounting'),
+        ('accounting', 'Accounting'),
         ('algebra_and_trigonometry', 'Algebra and Trigonometry'),
         ('american_government', 'American Government'),
-        ('anatomy_physiology', 'Anatomy & Physiology'),
+        ('anatomy_physiology', 'Anatomy and Physiology'),
         ('astronomy', 'Astronomy'),
         ('biology', 'Biology'),
-        ('ap_biology', 'AP Biology'),
+        # ('ap_biology', 'AP Biology'),
         ('calculus', 'Calculus'),
         ('chemistry', 'Chemistry'),
         ('chem_atoms_first', 'Chemistry: Atoms First'),
@@ -56,24 +56,24 @@ class Signup(AccountsBase):
         ('concepts_of_bio_non_majors', 'Concepts of Biology'),
         ('elementary_algebra', 'Elementary Algebra'),
         ('intermediate_algebra', 'Intermediate Algebra'),
-        # ('introduction_to_business', 'Introduction to Business'),
+        ('introduction_to_business', 'Introduction to Business'),
         ('introduction_to_sociology', 'Introduction to Sociology 2e'),
         ('introductory_statistics', 'Introductory Statistics'),
-        ('introductory_business_statistics',
-         'Introductory Business Statistics'),
+        # ('introductory_business_statistics',
+        #  'Introductory Business Statistics'),
         ('microbiology', 'Microbiology'),
         ('pre_algebra', 'Prealgebra'),
         ('precalc', 'Precalculus'),
         ('economics', 'Principles of Economics'),
         ('macro_econ', 'Principles of Macroeconomics'),
-        ('ap_macro_econ', 'AP Macro Econ'),
+        ('ap_macro_econ', 'Principles of Macroeconomics for AP® Courses'),
         ('micro_econ', 'Principles of Microeconomics'),
-        ('ap_micro_econ', 'AP Micro Econ'),
+        ('ap_micro_econ', 'Principles of Microeconomics for AP® Courses'),
         ('psychology', 'Psychology'),
-        ('ap_physics', 'AP Physics'),
+        ('ap_physics', 'The AP Physics Collection'),
         ('us_history', 'U.S. History'),
-        ('university_physics_calc', 'University Physics')
-        # ('not_listed', 'Not Listed')
+        ('university_physics_calc', 'University Physics'),
+        ('not_listed', 'Not Listed')
     ]
 
     _next_button_locator = (By.CSS_SELECTOR, '[type=submit]')

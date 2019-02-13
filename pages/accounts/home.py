@@ -82,7 +82,8 @@ class AccountsHome(AccountsBase):
         @property
         def user(self):
             """Return the user field."""
-            return self.find_element(*self._user_field_locator)
+            return self.wait.until(
+                expect.presence_of_element_located(self._user_field_locator))
 
         @user.setter
         def user(self, login):

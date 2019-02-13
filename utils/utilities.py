@@ -8,8 +8,7 @@ from warnings import warn
 
 import requests
 from faker import Faker
-from selenium.common.exceptions import ElementClickInterceptedException  # NOQA
-from selenium.common.exceptions import WebDriverException  # NOQA
+from selenium.common.exceptions import ElementClickInterceptedException, NoSuchElementException, StaleElementReferenceException, TimeoutException, WebDriverException  # NOQA
 from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support import expected_conditions as expect
@@ -349,15 +348,21 @@ class Utility(object):
         sleep(0.5)
         try:
             if force_js_click:
-                raise WebDriverException()
+                raise WebDriverException('Bypassing the driver-defined click')
             element.click()
         except WebDriverException:
             for _ in range(10):
                 try:
                     driver.execute_script(JAVASCRIPT_CLICK, element)
                     break
-                except ElementClickInterceptedException:
+                except ElementClickInterceptedException:  # Firefox issues
                     sleep(1.0)
+                except NoSuchElementException:  # Safari issues
+                    if locator:
+                        element = driver.find_element(*locator)
+                except StaleElementReferenceException:  # Chrome and Firefox
+                    if locator:
+                        element = driver.find_element(*locator)
 
     @classmethod
     def scroll_bottom(cls, driver):
@@ -577,8 +582,25 @@ class Status(object):
 
 def go_to_(destination):
     """Follow a destination link and wait for the page to load."""
-    destination.wait_for_page_to_load()
-    return destination
+    return go_to_external_(destination)
+
+
+def go_to_external_(destination, url=None):
+    """Follow an external destination link repeatedly waiting for page load."""
+    if url:
+        for _ in range(2):
+            try:
+                destination.wait_for_page_to_load()
+                return destination
+            except TimeoutException:
+                destination.driver.get(url)
+                sleep(1)
+    try:
+        destination.wait_for_page_to_load()
+        return destination
+    except TimeoutException:
+        raise TimeoutException('{0} did not load ({1})'
+                               .format(type(destination).__name__, url))
 
 
 class Actions(ActionChains):

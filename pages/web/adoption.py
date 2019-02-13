@@ -97,15 +97,14 @@ class Adoption(WebBase):
         assert(not user_errors), \
             'User errors: {issues}'.format(issues=user_errors)
         self.wait.until(
-            lambda _: Utility.is_image_visible(self.driver,
-                                               locator=self._image_locator))
-        sleep(1)
+            lambda _:
+                Utility.is_image_visible(self.driver,
+                                         locator=self._image_locator) and
+                self.find_element(*self._book_selection_locator))
         Utility.scroll_to(self.driver, self._book_selection_locator)
-        sleep(0.5)
         self.form.select_books(books)
         sleep(0.5)
         self.form.set_using(books)
-        sleep(0.5)
         self.form.next()
         book_error = self.form.get_book_error
         assert(not book_error), \
@@ -115,7 +114,7 @@ class Adoption(WebBase):
             'Using error - {using}'.format(using=using_errors)
         self.form.select_tech(tech_providers)
         if TechProviders.OTHER in tech_providers:
-            self.form.usage.other = other_provider
+            self.form.other = other_provider
         self.form.submit()
         return go_to_(AdoptionConfirmation(self.driver, self.base_url))
 
@@ -381,7 +380,10 @@ class Adoption(WebBase):
         @other.setter
         def other(self, value):
             """Send the other technology provider to the form."""
-            self.find_element(*self._other_option_locator).send_keys(value)
+            Utility.scroll_to(self.driver, element=self.other, shift=-80)
+            self.driver.execute_script(
+                'arguments[0].value = "{0}";'.format(value),
+                self.other)
 
         def next(self):
             """Click the Next button."""

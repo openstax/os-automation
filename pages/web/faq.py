@@ -6,7 +6,7 @@ from pypom import Region
 from selenium.webdriver.common.by import By
 
 from pages.web.base import WebBase
-from utils.utilities import Utility, go_to_
+from utils.utilities import Utility, go_to_external_
 
 
 class FAQ(WebBase):
@@ -17,7 +17,7 @@ class FAQ(WebBase):
     _main_content_locator = (By.CSS_SELECTOR, '.page-loaded')
     _title_locator = (By.CSS_SELECTOR, '.boxed h1')
     _heading_locator = (By.CSS_SELECTOR, '[data-html=subhead] p')
-    _support_locator = (By.CSS_SELECTOR, '.boxed a')
+    _support_locator = (By.CSS_SELECTOR, '.hero [href*=force]')
     _question_locator = (By.CSS_SELECTOR, '.qa')
 
     @property
@@ -41,9 +41,11 @@ class FAQ(WebBase):
 
     def visit_support(self):
         """Click the 'support page' link."""
-        Utility.switch_to(self.driver, link_locator=self._support_locator)
+        link = self.find_element(*self._support_locator)
+        url = link.get_attribute('href')
+        Utility.switch_to(self.driver, element=link)
         from pages.salesforce.home import Salesforce
-        return go_to_(Salesforce(self.driver))
+        return go_to_external_(Salesforce(self.driver), url)
 
     @property
     def questions(self):

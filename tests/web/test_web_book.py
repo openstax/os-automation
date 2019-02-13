@@ -767,9 +767,11 @@ def test_resources_have_a_title_description_and_access_type(
     #       complimentary iBooks download", or "Visit the
     #       Hub"
     for resource in book.instructor.resources_by_status(Web.ACCESS_OK):
-        assert(resource.title)
-        assert(resource.description)
-        assert(resource.status_message in Web.ACCESS_OK)
+        title = resource.title
+        assert(title)
+        assert(resource.description), '{0} missing a description'.format(title)
+        assert(resource.status_message in Web.ACCESS_OK), \
+            '{0} does not show {1}'.format(title, Web.ACCESS_OK)
 
     # WHEN: they click on the "Student resources" tab
     book.select_tab(Web.STUDENT_RESOURCES)
@@ -779,18 +781,23 @@ def test_resources_have_a_title_description_and_access_type(
     # AND:  each resource has an access type of "Go" to or
     #       "Download"
     for resource in book.student.resources_by_status(Web.ACCESS_OK):
-        assert(resource.title)
-        assert(resource.description)
-        assert(resource.status_message in Web.ACCESS_OK)
+        title = resource.title
+        assert(title)
+        assert(resource.description), '{0} missing a description'.format(title)
+        assert(resource.status_message in Web.ACCESS_OK), \
+            '{0} does not show {1}'.format(title, Web.ACCESS_OK)
 
     # WHEN: the screen is reduced to 600 pixels
     book.resize_window(width=Web.PHONE)
 
     # THEN: the description is not displayed
     for resource in book.student.resources_by_status(Web.ACCESS_OK):
-        assert(resource.title)
-        assert(not resource.description)
-        assert(resource.status_message in Web.ACCESS_OK)
+        title = resource.title
+        assert(title)
+        assert(not resource.description), \
+            '{0} shows a description'.format(title)
+        assert(resource.status_message in Web.ACCESS_OK), \
+            '{0} does not show {1}'.format(title, Web.ACCESS_OK)
 
 
 @test_case('C210371')

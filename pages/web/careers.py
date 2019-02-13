@@ -1,7 +1,6 @@
 """The OpenStax jobs board."""
 
 import re
-from time import sleep
 
 from selenium.webdriver.common.by import By
 
@@ -24,21 +23,21 @@ class Careers(WebBase):
     @property
     def loaded(self):
         """Return True when text content is found."""
-        return (
-            len(self.find_element(*self._careers_content_locator)
-                .text.strip()) > 0 and
-            (sleep(1) or True) and
-            self.find_element(*self._banner_locator))
+        content = (self.find_element(*self._careers_content_locator)
+                   .text.strip())
+        banner = self.find_element(*self._banner_locator)
+        return content and banner
 
     def is_displayed(self):
         """Return True if the heading is displayed."""
-        return self.find_element(*self._banner_locator).is_displayed()
+        return self.job_list
 
     @property
     def job_list(self):
         """Return the content within the open positions element."""
-        return (self.find_element(*self._job_list_locator)
-                .get_attribute('innerHTML'))
+        listings = self.wait.until(
+            lambda _: self.find_element(*self._job_list_locator))
+        return listings.get_attribute('innerHTML')
 
     @property
     def jobs(self):

@@ -3,7 +3,7 @@
 from time import sleep
 
 from pypom import Region
-from selenium.common.exceptions import WebDriverException
+from selenium.common.exceptions import TimeoutException, WebDriverException
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as expect
 
@@ -114,41 +114,30 @@ class Blog(WebBase):
 
         def is_displayed(self):
             """Return True if the tile has children."""
-            return (
-                self.root.is_displayed() and
-                Utility.has_children(self.root))
+            return (self.root.is_displayed() and
+                    Utility.has_children(self.root))
 
         @property
         def image(self):
             """Return the tile picture element."""
-            return self.wait.until(
-                expect.presence_of_element_located(self._image_locator))
+            return self._field_helper(self._image_locator, True)
 
         @property
         def title(self):
             """Return the article title."""
-            return self.wait.until(
-                expect.presence_of_element_located(self._title_locator)
-                ).text.strip()
+            return self._field_helper(self._title_locator)
 
         @property
         def excerpt(self):
             """Return the article excerpt or subheading."""
-            try:
-                text = (self.find_element(*self._subheading_locator)
-                        .text.strip())
-            except WebDriverException:
-                text = ''
-            if not text:
-                return self.body
-            return text
+            text = self._field_helper(self._subheading_locator)
+            return text if text else self.body
 
         @property
         def body(self):
             """Return the article text."""
-            text = self.wait.until(
-                expect.presence_of_element_located(self._excerpt_locator)
-                ).get_attribute('innerHTML')
+            text = (self._field_helper(self._excerpt_locator, True)
+                    .get_attribute('innerHTML'))
             import re
             text = re.sub(r'\<p[^<>]*\>', '\n', text)
             text = re.sub(r'(\<\/?[^<>]{1,}\>)', '', text)
@@ -156,8 +145,7 @@ class Blog(WebBase):
 
         def view(self):
             """Open the article."""
-            link = self.wait.until(
-                expect.visibility_of_element_located(self._read_more_locator))
+            link = self._field_helper(self._read_more_locator, True)
             article = link.get_attribute('href').split('/')[-1]
             Utility.safari_exception_click(self.driver, element=link)
             return go_to_(
@@ -166,17 +154,27 @@ class Blog(WebBase):
         @property
         def authors(self):
             """Return the article authors and editors."""
-            return self.find_element(*self._author_locator).text.strip()
+            return self._field_helper(self._author_locator)
 
         @property
         def date(self):
             """Return the article publish date string."""
-            return self.find_element(*self._date_locator).text.strip()
+            return self._field_helper(self._date_locator)
 
         def get_date(self):
             """Return a timezone-aware datetime of the publish date."""
             from datetime import datetime
             return datetime.strptime(self.date + ' +0000', '%b %d, %Y %z')
+
+        def _field_helper(self, locator, return_field=False):
+            try:
+                field = self.wait.until(
+                    expect.presence_of_element_located(locator))
+                if return_field:
+                    return field
+                return field.text.strip()
+            except TimeoutException:
+                return None
 
 
 class Article(Blog):
