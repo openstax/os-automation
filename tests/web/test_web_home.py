@@ -9,7 +9,7 @@ from pages.accounts.home import AccountsHome
 from pages.accounts.signup import Signup
 from pages.web.home import WebHome as Home
 from tests.markers import accounts, expected_failure, nondestructive  # NOQA
-from tests.markers import skip_test, smoke_test, test_case, web  # NOQA
+from tests.markers import smoke_test, test_case, web  # NOQA
 from utils.accounts import Accounts
 from utils.email import RestMail
 from utils.utilities import Utility
@@ -186,7 +186,6 @@ def test_mobile_menu_navigation(web_base_url, selenium):
     assert(not home.web_nav.meta.is_open)
 
 
-@skip_test(reason='Impact page replaced by Annual Report')
 @test_case('C210300')
 @nondestructive
 @web
@@ -214,7 +213,7 @@ def test_nav_our_impact_loads_the_impact_page(web_base_url, selenium):
     assert(impact.is_displayed())
 
 
-@skip_test(reason='Waiting on the Annual Report page content')
+'''@skip_test(reason='Waiting on the Annual Report page content')
 # @test_case('')
 @nondestructive
 @web
@@ -239,7 +238,7 @@ def test_nav_our_impact_loads_the_annual_report(web_base_url, selenium):
     annual = home.openstax_nav.view_our_impact()
 
     # THEN: the annual report webpage is displayed
-    assert(annual.is_displayed())
+    assert(annual.is_displayed())'''
 
 
 @test_case('C210301')

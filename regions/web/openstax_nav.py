@@ -6,15 +6,15 @@ from pypom import Region
 from selenium.common.exceptions import WebDriverException
 from selenium.webdriver.common.by import By
 
-from utils.utilities import Utility, go_to_
+from utils.utilities import Utility, go_to_, go_to_external_
 
 
 class OpenStaxNav(Region):
     """OpenStax's website shared navigational control."""
 
     _root_locator = (By.CLASS_NAME, 'meta-nav')
-    # _our_impact_locator = (By.CSS_SELECTOR, '[href$=impact]')
-    _our_impact_locator = (By.CSS_SELECTOR, '[href*=annual]')
+    _our_impact_locator = (By.CSS_SELECTOR, '[href$=impact]')
+    # _our_impact_locator = (By.CSS_SELECTOR, '[href*=annual]')
     _supporters_locator = (By.CSS_SELECTOR, '[href$=foundation]')
     _blog_locator = (By.CSS_SELECTOR, '[href$=blog]')
     _give_locator = (By.CSS_SELECTOR, '[href$=give]')
@@ -58,9 +58,11 @@ class OpenStaxNav(Region):
 
     def view_help_articles(self):
         """Go to the Salesforce help site."""
-        Utility.switch_to(self.driver, self._help_locator)
+        link = self.find_element(*self._help_locator)
+        url = link.get_attribute('href')
+        Utility.switch_to(self.driver, element=link)
         from pages.salesforce.home import Salesforce
-        return go_to_(Salesforce(self.driver))
+        return go_to_external_(Salesforce, self.driver, url)
 
     def go_to_rice(self):
         """Go to the Rice University home page."""

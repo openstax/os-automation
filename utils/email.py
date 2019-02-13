@@ -659,17 +659,16 @@ class RestMail(object):
             Timeout: after waiting the max time, no emails were received
 
         """
-        timer = 0
+        timer = 0.0
         while timer <= (max_time / pause_time):
             self.get_mail()
             if self._inbox:
                 return self._inbox
             timer = timer + pause_time
             sleep(pause_time)
-        raise requests.exceptions.Timeout(
-            'Mail not received in {time} seconds'.format(time=max_time)
-        )
-        return self
+        from requests.exceptions import Timeout
+        raise Timeout('Mail not received in {time} seconds'
+                      .format(time=max_time))
 
     @property
     def size(self):

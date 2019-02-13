@@ -3,7 +3,7 @@
 from pypom import Region
 from selenium.webdriver.common.by import By
 
-from utils.utilities import Utility, go_to_
+from utils.utilities import Utility, go_to_, go_to_external_
 
 
 class Footer(Region):
@@ -112,10 +112,11 @@ class Footer(Region):
 
         def view_the_code(self):
             """Open GitHub and view the OpenStax repositories."""
-            Utility.switch_to(
-                self.driver, link_locator=self._open_source_locator)
+            link = self.find_element(*self._open_source_locator)
+            url = link.get_attribute('href')
+            Utility.switch_to(self.driver, element=link)
             from pages.github.home import GitHub
-            return go_to_(GitHub(self.driver))
+            return go_to_external_(GitHub, self.driver, url)
 
         def go_to_the_contact_form(self):
             """Go to the contact form."""

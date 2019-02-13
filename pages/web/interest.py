@@ -60,11 +60,11 @@ class Interest(Adoption):
         user_errors = self.form.get_user_errors
         assert(not user_errors), \
             'User errors: {issues}'.format(issues=user_errors)
-        sleep(1.0)
         self.wait.until(
-            lambda _: Utility.is_image_visible(self.driver,
-                                               locator=self._image_locator))
-        sleep(1.0)
+            lambda _:
+                Utility.is_image_visible(self.driver,
+                                         locator=self._image_locator) and
+                self.find_element(*self._book_selection_locator))
         Utility.scroll_to(self.driver, self._book_selection_locator)
         self.form.select_books(books)
         sleep(0.5)
@@ -81,7 +81,7 @@ class Interest(Adoption):
             'Using error - {using}'.format(using=using_error)
         self.form.select_tech(tech_providers)
         if TechProviders.OTHER in tech_providers:
-            self.form.usage.other = other_provider
+            self.form.other = other_provider
         self.form.submit()
         return go_to_(InterestConfirmation(self.driver, self.base_url))
 
