@@ -413,12 +413,9 @@ class Utility(object):
         """Switch to the other window handle."""
         current = driver.current_window_handle
         data = None
-        if link_locator:
+        if not action:
             Utility.safari_exception_click(driver=driver,
                                            locator=link_locator,
-                                           force_js_click=force_js_click)
-        elif element:
-            Utility.safari_exception_click(driver=driver,
                                            element=element,
                                            force_js_click=force_js_click)
         else:
