@@ -92,11 +92,11 @@ class Utility(object):
     @classmethod
     def fake_email(cls, first_name, surname, id=False):
         """Return a name-based fake email."""
-        template = ('{first}.{second}.{random}@os.fake.org')
+        template = ('{first}.{second}.{random}@restmail.net')
         return template.format(
             first=first_name,
             second=surname,
-            random=id if id else Utility.random(100, 999)
+            random=id if id else Utility.random_hex(6)
         ).lower()
 
     @classmethod
