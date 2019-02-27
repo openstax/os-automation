@@ -35,6 +35,7 @@ pluggy==0.8.0
 post==1.0.2
 public==1.0.3
 py==1.7.0
+pyAesCrypt==0.4.2
 pyasn1==0.4.4
 pyasn1-modules==0.2.2
 pycodestyle==2.5.0
@@ -55,12 +56,14 @@ pytest-metadata==1.8.0
 pytest-randomly==1.2.3
 pytest-repeat==0.7.0
 pytest-rerunfailures==6.0
+pytest-securestore==0.1.2
 pytest-selenium==1.16.0
 pytest-testrail==2.3.3
 pytest-variables==1.7.1
 pytest-xdist==1.26.1
 python-dateutil==2.7.3
 python-dotenv==0.8.2
+PyYAML==3.13
 query-string==1.0.2
 request==1.0.2
 requests==2.21.0
