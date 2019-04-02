@@ -62,7 +62,13 @@ class Utility(object):
 
     @classmethod
     def clear_field(cls, driver, field=None, field_locator=None):
-        """Clear the contents of text-type fields."""
+        """Clear the contents of text-type fields.
+
+        :param driver: a selenium webdriver
+        :param field: an input field to interact with
+        :param field_locator: a By selector tuple (str, str)
+        :returns: None
+        """
         sleep(0.1)
         if not field:
             field = driver.find_element(*field_locator)
@@ -79,29 +85,57 @@ class Utility(object):
                 .perform()
 
     @classmethod
+    def click_option(cls, driver, locator=None, element=None,
+                     force_js_click=False):
+        """Another way to call the safe Safari click function."""
+        from . import Utility
+        Utility.safari_exception_click(
+            driver, locator, element, force_js_click)
+
+    @classmethod
     def close_tab(cls, driver):
-        """Close the current tab and switch to the other tab."""
+        """Close the current tab and switch to the other tab.
+
+        :param driver: a selenium webdriver
+        :returns: None
+        """
         driver.close()
         driver.switch_to.window(driver.window_handles[0])
 
     @classmethod
     def compare_colors(cls, left, right):
-        """Return True if two RGB color strings match."""
+        """Return True if two RGB color strings match.
+
+        :param left: a color string
+        :param right: a color string
+        :returns: True if the color strings match
+        """
         return Color.from_string(left) == Color.from_string(right)
 
     @classmethod
-    def fake_email(cls, first_name, surname, id=False):
-        """Return a name-based fake email."""
+    def fake_email(cls, first_name, surname, _id=False):
+        """Return a name-based fake email.
+
+        :param first_name: a user's first name
+        :param surname: a user's last or surname
+        :param _id: an ID string to append to the name
+        :returns: a compound RestMail email address string
+        """
         template = ('{first}.{second}.{random}@restmail.net')
         return template.format(
             first=first_name,
             second=surname,
-            random=id if id else Utility.random_hex(6)
+            random=_id if _id else Utility.random_hex(6)
         ).lower()
 
     @classmethod
     def fast_multiselect(cls, driver, element_locator, labels):
         """Select menu multiselect options.
+
+        :param driver: a selenium webdriver
+        :param element_locator: an element selector tuple (str, str)
+        :param labels: a list of menu options to select
+        :returns: the Select object
 
         Daniel Abel multiselect
         'https://sqa.stackexchange.com/questions/1355/
@@ -117,14 +151,23 @@ class Utility(object):
 
     @classmethod
     def get_error_information(cls, error):
-        """Break up an assertion error object."""
+        """Break up an assertion error object.
+
+        :param error: the assertion error object
+        :returns: a modified error message as a string
+        """
         short = str(error.getrepr(style='short'))
         info = short.split('AssertionError: ')[-1:][0]
         return info.replace("'", '').replace('{', '').replace('}', '')
 
     @classmethod
     def get_test_credit_card(cls, card=None, status=None):
-        """Return a random card number and CVV for test transactions."""
+        """Return a random card number and CVV for test transactions.
+
+        :param card: a credit card type like VISA or MasterCard
+        :param status: a credit card status
+        :returns: a tuple of the credit card number and the CVV number
+        """
         braintree = Card()
         _card = card if card else Status.VISA
         _status = status if status else Status.VALID
@@ -136,12 +179,21 @@ class Utility(object):
 
     @classmethod
     def has_children(cls, element):
-        """Return True if a specific element has one or more children."""
+        """Return True if a specific element has one or more children.
+
+        :param element: a webelement
+        :returns: True if the element has one or more child elements
+        """
         return len(element.find_elements('xpath', './*')) > 0
 
     @classmethod
     def has_height(cls, driver, locator):
-        """Return True if the computed height isn't 'auto'."""
+        """Return True if the computed height isn't 'auto'.
+
+        :param driver: a selenium webdriver
+        :param locator: a CSS selector for an element
+        :returns: True if the element's height is not 'auto'
+        """
         auto = ('return window.getComputedStyle('
                 'document.querySelector("{selector}")).height!="auto"'
                 ).format(selector=locator)
@@ -150,7 +202,17 @@ class Utility(object):
     @classmethod
     def in_viewport(cls, driver, locator=None, element=None,
                     ignore_bottom=False, display_marks=True):
-        """Return True if the element boundry completely lies in view."""
+        """Return True if the element boundry completely lies in view.
+
+        :param driver: a selenium webdriver
+        :param locator: an element selector tuple
+        :param element: a webelement
+        :param ignore_bottom: skip the check that the element is above the
+            bottom of the browser window
+        :param display_marks: output the bounding box values and checks to
+            stdout
+        :returns: True if the element box is within the browser window
+        """
         LEFT, TOP, RIGHT, BOTTOM = range(4)
         target = element if element else driver.find_element(*locator)
         rect = driver.execute_script(
@@ -232,7 +294,9 @@ class Utility(object):
     def load_background_images(cls, driver, locator):
         """Inject a script to wait for background image downloads.
 
-        Return True when complete so it can be used in loaded methods.
+        :param driver: a selenium webdriver instance
+        :param locator: a CSS selector for background image elements
+        :returns: True when complete so it can be used in loaded methods.
         """
         inject = (
             r'''
@@ -376,13 +440,12 @@ class Utility(object):
             cls, driver, element_locator=None, element=None, shift=0):
         """Scroll the screen to the element.
 
-        Args:
-            driver (webdriver): the selenium browser object
-            element_locator (Tuple(str, str)): a By selector and locator
-            element (WebElement): a specific element
-            shift (int): adjust the page vertically by a set number of pixels
+        :param driver: the selenium webdriver browser object
+        :param element_locator: a By selector and locator tuple (str, str)
+        :param element: a specific webelement
+        :param shift: adjust the page vertically by a set number of pixels
                 > 0 scrolls down, < 0 scrolls up
-
+        :returns: None
         """
         target = element if element else driver.find_element(*element_locator)
         driver.execute_script(SCROLL_INTO_VIEW, target)
@@ -391,7 +454,11 @@ class Utility(object):
 
     @classmethod
     def scroll_top(cls, driver):
-        """Scroll to the top of the browser screen."""
+        """Scroll to the top of the browser screen.
+
+        :param driver: the selenium webdriver object
+        :returns: None
+        """
         driver.execute_script('window.scrollTo(0, 0);')
         sleep(0.75)
 
@@ -406,6 +473,30 @@ class Utility(object):
         return Select(driver.find_element(*element_locator)) \
             .first_selected_option \
             .text
+
+    @classmethod
+    def summed_list(cls, length=4, total=100, use_float=False):
+        """Generate random, positive numbers that add up to a total.
+
+        :param length: the number of values in the resulting list
+        :param total: the summation of the values
+        :param use_float: return floating point values instead of integers
+        :returns: a list of values that equal the requested total
+        :raises ValueError: invalid parameters
+            length must be greater than or equal to one
+            total must be greater than or equal to zero
+        """
+        if length < 1:
+            raise(ValueError("The list length must be >= 1"))
+        if total < 0:
+            raise(ValueError("The sum (total) must be >= 0"))
+        from random import random as random_decimal
+        setup = float if use_float else int
+        group = ([setup(0)] +
+                 sorted(setup(random_decimal() * total)
+                        for _ in range(length - 1)) +
+                 [setup(total)])
+        return [group[i + 1] - group[i] for i in range(len(group) - 1)]
 
     @classmethod
     def switch_to(cls, driver, link_locator=None, element=None, action=None,

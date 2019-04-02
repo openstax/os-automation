@@ -151,6 +151,16 @@ def test_a_book_is_preselected_when_a_book_details_adoption_link_is_used(
     school = 'Automation'
     book, short, full, detail_append = Library().get_name_set()
     books = {short: {'status': '', 'students': '', }}
+    print(
+        'Test Data:\n' +
+        '\tUser Type: {}\n'.format(user_type) +
+        '\tName:      {0} {1}\n'.format(first_name, last_name) +
+        '\tPhone:     {}\n'.format(phone) +
+        '\tEmail:     {}\n'.format(email.address) +
+        '\tSchool:    {}\n'.format(school) +
+        '\tBooks:     "{book}":"{short}":"{full}":"{append}"\n'.format(
+            book=book, short=short, full=full, append=detail_append)
+    )
     book_details = Book(selenium, web_base_url, book_name=detail_append).open()
     adoption = book_details.is_using()
 
