@@ -15,12 +15,14 @@ class Dashboard(TutorBase):
     URL_TEMPLATE = '/dashboard'
 
     _root_locator = (By.CLASS_NAME, 'tutor-root')
+    _no_courses_locator = (By.CSS_SELECTOR, '.-course-list-empty')
     _pending_verify_locator = (
                             By.CSS_SELECTOR, '.pending-faculty-verification')
     _create_tile_locator = (By.CSS_SELECTOR, '.my-courses-add-zone')
     _current_courses_locator = (By.CSS_SELECTOR, '.my-courses-current')
     _preview_courses_locator = (By.CSS_SELECTOR, '.my-courses-preview')
     _past_courses_locator = (By.CSS_SELECTOR, '.my-courses-past')
+    _tooltip_locator = (By.CSS_SELECTOR, '.joyride-tooltip')
 
     @property
     def nav(self):
@@ -29,13 +31,22 @@ class Dashboard(TutorBase):
         return TutorNav(self)
 
     @property
+    def no_courses(self):
+        """Access the courseless section, if found."""
+        try:
+            root = self.find_element(*self._no_courses_locator)
+            return self.NoCourses(self, root)
+        except NoSuchElementException:
+            return None
+
+    @property
     def pending(self):
         """Access the pending verification section, if found."""
         try:
             root = self.find_element(*self._pending_verify_locator)
+            return self.Pending(self, root)
         except NoSuchElementException:
             return None
-        return self.Pending(self, root)
 
     @property
     def current_courses(self):
@@ -66,7 +77,13 @@ class Dashboard(TutorBase):
 
     @property
     def _get_section(self, locator):
-        """Return the past courses section."""
+        """Return the past courses section.
+
+        :param locator: a By-style Selenium selector for a course section
+        :type locator: tuple
+        :returns: a course selection region
+        :rtype: pages.tutor.dashboard.Courses
+        """
         try:
             root = self.find_element(*locator)
         except NoSuchElementException:
@@ -85,6 +102,37 @@ class Dashboard(TutorBase):
             return go_to_(Calendar(self.driver, self.base_url))
         from pages.tutor.course import StudentCourse
         return go_to_(StudentCourse(self.driver, self.base_url))
+
+    @property
+    def tooltips_displayed(self):
+        """Return True when the training wheels are visible."""
+        return bool(len(self.find_elements(*self._tooltip_locator)))
+
+    @property
+    def tooltips(self):
+        """Access the tooltips, if found."""
+        tooltips = self.find_elements(*self._tooltip_locator)
+        if tooltips:
+            from regions.tutor.tooltip import Tooltip
+            return Tooltip(self, tooltips[0])
+
+    class NoCourses(Region):
+        """No courses were found pane."""
+
+        _expanation_locator = (By.CSS_SELECTOR, '.lead')
+        _help_link_locator = (By.CSS_SELECTOR, 'a')
+
+        @property
+        def explanation(self):
+            """Return the explanation text."""
+            return self.find_element(*self._expanation_locator).text
+
+        def get_help(self):
+            """Click on the 'Get help >' link."""
+            link = self.find_element(*self._help_link_locator)
+            Utility.switch_to(self.driver, element=link)
+            from pages.salesforce.home import Salesforce
+            return go_to_(Salesforce(self.driver))
 
     class Pending(Region):
         """The pending faculty verification pane."""
