@@ -1,8 +1,11 @@
 """The student course view."""
 
 import re
+from datetime import datetime
+from time import sleep
 
 from pypom import Region
+from selenium.common.exceptions import NoSuchElementException
 from selenium.webdriver.common.by import By
 
 from pages.tutor.base2 import TutorBase
@@ -16,7 +19,10 @@ class StudentCourse(TutorBase):
     _notification_bar_locator = (
                                 By.CSS_SELECTOR, '.openstax-notifications-bar')
     _banner_locator = (By.CSS_SELECTOR, '.course-title-banner')
+    _this_week_locator = (By.CSS_SELECTOR, '.nav-tabs li:first-child a')
+    _all_past_work_locator = (By.CSS_SELECTOR, '.nav-tabs li:last-child a')
     _weekly_work_locator = (By.CSS_SELECTOR, '.row div:first-child')
+    _period_locator = (By.CSS_SELECTOR, '.active .card')
     _survey_locator = (By.CSS_SELECTOR, '.research-surveys')
     _performance_guide_locator = (By.CSS_SELECTOR, '.progress-guide')
     _reference_book_locator = (By.CSS_SELECTOR, 'a.browse-the-book')
@@ -55,15 +61,25 @@ class StudentCourse(TutorBase):
     # Assignments
     # ---------------------------------------------------- #
 
-    @property
-    def this_week(self):
-        """Access the student assignments for this or upcoming weeks."""
-        return self._this_week
+    def view_this_week(self):
+        """Click on the 'THIS WEEK' toggle to view current work."""
+        toggle = self.find_element(*self._this_week_locator)
+        Utility.click_option(self.driver, element=toggle)
+        sleep(0.5)
+        return self
+
+    def view_all_past_work(self):
+        """Click on the 'ALL PAST WORK' toggle to view previous work."""
+        toggle = self.find_element(*self._all_past_work_locator)
+        Utility.click_option(self.driver, element=toggle)
+        sleep(0.5)
+        return self.page
 
     @property
-    def all_past_work(self):
-        """Access the student assignments for previous weeks."""
-        return self._all_past_work
+    def weeks(self):
+        """Access the assignment weeks."""
+        return [self.Week(self, period)
+                for period in self.find_elements(*self._period_locator)]
 
     # ---------------------------------------------------- #
     # Sidebar
@@ -125,7 +141,7 @@ class StudentCourse(TutorBase):
             """A single notification bar."""
 
             _content_locator = (
-                By.CSS_SELECTOR,
+                By.CSdS_SELECTOR,
                 'div:not(.system) > .body > span , .system > span')
             _add_student_id_locator = (By.CSS_SELECTOR, 'a')
             _dismiss_locator = (By.CSS_SELECTOR, 'button')
@@ -201,6 +217,171 @@ class StudentCourse(TutorBase):
         def course_term(self):
             """Return the course term."""
             return self.find_element(*self._course_term_locator).text
+
+    class Weeks(Region):
+        """Assignments listed by week."""
+
+        _banner_locator = (By.CSS_SELECTOR, '.row:first-child')
+        _assignments_locator = (By.CSS_SELECTOR, '.row:not(:first-child)')
+        _key_guide_locator = (By.CSS_SELECTOR, '[class*="Wrapper-sc"] span')
+
+        @property
+        def banner(self):
+            """Access the period bar."""
+            banner_root = self.find_element(*self._banner_locator)
+            return self.Banner(self, banner_root)
+
+        @property
+        def assignments(self):
+            """Access the assignment bars."""
+            return [self.Assignment(self, line)
+                    for line in self.find_elements(*self._assignments_locator)]
+
+        @property
+        def guide(self):
+            """Access the key icons."""
+            return [self.Key(self, icon)
+                    for icon in self.find_elements(*self._key_guide_locator)]
+
+        class Banner(Region):
+            """The title bar for an assignment set."""
+
+            _start_date_locator = (By.CSS_SELECTOR, '.time:first-child')
+            _end_date_locator = (By.CSS_SELECTOR, '.time:li:last-child')
+            _title_locator = (By.CSS_SELECTOR, '.title')
+
+            def is_upcoming(self):
+                """Return True if a title element is present."""
+                return bool(self.find_elements(*self._title_locator))
+
+            def start(self):
+                """Return the week's starting date."""
+                date = self.find_element(*self._start_date_locator).text
+                return datetime.strptime(date, "%b %d, %Y")
+
+            def end(self):
+                """Return the week's ending date."""
+                date = self.find_element(*self._end_date_locator).text
+                return datetime.strptime(date, "%b %d, %Y")
+
+            def title(self):
+                """Return the title or week date information."""
+                if self.is_upcoming:
+                    return self.find_element(*self._title_locator).text
+                return "{start}–{end}".format(start=self.start, end=self.end)
+
+        class Assignment(Region):
+            """A student assignment."""
+
+            _title_locator = (By.CSS_SELECTOR, '.title')
+            _due_date_time_locator = (By.CSS_SELECTOR, '.due-at time')
+            _status_locator = (
+                            By.CSS_SELECTOR, '[data-tour-anchor-id*=progress]')
+            _secondary_status_locator = (
+                                    By.CSS_SELECTOR, '[class*=LateCaption]')
+            _lateness_locator = (By.CSS_SELECTOR, '.feedback svg')
+
+            _course_term_selector = '.course-title-banner'
+
+            @property
+            def title(self):
+                """Return the assignment name."""
+                return self.find_element(*self._title_locator).text
+
+            @property
+            def style(self):
+                """Return the assignment type."""
+                assignment_type = self.root.get_attribute('class')
+                if Tutor.EVENT in assignment_type:
+                    return Tutor.EVENT
+                elif Tutor.EXTERNAL in assignment_type:
+                    return Tutor.EXTERNAL
+                elif Tutor.HOMEWORK in assignment_type:
+                    return Tutor.HOMEWORK
+                elif Tutor.READING in assignment_type:
+                    return Tutor.READING
+                else:
+                    raise ValueError(
+                        '"{0}" does not contain a known assignment type'
+                        .format(assignment_type))
+
+            @property
+            def url(self):
+                """Return the assignment access URL."""
+                return self.root.get_attribute('href')
+
+            @property
+            def due(self):
+                """Return the assignment due date and time."""
+                # Th Apr 04, 7:00am
+                date_and_time = self.find_element(
+                    *self._due_date_time_locator).text
+                script = ('return document.querySelector("{0}")'
+                          .format(self._course_term_selector))
+                term, year = (self.driver.execute_script(script)
+                              .get_attribute("data-term").split())
+                year = int(year)
+                if term.lower() == "winter":
+                    date = date_and_time.split(",")[0].lower()
+                    if "jan" in date or "feb" in date or "mar" in date:
+                        year = year + 1
+                date_time = ("{date} {year}, {time} {timezone}"
+                             .format(date=date_and_time[3:].split(",")[0],
+                                     year=year,
+                                     time=date_and_time.split()[-1],
+                                     timezone="CST"))
+                return datetime.strptime(date_time, "%b %d %Y, %I:%M%p %Z")
+
+            @property
+            def progress(self):
+                """Return the assignment progress status."""
+                return self.find_element(*self._status_locator).text
+
+            @property
+            def late_work(self):
+                """Return the homework secondary status line."""
+                return self.find_element(*self._secondary_status_locator).text
+
+            @property
+            def lateness(self):
+                """Return the assignment on time or late status."""
+                try:
+                    late = self.find_element(*self._lateness_locator)
+                except NoSuchElementException:
+                    return Tutor.ON_TIME
+                icon = late.get_attribute('class')
+                if 'exclamation-circle' in icon:
+                    return Tutor.DUE_SOON
+                elif 'clock' in icon:
+                    color = icon.get_attribute('color')
+                    if color == Tutor.LATE_COLOR:
+                        return Tutor.LATE
+                    elif color == Tutor.ACCEPTED_COLOR:
+                        return Tutor.ACCEPTED_LATE
+                    else:
+                        error = ('"{color}" not {late} ({late_color}) '
+                                 'nor {accepted} ({accepted_color})')
+                        ValueError(
+                            error.format(color=color,
+                                         late=Tutor.LATE,
+                                         late_color=Tutor.LATE_COLOR,
+                                         accepted=Tutor.ACCEPTED_LATE,
+                                         accepted_color=Tutor.ACCEPTED_COLOR))
+
+        class Key(Region):
+            """An icon and descriptor for assignment lateness."""
+
+            _icon_locator = (By.CSS_SELECTOR, 'svg')
+
+            @property
+            def icon(self):
+                """Return the key icon."""
+                return self.find_element(*self._icon_locator)
+
+            @property
+            def description(self):
+                """Return the icon description."""
+                return self.root.text
 
     class Survey(Region):
         """A course research survey access card."""
