@@ -6,6 +6,15 @@ from selenium.common.exceptions import WebDriverException
 class Tutor(object):
     """Tutor shared variables."""
 
+    # Calendar
+
+    AFTER_TERM = 'after-term'
+    BEFORE_TERM = 'before-term'
+    IN_FUTURE = 'upcoming'
+    IN_PAST = 'past'
+    IN_TERM = 'in-term'
+    TODAY = 'today'
+
     # Course Page
 
     EMAIL = 'email'
