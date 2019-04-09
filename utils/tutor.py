@@ -8,6 +8,7 @@ class Tutor(object):
 
     # Course Page
 
+    EMAIL = 'email'
     END_OF_COURSE = 'course-has-ended'
     STUDENT_ID = 'missing-student-id'
     SYSTEM = 'system'

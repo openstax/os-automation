@@ -141,7 +141,7 @@ class StudentCourse(TutorBase):
             """A single notification bar."""
 
             _content_locator = (
-                By.CSdS_SELECTOR,
+                By.CSS_SELECTOR,
                 'div:not(.system) > .body > span , .system > span')
             _add_student_id_locator = (By.CSS_SELECTOR, 'a')
             _dismiss_locator = (By.CSS_SELECTOR, 'button')
@@ -150,7 +150,9 @@ class StudentCourse(TutorBase):
             def type(self):
                 """Return the notification type."""
                 root_style = self.root.get_attribute('class')
-                if Tutor.END_OF_COURSE in root_style:
+                if Tutor.EMAIL in root_style:
+                    return Tutor.EMAIL
+                elif Tutor.END_OF_COURSE in root_style:
                     return Tutor.END_OF_COURSE
                 elif Tutor.STUDENT_ID in root_style:
                     return Tutor.STUDENT_ID
