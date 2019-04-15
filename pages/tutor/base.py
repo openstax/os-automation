@@ -1,22 +1,25 @@
-"""Basic page parent for Tutor pages."""
+"""The Tutor base objects."""
 
 from time import sleep
 
 from pypom import Page, Region
+from selenium.common.exceptions import StaleElementReferenceException
 from selenium.webdriver.common.by import By
 
-from pages.accounts.home import AccountsHome
-from pages.rice.gdpr import GeneralDataPrivacyRegulation
-from pages.rice.home import Rice
-from pages.salesforce.home import Salesforce
-from pages.web.tutor import TutorMarketing
-from utils.utilities import Utility
+from regions.tutor.nav import TutorNav
+from utils.utilities import Utility, go_to_, go_to_external_
 
 
-class TutorBase(Page):
-    """Base class."""
+class TutorShared(Page):
+    """Shared base page functions."""
 
-    _root_locator = (By.TAG_NAME, 'body')
+    _root_locator = (By.CSS_SELECTOR, 'body')
+    _nav_locator = (By.CSS_SELECTOR, '.navbar')
+
+    def __init__(self, driver, base_url=None, timeout=60, **url_kwargs):
+        """Override the initialization to hold onto the Tutor timeout."""
+        super(TutorShared, self) \
+            .__init__(driver, base_url, timeout, **url_kwargs)
 
     @property
     def loaded(self):
@@ -28,31 +31,30 @@ class TutorBase(Page):
         return self.loaded.is_displayed()
 
     @property
-    def location(self):
-        """Return the current URL."""
-        return self.driver.current_url
+    def nav(self):
+        """Access the page nav."""
+        nav = self.find_element(*self._nav_locator)
+        return self.Nav(self, nav)
 
-    @property
-    def header(self):
-        """Return initial Tutor header."""
-        return self.Header(self)
+    def reload(self):
+        """Reload the current page.
 
-    @property
-    def footer(self):
-        """Return initial Tutor footer."""
-        return self.Footer(self)
+        Ignore stale element issues because we're reloading the page;
+        everything is going to be stale if accessed too quickly
+        (multi-process Firefox issue).
+        """
+        try:
+            self.driver.execute_script('location.reload();')
+            self.wait_for_page_to_load()
+        except StaleElementReferenceException:
+            pass
+        sleep(1.0)
+        return self
 
-    def go_to_web_overview(self):
-        """Go to the OpenStax web Tutor overview page."""
-        return TutorMarketing(self.driver)
-
-    def go_to_log_in(self):
-        """Go to the Accounts log in page for Tutor."""
-        return AccountsHome(self)
-
-    def log_in(self, username, password):
-        """Log into Tutor."""
-        return
+    def back(self):
+        """Go back to the previous page."""
+        self.driver.execute_script('window.history.go(-1)')
+        return self
 
     def close_tab(self):
         """Close the current tab and switch to the remaining one.
@@ -62,64 +64,111 @@ class TutorBase(Page):
         Utility.close_tab(self.driver)
         return self
 
-    class Header(Region):
-        """Tutor landing page header."""
+    @property
+    def location(self):
+        """Return the current URL."""
+        return self.driver.current_url
 
-        _root_locator = (By.CLASS_NAME, 'container')
-        _logo_locator = (By.CLASS_NAME, 'navbar-brand')
-        _help_link_locator = (By.LINK_TEXT, 'Help')
-        _rice_link_locator = (By.CLASS_NAME, 'navbar-brand-rice')
+    @property
+    def url(self):
+        """Return the last segment of the current URL."""
+        return self.location.split('/')[-1]
+
+    def resize_window(self, width=1024, height=768):
+        """Set the browser window size.
+
+        Args:
+            width (int): browser window width, default 4:3
+            height (int): browser window height, default 4:3
+
+        """
+        self.driver.set_window_size(width, height)
+        sleep(1.5)
+
+    @property
+    def is_safari(self):
+        """Return True if the browser in use is Safari."""
+        return self.driver.capabilities.get('browserName').lower() == 'safari'
+
+
+class TutorLoginBase(TutorShared):
+    """The base page for the Tutor URI root.
+
+    Used for `/` and `/terms`
+    """
+
+    _footer_locator = (By.CSS_SELECTOR, 'footer')
+
+    @property
+    def footer(self):
+        """Access the page footer."""
+        footer = self.find_element(*self._footer_locator)
+        return self.Footer(self, footer)
+
+    class Nav(Region):
+        """The log in base navigation."""
+
+        _home_locator = (By.CSS_SELECTOR, '.navbar-brand')
+        _help_link_locator = (By.CSS_SELECTOR, '[href*="force.com"]')
+        _rice_link_locator = (By.CSS_SELECTOR, '.navbar-brand-rice')
 
         @property
-        def is_header_displayed(self):
-            """Header display boolean."""
-            return self.loaded
+        def logo(self):
+            """Return the Tutor Beta logo."""
+            return self.find_element(*self._home_locator)
+
+        def go_home(self):
+            """Click on the logo."""
+            Utility.safari_exception_click(self.driver, element=self.logo)
+            return go_to_(self.page)
+
+        def view_help_articles(self):
+            """Click on the Help link to view Salesforce articles."""
+            link = self.find_element(*self._help_link_locator)
+            url = link.get_attribute('href')
+            Utility.switch_to(self.driver, element=link)
+            from pages.salesforce.home import Salesforce
+            return go_to_external_(Salesforce(self.driver), url)
 
         @property
-        def go_to_tutor_home(self):
-            """Follow the OpenStax icon link back to the site root."""
-            self.find_element(*self._logo_locator).click()
-            sleep(1)
-            return self
-
-        @property
-        def go_to_help(self):
-            """Click the Salesforce help link."""
-            Utility.switch_to(self.driver, self._help_link_locator)
-            return Salesforce(self.driver)
+        def rice_logo(self):
+            """Return the Rice University logo."""
+            return self.find_element(*self._rice_link_locator)
 
         def go_to_rice(self):
-            """Load the Rice webpage."""
-            self.find_element(*self._rice_link_locator).click()
-            sleep(1)
-            return Rice(self.driver)
+            """Click on the Rice logo to view the Rice University home page."""
+            logo = self.rice_logo
+            url = logo.get_attribute('href')
+            Utility.switch_to(self.driver, element=logo)
+            from pages.rice.home import Rice
+            return go_to_external_(Rice(self.driver), url)
 
     class Footer(Region):
-        """Tutor landing page footer."""
+        """The log in base footer."""
 
-        _root_locator = (By.TAG_NAME, 'footer')
-        _rice_link_locator = (By.TAG_NAME, 'a')
-        _terms_link_locator = (By.LINK_TEXT, 'Terms')
-        _gdpr_link_locator = (By.LINK_TEXT, 'GDPR')
-
-        @property
-        def is_footer_displayed(self):
-            """Footer display boolean."""
-            return self.loaded
+        _rice_link_locator = (By.CSS_SELECTOR, 'a:first-child')
+        _terms_link_locator = (By.CSS_SELECTOR, '[href$=terms]')
 
         def go_to_rice(self):
-            """Load the Rice webpage."""
-            self.find_element(*self._rice_link_locator).click()
-            sleep(1)
-            return Rice(self.driver)
+            """Click the Rice University link."""
+            link = self.find_element(*self._rice_link_locator)
+            url = link.get_attribute('href')
+            Utility.switch_to(self.driver, element=link)
+            from pages.rice.home import Rice
+            return go_to_external_(Rice(self.driver), url)
 
-        @property
-        def show_terms_of_use(self):
-            """Display the terms of use."""
-            self.find_element(*self._terms_link_locator).click()
-            sleep(1)
-            return self
+        def view_terms(self):
+            """View the general Tutor terms of service and privacy policy."""
+            link = self.find_element(*self._terms_link_locator)
+            Utility.safari_exception_click(self.driver, element=link)
+            from pages.tutor.legal import Terms
+            return go_to_(Terms(self.driver, base_url=self.page.base_url))
 
-        def go_to_gdpr(self):
-            """Go to the Rice GPDR compliance page."""
-            return GeneralDataPrivacyRegulation(self.driver)
+
+class TutorBase(TutorShared):
+    """The base page for the Tutor app."""
+
+    class Nav(TutorNav):
+        """Use the shared region Tutor navigation."""
+
+        pass

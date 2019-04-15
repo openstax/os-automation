@@ -1,0 +1,457 @@
+"""An instructor course page with calendar."""
+
+from time import sleep
+
+from pypom import Region
+from selenium.webdriver.common.by import By
+
+from pages.tutor.base import TutorBase
+from regions.tutor.notification import Notifications
+from utils.tutor import Tutor, TutorException
+from utils.utilities import Utility, go_to_
+
+
+class Calendar(TutorBase):
+    """The instructor course calendar."""
+
+    _banner_locator = (By.CSS_SELECTOR, '.course-page header')
+    _assignment_sidebar_locator = (By.CSS_SELECTOR, '.add-assignment-sidebar')
+    _calendar_body_locator = (By.CSS_SELECTOR, '.month-body')
+
+    # ---------------------------------------------------- #
+    # Banner / Header
+    # ---------------------------------------------------- #
+
+    @property
+    def banner(self):
+        """Access the course page header."""
+        banner = self.find_element(*self._banner_locator)
+        return self.Banner(self, banner)
+
+    @property
+    def title(self):
+        """Return the course title."""
+        return self.banner.title
+
+    @property
+    def term(self):
+        """Return the course term."""
+        return self.banner.term
+
+    @property
+    def notifications(self):
+        """Access the active notifications, if exists."""
+        if not self.banner.notes.displayed:
+            return []
+        return self.banner.notes.notifications
+
+    # ---------------------------------------------------- #
+    # Assignment sidebar
+    # ---------------------------------------------------- #
+
+    @property
+    def sidebar(self):
+        """Access the assignment sidebar."""
+        sidebar = self.find_element(*self._assignment_sidebar_locator)
+        return self.Sidebar(self, sidebar)
+
+    # ---------------------------------------------------- #
+    # Assignment sidebar
+    # ---------------------------------------------------- #
+
+    @property
+    def calendar(self):
+        """Access the calendar."""
+        calendar = self.find_element(*self._calendar_body_locator)
+        return self.Calendar(self, calendar)
+
+    # ---------------------------------------------------- #
+    # Instructor course regions
+    # ---------------------------------------------------- #
+
+    class Banner(Region):
+        """The header region of the course calendar."""
+
+        _title_locator = (By.CSS_SELECTOR, '.title')
+        _course_term_locator = (By.CSS_SELECTOR, '.subtitle')
+        _notification_bar_locator = (
+                                By.CSS_SELECTOR, '.openstax-notifications-bar')
+        _assignment_toggle_locator = (By.CSS_SELECTOR, '.sidebar-toggle')
+        _browse_the_book_locator = (By.CSS_SELECTOR, '.reference')
+        _question_library_locator = (By.CSS_SELECTOR, '[href$=questions]')
+        _performance_forecast_locator = (By.CSS_SELECTOR, '[href$=guide]')
+        _student_scores_locator = (By.CSS_SELECTOR, '[href$=scores]')
+
+        @property
+        def title(self):
+            """Return the course title."""
+            return self.find_element(*self._title_locator).text
+
+        @property
+        def term(self):
+            """Return the course term."""
+            return self.find_element(*self._course_term_locator).text
+
+        @property
+        def notes(self):
+            """Access the notifications."""
+            notes = self.find_element(*self._notification_bar_locator)
+            return Notifications(self, notes)
+
+        def add_assignment(self):
+            """Click on the 'Add Assignment' toggle button."""
+            button = self.find_element(*self._assignment_toggle_locator)
+            Utility.click_option(self.driver, element=button)
+            sleep(0.5)
+            return self.page
+
+        def browse_the_book(self):
+            """Click on the 'Browse the Book' button."""
+            button = self.find_element(*self._browse_the_book_locator)
+            Utility.switch_to(self.driver, element=button)
+            from pages.tutor.reference import ReferenceBook
+            return go_to_(ReferenceBook(self.driver, self.page.base_url))
+
+        def question_library(self):
+            """Click on the 'Question Library' button."""
+            button = self.find_element(*self._question_library_locator)
+            Utility.click_option(self.driver, element=button)
+            from pages.tutor.question_library import QuestionLibrary
+            return go_to_(QuestionLibrary(self.driver, self.page.base_url))
+
+        def performance_forecast(self):
+            """Click on the 'Performance Forecast' button."""
+            button = self.find_element(*self._performance_forecast_locator)
+            Utility.click_option(self.driver, element=button)
+            from pages.tutor.performance import Performance
+            return go_to_(Performance(self.driver, self.page.base_url))
+
+        def student_scores(self):
+            """Click on the 'Student Scores' button."""
+            button = self.find_element(*self._student_scores_locator)
+            Utility.click_option(self.driver, element=button)
+            from pages.tutor.scores import Scores
+            return go_to_(Scores(self.driver, self.page.base_url))
+
+    class Sidebar(Region):
+        """The assignment sidebar."""
+
+        _reading_bar_locator = (
+                            By.CSS_SELECTOR, '[data-assignment-type=reading]')
+        _homework_bar_locator = (
+                            By.CSS_SELECTOR, '[data-assignment-type=homework]')
+        _external_bar_locator = (
+                            By.CSS_SELECTOR, '[data-assignment-type=external]')
+        _event_bar_locator = (By.CSS_SELECTOR, '[data-assignment-type=event]')
+
+        _add_reading_locator = (By.CSS_SELECTOR, '[href$="reading/new"]')
+        _add_homework_locator = (By.CSS_SELECTOR, '[href$="homework/new"]')
+        _add_external_locator = (By.CSS_SELECTOR, '[href$="external/new"]')
+        _add_event_locator = (By.CSS_SELECTOR, '[href$="event/new"]')
+        _assignment_clone_locator = (By.CSS_SELECTOR, '.plans > div')
+
+        @property
+        def is_open(self):
+            """Return True if the assignment sidebar menu is displayed."""
+            return 'is-open' in self.root.get_attribute('class')
+
+        @property
+        def reading_bar(self):
+            """Return the 'Add Reading' bar element."""
+            return self.find_element(*self._reading_bar_locator)
+
+        @property
+        def homework_bar(self):
+            """Return the 'Add Homework' bar element."""
+            return self.find_element(*self._homework_bar_locator)
+
+        @property
+        def external_bar(self):
+            """Return the 'Add External Assignment' bar element."""
+            return self.find_element(*self._external_bar_locator)
+
+        @property
+        def event_bar(self):
+            """Return the 'Add Event' bar element."""
+            return self.find_element(*self._event_bar_locator)
+
+        def add_reading(self):
+            """Click on the 'Add Reading' button."""
+            return self._add_assignment(Tutor.READING)
+
+        def add_homework(self):
+            """Click on the 'Add Homework' button."""
+            return self._add_assignment(Tutor.HOMEWORK)
+
+        def add_external(self):
+            """Click on the 'Add External Assignment' button."""
+            return self._add_assignment(Tutor.EXTERNAL)
+
+        def add_event(self):
+            """Click on the 'Add Event' button."""
+            return self._add_assignment(Tutor.EVENT)
+
+        @property
+        def copied_assignments(self):
+            """Access the assignment clone options."""
+            return [self.AssignmentCopy(self, assignment)
+                    for assignment
+                    in self.find_elements(*self._assignment_clone_locator)]
+
+        def _add_assignment(self, assignment_type):
+            """Click on an add assignment button."""
+            if assignment_type == Tutor.EXTERNAL:
+                locator = self._add_external_locator
+                from pages.tutor.assignment import AddExternal as Assignment
+            elif assignment_type == Tutor.EVENT:
+                locator = self._add_event_locator
+                from pages.tutor.assignment import AddEvent as Assignment
+            elif assignment_type == Tutor.HOMEWORK:
+                locator = self._add_homework_locator
+                from pages.tutor.assignment import AddHomework as Assignment
+            elif assignment_type == Tutor.READING:
+                locator = self._add_reading_locator
+                from pages.tutor.assignment import AddReading as Assignment
+            else:
+                raise TutorException('"{0}" is not a known assignment type.'
+                                     .format(assignment_type))
+            button = self.find_element(*locator)
+            Utility.click_option(self.driver, element=button)
+            return go_to_(Assignment(self.driver, self.page.base_url))
+
+        class AssignmentCopy(Region):
+            """An assignment from a previous course."""
+
+            _title_locator = (By.CSS_SELECTOR, 'div')
+
+            @property
+            def plan_id(self):
+                """Return the assignment ID."""
+                return self.root.get_attribute('data-assignment-id')
+
+            @property
+            def assignment_type(self):
+                """Return the assignment type."""
+                return self.root.get_attribute('data-assignment-type')
+
+            @property
+            def title(self):
+                """Return the assignment name."""
+                return self.find_element(*self._title_locator).text
+
+    class CalendarMonth(Region):
+        """The instructor calendar."""
+
+        _current_month_locator = (By.CSS_SELECTOR, '.calendar-header-label')
+        _last_month_locator = (By.CSS_SELECTOR, '.previous')
+        _next_month_locator = (By.CSS_SELECTOR, '.next')
+        _day_locator = (By.CSS_SELECTOR, '.days > div')
+
+        @property
+        def month(self):
+            """Return the currently displayed month."""
+            return (self.find_element(*self._current_month_locator)
+                    .text.split()[0])
+
+        @property
+        def year(self):
+            """Return the currently displayed year."""
+            return (self.find_element(*self._current_month_locator)
+                    .text.split()[1])
+
+        def previous_month(self):
+            """Click on the left arrow to view the previous month."""
+            button = self.find_element(*self._last_month_locator)
+            Utility.click_option(self.driver, element=button)
+            sleep(0.5)
+            return Calendar(self.driver, self.page.base_url)
+
+        def next_month(self):
+            """Click on the right arrow to view the next month."""
+            button = self.find_element(*self._next_month_locator)
+            Utility.click_option(self.driver, element=button)
+            sleep(0.5)
+            return Calendar(self.driver, self.page.base_url)
+
+        @property
+        def days(self):
+            """Access the individual dates."""
+            return [self.Day(self, date)
+                    for date in self.find_elements(*self._day_locator)]
+
+        class Day(Region):
+            """A specific date."""
+
+            _today_locator = (By.CSS_SELECTOR, '.today')
+            _event_locator = (By.CSS_SELECTOR, '.events')
+            _assignment_locator = (By.CSS_SELECTOR, '.event')
+            _date_label_locator = (By.CSS_SELECTOR, '.label')
+
+            _add_assignment_selector = 'a[data-assignment-type={0}]'
+
+            @property
+            def term(self):
+                """Return whether the date is in or out of the term."""
+                term = self.root.get_attribute('class')
+                if Tutor.BEFORE_TERM in term:
+                    return Tutor.BEFORE_TERM
+                elif Tutor.IN_TERM in term:
+                    return Tutor.IN_TERM
+                elif Tutor.AFTER_TERM in term:
+                    return Tutor.AFTER_TERM
+                else:
+                    raise TutorException('No term-status listed in "{0}"'
+                                         .format(term.split()))
+
+            @property
+            def tense(self):
+                """Return whether the date is before today, today, or after."""
+                term = self.root.get_attribute('class')
+                if Tutor.IN_PAST in term:
+                    return Tutor.IN_PAST
+                elif Tutor.IN_FUTURE in term:
+                    return Tutor.IN_FUTURE
+                return Tutor.TODAY
+
+            def add_assignment(self, assignment_type=None):
+                """Click on the date number to add an assignment."""
+                label = self.find_element(*self._date_label_locator)
+                Utility.click_option(self.driver, element=label)
+                sleep(0.5)
+                if assignment_type == Tutor.EVENT:
+                    assignment = Tutor.EVENT
+                    from pages.tutor.assignment import AddEvent \
+                        as Assignment
+                elif assignment_type == Tutor.EXTERNAL:
+                    assignment = Tutor.EXTERNAL
+                    from pages.tutor.assignment import AddExternal \
+                        as Assignment
+                elif assignment_type == Tutor.HOMEWORK:
+                    assignment = Tutor.HOMEWORK
+                    from pages.tutor.assignment import AddHomework \
+                        as Assignment
+                elif assignment_type == Tutor.READING:
+                    assignment = Tutor.READING
+                    from pages.tutor.assignment import AddReading \
+                        as Assignment
+                elif assignment_type is None:
+                    # just open the pop up menu
+                    return self.page.page
+                else:
+                    raise TutorException(
+                        '"{0}" is not a known assignment type.'
+                        .format(assignment_type))
+                if assignment:
+                    button = self.driver.execute_script(
+                        'return document.querySelector("arguments[0]");',
+                        self._add_assignment_selector.format(assignment))
+                    Utility.click_option(self.driver, element=button)
+                    return go_to_(Assignment(self.driver,
+                                             self.page.page.base_url))
+
+            @property
+            def has_assignments(self):
+                """Return True if any class assignments are found."""
+                return bool(self.find_elements(*self._event_locator))
+
+            @property
+            def assignments(self):
+                """Access the assignments listed as due today."""
+                return [self.Assignment(self, event)
+                        for event
+                        in self.find_elements(*self._assignment_locator)]
+
+            class Assignment(Region):
+                """An individual student assignment or event."""
+
+                _plan_locator = (By.CSS_SELECTOR, '.plan')
+                _title_locator = (By.CSS_SELECTOR, '[data-opens-at]')
+                _edit_draft_locator = (By.CSS_SELECTOR, 'a')
+                _flagged_assignment_locator = (
+                                        By.CSS_SELECTOR, '[data-opens-at] svg')
+
+                @property
+                def style(self):
+                    """Return the assignment color display type."""
+                    return (self.root.get_attribute('class')
+                            .split('type-')[-1]
+                            .split()[0])
+
+                @property
+                def span(self):
+                    """Return the number of days this week the event spans."""
+                    return int(self.root.get_attribute('class')
+                               .split('span-')[-1]
+                               .split()[0])
+
+                @property
+                def plan(self):
+                    """Return the assignment plan element."""
+                    return self.find_element(*self._plan_locator)
+
+                @property
+                def is_published(self):
+                    """Return True if the assignment is published."""
+                    return 'is-published' in self.plan.get_attribute('class')
+
+                @property
+                def is_draft(self):
+                    """Return True if the assignment is a saved draft."""
+                    return 'is-draft' in self.plan.get_attribute('class')
+
+                @property
+                def is_open(self):
+                    """Return True if the assignment is open for work."""
+                    return 'is-open' in self.plan.get_attribute('class')
+
+                @property
+                def plan_id(self):
+                    """Return the assignment plan ID."""
+                    return self.plan.get_attribute('data-plan-id')
+
+                @property
+                def assignment_type(self):
+                    """Return the assignment type."""
+                    return self.plan.get_attribute('data-assignment-type')
+
+                @property
+                def opens_on(self):
+                    """Return the date the assignment opens on."""
+                    return (self.find_element(*self._title_locator)
+                            .get_attribute('data-opens-at'))
+
+                @property
+                def title(self):
+                    """Return the assignment title."""
+                    return self.find_element(*self._title_locator).text
+
+                def edit_draft(self):
+                    """Edit the selected assignment."""
+                    if self.is_draft:
+                        assignment_type = self.assignment_type
+                        link = self.find_element(*self._edit_draft_locator)
+                        Utility.click_option(self.driver, element=link)
+                        if assignment_type == Tutor.EVENT:
+                            from pages.tutor.assignment import AddEvent \
+                                as Assignment
+                        elif assignment_type == Tutor.EXTERNAL:
+                            from pages.tutor.assignment import AddExternal \
+                                as Assignment
+                        elif assignment_type == Tutor.HOMEWORK:
+                            from pages.tutor.assignment import AddHomework \
+                                as Assignment
+                        elif assignment_type == Tutor.READING:
+                            from pages.tutor.assignment import AddReading \
+                                as Assignment
+                        else:
+                            raise TutorException(
+                                '"{0}" is not a known assignment type.'
+                                .format(assignment_type))
+                        return go_to_(Assignment(self.driver,
+                                                 self.page.page.page.base_url))
+
+                @property
+                def flagged(self):
+                    """Return True if the trouble flag is present."""
+                    return bool(
+                        self.find_elements(*self._flagged_assignment_locator))

@@ -433,7 +433,7 @@ class WebNav(Region):
         _openstax_tutor_link_locator = (By.LINK_TEXT, 'OpenStax Tutor')
         _training_wheel_locator = (By.CSS_SELECTOR, '.training-wheel')
         _faculty_access_locator = (By.CSS_SELECTOR, '[href*=faculty]')
-        _log_out_link_locator = (By.CSS_SELECTOR, '[href*=signout]')
+        _log_out_link_locator = (By.CSS_SELECTOR, '[href*=logout]')
 
         @property
         def login(self):

@@ -16,6 +16,8 @@ def exercises_base_url(request):
                 config.getini('instance')).lower()
     if instance and base_url:
         segments = base_url.split(SPLIT)
-        return '{0}{3}-{2}{1}'.format(*segments, instance, SPLIT)
+        insert = ('' if instance.startswith('prod') else
+                  '-{instance}'.format(instance=instance))
+        return '{0}{2}{3}{1}'.format(*segments, SPLIT, insert)
     if base_url is not None:
         return base_url
