@@ -3,7 +3,7 @@
 from pypom import Region
 from selenium.webdriver.common.by import By
 
-from pages.tutor.base2 import TutorLoginBase
+from pages.tutor.base import TutorLoginBase
 from pages.utils import go_to_
 
 

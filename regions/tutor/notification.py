@@ -4,7 +4,7 @@ from pypom import Region
 from selenium.webdriver.common.by import By
 
 from utils.tutor import Tutor
-from util.utilities import Utility, go_to_
+from utils.utilities import Utility, go_to_
 
 
 class Notifications(Region):

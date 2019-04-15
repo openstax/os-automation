@@ -8,7 +8,7 @@ from pypom import Region
 from selenium.common.exceptions import NoSuchElementException
 from selenium.webdriver.common.by import By
 
-from pages.tutor.base2 import TutorBase
+from pages.tutor.base import TutorBase
 from regions.tutor.notification import Notifications
 from utils.tutor import Tutor, TutorException
 from utils.utilities import Utility, go_to_
