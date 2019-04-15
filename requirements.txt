@@ -63,7 +63,7 @@ pytest-variables==1.7.1
 pytest-xdist==1.26.1
 python-dateutil==2.7.3
 python-dotenv==0.8.2
-PyYAML==3.13
+PyYAML==5.1
 query-string==1.0.2
 request==1.0.2
 requests==2.21.0
