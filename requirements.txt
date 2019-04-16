@@ -44,10 +44,10 @@ pydocstyle==2.1.1
 pyflakes==2.1.0
 pyOpenSSL==19.0.0
 PyPOM==2.2.0
-pytest==4.3.0
+pytest==4.0.2
 pytest-base-url==1.4.1
 pytest-cache==1.0
-pytest-cov==2.6.1
+pytest-cov==2.6.0
 pytest-flake8==1.0.4
 pytest-forked==1.0.2
 pytest-html==1.20.0
