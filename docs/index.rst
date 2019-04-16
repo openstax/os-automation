@@ -3,18 +3,17 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Welcome to os-automation's documentation!
+os-automation
 =========================================
 
+Automated Selenium testing for the OpenStax Tutor and BIT products.
+
+Quickstart Guide
+----------------
+
+Step-by-step instructions on how to get started running automated tests.
+
 .. toctree::
-   :maxdepth: 2
-   :caption: Contents:
+   :maxdepth: 4
 
-
-
-Indices and tables
-==================
-
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
+   quickstart

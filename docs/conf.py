@@ -18,8 +18,8 @@
 # -- Project information -----------------------------------------------------
 
 project = 'os-automation'
-copyright = '2019, openstax-qa'
-author = 'openstax-qa'
+copyright = '2019, OpenStax'
+author = 'OpenStax QA'
 
 
 # -- General configuration ---------------------------------------------------
