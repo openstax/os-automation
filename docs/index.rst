@@ -8,12 +8,12 @@ os-automation
 
 Automated Selenium testing for the OpenStax Tutor and BIT products.
 
-Quickstart Guide
-----------------
+Installation Guide
+------------------
 
 Step-by-step instructions on how to get started running automated tests.
 
 .. toctree::
    :maxdepth: 4
 
-   quickstart
+   installation
