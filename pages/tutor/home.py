@@ -78,6 +78,8 @@ class TutorHome(TutorLoginBase):
     def log_in(self, username, password):
         """Log into Tutor with a specific user.
 
+        :param str username: the user to log in as
+        :param str password: the user's password
         :return: the user's dashboard
         :rtype: :py:class:`~pages.tutor.dashboard.Dashboard`
 
