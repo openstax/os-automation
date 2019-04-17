@@ -30,7 +30,7 @@ the following in your terminal:
 Install Python
 ----------------
 
-Install Python3 using the appropriate `brew` command.
+Install Python3 using the appropriate ``brew`` command.
 
 .. code-block:: bash
 
@@ -39,7 +39,7 @@ Install Python3 using the appropriate `brew` command.
 Install git
 ----------------
 
-Install git using `brew`:
+Install git using ``brew``:
 
 .. code-block:: bash
 
@@ -92,3 +92,40 @@ file into your virtual environment.
    is proper dependency management. According to the 3rd factor,
 
        "A twelve-factor app never relies on implicit existence of system-wide packages."
+
+Install Selenium WebDrivers
+---------------------------
+
+This test framework uses the following WebDrivers to run automated tests.
+
+* GeckoDriver - Mozilla Firefox
+* ChromeDriver - Google Chrome
+* SafariDriver - Apple Safari (Installed locally with OSX)
+
+
+Install GeckoDriver
+^^^^^^^^^^^^^^^^^^^
+
+.. note::
+   You'll need to have Firefox installed on your computer. You can download
+   Firefox at their `website <https://www.mozilla.org/en-US/firefox/new/>`_
+
+Use the ``brew`` command line tool to install GeckoDriver. You can do this by
+running the following in your terminal:
+
+.. code-block:: bash
+
+    brew install geckodriver
+
+Install ChromeDriver
+^^^^^^^^^^^^^^^^^^^^
+
+.. note::
+   You'll need to have Chrome installed on your computer. You can download Chrome
+   at their `website <https://www.google.com/chrome/>`_
+
+Use the ``brew cask`` command to install ChromeDriver:
+
+.. code-block:: bash
+
+    brew cask install chromedriver
