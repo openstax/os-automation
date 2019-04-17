@@ -108,11 +108,11 @@ class TutorHome(TutorLoginBase):
         def view_gdpr(self):
             """Click on the GDPR link to view the GDPR on Rice's webpage.
 
-        :return: the General Data Privacy Regulation page on Rice University's
-            webpage in a new tab
-        :rtype: :py:class:`~pages.rice.gdpr.GeneralDataPrivacyRegulation`
+            :return: the General Data Privacy Regulation page on Rice
+                University's webpage in a new tab
+            :rtype: :py:class:`~pages.rice.gdpr.GeneralDataPrivacyRegulation`
 
-        """
+            """
             link = self.find_element(*self._gdpr_locator)
             url = link.get_attribute('href')
             Utility.switch_to(self.driver, element=link)
