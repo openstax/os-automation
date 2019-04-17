@@ -233,7 +233,7 @@ class Calendar(TutorBase):
 
         @property
         def reading_bar(self):
-            """Return the 'Add Reading' bar element.
+            r"""Return the 'Add Reading' bar element.
 
             :return: the reading assignment bar
             :rtype: \
@@ -244,7 +244,7 @@ class Calendar(TutorBase):
 
         @property
         def homework_bar(self):
-            """Return the 'Add Homework' bar element.
+            r"""Return the 'Add Homework' bar element.
 
             :return: the homework assignment bar
             :rtype: \
@@ -255,7 +255,7 @@ class Calendar(TutorBase):
 
         @property
         def external_bar(self):
-            """Return the 'Add External Assignment' bar element.
+            r"""Return the 'Add External Assignment' bar element.
 
             :return: the external assignment bar
             :rtype: \
@@ -266,7 +266,7 @@ class Calendar(TutorBase):
 
         @property
         def event_bar(self):
-            """Return the 'Add Event' bar element.
+            r"""Return the 'Add Event' bar element.
 
             :return: the event bar
             :rtype: \
@@ -337,6 +337,8 @@ class Calendar(TutorBase):
                 :py:class:`~pages.tutor.assignment.AddReading`
             :raises :py:class:`~utils.tutor.TutorException`: if the
                 assignment_type does not match a known assignment type
+
+            :noindex:
 
             """
             if assignment_type == Tutor.EXTERNAL:
@@ -562,7 +564,7 @@ class Calendar(TutorBase):
 
             @property
             def assignments(self):
-                """Access the assignments listed as due today.
+                r"""Access the assignments listed as due today.
 
                 :returns: the list of assignments due on this day
                 :rtype: \
@@ -707,7 +709,7 @@ class Calendar(TutorBase):
                     :raises :py:class:`~utils.tutor.TutorException`: if the
                         assignment_type does not match a known assignment type
 
-                """
+                    """
                     if self.is_draft:
                         assignment_type = self.assignment_type
                         link = self.find_element(*self._edit_draft_locator)

@@ -453,7 +453,7 @@ class StudentCourse(TutorBase):
 
             @property
             def icon(self):
-                """Return the key icon.
+                r"""Return the key icon.
 
                 :return: the guide icon
                 :rtype: \
@@ -483,10 +483,10 @@ class StudentCourse(TutorBase):
         def title(self):
             """Return the survey title.
 
-                :return: the survey title
-                :rtype: str
+            :return: the survey title
+            :rtype: str
 
-                """
+            """
             title_text = self.find_element(*self._title_locator).text
             match = re.search(r'(["“][\w\ \.\-]+["”])', title_text)
             assert(match is not None), \
@@ -497,10 +497,10 @@ class StudentCourse(TutorBase):
         def content(self):
             """Return the text content of the survey card.
 
-                :return: the survey card text
-                :rtype: str
+            :return: the survey card text
+            :rtype: str
 
-                """
+            """
             content = [line.text
                        for line in self.find_elements(*self._content_locator)]
             return '\n'.join(list(content))
@@ -508,10 +508,10 @@ class StudentCourse(TutorBase):
         def take_survey(self):
             """Click on the 'Take Survey' button.
 
-                :return: the form for a research study
-                :rtype: :py:class:`~pages.tutor.research.ResearchSurvey`
+            :return: the form for a research study
+            :rtype: :py:class:`~pages.tutor.research.ResearchSurvey`
 
-                """
+            """
             button = self.find_element(*self._button_locator)
             Utility.click_option(self.driver, element=button)
             from pages.tutor.survey import ResearchSurvey
@@ -532,31 +532,31 @@ class StudentCourse(TutorBase):
         def title(self):
             """Return the forecast sidebar title.
 
-                :return: the performance forecast sidebar title
-                :rtype: str
+            :return: the performance forecast sidebar title
+            :rtype: str
 
-                """
+            """
             return self.find_element(*self._title_locator).text
 
         @property
         def is_empty(self):
             """Return True if the forecast has not been populated.
 
-                :return: ``True`` if the forecast is empty, else ``False``
-                :rtype: bool
+            :return: ``True`` if the forecast is empty, else ``False``
+            :rtype: bool
 
-                """
+            """
             return 'empty' in self.root.get_attribute('class')
 
         @property
         def empty_description(self):
             """Return the forecast explanation if the sidebar is empty.
 
-                :return: ``True`` if the forecast explanation is empty, else
-                    ``False``
-                :rtype: bool
+            :return: ``True`` if the forecast explanation is empty, else
+                ``False``
+            :rtype: bool
 
-                """
+            """
             if self.is_empty:
                 lines = [
                     line.text for line
@@ -568,12 +568,12 @@ class StudentCourse(TutorBase):
         def sections(self):
             """Access the section forecasts.
 
-                :return: the list of sections in the recent forecast
-                :rtype: list(:py:class:`~StudentCourse.Performance.Section`)
-                :raises :py:class:`~utils.tutor.TutorException`: if the
-                    recent topics forecast is empty
+            :return: the list of sections in the recent forecast
+            :rtype: list(:py:class:`~StudentCourse.Performance.Section`)
+            :raises :py:class:`~utils.tutor.TutorException`: if the recent
+                topics forecast is empty
 
-                """
+            """
             if self.is_empty:
                 raise TutorException("Forecast is not populated")
             return [self.Section(self, section)
@@ -583,10 +583,10 @@ class StudentCourse(TutorBase):
         def key_guide(self):
             """Access the color guide for the performance bars.
 
-                :return: the color guide keys for the performance bars
-                :rtype: list(:py:class:`~StudentCourse.Performance.Key`)
+            :return: the color guide keys for the performance bars
+            :rtype: list(:py:class:`~StudentCourse.Performance.Key`)
 
-                """
+            """
             return [self.Key(self, guide)
                     for guide in self.find_elements(*self._key_guide_locator)]
 
@@ -648,7 +648,7 @@ class StudentCourse(TutorBase):
 
             @property
             def progress_bar(self):
-                """Return the progress bar element.
+                r"""Return the progress bar element.
 
                 :return: the progress bar
                 :rtype: \
@@ -732,7 +732,7 @@ class StudentCourse(TutorBase):
 
             @property
             def progress_bar(self):
-                """Return the progress bar color box.
+                r"""Return the progress bar color box.
 
                 :return: the progress bar box
                 :rtype: \

@@ -183,7 +183,7 @@ class TutorLoginBase(TutorShared):
 
         @property
         def logo(self):
-            """Return the Tutor Beta logo.
+            r"""Return the Tutor Beta logo.
 
             :return: the OpenStax Tutor Beta logo element
             :rtype: \
@@ -217,7 +217,7 @@ class TutorLoginBase(TutorShared):
 
         @property
         def rice_logo(self):
-            """Return the Rice University logo.
+            r"""Return the Rice University logo.
 
             :return: the Rice University logo
             :rtype: \
