@@ -17,6 +17,34 @@ page, so we would like you to spend time to carefully read the entire thing from
 the beginning to the end. This will familiarize you with the process and reduce
 the chances that you do something wrong.
 
+Install Homebrew
+----------------
+
+We recommend installing Python using Homebrew. In order to install Homebrew run
+the following in your terminal:
+
+.. code-block:: bash
+
+    /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
+
+Install Python
+----------------
+
+Install Python3 using the appropriate `brew` command.
+
+.. code-block:: bash
+
+    brew install python
+
+Install git
+----------------
+
+Install git using `brew`:
+
+.. code-block:: bash
+
+    brew install git
+
 Clone this project
 ------------------
 
@@ -30,41 +58,37 @@ project locally like so:
 
 .. code-block:: bash
 
-    $ git clone git@github.com:openstax/os-automation.git
+    git clone git@github.com:openstax/os-automation.git
 
-Install Python 3
-------------
-
-We recommend installing Python using Homebrew. In order to install Homebrew run
-the following in your terminal:
+Git will clone down the code into a new folder called `os-automation`. Most of
+the commands in this guide will require you to be in this folder. Run the
+following in your terminal to change directories:
 
 .. code-block:: bash
 
-    $ /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
-
-
-
-Install Python3 using the appropriate `brew` command.
-
-.. code-block:: bash
-
-    $ brew install python
+    cd os-automation
 
 Create a virtual environment
 ----------------------------
 
-It's a best practice in Python to create a virtual environment for your project.
-There are various ways to do this. If you are already familiar with how to do
-this create a virtualenv in that manner of your choosing. If not, run the
-following `make` command in your terminal.
+It's a best practice in Python to create a virtual environment (virtualenv) for
+your project. Virtual environments isolate dependencies required for different
+projects in their own environment. There are various ways to do this depending
+on how long you have been using Python.
+
+If you are already familiar with how to create virtual environments you can
+manage that how you like. If not, run the following `make` command in your
+terminal.
 
 .. code-block:: bash
 
-    $ make venv
+    make venv
+
+This command will also install all dependencies defined in the `requirements.txt`
+file into your virtual environment.
 
 .. seealso::
    One of the practices of the `Twelve-Factor App <https://12factor.net/dependencies>`_
    is proper dependency management. According to the 3rd factor,
 
        "A twelve-factor app never relies on implicit existence of system-wide packages."
-
