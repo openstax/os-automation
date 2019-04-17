@@ -1,4 +1,4 @@
-.. _installation:
+.. _system_install:
 
 Installation Guide
 ==================
@@ -8,14 +8,16 @@ Installation Guide
    bash. If you are using a different operating system or shell you may need to
    adapt your commands.
 
-Before you start
-----------------
+System Requirements
+-------------------
 
-Excited for some automated testing? This page provides an introduction in how
-to get started with os-automation. There is some important information on this
-page, so we would like you to spend time to carefully read the entire thing from
-the beginning to the end. This will familiarize you with the process and reduce
-the chances that you do something wrong.
+The high level requirements installing os-automation are:
+
+* Homebrew (OSX package manager)
+* Python 3.7+
+* git
+* Firefox geckodriver
+* Chrome chromedriver
 
 Install Homebrew
 ----------------
@@ -28,7 +30,7 @@ the following in your terminal:
     /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
 
 Install Python
-----------------
+--------------
 
 Install Python3 using the appropriate ``brew`` command.
 
@@ -37,7 +39,7 @@ Install Python3 using the appropriate ``brew`` command.
     brew install python
 
 Install git
-----------------
+-----------
 
 Install git using ``brew``:
 
@@ -45,8 +47,8 @@ Install git using ``brew``:
 
     brew install git
 
-Clone this project
-------------------
+Clone os-automation from GitHub
+-------------------------------
 
 If you have cloned this project already you can skip this, otherwise you'll need
 clone this repo using Git. *if you do not know how to clone a GitHub repository,
@@ -68,31 +70,6 @@ following in your terminal to change directories:
 
     cd os-automation
 
-Create a virtual environment
-----------------------------
-
-It's a best practice in Python to create a virtual environment (virtualenv) for
-your project. Virtual environments isolate dependencies required for different
-projects in their own environment. There are various ways to do this depending
-on how long you have been using Python.
-
-If you are already familiar with how to create virtual environments you can
-manage that how you like. If not, run the following `make` command in your
-terminal.
-
-.. code-block:: bash
-
-    make venv
-
-This command will also install all dependencies defined in the `requirements.txt`
-file into your virtual environment.
-
-.. seealso::
-   One of the practices of the `Twelve-Factor App <https://12factor.net/dependencies>`_
-   is proper dependency management. According to the 3rd factor,
-
-       "A twelve-factor app never relies on implicit existence of system-wide packages."
-
 Install Selenium WebDrivers
 ---------------------------
 
@@ -104,7 +81,7 @@ This test framework uses the following WebDrivers to run automated tests.
 
 
 Install GeckoDriver
-^^^^^^^^^^^^^^^^^^^
+-------------------
 
 .. note::
    You'll need to have Firefox installed on your computer. You can download
@@ -118,7 +95,7 @@ running the following in your terminal:
     brew install geckodriver
 
 Install ChromeDriver
-^^^^^^^^^^^^^^^^^^^^
+--------------------
 
 .. note::
    You'll need to have Chrome installed on your computer. You can download Chrome
@@ -129,3 +106,5 @@ Use the ``brew cask`` command to install ChromeDriver:
 .. code-block:: bash
 
     brew cask install chromedriver
+
+
