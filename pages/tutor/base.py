@@ -21,16 +21,16 @@ class TutorShared(Page):
 
         :param driver: a web browser control
         :param base_url: (optional) the website base URL; required to use
-            the :py:function:`pypom.page.open` function
+            the :py:function:`~pypom.page.open` function
         :param int timeout: (optional) the maximum number of seconds to before
             the WebDriverWait polling times out, default is 1 minute
         :param url_kwargs: (optional) keyword arguments used when generating
             the :py:attr:`seed_url`
         :type base_url: str or None
-        :type driver: :py:class:`selenium.webdriver.Chrome` or
-            :py:class:`selenium.webdriver.Edge` or
-            :py:class:`selenium.webdriver.Firefox` or
-            :py:class:`selenium.webdriver.Safari`
+        :type driver: :py:class:`~selenium.webdriver.Chrome` or
+            :py:class:`~selenium.webdriver.Edge` or
+            :py:class:`~selenium.webdriver.Firefox` or
+            :py:class:`~selenium.webdriver.Safari`
 
         """
         super(TutorShared, self) \
@@ -44,7 +44,7 @@ class TutorShared(Page):
         within the DOM.
 
         :return: the root element
-        :rtype: :py:class:`selenium.webdriver.remote.webelement.WebElement`
+        :rtype: :py:class:`~selenium.webdriver.remote.webelement.WebElement`
 
         """
         return self.find_element(*self._root_locator)
@@ -63,7 +63,7 @@ class TutorShared(Page):
         """Access the page nav.
 
         :return: the OpenStax Tutor navigation bar
-        :rtype: :py:class:`TutorShared.Nav`
+        :rtype: :py:class:`~TutorShared.Nav`
 
         """
         nav = self.find_element(*self._nav_locator)
@@ -168,7 +168,7 @@ class TutorLoginBase(TutorShared):
         """Access the page footer.
 
         :return: the page footer element
-        :rtype: :py:class:`TutorLoginBase.Footer`
+        :rtype: :py:class:`~TutorLoginBase.Footer`
 
         """
         footer = self.find_element(*self._footer_locator)
@@ -186,7 +186,8 @@ class TutorLoginBase(TutorShared):
             """Return the Tutor Beta logo.
 
             :return: the OpenStax Tutor Beta logo element
-            :rtype: :py:class:`selenium.webdriver.remote.webelement.WebElement`
+            :rtype: \
+                :py:class:`~selenium.webdriver.remote.webelement.WebElement`
 
             """
             return self.find_element(*self._home_locator)
@@ -205,7 +206,7 @@ class TutorLoginBase(TutorShared):
             """Click on the Help link to view Salesforce articles.
 
             :return: the OpenStax knowledge base webpage
-            :rtype: :py:class:`pages.salesforce.home.Salesforce`
+            :rtype: :py:class:`~pages.salesforce.home.Salesforce`
 
             """
             link = self.find_element(*self._help_link_locator)
@@ -219,7 +220,8 @@ class TutorLoginBase(TutorShared):
             """Return the Rice University logo.
 
             :return: the Rice University logo
-            :rtype: :py:class:`selenium.webdriver.remote.webelement.WebElement`
+            :rtype: \
+                :py:class:`~selenium.webdriver.remote.webelement.WebElement`
 
             """
             return self.find_element(*self._rice_link_locator)
@@ -228,7 +230,7 @@ class TutorLoginBase(TutorShared):
             """Click on the Rice logo to view the Rice University home page.
 
             :return: the Rice University home page
-            :rtype: :py:class:`pages.rice.home.Rice`
+            :rtype: :py:class:`~pages.rice.home.Rice`
 
             """
             logo = self.rice_logo
@@ -247,7 +249,7 @@ class TutorLoginBase(TutorShared):
             """Click the Rice University link.
 
             :return: the Rice University home page
-            :rtype: :py:class:`pages.rice.home.Rice`
+            :rtype: :py:class:`~pages.rice.home.Rice`
 
             """
             link = self.find_element(*self._rice_link_locator)
@@ -260,7 +262,7 @@ class TutorLoginBase(TutorShared):
             """View the general Tutor terms of service and privacy policy.
 
             :return: the OpenStax Tutor Beta terms and policy page
-            :rtype: :py:class:`pages.tutor.legal.Terms`
+            :rtype: :py:class:`~pages.tutor.legal.Terms`
 
             """
             link = self.find_element(*self._terms_link_locator)

@@ -27,7 +27,7 @@ class Calendar(TutorBase):
         """Access the course page header.
 
         :return: the course banner region
-        :rtype: :py:class:`Calendar.Banner`
+        :rtype: :py:class:`~Calendar.Banner`
 
         """
         banner = self.find_element(*self._banner_locator)
@@ -58,7 +58,7 @@ class Calendar(TutorBase):
         """Access the active notifications, if exists.
 
         :return: the list of currently active site notifications
-        :rtype: list(:py:class:`regions.tutor.notification.Notifications`)
+        :rtype: list(:py:class:`~regions.tutor.notification.Notifications`)
 
         """
         if not self.banner.notes.displayed:
@@ -74,7 +74,7 @@ class Calendar(TutorBase):
         """Access the assignment sidebar.
 
         :return: the assignment creation and cloning sidebar region
-        :rtype: :py:class:`Calendar.Sidebar`
+        :rtype: :py:class:`~Calendar.Sidebar`
 
         """
         sidebar = self.find_element(*self._assignment_sidebar_locator)
@@ -89,7 +89,7 @@ class Calendar(TutorBase):
         """Access the calendar.
 
         :return: the assignment calendar region
-        :rtype: :py:class:`Calendar.Calendar`
+        :rtype: :py:class:`~Calendar.Calendar`
 
         """
         calendar = self.find_element(*self._calendar_body_locator)
@@ -137,7 +137,7 @@ class Calendar(TutorBase):
             """Access the notifications.
 
             :return: the list of currently active site notifications
-            :rtype: list(:py:class:`regions.tutor.notification.Notifications`)
+            :rtype: list(:py:class:`~regions.tutor.notification.Notifications`)
 
             """
             notes = self.find_element(*self._notification_bar_locator)
@@ -159,7 +159,7 @@ class Calendar(TutorBase):
             """Click on the 'Browse the Book' button.
 
             :return: the reference book view in a new tab
-            :rtype: :py:class:`pages.tutor.reference.ReferenceBook`
+            :rtype: :py:class:`~pages.tutor.reference.ReferenceBook`
 
             """
             button = self.find_element(*self._browse_the_book_locator)
@@ -171,7 +171,7 @@ class Calendar(TutorBase):
             """Click on the 'Question Library' button.
 
             :return: the course question library page
-            :rtype: :py:class:`pages.tutor.library.QuestionLibrary`
+            :rtype: :py:class:`~pages.tutor.library.QuestionLibrary`
 
             """
             button = self.find_element(*self._question_library_locator)
@@ -183,7 +183,7 @@ class Calendar(TutorBase):
             """Click on the 'Performance Forecast' button.
 
             :return: the course performance overview page
-            :rtype: :py:class:`pages.tutor.performance.Performance`
+            :rtype: :py:class:`~pages.tutor.performance.Performance`
 
             """
             button = self.find_element(*self._performance_forecast_locator)
@@ -195,7 +195,7 @@ class Calendar(TutorBase):
             """Click on the 'Student Scores' button.
 
             :return: the instructor scores page
-            :rtype: :py:class:`pages.tutor.scores.Scores`
+            :rtype: :py:class:`~pages.tutor.scores.Scores`
 
             """
             button = self.find_element(*self._student_scores_locator)
@@ -236,7 +236,8 @@ class Calendar(TutorBase):
             """Return the 'Add Reading' bar element.
 
             :return: the reading assignment bar
-            :rtype: :py:class:`selenium.webdriver.remote.webelement.WebElement`
+            :rtype: \
+                :py:class:`~selenium.webdriver.remote.webelement.WebElement`
 
             """
             return self.find_element(*self._reading_bar_locator)
@@ -246,7 +247,8 @@ class Calendar(TutorBase):
             """Return the 'Add Homework' bar element.
 
             :return: the homework assignment bar
-            :rtype: :py:class:`selenium.webdriver.remote.webelement.WebElement`
+            :rtype: \
+                :py:class:`~selenium.webdriver.remote.webelement.WebElement`
 
             """
             return self.find_element(*self._homework_bar_locator)
@@ -256,7 +258,8 @@ class Calendar(TutorBase):
             """Return the 'Add External Assignment' bar element.
 
             :return: the external assignment bar
-            :rtype: :py:class:`selenium.webdriver.remote.webelement.WebElement`
+            :rtype: \
+                :py:class:`~selenium.webdriver.remote.webelement.WebElement`
 
             """
             return self.find_element(*self._external_bar_locator)
@@ -266,7 +269,8 @@ class Calendar(TutorBase):
             """Return the 'Add Event' bar element.
 
             :return: the event bar
-            :rtype: :py:class:`selenium.webdriver.remote.webelement.WebElement`
+            :rtype: \
+                :py:class:`~selenium.webdriver.remote.webelement.WebElement`
 
             """
             return self.find_element(*self._event_bar_locator)
@@ -275,7 +279,7 @@ class Calendar(TutorBase):
             """Click on the 'Add Reading' button.
 
             :return: the add assignment page for a reading
-            :rtype: :py:class:`pages.tutor.assignment.AddReading`
+            :rtype: :py:class:`~pages.tutor.assignment.AddReading`
 
             """
             return self._add_assignment(Tutor.READING)
@@ -284,7 +288,7 @@ class Calendar(TutorBase):
             """Click on the 'Add Homework' button.
 
             :return: the add assignment page for a homework
-            :rtype: :py:class:`pages.tutor.assignment.AddHomework`
+            :rtype: :py:class:`~pages.tutor.assignment.AddHomework`
 
             """
             return self._add_assignment(Tutor.HOMEWORK)
@@ -293,7 +297,7 @@ class Calendar(TutorBase):
             """Click on the 'Add External Assignment' button.
 
             :return: the add assignment page for an external task
-            :rtype: :py:class:`pages.tutor.assignment.AddExternal`
+            :rtype: :py:class:`~pages.tutor.assignment.AddExternal`
 
             """
             return self._add_assignment(Tutor.EXTERNAL)
@@ -302,7 +306,7 @@ class Calendar(TutorBase):
             """Click on the 'Add Event' button.
 
             :return: the add assignment page for an event
-            :rtype: :py:class:`pages.tutor.assignment.AddEvent`
+            :rtype: :py:class:`~pages.tutor.assignment.AddEvent`
 
             """
             return self._add_assignment(Tutor.EVENT)
@@ -313,7 +317,7 @@ class Calendar(TutorBase):
 
             :return: the list of previous-course assignments available for
                 cloning
-            :rtype: list(:py:class:`Calendar.Sidebar.AssignmentCopy`)
+            :rtype: list(:py:class:`~Calendar.Sidebar.AssignmentCopy`)
 
             """
             return [self.AssignmentCopy(self, assignment)
@@ -327,11 +331,11 @@ class Calendar(TutorBase):
 
             :param str assignment_type: the type of assignment to add
             :return: an assignment creation page
-            :rtype: :py:class:`pages.tutor.assignment.AddExternal` or
-                :py:class:`pages.tutor.assignment.AddEvent` or
-                :py:class:`pages.tutor.assignment.AddHomework` or
-                :py:class:`pages.tutor.assignment.AddReading`
-            :raises :py:class:`utils.tutor.TutorException`: if the
+            :rtype: :py:class:`~pages.tutor.assignment.AddExternal` or
+                :py:class:`~pages.tutor.assignment.AddEvent` or
+                :py:class:`~pages.tutor.assignment.AddHomework` or
+                :py:class:`~pages.tutor.assignment.AddReading`
+            :raises :py:class:`~utils.tutor.TutorException`: if the
                 assignment_type does not match a known assignment type
 
             """
@@ -448,7 +452,7 @@ class Calendar(TutorBase):
             """Access the individual dates.
 
             :return: the list of visible days
-            :rtype: list(:py:class:`Calendar.CalendarMonth.Day`)
+            :rtype: list(:py:class:`~Calendar.CalendarMonth.Day`)
 
             """
             return [self.Day(self, date)
@@ -503,11 +507,11 @@ class Calendar(TutorBase):
 
                 :param str assignment_type: the type of assignment to add
                 :return: an assignment creation page
-                :rtype: :py:class:`pages.tutor.assignment.AddExternal` or
-                    :py:class:`pages.tutor.assignment.AddEvent` or
-                    :py:class:`pages.tutor.assignment.AddHomework` or
-                    :py:class:`pages.tutor.assignment.AddReading`
-                :raises :py:class:`utils.tutor.TutorException`: if the
+                :rtype: :py:class:`~pages.tutor.assignment.AddExternal` or
+                    :py:class:`~pages.tutor.assignment.AddEvent` or
+                    :py:class:`~pages.tutor.assignment.AddHomework` or
+                    :py:class:`~pages.tutor.assignment.AddReading`
+                :raises :py:class:`~utils.tutor.TutorException`: if the
                     assignment_type does not match a known assignment type
 
                 """
@@ -561,7 +565,8 @@ class Calendar(TutorBase):
                 """Access the assignments listed as due today.
 
                 :returns: the list of assignments due on this day
-                :rtype: list(:py:class:`Calendar.CalendarMonth.Day.Assignment`)
+                :rtype: \
+                    list(:py:class:`~Calendar.CalendarMonth.Day.Assignment`)
 
                 """
                 return [self.Assignment(self, event)
@@ -694,12 +699,12 @@ class Calendar(TutorBase):
                     :param str assignment_type: the type of assignment to add
                     :return: an assignment creation page if the assignment is
                         a saved draft else None
-                    :rtype: :py:class:`pages.tutor.assignment.AddExternal` or
-                        :py:class:`pages.tutor.assignment.AddEvent` or
-                        :py:class:`pages.tutor.assignment.AddHomework` or
-                        :py:class:`pages.tutor.assignment.AddReading` or
+                    :rtype: :py:class:`~pages.tutor.assignment.AddExternal` or
+                        :py:class:`~pages.tutor.assignment.AddEvent` or
+                        :py:class:`~pages.tutor.assignment.AddHomework` or
+                        :py:class:`~pages.tutor.assignment.AddReading` or
                         NoneType
-                    :raises :py:class:`utils.tutor.TutorException`: if the
+                    :raises :py:class:`~utils.tutor.TutorException`: if the
                         assignment_type does not match a known assignment type
 
                 """
