@@ -129,7 +129,7 @@ class Footer(Region):
             :rtype: :py:class:`~pages.web.contact.Contact`
 
             """
-            link = self.find_element(*self._contact_locator)
+            link = self.find_element(*self._contact_us_locator)
             Utility.safari_exception_click(self.driver, element=link)
             from pages.web.contact import Contact
             return go_to_(

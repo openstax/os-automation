@@ -213,34 +213,6 @@ def test_nav_our_impact_loads_the_impact_page(web_base_url, selenium):
     assert(impact.is_displayed())
 
 
-'''@skip_test(reason='Waiting on the Annual Report page content')
-# @test_case('')
-@nondestructive
-@web
-def test_nav_our_impact_loads_the_annual_report(web_base_url, selenium):
-    """Test the OpenStax nav link to Our Impact."""
-    # GIVEN: a user viewing the Web home page
-    home = Home(selenium, web_base_url).open()
-
-    # WHEN: they click the "Our Impact" link in the OpenStax nav
-    annual = home.openstax_nav.view_our_impact()
-
-    # THEN: the annual report webpage is displayed
-    assert(annual.is_displayed())
-
-    # WHEN: the user returns to the home page
-    # AND:  the screen is reduced to 960 pixels or less
-    # AND:  they click on the menu toggle
-    # AND:  click the "Our Impact" link
-    home.open()
-    home.resize_window(width=900)
-    home.web_nav.meta.toggle_menu()
-    annual = home.openstax_nav.view_our_impact()
-
-    # THEN: the annual report webpage is displayed
-    assert(annual.is_displayed())'''
-
-
 @test_case('C210301')
 @nondestructive
 @web
@@ -1297,108 +1269,29 @@ def test_page_footer_is_displayed(web_base_url, selenium):
     assert(home.footer.is_displayed())
 
 
-@test_case('C210331')
+@test_case('C210339')
 @nondestructive
 @web
-def test_the_licensing_link_in_the_footer(web_base_url, selenium):
-    """Test the footer's licensing link."""
+def test_footer_static_text(web_base_url, selenium):
+    """Test for the footer nonprofit status, mission and copyright info."""
     # GIVEN: a user viewing the Web page footer
     home = Home(selenium, web_base_url).open()
     home.footer.show()
 
-    # WHEN: they click the "Licensing" link
-    license = home.footer.directory.view_licensing()
+    # WHEN:
 
-    # THEN: the licensing page is displayed
-    assert(license.is_displayed())
-    assert('license' in license.location)
-
-
-@test_case('C210332')
-@nondestructive
-@web
-def test_the_terms_of_use_link_in_the_footer(web_base_url, selenium):
-    """Test the footer's terms of use link."""
-    # GIVEN: a user viewing the Web page footer
-    home = Home(selenium, web_base_url).open()
-    home.footer.show()
-
-    # WHEN: they click the "Terms of Use" link
-    terms = home.footer.directory.view_the_terms_of_use()
-
-    # THEN: the terms page is displayed
-    assert(terms.is_displayed())
-    assert('tos' in terms.location)
-
-
-@test_case('C210333')
-@nondestructive
-@web
-def test_the_privacy_policy_link_in_the_footer(web_base_url, selenium):
-    """Test the footer's privacy policy link."""
-    # GIVEN: a user viewing the Web page footer
-    home = Home(selenium, web_base_url).open()
-    home.footer.show()
-
-    # WHEN: they click the "Privacy Policy" link
-    privacy = home.footer.directory.view_the_privacy_policy()
-
-    # THEN: the privacy policy page is displayed
-    assert(privacy.is_displayed())
-    assert('privacy-policy' in privacy.location)
-
-
-@test_case('C210334')
-@nondestructive
-@web
-def test_the_accessibility_statement_link_in_the_footer(
-        web_base_url, selenium):
-    """Test the footer's accessibility statement link."""
-    # GIVEN: a user viewing the Web page footer
-    home = Home(selenium, web_base_url).open()
-    home.footer.show()
-
-    # WHEN: they click the "Accessibility Statement" link
-    accessibility = home.footer.directory.view_the_accessibility_statement()
-
-    # THEN: the accessibility statement page is displayed
-    assert(accessibility.is_displayed())
-    assert('accessibility-statement' in accessibility.location)
-
-
-@test_case('C210335')
-@nondestructive
-@web
-def test_the_careers_link_in_the_footer(web_base_url, selenium):
-    """Test the footer's careers link."""
-    # GIVEN: a user viewing the Web page footer
-    home = Home(selenium, web_base_url).open()
-    home.footer.show()
-
-    # WHEN: they click the "Careers" link
-    careers = home.footer.directory.view_openstax_career_opportunities()
-
-    # THEN: the jobs page is displayed
-    assert(careers.is_displayed())
-    assert('careers' in careers.location)
-
-
-@test_case('C210336')
-@nondestructive
-@web
-def test_the_github_link_in_the_footer(web_base_url, selenium):
-    """Test the footer's GitHub link to OpenStax repositories."""
-    # GIVEN: a user viewing the Web page footer
-    home = Home(selenium, web_base_url).open()
-    home.footer.show()
-
-    # WHEN: they click the "Open Source Code" link
-    github = home.footer.directory.view_the_code()
-
-    # THEN: the OpenStax GitHub repository page is displayed in a new tab
-    assert(github.is_displayed())
-    assert('github' in github.location)
-    assert(github.name == 'OpenStax')
+    # THEN: the company nonprofit status is stated
+    # AND:  the company mission statement is stated
+    # AND:  the copyright and trademark information is
+    #       stated
+    assert('501(c)(3) nonprofit' in home.footer.directory.non_profit)
+    assert("It's our mission to give every student the tools they need to be" +
+           " successful in the classroom."
+           in home.footer.directory.our_mission)
+    assert('licensed under a Creative Commons'
+           in home.footer.supplemental.copyright)
+    assert('trademarks registered and/or owned by the College Board'
+           in home.footer.supplemental.ap_statement)
 
 
 @test_case('C210337')
@@ -1413,11 +1306,46 @@ def test_the_contact_us_link_in_the_footer_opens_the_contact_form(
     home.footer.show()
 
     # WHEN: they click the "Contact Us" link
-    contact = home.footer.directory.go_to_the_contact_form()
+    contact = home.footer.directory.contact_us()
 
     # THEN: the contact form is displayed
     assert(contact.is_displayed())
     assert('contact' in contact.location)
+
+
+@test_case('C476813')
+@nondestructive
+@web
+def test_the_support_center_link_in_the_footer(web_base_url, selenium):
+    """Test the footer's 'Support Center' link."""
+    # GIVEN: a user viewing the Web page footer
+    home = Home(selenium, web_base_url).open()
+    home.footer.show()
+
+    # WHEN: they click the "Support Center" link
+    salesforce = home.footer.directory.support_center()
+
+    # THEN: the Salesforce support page is loaded in a new
+    #       tab
+    assert(salesforce.is_displayed())
+    assert('openstax.secure.force.com' in salesforce.location)
+
+
+@test_case('C476814')
+@nondestructive
+@web
+def test_the_faq_link_in_the_footer(web_base_url, selenium):
+    """Test the footer's 'FAQ' link."""
+    # GIVEN: a user viewing the Web page footer
+    home = Home(selenium, web_base_url).open()
+    home.footer.show()
+
+    # WHEN: they click the "FAQ" link
+    faq = home.footer.directory.faq()
+
+    # THEN: the frequently asked questions page is displayed
+    assert(faq.is_displayed())
+    assert('faq' in faq.location)
 
 
 @test_case('C210338')
@@ -1430,33 +1358,114 @@ def test_the_press_link_in_the_footer(web_base_url, selenium):
     home.footer.show()
 
     # WHEN: they click the "Press" link
-    press = home.footer.directory.view_press_releases()
+    press = home.footer.directory.press()
 
     # THEN: the press page is displayed
     assert(press.is_displayed())
     assert('press' in press.location)
 
 
-@test_case('C210339')
+@test_case('C476815')
 @nondestructive
 @web
-def test_footer_static_text(web_base_url, selenium):
-    """Test for the footer slogan, nonprofit status and copyright info."""
+def test_the_newsletter_sign_up_link_in_the_footer(web_base_url, selenium):
+    """Test the footer's newsletter sign link."""
+    # GIVEN: a user viewing the blog page
+    home = Home(selenium, web_base_url).open()
+    home.footer.show()
+
+    # WHEN: they click on the "Sign Up" button
+    sign_up = home.footer.directory.newsletter()
+
+    # THEN: the newsletter sign up form is displayed in the new tab
+    assert(sign_up.is_displayed())
+    assert('www2' in sign_up.location)
+
+
+@test_case('C210335')
+@nondestructive
+@web
+def test_the_careers_link_in_the_footer(web_base_url, selenium):
+    """Test the footer's careers link."""
     # GIVEN: a user viewing the Web page footer
     home = Home(selenium, web_base_url).open()
     home.footer.show()
 
-    # WHEN:
+    # WHEN: they click the "Careers" link
+    careers = home.footer.directory.careers()
 
-    # THEN: the company slogan is stated
-    # AND:  the company nonprofit status is stated
-    # AND:  the copyright information is stated
-    assert('Access. The future of education.' in home.footer.box.statement)
-    assert('501(c)(3) nonprofit' in home.footer.directory.organization)
-    assert('licensed under a Creative Commons'
-           in home.footer.directory.copyright)
-    assert('trademarks registered and/or owned by the College Board'
-           in home.footer.directory.ap_statement)
+    # THEN: the jobs page is displayed
+    assert(careers.is_displayed())
+    assert('careers' in careers.location)
+
+
+@test_case('C210334')
+@nondestructive
+@web
+def test_the_accessibility_statement_link_in_the_footer(
+        web_base_url, selenium):
+    """Test the footer's accessibility statement link."""
+    # GIVEN: a user viewing the Web page footer
+    home = Home(selenium, web_base_url).open()
+    home.footer.show()
+
+    # WHEN: they click the "Accessibility Statement" link
+    accessibility = home.footer.directory.accessibility_statement()
+
+    # THEN: the accessibility statement page is displayed
+    assert(accessibility.is_displayed())
+    assert('accessibility-statement' in accessibility.location)
+
+
+@test_case('C210332')
+@nondestructive
+@web
+def test_the_terms_of_use_link_in_the_footer(web_base_url, selenium):
+    """Test the footer's terms of use link."""
+    # GIVEN: a user viewing the Web page footer
+    home = Home(selenium, web_base_url).open()
+    home.footer.show()
+
+    # WHEN: they click the "Terms of Use" link
+    terms = home.footer.directory.terms_of_use()
+
+    # THEN: the terms page is displayed
+    assert(terms.is_displayed())
+    assert('tos' in terms.location)
+
+
+@test_case('C210331')
+@nondestructive
+@web
+def test_the_licensing_link_in_the_footer(web_base_url, selenium):
+    """Test the footer's licensing link."""
+    # GIVEN: a user viewing the Web page footer
+    home = Home(selenium, web_base_url).open()
+    home.footer.show()
+
+    # WHEN: they click the "Licensing" link
+    license = home.footer.directory.licensing()
+
+    # THEN: the licensing page is displayed
+    assert(license.is_displayed())
+    assert('license' in license.location)
+
+
+@test_case('C210333')
+@nondestructive
+@web
+def test_the_privacy_policy_link_in_the_footer(web_base_url, selenium):
+    """Test the footer's privacy policy link."""
+    # GIVEN: a user viewing the Web page footer
+    home = Home(selenium, web_base_url).open()
+    home.footer.show()
+
+    # WHEN: they click the "Privacy Policy" link
+    privacy = home.footer.directory.privacy_policy()
+
+    # THEN: the privacy policy page is displayed
+    assert(privacy.is_displayed())
+    assert('privacy-policy' in privacy.location)
 
 
 @test_case('C210340')
@@ -1469,7 +1478,7 @@ def test_the_footer_openstax_facebook_link(web_base_url, selenium):
     home.footer.show()
 
     # WHEN: they click the Facebook icon
-    facebook = home.footer.social.go_to_facebook()
+    facebook = home.footer.supplemental.facebook()
 
     # THEN: the OpenStax Facebook page is displayed in a new tab
     assert(facebook.is_displayed())
@@ -1486,7 +1495,7 @@ def test_the_footer_openstax_twitter_link(web_base_url, selenium):
     home.footer.show()
 
     # WHEN: they click the Twitter icon
-    twitter = home.footer.social.go_to_twitter()
+    twitter = home.footer.supplemental.twitter()
 
     # THEN: the OpenStax Twitter feed is displayed in a new tab
     assert(twitter.is_displayed())
@@ -1503,7 +1512,7 @@ def test_the_footer_openstax_linkedin_link(web_base_url, selenium):
     home.footer.show()
 
     # WHEN: they click the LinkedIn icon
-    linkedin = home.footer.social.go_to_linkedin()
+    linkedin = home.footer.supplemental.linkedin()
 
     # THEN: the OpenStax LinkedIn company page is displayed in a new tab
     assert(linkedin.is_displayed())
@@ -1520,7 +1529,7 @@ def test_the_footer_openstax_instagram_link(web_base_url, selenium):
     home.footer.show()
 
     # WHEN: they click the Instagram icon
-    instagram = home.footer.social.go_to_instagram()
+    instagram = home.footer.supplemental.instagram()
 
     # THEN: the OpenStax Instagram page is displayed in a new tab
     assert(instagram.is_displayed())

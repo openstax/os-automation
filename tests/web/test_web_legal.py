@@ -13,7 +13,7 @@ def test_each_intellectual_property_question_has_an_answer(
     """Each topic consists of a question and an associated answer."""
     # GIVEN: a user viewing the legal page
     home = WebHome(selenium, web_base_url).open()
-    license = home.footer.directory.view_licensing()
+    license = home.footer.directory.licensing()
 
     # WHEN:
 

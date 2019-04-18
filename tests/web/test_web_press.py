@@ -13,7 +13,7 @@ def test_the_two_most_recent_press_releases_are_shown(web_base_url, selenium):
     """The two most recent press releases are displayed."""
     # GIVEN: a user viewing the press page
     home = WebHome(selenium, web_base_url).open()
-    press = home.footer.directory.view_press_releases()
+    press = home.footer.directory.press()
 
     # WHEN:
 
@@ -75,7 +75,7 @@ def test_the_ten_most_recent_new_mentions_are_shown(web_base_url, selenium):
     """The ten most recent press mentions are displayed."""
     # GIVEN: a user viewing the press page
     home = WebHome(selenium, web_base_url).open()
-    press = home.footer.directory.view_press_releases()
+    press = home.footer.directory.press()
 
     # WHEN:
 
@@ -116,7 +116,7 @@ def test_the_openstax_mission_statement_is_outlined(web_base_url, selenium):
     """The OpenStax mission is outlined."""
     # GIVEN: a user viewing the press page
     home = WebHome(selenium, web_base_url).open()
-    press = home.footer.directory.view_press_releases()
+    press = home.footer.directory.press()
 
     # WHEN:
 
@@ -139,7 +139,7 @@ def test_press_inquiry_options(web_base_url, selenium):
     """Press inquiries are directed to MarComm, social accounts, or the kit."""
     # GIVEN: a user viewing the press page
     home = WebHome(selenium, web_base_url).open()
-    press = home.footer.directory.view_press_releases()
+    press = home.footer.directory.press()
 
     # WHEN:
 
@@ -178,7 +178,7 @@ def test_expert_speaker_availability(web_base_url, selenium):
     """Expert speakers are listed."""
     # GIVEN: a user viewing the press page
     home = WebHome(selenium, web_base_url).open()
-    press = home.footer.directory.view_press_releases()
+    press = home.footer.directory.press()
 
     # WHEN:
 
@@ -202,7 +202,7 @@ def test_mobile_users_are_presented_a_drop_down_menu(web_base_url, selenium):
     home = WebHome(selenium, web_base_url)
     home.resize_window(width=600)
     home.open()
-    press = home.footer.directory.view_press_releases()
+    press = home.footer.directory.press()
 
     # WHEN:
 
@@ -250,7 +250,7 @@ def test_mobile_users_do_not_see_the_mission_statement(web_base_url, selenium):
     home = WebHome(selenium, web_base_url)
     home.resize_window(width=600)
     home.open()
-    press = home.footer.directory.view_press_releases()
+    press = home.footer.directory.press()
 
     # WHEN:
 
