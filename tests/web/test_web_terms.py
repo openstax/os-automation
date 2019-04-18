@@ -13,7 +13,7 @@ def test_the_terms_of_use_load(web_base_url, selenium):
     home = WebHome(selenium, web_base_url).open()
 
     # WHEN: a user opens the terms webpage
-    terms = home.footer.directory.view_the_terms_of_use()
+    terms = home.footer.directory.terms_of_use()
 
     # THEN: the page loads
     # AND:  there are multiple sections with text

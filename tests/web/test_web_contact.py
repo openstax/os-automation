@@ -22,7 +22,7 @@ def test_a_user_may_submit_a_message(web_base_url, selenium):
     email.empty()
     message = chomsky(Utility.random(1, 3))
     home = WebHome(selenium, web_base_url).open()
-    contact = home.footer.directory.go_to_the_contact_form()
+    contact = home.footer.directory.contact_us()
 
     # WHEN: they select a question topic from the drop down
     #       menu
@@ -62,7 +62,7 @@ def test_all_contact_form_fields_are_required(web_base_url, selenium):
     """Test the contact form field verification."""
     # GIVEN: a user viewing the contact form page
     home = WebHome(selenium, web_base_url).open()
-    contact = home.footer.directory.go_to_the_contact_form()
+    contact = home.footer.directory.contact_us()
 
     # WHEN: they click "Send"
     contact.form.send()
@@ -85,7 +85,7 @@ def test_the_openstax_mailing_address_is_displayed(web_base_url, selenium):
     """The OpenStax mailing address is displayed next to the contact form."""
     # GIVEN: a user viewing the contact form page
     home = WebHome(selenium, web_base_url).open()
-    contact = home.footer.directory.go_to_the_contact_form()
+    contact = home.footer.directory.contact_us()
 
     # WHEN:
 
@@ -101,7 +101,7 @@ def test_users_seeking_help_are_directed_to_the_support_page(
     """Users looking for help are directed to the Salesforce support pages."""
     # GIVEN: a user viewing the contact form page
     home = WebHome(selenium, web_base_url).open()
-    contact = home.footer.directory.go_to_the_contact_form()
+    contact = home.footer.directory.contact_us()
 
     # WHEN: they click on the "SUPPORT CENTER" link
     support = contact.visit_the_support_center()
