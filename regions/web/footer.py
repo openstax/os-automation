@@ -114,7 +114,7 @@ class Footer(Region):
 
             """
             link = self.find_element(*self._donate_locator)
-            Utility.click_option(self.driver, element=link)
+            Utility.switch_to(self.driver, element=link)
             from pages.web.donation import Give
             return go_to_(Give(self.driver, base_url=self.page.page.base_url))
 
@@ -260,7 +260,8 @@ class Footer(Region):
     class Supplemental(Region):
         """Trademarks and OpenStax social program Links."""
 
-        _copyright_statement_locator = (By.CSS_SELECTOR, '.copyrights p')
+        _copyright_statement_locator = (
+                                    By.CSS_SELECTOR, '[data-html=copyrights]')
         _ap_statement_locator = (By.CSS_SELECTOR, '[data-html=apStatement]')
         _facebook_locator = (By.CSS_SELECTOR, '.facebook')
         _twitter_locator = (By.CSS_SELECTOR, '.twitter')
