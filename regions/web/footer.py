@@ -4,169 +4,304 @@ from pypom import Region
 from selenium.webdriver.common.by import By
 
 from utils.utilities import Utility, go_to_, go_to_external_
+from utils.web import Web
 
 
 class Footer(Region):
     """OpenStax Web footer region."""
 
-    _root_locator = (By.ID, 'footer')
-    _box_locator = (By.CLASS_NAME, 'hero-quote')
-    _directory_locator = (By.CSS_SELECTOR, '[role=contentinfo]')
-    _social_locator = (By.CLASS_NAME, 'social')
+    _root_locator = (By.CSS_SELECTOR, '#footer')
+    _directory_locator = (By.CSS_SELECTOR, '.top .boxed')
+    _supplemental_locator = (By.CSS_SELECTOR, '.bottom .boxed')
 
     @property
     def loaded(self):
-        """Return True if the footer is currently displayed."""
+        """Return True if the footer is currently displayed.
+
+        :return: ``True`` if the Web footer is displayed, else ``False``
+        :rtype: bool
+
+        """
         return self.root.is_displayed()
 
     def is_displayed(self):
-        """Return True if the region is displayed."""
+        """Return True if the region is displayed.
+
+        :return: ``True`` if the Web footer is loaded, else ``False`
+        :rtype: bool
+
+        """
         return self.loaded
 
     @property
-    def box(self):
-        """Access the box region."""
-        region_root = self.find_element(*self._box_locator)
-        return self.Box(self, region_root)
-
-    @property
     def directory(self):
-        """Access the directory."""
+        """Access the directory.
+
+        :return: the upper footer box directory
+        :rtype: :py:class:`~Footer.Directory`
+
+        """
         region_root = self.find_element(*self._directory_locator)
         return self.Directory(self, region_root)
 
     @property
-    def social(self):
-        """Access the social services."""
-        region_root = self.find_element(*self._social_locator)
-        return self.SocialLinks(self, region_root)
+    def supplemental(self):
+        """Access the supplemental information and social services.
+
+        :return: the lower footer box information
+        :rtype: :py:class:`~Footer.Supplemental`
+
+        """
+        region_root = self.find_element(*self._supplemental_locator)
+        return self.Supplemental(self, region_root)
 
     def show(self):
-        """Scroll the section into view."""
+        """Scroll the section into view.
+
+        :return: the parent Web page
+        :rtype: :py:class:`~pages.web.WebBase`
+
+        """
         Utility.scroll_to(self.driver, element=self.root)
         return self.page
-
-    class Box(Region):
-        """The footer's statement box."""
-
-        @property
-        def statement(self):
-            """Return the hero banner statement."""
-            return self.root.text.strip()
 
     class Directory(Region):
         """The site map directory links."""
 
-        _license_locator = (By.CSS_SELECTOR, '[href$=license]')
-        _terms_of_use_locator = (By.CSS_SELECTOR, '[href$=tos]')
-        _privacy_policy_locator = (By.CSS_SELECTOR, '[href$=privacy-policy]')
-        _accessibility_statement_locator = (By.CSS_SELECTOR,
-                                            '[href*=accessibility]')
-        _careers_locator = (By.CSS_SELECTOR, '[href$=careers]')
-        _open_source_locator = (By.CSS_SELECTOR, '[href*=github]')
+        _heading_locator = (By.CSS_SELECTOR, '[role=heading]')
+        _mission_statement_locator = (By.CSS_SELECTOR, '.mission')
+        _give_locator = (By.CSS_SELECTOR, '[href$=give]')
+
         _contact_us_locator = (By.CSS_SELECTOR, '[href$=contact]')
-        _press_locator = (By.CSS_SELECTOR, '[href*=press]')
-        _newsletter_locator = (By.LINK_TEXT, 'Newsletter')
-        _nonprofit_statement_locator = (By.CSS_SELECTOR, 'p:first-of-type')
-        _copyright_statement_locator = (By.CSS_SELECTOR, 'p:first-of-type ~ p')
-        _ap_statement_locator = (By.TAG_NAME, 'ap-html')
+        _support_center_locator = (By.CSS_SELECTOR, '[href$=help]')
+        _faq_locator = (By.CSS_SELECTOR, '[href$=faq]')
 
-        def view_licensing(self):
-            """Go to the website license page."""
-            Utility.safari_exception_click(
-                self.driver, locator=self._license_locator)
-            from pages.web.legal import License
-            return go_to_(License(self.driver,
-                                  base_url=self.page.page.base_url))
+        _press_locator = (By.CSS_SELECTOR, '[href$=press]')
+        _newsletter_locator = (By.CSS_SELECTOR, '[href*="www2.openstax.org"]')
+        _careers_locator = (By.CSS_SELECTOR, '[href$=careers]')
 
-        def view_the_terms_of_use(self):
-            """View the terms of use."""
-            Utility.safari_exception_click(
-                self.driver, locator=self._terms_of_use_locator)
-            from pages.web.legal import Terms
-            return go_to_(Terms(self.driver, base_url=self.page.page.base_url))
+        _accessibility_statement_locator = (
+                                    By.CSS_SELECTOR, '[href*=accessibility]')
+        _terms_of_use_locator = (By.CSS_SELECTOR, '[href$=tos]')
+        _license_locator = (By.CSS_SELECTOR, '[href$=license]')
+        _privacy_policy_locator = (By.CSS_SELECTOR, '[href$=privacy-policy]')
 
-        def view_the_privacy_policy(self):
-            """View the privacy policy."""
-            Utility.safari_exception_click(
-                self.driver, locator=self._privacy_policy_locator)
-            from pages.web.legal import PrivacyPolicy
-            return go_to_(PrivacyPolicy(self.driver,
-                                        base_url=self.page.page.base_url))
+        @property
+        def non_profit(self):
+            """Return the non-profit text.
 
-        def view_the_accessibility_statement(self):
-            """View the accessibility statement."""
-            Utility.safari_exception_click(
-                self.driver, locator=self._accessibility_statement_locator)
-            from pages.web.accessibility import Accessibility
-            return go_to_(Accessibility(self.driver,
-                                        base_url=self.page.page.base_url))
+            :return: the Rice University non-profit statement
+            :rtype: str
 
-        def view_openstax_career_opportunities(self):
-            """View the careers page."""
-            Utility.safari_exception_click(
-                self.driver, locator=self._careers_locator)
-            from pages.web.careers import Careers
-            return go_to_(Careers(self.driver,
-                                  base_url=self.page.page.base_url))
+            """
+            return self.find_element(*self._heading_locator).text
 
-        def view_the_code(self):
-            """Open GitHub and view the OpenStax repositories."""
-            link = self.find_element(*self._open_source_locator)
-            url = link.get_attribute('href')
-            Utility.switch_to(self.driver, element=link)
-            from pages.github.home import GitHub
-            return go_to_external_(GitHub(self.driver), url)
+        @property
+        def our_mission(self):
+            """Return the OpenStax mission statement.
 
-        def go_to_the_contact_form(self):
-            """Go to the contact form."""
-            Utility.safari_exception_click(
-                self.driver, locator=self._contact_us_locator)
+            :return: the OpenStax mission statement.
+            :rtype: str
+
+            """
+            return self.find_element(*self._mission_statement_locator).text
+
+        def donate(self):
+            """Click on the 'donating' link.
+
+            :return: the donation page
+            :rtype: :py:class:`~pages.web.donation.Give`
+
+            """
+            link = self.find_element(*self._donate_locator)
+            Utility.click_option(self.driver, element=link)
+            from pages.web.donation import Give
+            return go_to_(Give(self.driver, base_url=self.page.page.base_url))
+
+        # ------------------------------------------------ #
+        # Help
+        # ------------------------------------------------ #
+
+        def contact_us(self):
+            """Go to the contact form.
+
+            :return: the contact form
+            :rtype: :py:class:`~pages.web.contact.Contact`
+
+            """
+            link = self.find_element(*self._contact_locator)
+            Utility.safari_exception_click(self.driver, element=link)
             from pages.web.contact import Contact
-            return go_to_(Contact(self.driver,
-                                  base_url=self.page.page.base_url))
+            return go_to_(
+                Contact(self.driver, base_url=self.page.page.base_url))
 
-        def view_press_releases(self):
-            """View the press page."""
-            Utility.safari_exception_click(
-                self.driver, locator=self._press_locator)
+        def support_center(self):
+            """Go to the OpenStax Salesforce support site.
+
+            :return: the Salesforce knowledge base in a new tab
+            :rtype: :py:class:`~pages.salesforce.home.Salesforce`
+
+            """
+            link = self.find_element(*self._support_center_locator)
+            Utility.switch_to(self.driver, element=link)
+            from pages.salesforce.home import Salesforce
+            return go_to_external_(
+                Salesforce(self.driver, base_url=Web.SALESFORCE_SUPPORT))
+
+        def faq(self):
+            """View frequently asked questions.
+
+            :return: the OpenStax FAQ
+            :rtype: :py:class:`~pages.web.faq.FAQ`
+
+            """
+            link = self.find_element(*self._faq_locator)
+            Utility.click_option(self.driver, element=link)
+            from pages.web.faq import FAQ
+            return go_to_(FAQ(self.driver, base_url=self.page.page.base_url))
+
+        # ------------------------------------------------ #
+        # OpenStax information
+        # ------------------------------------------------ #
+
+        def press(self):
+            """View the press page.
+
+            :return: the OpenStax Marketing and Communications press page
+            :rtype: :py:class:`~pages.web.press.Press`
+
+            """
+            link = self.find_element(*self._press_locator)
+            Utility.click_option(self.driver, element=link)
             from pages.web.press import Press
             return go_to_(Press(self.driver, base_url=self.page.page.base_url))
 
-        def go_to_the_newsletter_signup_form(self):
-            """Go to the newsletter signup."""
-            Utility.safari_exception_click(
-                self.driver, locator=self._newsletter_locator)
-            from pages.web.newsletter import NewsletterSignup
-            return go_to_(NewsletterSignup(self.driver))
+        def newsletter(self):
+            """Go to the newsletter signup form.
 
-        @property
-        def organization(self):
-            """Return the OpenStax tax status statement."""
-            return self.find_element(*self._nonprofit_statement_locator).text
+            :return: the newsletter signup form in a new tab
+            :rtype: :py:class:`~pages.web.newsletter.NewsletterSignup`
+
+            """
+            link = self.find_element(*self._newsletter_locator)
+            Utility.switch_to(self.driver, element=link)
+            from pages.web.newsletter import NewsletterSignup
+            return go_to_external_(
+                NewsletterSignup(self.driver, base_url=Web.NEWSLETTER_SIGNUP))
+
+        def careers(self):
+            """View the careers page.
+
+            :return: the open positions at OpenStax page
+            :rtype: :py:class:`~pages.web.careers.Careers`
+
+            """
+            link = self.find_element(*self._careers_locator)
+            Utility.click_option(self.driver, element=link)
+            from pages.web.careers import Careers
+            return go_to_(
+                Careers(self.driver, base_url=self.page.page.base_url))
+
+        # ------------------------------------------------ #
+        # Policies
+        # ------------------------------------------------ #
+
+        def accessibility_statement(self):
+            """View the accessibility statement.
+
+            :return: the accessibility statement page
+            :rtype: :py:class:`~pages.web.accessibility.Accessibility`
+
+            """
+            link = self.find_element(*self._accessibility_statement_locator)
+            Utility.click_option(self.driver, element=link)
+            from pages.web.accessibility import Accessibility
+            return go_to_(
+                Accessibility(self.driver, base_url=self.page.page.base_url))
+
+        def terms_of_use(self):
+            """View the OpenStax webpage terms of use.
+
+            :return: the terms of use page
+            :rtype: :py:class:`~pages.web.legal.Terms`
+
+            """
+            link = self.find_element(*self._terms_of_use_locator)
+            Utility.click_option(self.driver, element=link)
+            from pages.web.legal import Terms
+            return go_to_(Terms(self.driver, base_url=self.page.page.base_url))
+
+        def licensing(self):
+            """Go to the website licensing page.
+
+            :return: the licensing page
+            :rtype: :py:class:`~pages.web.legal.License`
+
+            """
+            link = self.find_element(*self._license_locator)
+            Utility.safari_exception_click(self.driver, element=link)
+            from pages.web.legal import License
+            return go_to_(
+                License(self.driver, base_url=self.page.page.base_url))
+
+        def privacy_policy(self):
+            """View the OpenStax webpage privacy policy.
+
+            :return: the privacy policy page
+            :rtype: :py:class:`~pages.web.legal.PrivacyPolicy`
+
+            """
+            link = self.find_element(*self._privacy_policy_locator)
+            Utility.click_option(self.driver, element=link)
+            from pages.web.legal import PrivacyPolicy
+            return go_to_(
+                PrivacyPolicy(self.driver, base_url=self.page.page.base_url))
+
+    class Supplemental(Region):
+        """Trademarks and OpenStax social program Links."""
+
+        _copyright_statement_locator = (By.CSS_SELECTOR, '.copyrights p')
+        _ap_statement_locator = (By.CSS_SELECTOR, '[data-html=apStatement]')
+        _facebook_locator = (By.CSS_SELECTOR, '.facebook')
+        _twitter_locator = (By.CSS_SELECTOR, '.twitter')
+        _linkedin_locator = (By.CSS_SELECTOR, '.linkedin')
+        _instagram_locator = (By.CSS_SELECTOR, '.instagram')
+
+        # ------------------------------------------------ #
+        # Copyrights and trademarks
+        # ------------------------------------------------ #
 
         @property
         def copyright(self):
-            """Return the OpenStax copyright statement."""
-            return (self.find_element(*self._copyright_statement_locator)
-                    .text.replace('\n', ' ').strip())
+            """Return the OpenStax copyright statement.
+
+            :return: the Rice University copyright statement
+            :rtype: str
+
+            """
+            return self.find_element(*self._copyright_statement_locator).text
 
         @property
         def ap_statement(self):
-            """Return the AP statement."""
-            return (self.find_element(*self._ap_statement_locator)
-                    .text.replace('\n', ' ').strip())
+            """Return the AP statement.
 
-    class SocialLinks(Region):
-        """OpenStax social program Links."""
+            :return: the AP trademark statement
+            :rtype: str
 
-        _facebook_locator = (By.CLASS_NAME, 'facebook')
-        _twitter_locator = (By.CLASS_NAME, 'twitter')
-        _linkedin_locator = (By.CLASS_NAME, 'linkedin')
-        _instagram_locator = (By.CLASS_NAME, 'instagram')
+            """
+            return self.find_element(*self._ap_statement_locator).text
 
-        def go_to_facebook(self):
-            """Go to OpenStax's Facebook page."""
+        # ------------------------------------------------ #
+        # Social media
+        # ------------------------------------------------ #
+
+        def facebook(self):
+            """Go to OpenStax's Facebook page.
+
+            :return: the OpenStax Facebook page
+            :rtype: :py:class:`~pages.facebook.home.Facebook`
+
+            """
             facebook = self.find_element(*self._facebook_locator)
             url = facebook.get_attribute('href')[:-8]
             script = ('arguments[0].setAttribute("href", "{url}");'
@@ -177,22 +312,37 @@ class Footer(Region):
             from pages.facebook.home import Facebook
             return go_to_(Facebook(self.driver))
 
-        def go_to_twitter(self):
-            """Go to OpenStax's Twitter page."""
+        def twitter(self):
+            """Go to OpenStax's Twitter page.
+
+            :return: the OpenStax Twitter page
+            :rtype: :py:class:`~pages.twitter.home.Twitter`
+
+            """
             Utility.switch_to(
                 self.driver, link_locator=self._twitter_locator)
             from pages.twitter.home import Twitter
             return go_to_(Twitter(self.driver))
 
-        def go_to_linkedin(self):
-            """Go to OpenStax's LinkedIn company page."""
+        def linkedin(self):
+            """Go to OpenStax's LinkedIn company page.
+
+            :return: the OpenStax LinkedIn company page
+            :rtype: :py:class:`~pages.linkedin.home.LinkedIn`
+
+            """
             Utility.switch_to(
                 self.driver, link_locator=self._linkedin_locator)
             from pages.linkedin.home import LinkedIn
             return go_to_(LinkedIn(self.driver))
 
-        def go_to_instagram(self):
-            """Go to OpenStax's Instagram page."""
+        def instagram(self):
+            """Go to OpenStax's Instagram page.
+
+            :return: the OpenStax Instragram page
+            :rtype: :py:class:`~pages.instagram.home.Instagram`
+
+            """
             Utility.switch_to(
                 self.driver, link_locator=self._instagram_locator)
             from pages.instagram.home import Instagram
