@@ -21,7 +21,7 @@ class TutorShared(Page):
 
         :param driver: a web browser control
         :param base_url: (optional) the website base URL; required to use
-            the :py:function:`~pypom.page.open` function
+            the :py:function:`~pypom.Page.open` function
         :param int timeout: (optional) the maximum number of seconds to before
             the WebDriverWait polling times out, default is 1 minute
         :param url_kwargs: (optional) keyword arguments used when generating
