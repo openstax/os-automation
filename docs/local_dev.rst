@@ -1,8 +1,8 @@
 .. _local_dev:
 
-##########################################
-Prepare your local development environment
-##########################################
+##############################
+Prepare your local environment
+##############################
 
 Create a virtual environment
 ----------------------------
@@ -80,5 +80,20 @@ file.
 
     cp .env.example ./.env
 
-The `.env` file is not checked into the rest of the project files. This allows
-the ability to place secrets in the file and them not to make into source control.
+The `.env` file is not checked into source control. This allows us the ability
+to place secrets or other sensitive variables into the file and not check them
+into source control.
+
+Depending on the products and tests you are running you need to have specific
+variables set. These are covered in the section about running tests.
+
+At a minimum you'll want to make sure to set the production urls for the
+following values:
+
+.. code-block:: bash
+
+    ACCOUNTS_BASE_URL=https://accounts.openstax.org
+    EXERCISES_BASE_URL=https://exercises.openstax.org
+    PAYMENTS_BASE_URL=https://payments.openstax.org/admin
+    TUTOR_BASE_URL=https://tutor.openstax.org
+    WEB_BASE_URL=https://openstax.org
