@@ -307,3 +307,9 @@ def pytest_runtest_makereport(item, call):
     # "call", "teardown" can be used by yield fixtures to determine if the
     # test failed (see selenium fixture)
     setattr(item, 'rep_{when}'.format(when=rep.when), rep)
+
+
+def pytest_sessionfinish(session, exitstatus):
+    """If pytest finishes without any tests being run, exit with a 0."""
+    if exitstatus == 5:
+        session.exitstatus = 0
