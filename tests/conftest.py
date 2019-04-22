@@ -202,13 +202,11 @@ def pytest_addoption(parser):
         nargs='+',
         default=[
             'accounts', 'biglearn', 'exercises',
-            'hypothesis', 'payments', 'support',
-            'tutor', 'web'],
+            'payments', 'support', 'tutor', 'web'],
         help=(
             'Systems under test\n'
             'Options: accounts, biglearn, exercises\n'
-            '         hypothesis, payments, support,\n'
-            '         tutor, web'))
+            '         payments, support, tutor, web'))
 
 
 def pytest_collection_modifyitems(config, items):
@@ -232,6 +230,9 @@ def pytest_collection_modifyitems(config, items):
     deselected = []
     remaining = []
     for item in items:
+        if '<Function test_case>' in str(item):
+            deselected.append(item)
+            continue
         if run_smoke_tests:
             if 'smoke_test' not in item.keywords:
                 deselected.append(item)
@@ -253,10 +254,6 @@ def pytest_collection_modifyitems(config, items):
                 deselected.append(item)
                 continue
             if 'exercises' not in run_systems and 'exercises' in item.keywords:
-                deselected.append(item)
-                continue
-            if ('hypothesis' not in run_systems
-                    and 'hypothesis' in item.keywords):
                 deselected.append(item)
                 continue
             if 'payments' not in run_systems and 'payments' in item.keywords:

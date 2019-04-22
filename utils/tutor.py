@@ -47,6 +47,11 @@ class Tutor(object):
     IS_PREVIEW = 'is preview'
     IS_TEACHER = 'is teacher'
 
+    # Scores
+
+    AS_NUMBER = 'number'
+    AS_PERCENTAGE = 'percentage'
+
 
 class TutorException(WebDriverException):
     """A generic exception for Tutor."""
