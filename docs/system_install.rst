@@ -1,7 +1,8 @@
 .. _system_install:
 
+##################
 Installation Guide
-==================
+##################
 
 .. note::
    This guide assumes the operating system used is OSX and the terminal shell is
@@ -18,6 +19,7 @@ The high level requirements installing os-automation are:
 * git
 * Firefox geckodriver
 * Chrome chromedriver
+* Safari safaridriver (installed locally)
 
 Install Homebrew
 ----------------
