@@ -23,7 +23,8 @@ Contents
 
 .. toctree::
    :maxdepth: 2
-   :titlesonly:
 
    What you need installed on your computer first <system_install>
    local_dev
+   run_tests
+   cheatsheet
