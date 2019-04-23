@@ -138,7 +138,7 @@ def test_sign_up_as_a_nonstudent_user(accounts_base_url, selenium, teacher):
     #      Privacy Policy."
     # AND: clicks the "CREATE ACCOUNT" button
     # AND: clicks the "OK" button
-    page.login.go_to_signup.account_signup(
+    profile = page.login.go_to_signup.account_signup(
         email=address,
         password=password,
         _type=Accounts.OTHER,
@@ -153,7 +153,7 @@ def test_sign_up_as_a_nonstudent_user(accounts_base_url, selenium, teacher):
         access_notice=False)
 
     # THEN: the Account Profile page is loaded
-    assert(page.current_url == accounts_base_url + '/profile'), \
+    assert(profile.current_url == accounts_base_url + '/profile'), \
         'Account profile not loaded'
 
 
