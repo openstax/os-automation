@@ -8,7 +8,6 @@ from selenium.common.exceptions import TimeoutException, WebDriverException
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 
-from pages.accounts import home, profile
 from pages.accounts.base import AccountsBase
 from utils.email import GmailReader, GuerrillaMail, RestMail
 from utils.utilities import Utility, go_to_
@@ -47,20 +46,15 @@ class Signup(AccountsBase):
         ('anatomy_physiology', 'Anatomy and Physiology'),
         ('astronomy', 'Astronomy'),
         ('biology', 'Biology'),
-        # ('ap_biology', 'AP Biology'),
         ('calculus', 'Calculus'),
         ('chemistry', 'Chemistry'),
         ('chem_atoms_first', 'Chemistry: Atoms First'),
         ('college_algebra', 'College Algebra'),
         ('college_physics_algebra', 'College Physics'),
         ('concepts_of_bio_non_majors', 'Concepts of Biology'),
-        ('elementary_algebra', 'Elementary Algebra'),
-        ('intermediate_algebra', 'Intermediate Algebra'),
         ('introduction_to_business', 'Introduction to Business'),
         ('introduction_to_sociology', 'Introduction to Sociology 2e'),
         ('introductory_statistics', 'Introductory Statistics'),
-        # ('introductory_business_statistics',
-        #  'Introductory Business Statistics'),
         ('microbiology', 'Microbiology'),
         ('pre_algebra', 'Prealgebra'),
         ('precalc', 'Precalculus'),
@@ -133,10 +127,11 @@ class Signup(AccountsBase):
                     anatomy_physiology, astronomy, biology, calculus,
                     chemistry, chem_atoms_first, college_algebra,
                     college_physics_algebra, concepts_of_bio_non_majors,
-                    introduction_to_sociology, introductory_statistics,
-                    microbiology, pre_algebra, precalc, economics, macro_econ,
-                    ap_macro_econ, micro_econ, ap_micro_econ, psychology,
-                    ap_physics, us_history, university_physics_calc, not_listed
+                    introduction_to_business, introduction_to_sociology,
+                    introductory_statistics, microbiology, pre_algebra,
+                    precalc, economics, macro_econ, ap_macro_econ, micro_econ,
+                    ap_micro_econ, psychology, ap_physics, us_history,
+                    university_physics_calc, not_listed
                 'use': (string) using OpenStax -
                     Signup.ADOPTED
                         'Fully adopted and using it as the primary textbook'
@@ -208,8 +203,10 @@ class Signup(AccountsBase):
             # set the initial password
             self.password.password = password
             self.password.confirmation = password
+            sleep(0.5)
             self.next()
             assert(not self.error), '{0}'.format(self.error)
+            self.wait.until(lambda _: 'profile' in self.location)
         elif kwargs.get('social') == 'facebook':
             # use Facebook
             self.password.use_social_login() \
@@ -299,7 +296,8 @@ class Signup(AccountsBase):
             self.notice.get_confirmation_email()
             self.next()
 
-        return go_to_(profile.Profile(self.driver, self.base_url))
+        from pages.accounts.profile import Profile
+        return go_to_(Profile(self.driver, self.base_url))
 
     def instructor_access(self, role, school_email, phone_number, school,
                           webpage, students=None, using=None, interests=None,
@@ -465,7 +463,9 @@ class Signup(AccountsBase):
             """Return to the login screen."""
             return self.find_element(*self._sign_in_locator).click()
             sleep(1)
-            return home.Home(self.driver)
+            from pages.accounts.home import AccountsHome
+            return go_to_(
+                AccountsHome(self.driver, base_url=self.page.base_url))
 
     class PinVerification(Region):
         """Pin verification."""
@@ -540,11 +540,7 @@ class Signup(AccountsBase):
         @property
         def has_error(self):
             """Return True if error messages are displayed."""
-            try:
-                self.find_element(*self._error_locator)
-            except Exception:
-                return False
-            return True
+            return bool(self.find_elements(*self._error_locator))
 
         @property
         def get_error(self):
@@ -552,11 +548,10 @@ class Signup(AccountsBase):
             if not self.has_error:
                 return []
             try:
-                self.find_element(*self._multi_error_locator)
+                return [el.text for el in
+                        self.find_elements(*self._multi_error_locator)]
             except Exception:
                 return [self.find_element(*self._error_locator).text]
-            return [el.text for el in
-                    self.find_elements(*self._multi_error_locator)]
 
         def use_social_login(self):
             """Go to the social login setup."""
