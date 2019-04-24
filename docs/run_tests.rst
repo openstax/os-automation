@@ -16,7 +16,7 @@ Supported products
 
 The os-automation framework includes tests for the following products:
 
-* openstax.org (os-web)
+* openstax.org (Web)
 * Accounts
 * Tutor (work-in-progress)
 
