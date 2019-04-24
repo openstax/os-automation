@@ -78,7 +78,7 @@ file.
 
 .. code-block:: bash
 
-    cp .env.example ./.env
+    cp .env.template ./.env
 
 The `.env` file is not checked into source control. This allows us the ability
 to place secrets or other sensitive variables into the file and not check them
