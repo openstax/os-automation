@@ -138,7 +138,7 @@ def test_attempt_to_log_in_with_an_invalid_password(
 @test_case('C195542')
 @smoke_test
 @accounts
-def test_reset_a_users_password(accounts_base_url, selenium, student):
+def test_reset_a_users_password(accounts_base_url, selenium):
     """Reset a user's password."""
     # GIVEN: a valid, accessible e-mail for a user
     # AND: at the Accounts Home page is loaded
@@ -150,10 +150,10 @@ def test_reset_a_users_password(accounts_base_url, selenium, student):
     )
     email.empty()
     address = email.address
-    password = student[1]
+    password = Utility.random_hex(length=14, lower=True)
     reset_password = Utility.random_hex(length=12, lower=True)
-    page = Home(selenium, accounts_base_url).open()
-    page = page.login.go_to_signup.account_signup(
+    home = Home(selenium, accounts_base_url).open()
+    home = home.login.go_to_signup.account_signup(
         email=address,
         password=password,
         _type='Student',
@@ -161,19 +161,25 @@ def test_reset_a_users_password(accounts_base_url, selenium, student):
         name=name,
         school='Automation',
         news=False)
-    page.log_out()
+    home.log_out()
     email.empty()
 
-    # WHEN: the e-mail is entered in the input box
-    # AND: click the "NEXT" button
-    # AND: click the "Click here to reset it." link
-    page.login.trigger_reset(address)
+    # pause for the new account to settle
+    # bug patch
+    from time import sleep
+    while 'reset' not in selenium.current_url:
+        sleep(1)
+        home = Home(selenium, accounts_base_url).open()
+
+        # WHEN: the e-mail is entered in the input box
+        # AND: click the "NEXT" button
+        # AND: click the "Click here to reset it." link
+        home.login.trigger_reset(address)
 
     # THEN: a "Check your email" text box is displayed
-    assert('send_reset' in page.selenium.current_url and
-           'Check your email' in page.selenium.page_source), \
-        ('Check your email message not seen ({url})'
-         .format(url=page.selenium.current_url))
+    assert('Check your email' in home.selenium.page_source), (
+        'Check your email message not seen ({url})'
+        .format(url=selenium.current_url))
 
     # WHEN: open the "Reset your OpenStax password" e-mail
     # AND: click the "Click here to reset your OpenStax password." link
@@ -182,18 +188,18 @@ def test_reset_a_users_password(accounts_base_url, selenium, student):
     # AND: click the "CONTINUE" button
     email.wait_for_mail()
     url = email.inbox[0].reset_link
-    page.login.reset_password(url, reset_password)
+    profile = home.login.reset_password(url, reset_password)
 
     # THEN: the user's profile is displayed
-    assert(page.logged_in), 'User is not logged in'
+    assert(profile.logged_in), 'User is not logged in'
 
     # WHEN: the user logs out
     # AND: logs in using the new password
-    page.log_out()
-    page.log_in(address, reset_password)
+    home = profile.log_out()
+    profile = home.log_in(address, reset_password)
 
     # THEN: the user's profile is displayed
-    assert(page.logged_in), 'User is not logged in'
+    assert(profile.logged_in), 'User is not logged in'
 
 
 @test_case('C195140')

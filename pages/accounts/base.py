@@ -81,6 +81,11 @@ class AccountsBase(Page):
         self.driver.set_window_size(width, height)
         sleep(1.5)
 
+    @property
+    def is_safari(self):
+        """Return True if the browser in use is Safari."""
+        return self.driver.capabilities.get('browserName').lower() == 'safari'
+
     class Header(Region):
         """Accounts header."""
 

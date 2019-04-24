@@ -12,7 +12,7 @@ def test_open_positions_are_available(web_base_url, selenium):
     """Open positions are listed."""
     # GIVEN: a user viewing the careers page
     home = WebHome(selenium, web_base_url).open()
-    careers = home.footer.directory.view_openstax_career_opportunities()
+    careers = home.footer.directory.careers()
 
     # WHEN:
 
@@ -26,6 +26,7 @@ def test_open_positions_are_available(web_base_url, selenium):
         assert(position.title)
         assert(position.description)
         assert(position.url)
-        assert(Utility.test_url_and_warn(url=position.url,
-                                         message=position.title,
-                                         driver=selenium))
+        assert(Utility.test_url_and_warn(
+            url=position.url,
+            message=position.title,
+            driver=selenium))

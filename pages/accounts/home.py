@@ -3,7 +3,8 @@
 from time import sleep
 
 from pypom import Region
-from selenium.common.exceptions import WebDriverException
+from selenium.common.exceptions import ElementNotInteractableException  # NOQA
+from selenium.common.exceptions import TimeoutException, WebDriverException
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as expect
 
@@ -122,7 +123,10 @@ class AccountsHome(AccountsBase):
         def login(self, user, password):
             """Log into Accounts with a specific user."""
             self.service_login(user, password)
-            self.wait.until(lambda _: self.logged_in)
+            try:
+                self.wait.until(lambda _: self.logged_in)
+            except TimeoutException:
+                pass
             from pages.accounts.profile import Profile
             return go_to_(Profile(self.driver, self.page.base_url))
 
@@ -131,9 +135,13 @@ class AccountsHome(AccountsBase):
             """Log into the site with a specific user from another service."""
             self.user = user
             self.next()
+            if self.page.is_safari:
+                sleep(1)
             assert(not self.get_login_error()), 'Username failed'
             self.password = password
             self.next()
+            if self.page.is_safari:
+                sleep(1)
             assert(not self.get_login_error()), 'Password failed'
             while 'terms/pose' in self.page.location:
                 Utility.scroll_to(self.driver, element=self.agreement_checkbox)
@@ -197,7 +205,11 @@ class AccountsHome(AccountsBase):
                 field.send_keys(password)
             self.find_element(*self._password_reset_submit).click()
             sleep(1.0)
-            self.find_element(*self._password_reset_submit).click()
+            try:
+                self.find_element(*self._password_reset_submit).click()
+            except ElementNotInteractableException:
+                sleep(2)
+                self.find_element(*self._password_reset_submit).click()
             sleep(1.0)
             from pages.accounts.profile import Profile
             return go_to_(Profile(self.driver, self.page.base_url))

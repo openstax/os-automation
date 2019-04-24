@@ -3,10 +3,11 @@
 from time import sleep
 
 from pypom import Region
+from selenium.common.exceptions import ElementNotVisibleException
 from selenium.webdriver.common.by import By
 
 from pages.accounts.home import AccountsHome
-from utils.utilities import Utility
+from utils.utilities import Utility, go_to_
 
 
 class Profile(AccountsHome):
@@ -29,9 +30,7 @@ class Profile(AccountsHome):
     @property
     def loaded(self):
         """Override the loaded method for the account profile."""
-        return (
-            self.title and
-            self.find_element(*self._name_locator))
+        return bool(self.find_elements(*self._name_locator))
 
     @property
     def title(self):
@@ -62,14 +61,14 @@ class Profile(AccountsHome):
         """Log the user out."""
         self.find_element(*self._log_out_locator).click()
         sleep(1)
-        return AccountsHome(self.driver)
+        return AccountsHome(self.driver, base_url=self.base_url)
 
     def open_popup_console(self):
         """Open the small admin console."""
         if not self.is_admin:
             raise AccountException('User is not an administrator')
         self.find_element(*self._popup_console_locator).click()
-        sleep(0.25)
+        sleep(1)
         return self.PopupConsole(self)
 
     def open_full_console(self):
@@ -79,7 +78,7 @@ class Profile(AccountsHome):
         self.find_element(*self._full_console_locator).click()
         sleep(1)
         from pages.accounts.admin.console import Console
-        return Console(self.driver)
+        return Console(self.driver, base_url=self.base_url)
 
     @property
     def is_popup_console_displayed(self):
@@ -141,19 +140,19 @@ class Profile(AccountsHome):
             full_name = self.find_element(*self._full_name_locator)
             if 'editable-open' not in full_name.get_attribute('class'):
                 full_name.click()
-                sleep(0.25)
+                sleep(0.5)
             return self
 
         def confirm(self):
             """Accept the current values."""
             self.find_element(*self._edit_submit_locator).click()
-            sleep(0.25)
+            sleep(1)
             return self
 
         def cancel(self):
             """Cancel any changes."""
             self.find_element(*self._edit_cancel_locator).click()
-            sleep(0.25)
+            sleep(0.5)
             return self
 
         def _set_field(self, locator, position, new_value):
@@ -226,12 +225,16 @@ class Profile(AccountsHome):
         @username.setter
         def username(self, username):
             """Set a new username."""
-            self.find_element(*self._username_locator).click()
+            try:
+                self.find_element(*self._username_locator).click()
+            except ElementNotVisibleException:
+                sleep(1)
+                self.find_element(*self._username_locator).click()
             self.find_element(*Profile._edit_clear_locator).click()
             self.find_element(*self._input_locator).send_keys(username)
             self.find_element(*Profile._edit_submit_locator).click()
-            sleep(0.25)
-            return Profile(self.driver)
+            sleep(1)
+            return Profile(self.driver, base_url=self.page.base_url)
 
     class Emails(Region):
         """Email sections."""
@@ -259,14 +262,17 @@ class Profile(AccountsHome):
 
         def add_email(self, email):
             """Add a email to the account's email list."""
-            sleep(0.2)
+            sleep(0.3)
             self.find_element(*self._add_email_locator).click()
             sleep(0.3)
             self.find_element(*self._email_form_locator).send_keys(email)
             self.find_element(*self._email_submit_locator).click()
-            sleep(0.2)
-            self.driver.refresh()
-            return Profile(self.driver)
+            for _ in range(3):
+                sleep(1)
+                self.driver.refresh()
+                if email in self.email_texts:
+                    break
+            return go_to_(Profile(self.driver, base_url=self.page.base_url))
 
         class Email(Region):
             """Individual email section."""
@@ -293,15 +299,18 @@ class Profile(AccountsHome):
                 self.find_element(*self._delete_locator).click()
                 sleep(0.5)
                 self.find_element(*self._ok_locator).click()
-                sleep(0.25)
-                return Profile(self.driver)
+                sleep(1)
+                return go_to_(
+                    Profile(self.driver, base_url=self.page.page.base_url))
 
             def resend_confirmation(self):
                 """Resend confirmation email for a certain email."""
                 self.find_element(*self._unverified_btn_locator).click()
-                sleep(0.1)
+                sleep(0.25)
                 self.find_element(*self._confirmation_btn_locator).click()
-                return Profile(self.driver)
+                sleep(1)
+                return go_to_(
+                    Profile(self.driver, base_url=self.page.page.base_url))
 
             @property
             def is_confirmed(self):
@@ -344,9 +353,6 @@ class Profile(AccountsHome):
             link = self.find_element(*self._inactive_option_expander_locator)
             link.click()
             sleep(0.25)
-            # if link.is_displayed():
-            #    link.click()
-            #    sleep(0.25)
             return self
 
         def add_password(self, password):
@@ -373,7 +379,7 @@ class Profile(AccountsHome):
                 sleep(1)
                 self.find_element(*self._continue_locator).click()
                 sleep(1)
-                return Profile(self.driver)
+                return Profile(self.driver, base_url=self.page.page.base_url)
 
         class Option(Region):
             """Login options."""
