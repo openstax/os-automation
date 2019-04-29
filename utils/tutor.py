@@ -47,6 +47,11 @@ class Tutor(object):
     IS_PREVIEW = 'is preview'
     IS_TEACHER = 'is teacher'
 
+    # Scores
+    ASCENDING = 'is-ascending'
+    DESCENDING = 'is-descending'
+    NO_SORT = 'no sort'
+
 
 class TutorException(WebDriverException):
     """A generic exception for Tutor."""
