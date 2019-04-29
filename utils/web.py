@@ -8,6 +8,10 @@ from utils.utilities import Utility
 class Web(object):
     """Website shared variables."""
 
+    # Supplemental base URLs
+    NEWSLETTER_SIGNUP = "http://www2.openstax.org/l/218812/2016-10-04/lvk"
+    SALESFORCE_SUPPORT = "https://openstax.secure.force.com/help"
+
     # Sizing
     PHONE = 600
     SMALL_TABLET = 760

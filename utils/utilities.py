@@ -88,7 +88,6 @@ class Utility(object):
     def click_option(cls, driver, locator=None, element=None,
                      force_js_click=False):
         """Another way to call the safe Safari click function."""
-        from . import Utility
         Utility.safari_exception_click(
             driver, locator, element, force_js_click)
 

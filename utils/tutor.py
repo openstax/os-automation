@@ -52,6 +52,9 @@ class Tutor(object):
     DESCENDING = 'is-descending'
     NO_SORT = 'no sort'
 
+    AS_NUMBER = 'number'
+    AS_PERCENTAGE = 'percentage'
+
 
 class TutorException(WebDriverException):
     """A generic exception for Tutor."""

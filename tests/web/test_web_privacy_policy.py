@@ -14,7 +14,7 @@ def test_the_privacy_policy_page(web_base_url, selenium):
     # GIVEN: a user viewing the privacy policy
     home = WebHome(selenium, web_base_url).open()
     Utility.scroll_bottom(selenium)
-    privacy = home.footer.directory.view_the_privacy_policy()
+    privacy = home.footer.directory.privacy_policy()
 
     for section, heading in enumerate(privacy.sections):
         # WHEN: they scroll through the page
