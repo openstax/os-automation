@@ -26,13 +26,23 @@ class Dashboard(TutorBase):
 
     @property
     def nav(self):
-        """Access the nav region."""
+        """Access the nav region.
+
+        :return: the general Tutor navigation
+        :rtype: :py:class:`~regions.tutor.nav.TutorNav`
+
+        """
         from regions.tutor.nav import TutorNav
         return TutorNav(self)
 
     @property
     def no_courses(self):
-        """Access the courseless section, if found."""
+        """Access the courseless section, if found.
+
+        :return: the courseless section or None
+        :rtype: :py:class:`~Dashboard.NoCourses`
+
+        """
         try:
             root = self.find_element(*self._no_courses_locator)
             return self.NoCourses(self, root)
@@ -41,7 +51,12 @@ class Dashboard(TutorBase):
 
     @property
     def pending(self):
-        """Access the pending verification section, if found."""
+        """Access the pending verification section, if found.
+
+        :return: the pending verification text region or None
+        :rtype: :py:class:`~Dashboard.Pending`
+
+        """
         try:
             root = self.find_element(*self._pending_verify_locator)
             return self.Pending(self, root)
@@ -50,11 +65,21 @@ class Dashboard(TutorBase):
 
     @property
     def current_courses(self):
-        """Return the current courses section."""
+        """Return the current courses section.
+
+        :return: the current courses region
+        :rtype: :py:class:`~pages.tutor.dashboard.Courses`
+
+        """
         return self._get_section(self._current_courses_locator)
 
     def create_a_course(self):
-        """Select the create course tile."""
+        """Select the create course tile.
+
+        :return: the course creation wizard
+        :rtype: :py:class:`~pages.tutor.new_course.CloneCourse`
+
+        """
         tile = self.find_elements(*self._create_tile_locator)
         assert(tile), (
             "Create a course tile not found - "
@@ -67,12 +92,22 @@ class Dashboard(TutorBase):
 
     @property
     def preview_courses(self):
-        """Return the preview courses section."""
+        """Return the preview courses section.
+
+        :return: the preview courses region
+        :rtype: :py:class:`~pages.tutor.dashboard.Courses`
+
+        """
         return self._get_section(self._preview_courses_locator)
 
     @property
     def past_courses(self):
-        """Return the past courses section."""
+        """Return the past courses section.
+
+        :return: the past courses region
+        :rtype: :py:class:`~pages.tutor.dashboard.Courses`
+
+        """
         return self._get_section(self._past_courses_locator)
 
     @property
@@ -80,9 +115,12 @@ class Dashboard(TutorBase):
         """Return the past courses section.
 
         :param locator: a By-style Selenium selector for a course section
-        :type locator: tuple
+        :type locator: (str, str)
         :returns: a course selection region
-        :rtype: pages.tutor.dashboard.Courses
+        :rtype: :py:class:`~pages.tutor.dashboard.Courses`
+
+        :noindex:
+
         """
         try:
             root = self.find_element(*locator)
@@ -93,7 +131,14 @@ class Dashboard(TutorBase):
         return Courses(self, root)
 
     def go_to_first_course(self):
-        """Go to the first course."""
+        """Go to the first course.
+
+        :return: the calendar (teacher) or current week (student) page for the
+            first course in the list
+        :rtype: :py:class:`~pages.tutor.calendar.Calendar` or
+            :py:class:`~pages.tutor.course.StudentCourse`
+
+        """
         course = self.courses_region.courses[0]
         is_teacher = course.is_teacher
         course.go_to_course()
@@ -105,12 +150,22 @@ class Dashboard(TutorBase):
 
     @property
     def tooltips_displayed(self):
-        """Return True when the training wheels are visible."""
+        """Return True when the training wheels are visible.
+
+        :return: ``True`` if a training wheel modal is visible, else ``False``
+        :rtype: bool
+
+        """
         return bool(len(self.find_elements(*self._tooltip_locator)))
 
     @property
     def tooltips(self):
-        """Access the tooltips, if found."""
+        """Access the tooltips, if found.
+
+        :return: a tooltip or None
+        :rtype: :py:class:`~regions.tutor.tooltip.Tooltip`
+
+        """
         tooltips = self.find_elements(*self._tooltip_locator)
         if tooltips:
             from regions.tutor.tooltip import Tooltip
@@ -128,7 +183,12 @@ class Dashboard(TutorBase):
             return self.find_element(*self._expanation_locator).text
 
         def get_help(self):
-            """Click on the 'Get help >' link."""
+            """Click on the 'Get help >' link.
+
+            :return: the OpenStax knowledge base webpage in a new tab
+            :rtype: :py:class:`~pages.salesforce.home.Salesforce`
+
+            """
             link = self.find_element(*self._help_link_locator)
             Utility.switch_to(self.driver, element=link)
             from pages.salesforce.home import Salesforce
@@ -143,21 +203,42 @@ class Dashboard(TutorBase):
 
         @property
         def title(self):
-            """Return the pending title overlay text."""
+            """Return the pending title overlay text.
+
+            :return: the pending verification title overlay content
+            :rtype: str
+
+            """
             return self.find_element(*self._title_locator).text
 
         @property
         def explanation(self):
-            """Return the explanation text."""
+            """Return the explanation text.
+
+            :return: the pending verification explanation content
+            :rtype: str
+
+            """
             return self.find_element(*self._expanation_locator).text
 
         @property
         def verify_button(self):
-            """Return the verify now button."""
+            r"""Return the verify now button.
+
+            :return: the verify button
+            :rtype: \
+                :py:class:`~selenium.webdriver.remote.webelement.WebElement`
+
+            """
             return self.find_element(*self._chat_verify_locator)
 
         def verify_now(self):
-            """Click the 'Verify now via chat' button."""
+            """Click the 'Verify now via chat' button.
+
+            :return: the Salesforce chat window
+            :rtype: :py:class:`~pages.salesforce.chat.Chat`
+
+            """
             Utility.switch_to(self.driver, element=self.verify_button)
             from pages.salesforce.chat import Chat
             return go_to_(Chat(self.driver))
@@ -170,25 +251,27 @@ class Courses(Region):
 
     @property
     def courses(self):
-        """Return a list of course objects."""
+        """Return a list of course objects.
+
+        :return: the list of available courses
+        :rtype: list(:py:class:`~pages.tutor.dashboard.Courses.Course`)
+
+        """
         return [self.Course(self, element)
                 for element in self.find_elements(*self._course_locator)]
 
     def select_course_by_name(self, name, ignore_case=False, latest=True):
         """Select a course by the course name.
 
-        :param name: the course name to select
-        :type name: str
-        :param ignore_case: match the case-insensitive value
-            default - use case-sensitive matching
-        :type ignore_case: bool
-        :param latest: use the most recent course in the option list
-            default - select a random, matching course option
-        :type latest: bool
-        :returns: the calendar (teacher) or current week (student) page
-            object for the selected course
-        :rtype: pages.tutor.calendar.Calendar
-            or pages.tutor.course.StudentCourse
+        :param str name: the course name to select
+        :param bool ignore_case: (optional) match to the case-insensitive value
+        :param bool latest: (optional) use the most recent course in the option
+            list
+        :return: the calendar (teacher) or current week (student) page for the
+            selected course
+        :rtype: :py:class:`~pages.tutor.calendar.Calendar` or
+            :py:class:`~pages.tutor.course.StudentCourse`
+
         """
         return self._course_selection(
             Tutor.BY_TITLE, name, ignore_case, latest)
@@ -196,39 +279,37 @@ class Courses(Region):
     def select_course_by_id(self, course_id):
         """Select a course by the course identification number.
 
-        :param course_id: the course identification number to select
-        :type course_id: str
-        :returns: the calendar (teacher) or current week (student) page
-            object for the selected course
-        :rtype: pages.tutor.calendar.Calendar
-            or pages.tutor.course.StudentCourse
+        :param str course_id: the course identification number to select
+        :return: the calendar (teacher) or current week (student) page for the
+            selected course
+        :rtype: :py:class:`~pages.tutor.calendar.Calendar` or
+            :py:class:`~pages.tutor.course.StudentCourse`
+
         """
         return self._course_selection(Tutor.BY_ID, course_id)
 
     def select_course_by_subject(self, subject):
         """Select a random course by the book subject.
 
-        :param subject: the course subject to select from
-        :type subject: str
-        :returns: the calendar (teacher) or current week (student) page
-            object for the selected course
-        :rtype: pages.tutor.calendar.Calendar
-            or pages.tutor.course.StudentCourse
+        :param str subject: the course subject to select from
+        :return: the calendar (teacher) or current week (student) page for the
+            selected course
+        :rtype: :py:class:`~pages.tutor.calendar.Calendar` or
+            :py:class:`~pages.tutor.course.StudentCourse`
+
         """
         return self._course_selection(Tutor.BY_SUBJECT, subject)
 
     def select_course_by_term(self, term, year=None):
         """Select a random course by the term and year.
 
-        :param term: the semester or quarter to select from
-        :type term: str
-        :param year: the 4-digit calendar year to select from
-            default - use today's year
-        :type year: str
-        :returns: the calendar (teacher) or current week (student) page
-            object for the selected course
-        :rtype: pages.tutor.calendar.Calendar
-            or pages.tutor.course.StudentCourse
+        :param str term: the semester or quarter to select from
+        :param str year: (optional) the 4-digit calendar year to select from
+        :return: the calendar (teacher) or current week (student) page for the
+            selected course
+        :rtype: :py:class:`~pages.tutor.calendar.Calendar` or
+            :py:class:`~pages.tutor.course.StudentCourse`
+
         """
         if not year:
             from datetime import datetime
@@ -238,7 +319,21 @@ class Courses(Region):
 
     def _course_selection(self, option, value,
                           ignore_case=False, latest=False):
-        """Select a specific or random course matching a particular option."""
+        """Select a specific or random course matching a particular option.
+
+        :param str option: the data option to retrieve
+        :param str value: the expected value to match a course against
+        :param bool ignore_case: (optional) match the value in a unicode-safe,
+            case-blind match
+        :param bool latest: (optional) select the newest course
+        :return: the calendar (teacher) or current week (student) page for the
+            selected course
+        :rtype: :py:class:`~pages.tutor.calendar.Calendar` or
+            :py:class:`~pages.tutor.course.StudentCourse`
+
+        :noindex:
+
+        """
         value = value.casefold() if ignore_case else value
         course_options = []
         for course in self.courses:
@@ -260,54 +355,108 @@ class Courses(Region):
 
         @property
         def course_info(self):
-            """Return the course data element."""
+            r"""Return the course data element.
+
+            :return: the course data object
+            :rtype: \
+                :py:class:`~selenium.webdriver.remote.webelement.WebElement`
+
+            """
             return self.find_element(*self._course_info_locator)
 
         @property
         def course_brand(self):
-            """Return the course brand element."""
+            r"""Return the course brand element.
+
+            :return: the course branding object
+            :rtype: \
+                :py:class:`~selenium.webdriver.remote.webelement.WebElement`
+
+            """
             return self.find_element(*self._course_brand_locator)
 
         @property
         def course_clone(self):
-            """Return the course clone button."""
+            r"""Return the course clone button.
+
+            :return: the course clone button
+            :rtype: \
+                :py:class:`~selenium.webdriver.remote.webelement.WebElement`
+
+            """
             return self.find_element(*self._course_clone_locator)
 
         @property
         def title(self):
-            """Return the course title."""
+            """Return the course title.
+
+            :return: the course title
+            :rtype: str
+
+            """
             return self.course_info.get_attribute("data-title")
 
         @property
         def book_title(self):
-            """Return the textbook title."""
+            """Return the textbook title.
+
+            :return: the course textbook title
+            :rtype: str
+
+            """
             return self.course_info.get_attribute("data-book-title")
 
         @property
         def appearance(self):
-            """Return the book tile appearance code."""
+            """Return the book tile appearance code.
+
+            :return: the book tile appearance code
+            :rtype: str
+
+            """
             return self.course_info.get_attribute("data-appearance")
 
         @property
         def is_preview(self):
-            """Return True if the course is a preview course."""
+            """Return True if the course is a preview course.
+
+            :return: ``True`` if the course is a preview, else ``False``
+            :rtype: bool
+
+            """
             return (self.course_info
                     .get_attribute("data-is-preview").lower() == "true")
 
         @property
         def term(self):
-            """Return the course term."""
+            """Return the course term.
+
+            :return: the course semester or quarter and year
+            :rtype: str
+
+            """
             return self.course_info.get_attribute("data-term")
 
         @property
         def is_teacher(self):
-            """Return True if the current user is a course instructor."""
+            """Return True if the current user is a course instructor.
+
+            :return: ``True`` if the currently logged in user is an instructor
+                for the course, else ``False``
+            :rtype: bool
+
+            """
             return (self.course_info
                     .get_attribute("data-is-teacher").lower() == "true")
 
         @property
         def course_id(self):
-            """Return the course identification number."""
+            """Return the course identification number.
+
+            :return: the course identification number
+            :rtype: str
+
+            """
             return self.course_info.get_attribute("data-course-id")
 
         @property
@@ -316,12 +465,23 @@ class Courses(Region):
 
             Most courses will be Tutor, but some Concept
             Coach courses may still show for old users.
+
+            :return: the course type
+            :rtype: str
+
             """
             return (self.course_info
                     .get_attribute("data-course-course-type"))
 
         def go_to_course(self):
-            """Go to the course page for this course."""
+            """Go to the course page for this course.
+
+            :return: the calendar (teacher) or current week (student) page for
+                the selected course
+            :rtype: :py:class:`~pages.tutor.calendar.Calendar` or
+                :py:class:`~pages.tutor.course.StudentCourse`
+
+            """
             self.find_element(*self._card_locator).click()
             if self.is_teacher:
                 from pages.tutor.calendar import Calendar
@@ -332,7 +492,12 @@ class Courses(Region):
                                         self.page.page.base_url))
 
         def clone_course(self):
-            """Clone the selected course."""
+            """Clone the selected course.
+
+            :return: the course cloning wizard
+            :rtype: :py:class:`~pages.tutor.new_course.CloneCourse`
+
+            """
             assert(self.is_teacher), \
                 "Only verified instructors may clone a course"
             assert(not self.is_preview), \
@@ -350,13 +515,27 @@ class Courses(Region):
 
         @property
         def preview_text(self):
-            """Return the preview belt explanation text if found."""
+            """Return the preview belt explanation text if found.
+
+            :return: the preview belt text if the course is a preview or an
+                empty string
+            :rtype: str
+
+            """
             if self.is_preview:
                 return self.find_element(*self._preview_belt_locator).text
             return ""
 
         def _get_data_option(self, option):
-            """Return the property value by the option type."""
+            """Return the property value by the option type.
+
+            :param str option: the option to select
+            :return: the value of the requested course data option
+            :rtype: str
+
+            :noindex:
+
+            """
             if option == Tutor.BY_TITLE:
                 return self.title
             elif option == Tutor.BY_SUBJECT:

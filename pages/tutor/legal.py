@@ -12,27 +12,52 @@ class Policies(TutorLoginBase):
 
     @property
     def policies(self):
-        """Access the main page text."""
+        """Access the main page text.
+
+        :return: the policies page content
+        :rtype: :py:class:`~Policies.Policies`
+
+        """
         return self.Policies(self)
 
     @property
     def title(self):
-        """Return the policy page title."""
+        """Return the policy page title.
+
+        :return: the policy page title
+        :rtype: str
+
+        """
         return self.policies.title
 
     @property
     def description(self):
-        """Return the policy page explanation text."""
+        """Return the policy page explanation text.
+
+        :return: the policy page description
+        :rtype: str
+
+        """
         return self.policies.description
 
     @property
     def terms_of_use(self):
-        """Return the terms of use policy text."""
+        """Return the terms of use policy text.
+
+        :return: the terms of use content
+        :rtype: str
+
+        """
         return self.policies.terms_of_use
 
     @property
     def privacy_policy(self):
-        """Return the privacy policy text."""
+        """Return the privacy policy text.
+
+        :return: the privacy policy content
+        :rtype: str
+
+        """
         return self.policies.privacy_policy
 
     class Policies(Region):
@@ -50,31 +75,65 @@ class Policies(TutorLoginBase):
 
         @property
         def title(self):
-            """Return the policy page title."""
+            """Return the policy page title.
+
+            :return: the policy page title
+            :rtype: str
+
+            """
             return self.find_element(*self._title_locator).text
 
         @property
         def description(self):
-            """Return the policy explanation."""
+            """Return the policy explanation.
+
+            :return: the policy page description and explanation
+            :rtype: str
+
+            """
             return self.find_element(*self._description_locator).text
 
         @property
         def policies(self):
-            """Return the policy sections."""
+            r"""Return the policy sections.
+
+            :return: the list of policy sections
+            :rtype: \
+                list(:py:class:`~selenium.webdriver.remote.webelement.WebElement`)
+
+            """
             return self.find_elements(*self._policy_locator)
 
         @property
         def terms_of_use(self):
-            """Return the terms of use."""
+            """Return the terms of use.
+
+            :return: the terms of use text
+            :rtype: str
+
+            """
             return self._policy_text(self.TERMS_OF_USE)
 
         @property
         def privacy_policy(self):
-            """Return the privacy policy."""
+            """Return the privacy policy.
+
+            :return: the privacy policy text
+            :rtype: str
+
+            """
             return self._policy_text(self.PRIVACY_POLICY)
 
         def _policy_text(self, section):
-            """Return the text list for a particular policy."""
+            """Return the text list for a particular policy.
+
+            :param str section: request the terms of use or the privacy policy
+            :return: the content for the requested section
+            :rtype: str
+
+            :noindex:
+
+            """
             parts = self.policies[section]
             lines = [line.text
                      for line in parts.find_elements(*self._section_locator)]
@@ -86,7 +145,12 @@ class Policies(TutorLoginBase):
         _log_in_locator = (By.CSS_SELECTOR, '.btn')
 
         def go_to_log_in(self):
-            """Click the 'LOG IN' button."""
+            """Click the 'LOG IN' button.
+
+            :return: the Accounts log in page
+            :rtype: :py:class:`~pages.accounts.home.AccountsHome`
+
+            """
             self.find_element(*self._log_in_locator).click()
             from pages.accounts.home import AccountsHome
             return go_to_(AccountsHome(self.driver))

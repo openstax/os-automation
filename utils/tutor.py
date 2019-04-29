@@ -48,6 +48,9 @@ class Tutor(object):
     IS_TEACHER = 'is teacher'
 
     # Scores
+    ASCENDING = 'is-ascending'
+    DESCENDING = 'is-descending'
+    NO_SORT = 'no sort'
 
     AS_NUMBER = 'number'
     AS_PERCENTAGE = 'percentage'
