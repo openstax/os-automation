@@ -261,7 +261,7 @@ class Footer(Region):
         """Trademarks and OpenStax social program Links."""
 
         _copyright_statement_locator = (
-                                    By.CSS_SELECTOR, '[data-html=copyrights]')
+                                 By.CSS_SELECTOR, '[data-html=copyright]')
         _ap_statement_locator = (By.CSS_SELECTOR, '[data-html=apStatement]')
         _facebook_locator = (By.CSS_SELECTOR, '.facebook')
         _twitter_locator = (By.CSS_SELECTOR, '.twitter')

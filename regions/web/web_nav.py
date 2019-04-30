@@ -13,6 +13,24 @@ from utils.web import Web
 class WebNavMenu(Region):
     """Shared nav menu functionality."""
 
+    _menu_item_selector = r'[href=\".\"]'
+
+    @property
+    def loaded(self):
+        """Return True if the subjects menu exist.
+
+        :return: ``True`` if the subjects dropdown menu is found, else
+            ``False``
+        :rtype: bool
+
+        """
+        script = ('return document.querySelectorAll("{0}");'
+                  .format(self._menu_item_selector))
+        menus = ' '.join(list(
+            menu.get_attribute('textContent')
+            for menu in self.driver.execute_script(script)))
+        return 'Subjects' in menus
+
     def is_displayed(self):
         """Return True if the region is displayed."""
         return self.root.is_displayed()
@@ -43,7 +61,7 @@ class WebNavMenu(Region):
             is_expanded = self.find_element(*self._menu_expand_locator) \
                 .get_attribute('aria-expanded') == 'true'
         except WebDriverException as ex:
-            print(self.driver.current_url, str(ex))
+            print('WebNav > open -- ', self.driver.current_url, str(ex))
             is_expanded = False
         if not is_expanded:
             target = (

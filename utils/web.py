@@ -242,11 +242,11 @@ class Web(object):
 
     USERS = [
         STUDENT,
-        INSTRUCTOR,
+        'Instructor',
+        'Homeschool Instructor',
         ADMINISTRATOR,
         LIBRARIAN,
         DESIGNER,
-        HOMESCHOOL,
         ADJUNCT,
         OTHER
     ]
@@ -465,7 +465,8 @@ class Library():
     # Business
     ETHICS = 'Business Ethics'
     INTRO_BUSINESS = 'Introduction to Business'
-    ACCOUNTING = 'Principles of Accounting, Volume 2: Managerial Accounting'
+    ACCOUNTING_1 = 'Principles of Accounting, Volume 1: Financial Accounting'
+    ACCOUNTING_2 = 'Principles of Accounting, Volume 2: Managerial Accounting'
 
     # Humanities
     US_HISTORY = 'U.S. History'
@@ -589,7 +590,25 @@ class Library():
                 self.PRE_RELEASE: False,
                 self.PRINT_COPY: False,
                 self.SHORT_NAME: 'Introduction to Business', },
-            self.ACCOUNTING: {
+            self.ACCOUNTING_1: {
+                self.BOOKSHARE: False,
+                self.CATEGORY: [self.ALL, self.BUSINESS],
+                self.COMP_COPY: False,
+                self.DETAILS: ('principles-accounting-'
+                               'volume-1-financial-accounting'),
+                self.HAS_I_LOCK: False,
+                self.HAS_I_UNLOCK: False,
+                self.HAS_S_LOCK: False,
+                self.HAS_S_UNLOCK: False,
+                self.INTEREST: 'null',  # temp short URL
+                self.IS_AP: False,
+                self.ITUNES: False,
+                self.KINDLE: False,
+                self.LANGUAGE: self.ENGLISH,
+                self.PRE_RELEASE: True,
+                self.PRINT_COPY: False,
+                self.SHORT_NAME: 'Accounting', },
+            self.ACCOUNTING_2: {
                 self.BOOKSHARE: False,
                 self.CATEGORY: [self.ALL, self.BUSINESS],
                 self.COMP_COPY: False,

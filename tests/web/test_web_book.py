@@ -39,7 +39,7 @@ def test_for_book_details_and_user_resource_pages(web_base_url, selenium):
     assert('details' in book.location)
     assert(book.details.is_displayed())
     assert(book.tabs[Web.INSTRUCTOR_RESOURCES].is_displayed())
-    if book.title != Library.ACCOUNTING:
+    if book.title != Library.ACCOUNTING_1:
         assert(book.tabs[Web.STUDENT_RESOURCES].is_displayed())
 
     # WHEN: they select a Polish book tile
@@ -595,7 +595,7 @@ def test_teachers_are_asked_to_sign_up_to_access_locked_content(
 @accounts
 @web
 def test_pending_instructors_see_access_pending_for_locked_resources(
-        accounts_base_url, web_base_url, selenium, teacher):
+        accounts_base_url, web_base_url, selenium):
     """Test pending instructors see 'Access pending' for locked resources."""
     # GIVEN: a user viewing the book details page
     # AND:  have an unverified instructor account
@@ -608,7 +608,7 @@ def test_pending_instructors_see_access_pending_for_locked_resources(
     )
     email.empty()
     address = email.address
-    password = teacher[1]
+    password = Utility.random_hex(17)
     accounts = AccountsHome(selenium, accounts_base_url).open()
     accounts.login.go_to_signup.account_signup(
         email=address, password=password, _type=Signup.INSTRUCTOR,
@@ -804,7 +804,7 @@ def test_resources_have_a_title_description_and_access_type(
 @accounts
 @web
 def test_unverified_users_sent_to_faculty_verification_for_locked_resources(
-        accounts_base_url, web_base_url, selenium, admin, teacher):
+        accounts_base_url, web_base_url, selenium, admin):
     """Test non-verified users must fill out faculty verification form."""
     # GIVEN: a user viewing the instructor resources on a book details page
     # AND:  have a non-verified, non-pending account
@@ -814,7 +814,7 @@ def test_unverified_users_sent_to_faculty_verification_for_locked_resources(
         first=name[1], last=name[2], tag=Utility.random_hex(4)).lower())
     email.empty()
     address = email.address
-    password = teacher[1]
+    password = Utility.random_hex(20)
     accounts = AccountsHome(selenium, accounts_base_url).open()
     profile = accounts.login.go_to_signup.account_signup(
         name=name, email=address, password=password, _type=Signup.INSTRUCTOR,
