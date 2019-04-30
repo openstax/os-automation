@@ -1,5 +1,7 @@
 """Test the adoption form."""
 
+from random import choice
+
 import pytest
 
 from pages.web.adoption import Adoption, AdoptionConfirmation
@@ -17,7 +19,10 @@ from utils.web import Library, TechProviders, Web
 def test_adoption_form_loads(web_base_url, selenium):
     """Test the form loading."""
     # GIVEN: a user viewing the adoption page
-    adoption = Adoption(selenium, web_base_url).open()
+    home = WebHome(selenium, web_base_url).open()
+    subjects = home.web_nav.subjects.view_all()
+    book = subjects.select_random_book(_from=Library.OPENSTAX)
+    adoption = book.is_using()
 
     # WHEN:
 
@@ -31,7 +36,10 @@ def test_adoption_form_loads(web_base_url, selenium):
 def test_adoption_form_links_to_the_interest_form(web_base_url, selenium):
     """Test the cross-form link."""
     # GIVEN: a user viewing the adoption page
-    adoption = Adoption(selenium, web_base_url).open()
+    home = WebHome(selenium, web_base_url).open()
+    subjects = home.web_nav.subjects.view_all()
+    book = subjects.select_random_book(_from=Library.OPENSTAX)
+    adoption = book.is_using()
 
     # WHEN: they click on the "interest form" link
     interest = adoption.go_to_interest()
@@ -47,7 +55,10 @@ def test_students_do_not_need_to_fill_out_the_adoption_form(
         web_base_url, selenium):
     """Test when students try to fill out the adoption form."""
     # GIVEN: a user viewing the adoption page
-    adoption = Adoption(selenium, web_base_url).open()
+    home = WebHome(selenium, web_base_url).open()
+    subjects = home.web_nav.subjects.view_all()
+    book = subjects.select_random_book(_from=Library.OPENSTAX)
+    adoption = book.is_using()
 
     # WHEN: they access the adoption form
     # AND:  select "Student" from the drop down menu
@@ -107,7 +118,11 @@ def test_non_student_users_submit_the_adoption_form(web_base_url, selenium):
         other = 'Another product provider'
     else:
         other = None
-    adoption = Adoption(selenium, web_base_url).open()
+    home = WebHome(selenium, web_base_url).open()
+    subjects = home.web_nav.subjects.view_all()
+    initial_book = choice(list(books.keys()))
+    book = subjects.select_book(initial_book)
+    adoption = book.is_using()
 
     # WHEN: they select a non-Student role from the drop down menu
     # AND:  fill out the contact form fields
@@ -151,18 +166,10 @@ def test_a_book_is_preselected_when_a_book_details_adoption_link_is_used(
     school = 'Automation'
     book, short, full, detail_append = Library().get_name_set()
     books = {short: {'status': '', 'students': '', }}
-    print(
-        'Test Data:\n' +
-        '\tUser Type: {}\n'.format(user_type) +
-        '\tName:      {0} {1}\n'.format(first_name, last_name) +
-        '\tPhone:     {}\n'.format(phone) +
-        '\tEmail:     {}\n'.format(email.address) +
-        '\tSchool:    {}\n'.format(school) +
-        '\tBooks:     "{book}":"{short}":"{full}":"{append}"\n'.format(
-            book=book, short=short, full=full, append=detail_append)
-    )
-    book_details = Book(selenium, web_base_url, book_name=detail_append).open()
-    adoption = book_details.is_using()
+    home = WebHome(selenium, web_base_url).open()
+    subjects = home.web_nav.subjects.view_all()
+    book = subjects.select_random_book(_from=Library.OPENSTAX)
+    adoption = book.is_using()
 
     # WHEN: they click on the "Using this book? Let us know." link
     # AND:  select a non-Student role from the drop down menu
@@ -191,7 +198,10 @@ def test_adoption_form_identity_fields_are_required(web_base_url, selenium):
     """Test for error messages for all identification fields."""
     # GIVEN: a user viewing the adoption page
     user_type = Web.USERS[Utility.random(1, len(Web.USERS) - 1)]
-    adoption = Adoption(selenium, web_base_url).open()
+    home = WebHome(selenium, web_base_url).open()
+    subjects = home.web_nav.subjects.view_all()
+    book = subjects.select_random_book(_from=Library.OPENSTAX)
+    adoption = book.is_using()
 
     # WHEN: they select a non-Student role from the drop down menu
     # AND:  click on the "Next" button
@@ -221,7 +231,8 @@ def test_adoption_form_identity_fields_are_required(web_base_url, selenium):
     assert(first and last and email and phone and school), (
         'Errors not all shown:\n{errors}\n'.format(errors=data_issues)
         ('{first} {last} {email} {phone} {school}'
-         .format(first=first, last=last, email=email, school=school)))
+         .format(first=first, last=last, email=email,
+                 phone=phone, school=school)))
 
 
 @skip_test(reason='Not written')

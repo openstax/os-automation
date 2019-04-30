@@ -247,6 +247,21 @@ class Subjects(WebBase):
         """Select active books with unlocked student resources."""
         return self._selection_helper(Library().unlocked_student)
 
+    def select_book(self, book_title):
+        """Return the book page for a specific title.
+
+        :param str book_title: the full book title found in the alt field
+        :return: the book page for the selected title
+        :rtype: :py:class:`~pages.web.book.Book`
+
+        """
+        append = Library().get(book_title, field=Library.DETAILS)
+        selector = '[href$="{book_details}"]'.format(book_details=append)
+        book = self.find_element(By.CSS_SELECTOR, selector)
+        Utility.click_option(self.driver, element=book)
+        from pages.web.book import Book as Details
+        return go_to_(Details(self.driver, book_name=append))
+
     def select_random_book(self, _from=Library.OPENSTAX, filter_current=False):
         """Return a random book from the active list."""
         using = {
@@ -278,7 +293,7 @@ class Subjects(WebBase):
         assert(total > 0), 'No books are available for selection'
         book = Utility.random(0, total - 1)
         selected = using[book]
-        print(selected.title)
+        print('Selected book: {0}'.format(selected.title))
         destination = selected.url_append
         selected.select()
         sleep(1.0)

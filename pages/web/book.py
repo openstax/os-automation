@@ -347,14 +347,14 @@ class Book(WebBase):
             Utility.safari_exception_click(
                 self.driver, locator=self._interest_locator)
             from pages.web.interest import Interest
-            return go_to_(Interest(self.driver))
+            return go_to_(Interest(self.driver, base_url=self.page.base_url))
 
         def submit_adoption_form(self):
             """Go to the adoption form."""
             Utility.safari_exception_click(
                 self.driver, locator=self._adoption_locator)
             from pages.web.adoption import Adoption
-            return go_to_(Adoption(self.driver))
+            return go_to_(Adoption(self.driver, base_url=self.page.base_url))
 
     class Details(Region):
         """The book details main region."""

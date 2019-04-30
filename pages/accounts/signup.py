@@ -670,8 +670,6 @@ class Signup(AccountsBase):
         @property
         def students(self):
             """Return the student count field."""
-            print(self.find_element(By.CSS_SELECTOR, '#application-body')
-                  .get_attribute('innerHTML'))
             return self.find_element(*self._student_number_locator)
 
         @students.setter
@@ -728,9 +726,7 @@ class Signup(AccountsBase):
 
         def select_subjects(self, subject_list):
             """Mark each interested subject."""
-            print(subject_list)
             for subject in self.subjects:
-                print(subject, subject.title, subject.title in subject_list)
                 if subject.title in subject_list:
                     subject.select()
             return self

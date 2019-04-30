@@ -3,7 +3,9 @@
 from time import sleep
 
 from pypom import Region
+from selenium.common.exceptions import ElementNotInteractableException  # NOQA
 from selenium.common.exceptions import NoSuchElementException  # NOQA
+from selenium.common.exceptions import StaleElementReferenceException  # NOQA
 from selenium.common.exceptions import WebDriverException  # NOQA
 from selenium.webdriver.common.by import By
 
@@ -45,9 +47,9 @@ class Adoption(WebBase):
         locator = link if link else self._interest_form_link_locator
         from pages.web.interest import Interest
         destination = Interest if not link else Adoption
-        self.wait.until(
-            lambda _: self.find_element(*locator)
-        ).click()
+        link = self.wait.until(
+            lambda _: self.find_element(*locator))
+        Utility.click_option(self.driver, element=link)
         sleep(1.0)
         return go_to_(destination(driver=self.driver, base_url=self.base_url))
 
@@ -93,6 +95,7 @@ class Adoption(WebBase):
         self.form.phone = phone
         self.form.school = school
         self.form.next()
+        sleep(1)
         user_errors = self.form.get_user_errors
         assert(not user_errors), \
             'User errors: {issues}'.format(issues=user_errors)
@@ -101,11 +104,14 @@ class Adoption(WebBase):
                 Utility.is_image_visible(self.driver,
                                          locator=self._image_locator) and
                 self.find_element(*self._book_selection_locator))
-        Utility.scroll_to(self.driver, self._book_selection_locator)
+        Utility.scroll_to(self.driver, self._book_selection_locator, shift=-80)
+        sleep(0.25)
         self.form.select_books(books)
         sleep(0.5)
         self.form.set_using(books)
+        sleep(0.5)
         self.form.next()
+        sleep(1)
         book_error = self.form.get_book_error
         assert(not book_error), \
             'Book error - {book}'.format(book=book_error)
@@ -113,7 +119,7 @@ class Adoption(WebBase):
         assert(not using_errors), \
             'Using error - {using}'.format(using=using_errors)
         self.form.select_tech(tech_providers)
-        if TechProviders.OTHER in tech_providers:
+        if tech_providers and TechProviders.OTHER in tech_providers:
             self.form.other = other_provider
         self.form.submit()
         return go_to_(AdoptionConfirmation(self.driver, self.base_url))
@@ -185,12 +191,22 @@ class Adoption(WebBase):
 
         def select(self, user_type):
             """Select a user type from the user drop down menu."""
-            self.find_element(*self._user_select_locator).click()
             sleep(0.25)
-            result = [option for option in self.options
-                      if option.get_attribute('data-value') == user_type][0]
-            Utility.scroll_to(self.driver, element=result, shift=-80)
-            result.click()
+            Utility.click_option(self.driver,
+                                 locator=self._user_select_locator)
+            for _ in range(60):
+                try:
+                    select = self.find_element(*self._user_select_locator)
+                    if 'open' not in select.get_attribute('class'):
+                        break
+                except StaleElementReferenceException:
+                    sleep(1)
+                    select = self.find_element(*self._user_select_locator)
+                sleep(0.5)
+                for option in self.options:
+                    if option.get_attribute('textContent') == user_type:
+                        option.click()
+            sleep(0.5)
             return self
 
         @property
@@ -221,7 +237,7 @@ class Adoption(WebBase):
         @first_name.setter
         def first_name(self, name):
             """Type the first name."""
-            self.first_name.send_keys(name)
+            self._setter_helper(self.first_name, name)
 
         @property
         def last_name(self):
@@ -231,7 +247,7 @@ class Adoption(WebBase):
         @last_name.setter
         def last_name(self, name):
             """Type the last name."""
-            self.last_name.send_keys(name)
+            self._setter_helper(self.last_name, name)
 
         @property
         def email(self):
@@ -241,7 +257,7 @@ class Adoption(WebBase):
         @email.setter
         def email(self, email):
             """Type the email."""
-            self.email.send_keys(email)
+            self._setter_helper(self.email, email)
 
         @property
         def phone(self):
@@ -251,7 +267,7 @@ class Adoption(WebBase):
         @phone.setter
         def phone(self, phone_number):
             """Type the phone number."""
-            self.phone.send_keys(phone_number)
+            self._setter_helper(self.phone, phone_number)
 
         @property
         def school(self):
@@ -261,7 +277,25 @@ class Adoption(WebBase):
         @school.setter
         def school(self, school_name):
             """Type the school name."""
-            self.school.send_keys(school_name)
+            self._setter_helper(self.school, school_name)
+
+        def _setter_helper(self, field, value):
+            r"""Set an input text field value.
+
+            :param field: the input box to fill out
+            :param str value: the value to send to the input field
+            :type field: \
+                :py:class:`~selenium.webdriver.remote.webelement.WebElement`
+            :return: None
+
+            """
+            sleep(0.25)
+            for _ in range(20):
+                try:
+                    field.send_keys(value)
+                    return
+                except ElementNotInteractableException:
+                    sleep(1)
 
         @property
         def school_suggestions(self):
@@ -277,11 +311,16 @@ class Adoption(WebBase):
         def get_user_errors(self):
             """Return the error messages."""
             errors = {}
-            first = self.find_element(*self._first_name_error_locator).text
-            last = self.find_element(*self._last_name_error_locator).text
-            email = self.find_element(*self._email_error_locator).text
-            phone = self.find_element(*self._phone_error_locator).text
-            school = self.find_element(*self._school_error_locator).text
+            first = (self.find_element(*self._first_name_error_locator)
+                     .get_attribute('textContent'))
+            last = (self.find_element(*self._last_name_error_locator)
+                    .get_attribute('textContent'))
+            email = (self.find_element(*self._email_error_locator)
+                     .get_attribute('textContent'))
+            phone = (self.find_element(*self._phone_error_locator)
+                     .get_attribute('textContent'))
+            school = (self.find_element(*self._school_error_locator)
+                      .get_attribute('textContent'))
             if first:
                 errors['first_name'] = first
             if last:
@@ -306,7 +345,6 @@ class Adoption(WebBase):
                             self.find_elements(*self._book_checkbox_locator))
             for book in self.books:
                 if book.title in book_list and not book.checked:
-                    print(book)
                     book.select()
                     sleep(0.25)
             return self
@@ -328,15 +366,15 @@ class Adoption(WebBase):
         def set_using(self, book_list):
             """Select the status and student count for each book."""
             for book in self.usage:
-                Utility.scroll_to(self.driver,
-                                  element=book.root,
-                                  shift=-80)
+                Utility.scroll_to(self.driver, element=book.root, shift=-100)
                 if book.title in book_list:
+                    sleep(0.25)
                     status = book_list.get(book.title).get('status')
                     if Web.ADOPTED in status:
                         book.adopted()
                     elif Web.RECOMMENDED in status:
                         book.recommend()
+                    sleep(0.25)
                     book.students = book_list.get(book.title).get('students')
             return self
 
@@ -389,7 +427,7 @@ class Adoption(WebBase):
             """Click the Next button."""
             button = self.find_element(*self._next_button_locator)
             Utility.scroll_to(self.driver, element=button, shift=-80)
-            button.click()
+            Utility.click_option(self.driver, element=button)
             sleep(1.0)
             return self
 
@@ -397,7 +435,7 @@ class Adoption(WebBase):
             """Click the Back button."""
             button = self.find_element(*self._back_button_locator)
             Utility.scroll_to(self.driver, element=button, shift=-80)
-            button.click()
+            Utility.click_option(self.driver, element=button)
             sleep(1.0)
             return self
 
@@ -405,7 +443,7 @@ class Adoption(WebBase):
             """Click the Submit form button."""
             button = self.find_element(*self._submit_button_locator)
             Utility.scroll_to(self.driver, element=button, shift=-80)
-            button.click()
+            Utility.click_option(self.driver, element=button)
             sleep(1.0)
             return self
 
@@ -495,24 +533,21 @@ class Adoption(WebBase):
 
             def adopted(self):
                 """Select the 'Fully adopted' option."""
-                Utility.safari_exception_click(
-                    self.driver,
-                    element=self.find_element(*self._adopted_locator))
+                radio = self.find_element(*self._adopted_locator)
+                Utility.click_option(self.driver, element=radio)
                 return self.page
 
             def recommend(self):
                 """Select the 'Recommending the book' option."""
-                Utility.safari_exception_click(
-                    self.driver,
-                    element=self.find_element(*self._recommended_locator))
+                radio = self.find_element(*self._recommended_locator)
+                Utility.click_option(self.driver, element=radio)
                 return self.page
 
             @property
             def using_error(self):
                 """Return the error message, if any, on the radio fields."""
                 try:
-                    return (self.find_element(*self._radio_error_locator)
-                            .text)
+                    return self.find_element(*self._radio_error_locator).text
                 except NoSuchElementException:
                     return ''
 
@@ -524,7 +559,13 @@ class Adoption(WebBase):
             @students.setter
             def students(self, number):
                 """Set the number of students using the selected book."""
-                self.find_element(*self._students_locator).send_keys(number)
+                sleep(0.25)
+                for _ in range(20):
+                    try:
+                        self.students.send_keys(number)
+                        return
+                    except ElementNotInteractableException:
+                        sleep(1)
 
             @property
             def students_error(self):

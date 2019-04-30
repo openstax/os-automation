@@ -26,7 +26,8 @@ class WebBase(Page):
     @property
     def loaded(self):
         """Return True when the page-loaded class is added to the body tag."""
-        return self.find_element(*self._root_locator).is_displayed()
+        return (self.find_element(*self._root_locator).is_displayed() and
+                self.web_nav.loaded)
 
     def open(self):
         """Open the page."""
