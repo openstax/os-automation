@@ -3,12 +3,15 @@
 from time import sleep
 
 from pypom import Region
+from selenium.common.exceptions import NoSuchElementException
 from selenium.webdriver.common.by import By
 
 from pages.tutor.base import TutorBase
 from utils.tutor import TutorException
 from utils.utilities import Utility
 
+# a javascript query to get the modal and tooltip root that is a neighbor of
+# the React root element
 GET_ROOT = 'return document.querySelector("[role={0}]");'
 
 
@@ -242,12 +245,6 @@ class AddSection(Modal):
     def section_name(self, section_name):
         """Type the section name in the box.
 
-        .. note::
-
-           If the section_name matches an existing section (case-sensitive), an
-           HTML 422 error will be thrown by Tutor; server errors are not
-           handled by the automation code.
-
         :param str section_name: the new section name
         :return: the Add Section modal
         :rtype: :py:class:`AddSection`
@@ -258,6 +255,12 @@ class AddSection(Modal):
 
     def add(self):
         """Click the 'Add' button.
+
+        .. note::
+
+           If the section_name matches an existing section (case-sensitive), an
+           HTML 422 error will be thrown by Tutor; server errors are not
+           handled by the automation code.
 
         :return: the course roster with the new section displayed in the
             available tabs
@@ -456,24 +459,19 @@ class CourseRoster(TutorBase):
         class Teacher(User):
             """An instructor row with actions."""
 
-            def remove(self):
-                """Click the 'Remove' button.
-
-                :return: the remove instructor tooltip
-                :rtype: :py:class:`RemoveInstructor`
-
-                """
-                return self._remove_user(student=False, return_tooltip=True)
-
-            def remove_instructor(self):
+            def remove(self, remove_instructor=True):
                 """Remove this instructor from the course.
 
-                :return: the course roster
-                :rtype: :py:class:`CourseRoster`
+                :return: the course roster if remove_instructor is ``True``
+                    else the remove instructor tooltip
+                :rtype: :py:class:`CourseRoster` or
+                    :py:class:`RemoveInstructor`
 
                 """
-                self._remove_user(student=False)
-                return self.page.page
+                if remove_instructor:
+                    self._remove_user(student=False)
+                    return self.page.page
+                return self._remove_user(student=False, return_tooltip=True)
 
     class Roster(Region):
         """The student roster tables."""
@@ -486,17 +484,294 @@ class CourseRoster(TutorBase):
         _dropped_student_row_locator = (
             By.CSS_SELECTOR, '.dropped-students tbody tr')
 
+        @property
+        def sections(self):
+            """Return the list of available course sections or periods.
+
+            :return: the list of course section tabs
+            :rtype: list(:py:class:`~CourseRoster.Roster.Section`)
+
+            """
+            return [self.Section(self, tab)
+                    for tab in self.find_elements(*self._section_tab_locator)]
+
+        def select_section(self, name=None, position=1):
+            """Select a section or period tab by name or position.
+
+            .. note::
+
+               section/period names are case sensitive (e.g. '1st' and '1ST'
+               can occur in the same course)
+
+            :param str name: (optional) the section or period name to select
+            :param int position: (optional) the position of the section or
+                period tab to select from 1 to the number of tabs
+            :return: the course roster displaying the selected course section
+                roster
+            :rtype: :py:class:`CourseRoster`
+            :raises :py:class:`~utils.tutor.TutorException`: if the name does
+                not match an existing tab name or if the position is not
+                between 1 and number of active tabs
+
+            """
+            if name:
+                section_found = False
+                for section in self.sections:
+                    if section.name == name:
+                        section_found = True
+                        section.select()
+                if not section_found:
+                    raise TutorException(
+                        '"{name}" does not match any active section'
+                        .format(name=name))
+            else:
+                maximum = len(self.sections)
+                if position < 1 or position > maximum:
+                    raise TutorException(
+                        "position {pos} is not between 1 and {max}"
+                        .format(position, maximum))
+                self.sections[position - 1].select()
+            sleep(0.5)
+            return self.page
+
+        def add_section(self, name=None):
+            """Add a new section or period to the course.
+
+            .. note::
+
+               If the name matches an existing section (case-sensitive), an
+               HTML 422 error will be thrown by Tutor; server errors are not
+               handled by the automation code.
+
+            If name is not provided, open and return the Add Section modal. If
+            it is provided, add the new section or period to the course and
+            return the course roster.
+
+            :param str name: (optional) the section or period name
+            :return: the Add Section modal if name is not provided or the
+                course roster if name is provided
+            :rtype: :py:class:`AddSection` or :py:class:`CourseRoster`
+
+            """
+            link = self.find_element(*self._add_section_link_locator)
+            Utility.click_option(self.driver, element=link)
+            sleep(0.5)
+            dialog_root = self.driver.execute_script(GET_ROOT.format('dialog'))
+            modal = AddSection(self.page, dialog_root)
+            if not name:
+                return modal
+            modal.section_name = name
+            return modal.add()
+
+        def rename_section(self, name=None):
+            """Rename a current course section or period.
+
+            .. note::
+
+               If the name matches an existing section (case-sensitive), an
+               HTML 422 error will be thrown by Tutor; server errors are not
+               handled by the automation code.
+
+            If name is not provided, open and return the Rename Section modal.
+            If it is provided, rename the current section or period and return
+            the course roster.
+
+            :param str name: (optional) the section or period name
+            :return: the Rename Section modal if name is not provided or the
+                course roster if name is provided
+            :rtype: :py:class:`RenameSection` or :py:class:`CourseRoster`
+
+            """
+            link = self.find_element(*self._rename_section_link_locator)
+            Utility.click_option(self.driver, element=link)
+            sleep(0.5)
+            dialog_root = self.driver.execute_script(GET_ROOT.format('dialog'))
+            modal = RenameSection(self.page, dialog_root)
+            if not name:
+                return modal
+            Utility.clear_field(self.driver, field=modal.section_name)
+            modal.section_name = name
+            return modal.rename()
+
+        def delete_section(self, delete=True):
+            """Delete the current section or period.
+
+            :param bool delete: (optional) if ``True``, delete the current
+                section or period; if ``False`` open and return the Delete
+                Section modal
+            :return: the Delete Section modal if delete is ``False`` or the
+                course roster if delete is ``True``
+            :rtype: :py:class:`DeleteSection` or :py:class:`CourseRoster`
+
+            """
+            link = self.find_element(*self._delete_section_link_locator)
+            Utility.click_option(self.driver, element=link)
+            sleep(0.5)
+            dialog_root = self.driver.execute_script(GET_ROOT.format('dialog'))
+            modal = DeleteSection(self.page, dialog_root)
+            return modal.delete() if delete else modal
+
+        @property
+        def students(self):
+            """Access the student rows.
+
+            :return: the list of students in the current section or period
+            :rtype: list(:py:class:`~CourseRoster.Roster.Student`)
+
+            """
+            return [self.Student(self, row)
+                    for row
+                    in self.find_elements(*self._student_row_locator)]
+
+        @property
+        def dropped_students(self):
+            """Access the dropped student rows.
+
+            :return: the list of dropped students
+            :rtype: list(:py:class:`~CourseRoster.Roster.Student`)
+
+            """
+            return [self.Student(self, row)
+                    for row
+                    in self.find_elements(*self._dropped_student_row_locator)]
+
         class Section(Region):
             """A section or period tab."""
 
             _section_name_locator = (By.CSS_SELECTOR, 'h2')
+            _section_select_locator = (By.CSS_SELECTOR, 'a')
+
+            @property
+            def name(self):
+                """Return the section or period name.
+
+                :return: the section or period name
+                :rtype: str
+
+                """
+                return self.find_element(*self._section_name_locator).text
+
+            @property
+            def is_active(self):
+                """Return True if the section is currently displayed.
+
+                :return: ``True`` if the section is displayed else ``False``
+                :rtype: bool
+
+                """
+                return self.root.get_attribute('aria-selected') == 'true'
+
+            def select(self):
+                """Click on the section or period tab.
+
+                Click on the section or period tab to display that section's
+                active students.
+
+                :return: the course roster with the selected section active
+                :rtype: :py:class:`CourseRoster`
+
+                """
+                button = self.find_element(*self._section_select_locator)
+                Utility.click_option(self.driver, element=button)
+                sleep(0.5)
+                return self.page.page
 
         class Student(User):
             """A student row with actions."""
 
             _student_id_locator = (By.CSS_SELECTOR, '.identifier')
+            _student_id_input_box_locator = (
+                By.CSS_SELECTOR, '.student-id input')
             _edit_student_id_locator = (By.CSS_SELECTOR, '.student-id a')
             _change_section_link_locator = (
                 By.XPATH, '//a[*[@data-icon="clock"]]')
             _readd_student_link_locator = (
                 By.XPATH, '//a[*[@data-icon="user-plus"]]')
+
+            @property
+            def student_id(self):
+                """Return the student's identification number.
+
+                :return: the student ID number
+                :rtype: str
+
+                """
+                try:
+                    return self.find_element(*self._student_id_locator).text
+                except NoSuchElementException:
+                    return (self.find_element(
+                        *self._student_id_input_box_locator)
+                        .get_attribute('value'))
+
+            @student_id.setter
+            def student_id(self, _id=None):
+                """Set the student's identification number.
+
+                :param str _id: (optional) the student's new ID number; if _id
+                    is '' or None, the field will be cleared
+                :return: the course roster
+                :rtype: :py:class:`CourseRoster`
+
+                """
+                from selenium.webdriver.common.keys import Keys
+                edit_button = self.find_element(*self._edit_student_id_locator)
+                Utility.click_option(self.driver, element=edit_button)
+                sleep(0.25)
+                id_field = self.find_element(
+                    *self._student_id_input_box_locator)
+                Utility.clear_field(self.driver, id_field)
+                if _id:
+                    id_field.send_keys(_id)
+                id_field.send_keys(Keys.TAB)
+                return self.page.page
+
+            def change_section(self, section=None):
+                """Move the student to a new section.
+
+                :param str section: (optional) the student's new section or
+                    period
+                :return: the change section tooltip if section is not provided
+                    else the course roster
+                :rtype: :py:class:`ChangeSection` or :py:class:`CourseRoster`
+                :raises :py:class:`~utils.tutor.TutorException`: if no section
+                    or period matches the requested section
+
+                """
+                change_button = self.find_element(
+                    *self._change_section_link_locator)
+                Utility.click_option(self.driver, element=change_button)
+                tooltip_root = self.driver.execute_script(
+                    GET_ROOT.format('tooltip'))
+                tooltip = ChangeSection(self.page.page, tooltip_root)
+                return tooltip.switch_to(section) if section else tooltip
+
+            def drop(self, drop_student=True):
+                """Click the 'Drop' button.
+
+                :return: the course roster if drop_student is ``True``,
+                    otherwise the drop student tooltip
+                :rtype: :py:class:`DropStudent` or :py:class:`CourseRoster`
+
+                """
+                if not drop_student:
+                    return self._remove_user(return_tooltip=True)
+                self._remove_user()
+                return self.page.page
+
+            def add_back_to_active_roster(self, return_tooltip=False):
+                """Re-add the dropped student to the active roster.
+
+                :param bool return_tooltip: (optional) return the re-add
+                    tooltip instead of re-adding the student
+                :return: the add back tooltip if return_tooltip is ``True``
+                    else the course roster
+                :rtype: :py:class:`ReAddStudent` or :py:class:`CourseRoster`
+
+                """
+                readd_button = self.find_element(
+                    *self._readd_student_link_locator)
+                Utility.click_option(self.driver, element=readd_button)
+                tooltip_root = self.driver.execute_script(
+                    GET_ROOT.format('tooltip'))
+                tooltip = ReAddStudent(self.page.page, tooltip_root)
+                return tooltip.restore() if not return_tooltip else tooltip
