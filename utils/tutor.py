@@ -15,6 +15,24 @@ class Tutor(object):
     IN_TERM = 'in-term'
     TODAY = 'today'
 
+    # Course Settings
+
+    STUDENT_ACCESS = 0
+    DATES_AND_TIME = 1
+
+    START_DATE = 1
+    END_DATE = 3
+
+    ALASKA = 'Alaska'
+    ARIZONA = 'Arizona'
+    ATLANTIC = 'Atlantic Time (Canada)'
+    CENTRAL_TIME = 'Central Time (US & Canada)'
+    EASTERN_TIME = 'Eastern Time (US & Canada)'
+    HAWAII = 'Hawaii'
+    INDIANA = 'Indiana (East)'
+    MOUNTAIN_TIME = 'Mountain Time (US & Canada)'
+    PACIFIC_TIME = 'Pacific Time (US & Canada)'
+
     # Course Page
 
     EMAIL = 'email'
