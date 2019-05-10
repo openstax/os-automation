@@ -948,7 +948,7 @@ class External(Assignment):
         errors = super().errors()
         url = self.find_elements(*self._assignment_url_required_locator)
         if url and self.driver.execute_script(DISPLAYED, url[0]):
-            errors.append('Name: {0}'.format(url[0].text))
+            errors.append('URL: {0}'.format(url[0].text))
         return errors
 
 
@@ -958,6 +958,91 @@ class Homework(Assignment):
 
 class Reading(Assignment):
     """A reading assignment creation or modification."""
+
+    _selected_reading_list_locator = (
+        By.CSS_SELECTOR, '.selected-reading-list .selected-section')
+    _readings_required_locator = (By.CSS_SELECTOR, '.readings-required')
+    _add_readings_button_locator = (
+        By.CSS_SELECTOR, '#reading-select')
+    _reading_plan_root_locator = (
+        By.CSS_SELECTOR, '.reading-plan-select-topics')
+    _see_questions_tooltip_locator = (
+        By.CSS_SELECTOR, '#reading-select ~ button')
+    _what_do_students_see_button_locator = (By.CSS_SELECTOR, '.preview-btn')
+
+    @property
+    def reading_list(self):
+        """Access the selected readings list.
+
+        :return: a list of reading sections for the assignment
+        :rtype: list(:py:class:`~Reading.ReadingSelection`)
+
+        """
+        return [self.ReadingSelection(self, item)
+                for item
+                in self.find_elements(*self._selected_reading_list_locator)]
+
+    def add_readings(self):
+        """Click on the 'Add Readings' button.
+
+        :return: the section selector
+        :rtype: :py:class:`SectionSelector`
+
+        """
+        button = self.find_element(*self._add_readings_button_locator)
+        Utility.click_option(self.driver, element=button)
+        sleep(1)
+        selector_root = self.find_element(*self._reading_plan_root_locator)
+        return SectionSelector(self, selector_root)
+
+    @property
+    def readings_error(self):
+        """Return the readings required error message.
+
+        :return: the readings required field error text
+        :rtype: str
+
+        """
+        return self.find_element(*self._readings_required_locator).text
+
+    @property
+    def errors(self):
+        """Return any error messages.
+
+        :return: a list of error messages
+        :rtype: list(str)
+
+        """
+        errors = super().errors()
+        url = self.find_elements(*self._readings_required_locator)
+        if url and self.driver.execute_script(DISPLAYED, url[0]):
+            errors.append('Readings: {0}'.format(url[0].text))
+        return errors
+
+    def why_cant_i_see_the_questions(self):
+        """Click on the 'see the questions' FAQ question link.
+
+        :return: the reading question FAQ tooltip
+        :rtype: :py:class:`ReadingQuestionTooltip`
+
+        """
+        link = self.find_element(*self._see_questions_tooltip_locator)
+        Utility.click_option(self.driver, element=link)
+        sleep(0.25)
+        tooltip_root = self.driver.execute_script(GET_ROOT.format('tooltip'))
+        return ReadingQuestionTooltip(self, tooltip_root)
+
+    def what_do_students_see(self):
+        """Click the 'What do students see?' button.
+
+        :return: the student preview video pop up
+        :rtype: :py:class:`~pages.tutor.preview.StudentPreview`
+
+        """
+        button = self.find_element(*self._what_do_students_see_button_locator)
+        Utility.switch_to(self.driver, element=button)
+        from pages.tutor.preview import StudentPreview
+        return StudentPreview(self.driver)
 
     class ReadingSelection(Region):
         """The reading order list."""
