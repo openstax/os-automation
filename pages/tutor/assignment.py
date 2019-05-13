@@ -18,10 +18,16 @@ from pages.tutor.base import TutorBase
 from utils.tutor import TutorException
 from utils.utilities import Utility, go_to_
 
-# return True if the error message is displayed
+# -------------------------------------------------------- #
+# Javascript page requests
+# -------------------------------------------------------- #
+
+# return True if the field error message is displayed
 DISPLAYED = 'return getComputedStyle(arguments[0]).display != none;'
 # get the modal and tooltip root that is a neighbor of the React root element
 GET_ROOT = 'return document.querySelector("[role={0}]");'
+# wait until the loading animation (bouncing books) is gone
+ANIMATION = 'return document.querySelector(".loading-animation");'
 
 
 # -------------------------------------------------------- #
@@ -32,6 +38,16 @@ class ButtonTooltip(Region):
     """The card button explanation tooltip."""
 
     _explanation_locator = (By.CSS_SELECTOR, 'p')
+
+    @property
+    def root(self):
+        """Locate the tooltip trunk.
+
+        :return: the root element for a tooltip
+        :rtype: :py:class:`~selenium.webdriver.remote.webelement.WebElement`
+
+        """
+        return self.driver.execute_script(GET_ROOT.format('tooltip'))
 
     @property
     def description(self):
@@ -115,6 +131,12 @@ class CancelConfirm(Region):
 
 class ReadingQuestionTooltip(ButtonTooltip):
     """The reading questions informational tooltip."""
+
+    pass
+
+
+class HomeworkTutorSelectionsTooltip(ButtonTooltip):
+    """The 'What are these?' Tutor selections tooltip."""
 
     pass
 
@@ -371,6 +393,20 @@ class SectionSelector(Region):
     _add_readings_button_locator = (By.CSS_SELECTOR, '.show-problems')
     _cancel_button_locator = (By.CSS_SELECTOR, '.btn-default')
 
+    _exercise_selection_selector = '.homework-builder-view'
+
+    @property
+    def loaded(self):
+        """Wait until the loading animation is done.
+
+        :return: ``True`` when the loading animation is not found, otherwise
+            ``False``
+        :rtype: bool
+
+        """
+        sleep(0.25)
+        return self.execute_script(ANIMATION) is None
+
     @property
     def title(self):
         """Return the card heading.
@@ -405,17 +441,25 @@ class SectionSelector(Region):
                 for chapter in self.find_elements(*self._chapter_locator)]
 
     def add_readings(self):
-        """Click the 'Add Readings' button.
+        """Click the 'Add Readings' / 'Show Problems' button.
 
         :return: the assignment creation wizard with the new readings added to
-            the assignment
-        :rtype: :py:class:`Assignment`
+            the assignment or the exercise selector for homeworks
+        :rtype: :py:class:`Assignment` or :py:class:`ExerciseSelector`
 
         """
         button = self.find_element(*self._add_readings_button_locator)
+        destination = button.text
         Utility.click_option(self.driver, element=button)
         sleep(0.5)
-        return self.page
+        if 'Reading' in destination:
+            return self.page
+        selector_root = self.driver.execute_script(
+            'return document.querySelector("{0}");'
+            .format(self._exercise_selection_selector))
+        return ExerciseSelector(self, selector_root)
+
+    show_problems = add_readings
 
     def cancel(self):
         """Click the 'Cancel' button and return to the assignment wizard.
@@ -591,6 +635,433 @@ class SectionSelector(Region):
 
                 """
                 return self.find_element(*self._section_title_locator).text
+
+
+class ExerciseSelector(Region):
+    """A section-grouped exercise selector and display."""
+
+
+class ExerciseTableReview(Region):
+    """The exercise selection review."""
+
+    _total_problems_locator = (By.CSS_SELECTOR, '.total h2')
+    _my_selections_locator = (By.CSS_SELECTOR, '.mine h2')
+    _tutor_selections_locator = (By.CSS_SELECTOR, '.tutor-selections h2')
+    _fewer_tutor_selections_locator = (
+        By.CSS_SELECTOR, '.ox-icon-chevron-down')
+    _more_tutor_selections_locator = (
+        By.CSS_SELECTOR, '.ox-icon-chevron-up')
+    _what_are_these_link_locator = (
+        By.CSS_SELECTOR, '#homework-selections-trigger')
+    _add_more_sections_button_locator = (By.CSS_SELECTOR, '.add-sections')
+    _question_overview_locator = (By.CSS_SELECTOR, '.exercise-table tbody tr')
+    _assessment_card_locator = (By.CSS_SELECTOR, '.exercise-wrapper')
+
+    @property
+    def loaded(self):
+        """Wait until the loading animation is done.
+
+        :return: ``True`` when the loading animation is not found, otherwise
+            ``False``
+        :rtype: bool
+
+        """
+        sleep(0.25)
+        return self.execute_script(ANIMATION) is None
+
+    @property
+    def total_problems(self):
+        """Return the total number of assignment problems selected.
+
+        :return: the number of user-selected assessments plus the number of
+            Tutor-selected assessments
+        :rtype: int
+
+        """
+        return int(self.find_element(*self._total_problems_locator).text)
+
+    @property
+    def my_selections(self):
+        """Return the number of user-selected assessments.
+
+        :return: the number of user-selected assessments
+        :rtype: int
+
+        """
+        return int(self.find_element(*self._my_selections_locator).text)
+
+    @property
+    def tutor_selections(self):
+        """Return the number of Tutor-selected assessments.
+
+        :return: the number of Tutor-selected assessments
+        :rtype: int
+
+        """
+        return int(self.find_element(*self._tutor_selections_locator).text)
+
+    def fewer_tutor_selections(self):
+        """Click the down arrow to reduce the number of Tutor selections.
+
+        :return: the assessment review table
+        :rtype: :py:class:`ExerciseReviewTable`
+
+        """
+        try:
+            arrow_down = self.find_element(
+                *self._fewer_tutor_selections_locator)
+        except NoSuchElementException:
+            raise TutorException(
+                "Cannot have fewer than zero (0) Tutor-selected assessments")
+        Utility.click_option(self.driver, element=arrow_down)
+        sleep(0.25)
+        return self
+
+    def more_tutor_selections(self):
+        """Click the up arrow to increase the number of Tutor selections.
+
+        :return: the assessment review table
+        :rtype: :py:class:`ExerciseReviewTable`
+
+        """
+        try:
+            arrow_up = self.find_element(
+                *self._more_tutor_selections_locator)
+        except NoSuchElementException:
+            raise TutorException(
+                "Cannot have more than four (4) Tutor-selected assessments")
+        Utility.click_option(self.driver, element=arrow_up)
+        sleep(0.25)
+        return self
+
+    def what_are_these(self):
+        """Click the 'What are these?' link.
+
+        :return: the homework Tutor selections explanation tooltip
+        :rtype: :py:class:`HomeworkTutorSelectionsTooltip`
+
+        """
+        link = self.find_element(*self._what_are_these_link_locator)
+        Utility.click_option(self.driver, element=link)
+        sleep(0.25)
+        return HomeworkTutorSelectionsTooltip(self)
+
+    def add_more_sections(self):
+        """Click the '+ Add More Sections' button.
+
+        :return: the homework section selector
+        :rtype: :py:class:`SectionSelector`
+
+        """
+        button = self.find_element(*self._add_more_sections_button_locator)
+        Utility.click_option(self.driver, element=button)
+        sleep(0.25)
+        return SectionSelector(self.page)
+
+    @property
+    def problem_questions(self):
+        """Access the Problem Questions assessment overview table.
+
+        :return: the overview table row data
+        :rtype: list(:py:class:`~ExerciseTableReview.OverviewRow`)
+
+        """
+        return [self.OverviewRow(self, row)
+                for row
+                in self.find_elements(*self._question_overview_locator)]
+
+    @property
+    def cards(self):
+        """Access the assessment cards in the assignment review.
+
+        :return: the assessment cards
+        :rtype: list(:py:class:`~ExerciseTableReview.Assessment`)
+
+        """
+        return [self.Assessment(self, card)
+                for card
+                in self.find_elements(*self._assessment_card_locator)]
+
+    class OverviewRow(Region):
+        """An exercise table assessment overview row."""
+
+        _position_column_locator = (By.CSS_SELECTOR, 'td:nth-child(1)')
+        _section_column_locator = (By.CSS_SELECTOR, 'td:nth-child(2)')
+        _assessment_column_locator = (By.CSS_SELECTOR, 'td:nth-child(3)')
+        _lo_column_locator = (By.CSS_SELECTOR, 'td:nth-child(4)')
+        _details_column_locator = (By.CSS_SELECTOR, 'td:nth-child(5)')
+
+        @property
+        def position(self):
+            """Return the assessment position within the table.
+
+            :return: the position of the assessment within the review table
+            :rtype: int
+
+            """
+            return int(self.find_element(*self._position_column_locator).text)
+
+        @property
+        def section(self):
+            """Return the book section containing the assessment, if known.
+
+            :return: the book section for known locations, an empty string for
+                unaffiliated assessments, or a '-' for Tutor selections
+            :rtype: str
+
+            """
+            return self.find_element(*self._section_column_locator).text
+
+        @property
+        def question(self):
+            """Return the first question in the assessment.
+
+            :return: the question stem for normal assessments or the first
+                question stem for multipart assessments
+            :rtype: str
+
+            """
+            return (self.find_element(*self._assessment_column_locator)
+                    .get_attribute('textContent'))
+
+        @property
+        def learning_objective(self):
+            """Return the learning objective tag.
+
+            :return: the learning objective tag
+            :rtype: str
+
+            """
+            return self.find_element(*self._lo_column_locator).text
+
+        @property
+        def details(self):
+            """Return the addition detail tags.
+
+            :return: assessment detail tags
+            :rtype: str
+
+            """
+            return self.find_element(*self._details_column_locator).text
+
+    class Assessment(Region):
+        """An exercise review card."""
+
+        _position_locator = (By.CSS_SELECTOR, '.exercise-number')
+        _move_up_arrow_locator = (By.CSS_SELECTOR, '.-move-exercise-up')
+        _move_down_arrow_locator = (By.CSS_SELECTOR, '.-move-exercise-down')
+        _remove_exercise_locator = (By.CSS_SELECTOR, '.-remove-exercise')
+        _multipart_stimulus_locator = (By.CSS_SELECTOR, '.stimulus')
+        _question_locator = (By.CSS_SELECTOR, '.openstax-question')
+        _exercise_tag_locator = (By.CSS_SELECTOR, '.exercise-tag')
+
+        @property
+        def position(self):
+            """Return the position of the assessment in the assignment.
+
+            :return: the position of the assessment within the homework
+                assignment
+            :rtype: int
+
+            """
+            return int(self.find_element(*self._position_locator).text)
+
+        def move_up(self):
+            """Move the selected assessment earlier in the assignment.
+
+            .. note::
+
+               If the assessment is in position 1, the move up arrow is not
+               available.
+
+            :return: the review table
+            :rtype: :py:class:`ExerciseTableReview`
+
+            """
+            try:
+                button = self.find_element(*self._move_up_arrow_locator)
+                Utility.click_option(self.driver, element=button)
+                sleep(0.25)
+            except NoSuchElementException:
+                pass
+            return self.page
+
+        def move_down(self):
+            """Move the selected assessment later in the assignment.
+
+            .. note::
+
+               If the assessment is in the last position, the move down arrow
+               is not available.
+
+            :return: the review table
+            :rtype: :py:class:`ExerciseTableReview`
+
+            """
+            try:
+                button = self.find_element(*self._move_down_arrow_locator)
+                Utility.click_option(self.driver, element=button)
+                sleep(0.25)
+            except NoSuchElementException:
+                pass
+            return self.page
+
+        def remove(self):
+            """Remove the assessment from the assignment.
+
+            :return: the review table
+            :rtype: :py:class:`ExerciseTableReview`
+
+            """
+            button = self.find_element(*self._remove_exercise_locator)
+            Utility.click_option(self.driver, element=button)
+            sleep(0.5)
+            return self.page
+
+        @property
+        def stimulus(self):
+            """Return the introductory stimulus for a multipart question.
+
+            :return: the introductory stimulus if the assessment is a multi-
+                part question, otherwise return an empty string
+            :rtype: str
+
+            """
+            try:
+                return (self.find_element(*self._multipart_stimulus_locator)
+                        .get_attribute('textContent'))
+            except NoSuchElementException:
+                return ''
+
+        @property
+        def question(self):
+            """Access the assessment(s).
+
+            :return: the question or list of questions
+            :rtype: :py:class:`~ExerciseTableReview.Assessment.Question` or
+                list(:py:class:`~ExerciseTableReview.Assessment.Question`)
+
+            """
+            questions = self.find_elements(*self._question_locator)
+            if len(questions) == 1:
+                return self.Question(self, questions[0])
+            return [self.Question(self, question)
+                    for question in questions]
+
+        @property
+        def tags(self):
+            """Return the tag key/value pairs.
+
+            :return: the group of tag key:value pairs
+            :rtype: dict(str, str)
+
+            """
+            tags = {}
+            for tag in self.find_elements(*self._exercise_tag_locator):
+                key, value = tag.split(':', 1)
+                tags[key] = value
+            return tags
+
+        class Question(Region):
+            """An individual question within an assessment item."""
+
+            _question_stem_locator = (By.CSS_SELECTOR, '.question-stem')
+            _exercise_answer_locator = (By.CSS_SELECTOR, '.openstax-answer')
+            _detailed_solution_locator = (By.CSS_SELECTOR, '.solution')
+            _tutor_label_locator = (By.CSS_SELECTOR, '.openstax-answer label')
+
+            @property
+            def stem(self):
+                """Return the exercise question stem.
+
+                :return: the assessment question stem
+                :rtype: str
+
+                """
+                return (self.find_element(*self._question_stem_locator)
+                        .get_attribute('textContent'))
+
+            @property
+            def answers(self):
+                r"""Access the list of answers for the current question.
+
+                :return: the list of answer options for the current assessment
+                :rtype: list(:py:class:`~ExerciseTableReview.OverviewRow \
+                                        .Question.Answer`)
+
+                """
+                return [self.Answer(self, answer)
+                        for answer
+                        in self.find_elements(*self._exercise_answer_locator)]
+
+            @property
+            def detailed_solution(self):
+                """Return the detailed solution.
+
+                :return: the detailed solution, if present
+                :rtype: str
+
+                """
+                return (self.find_element(*self._detailed_solution_locator)
+                        .get_attribute('textContent'))
+
+            @property
+            def tutor_label(self):
+                """Return the Tutor exercise reference number for the question.
+
+                :return: the Tutor exercise reference ID for the question
+                    within this assignment
+                :rtype: str
+
+                """
+                return (self.find_element(*self._tutor_label_locator)
+                        .get_attribute('for')
+                        .split('-')[0])
+
+            class Answer(Region):
+                """An exercise answer."""
+
+                _is_correct_locator = (
+                    By.CSS_SELECTOR, '.correct-incorrect svg')
+                _answer_letter_locator = (By.CSS_SELECTOR, '.answer-letter')
+                _answer_content_locator = (By.CSS_SELECTOR, '.answer-content')
+
+                @property
+                def is_correct(self):
+                    """Return True if the answer is correct.
+
+                    :return: ``True`` if the answer is correct, ``False`` if it
+                        is incorrect
+                    :rtype: bool
+
+                    """
+                    return bool(self.find_elements(*self._is_correct_locator))
+
+                @property
+                def letter(self):
+                    """Return the answer letter.
+
+                    :return: the letter representing the answer
+                    :rtype: str
+
+                    """
+                    return self.find_element(*self._answer_letter_locator).text
+
+                @property
+                def answer(self):
+                    """Return the answer content.
+
+                    .. note::
+
+                       The content may not be clear when the answer includes
+                       LaTeX.
+
+                    :return: the answer text including sub-elements
+                    :rtype: str
+
+                    """
+                    return (self.find_element(*self._answer_content_locator)
+                            .get_attribute('textContent'))
 
 
 # -------------------------------------------------------- #
@@ -955,6 +1426,62 @@ class External(Assignment):
 class Homework(Assignment):
     """A homework assignment creation or modification."""
 
+    _feedback_select_menu_locator = (By.CSS_SELECTOR, '#feedback-select')
+    _select_problems_button_locator = (By.CSS_SELECTOR, '#problem-select')
+    _problems_required_locator = (By.CSS_SELECTOR, '.problems-required')
+    _homework_plan_root_locator = (
+        By.CSS_SELECTOR, '.homework-plan-select-topics')
+    _what_do_students_see_button_locator = (By.CSS_SELECTOR, '.preview-btn')
+
+    def select_problems(self):
+        """Click on the 'Select Problems' button.
+
+        :return: the section selector
+        :rtype: :py:class:`SectionSelector`
+
+        """
+        button = self.find_element(*self._add_readings_button_locator)
+        Utility.click_option(self.driver, element=button)
+        sleep(1)
+        selector_root = self.find_element(*self._reading_plan_root_locator)
+        return SectionSelector(self, selector_root)
+
+    @property
+    def problem_error(self):
+        """Return the questions required error message.
+
+        :return: the questions required field error text
+        :rtype: str
+
+        """
+        return self.find_element(*self._readings_required_locator).text
+
+    @property
+    def errors(self):
+        """Return any error messages.
+
+        :return: a list of error messages
+        :rtype: list(str)
+
+        """
+        errors = super().errors()
+        url = self.find_elements(*self._readings_required_locator)
+        if url and self.driver.execute_script(DISPLAYED, url[0]):
+            errors.append('Readings: {0}'.format(url[0].text))
+        return errors
+
+    def what_do_students_see(self):
+        """Click the 'What do students see?' button.
+
+        :return: the student preview video pop up
+        :rtype: :py:class:`~pages.tutor.preview.StudentPreview`
+
+        """
+        button = self.find_element(*self._what_do_students_see_button_locator)
+        Utility.switch_to(self.driver, element=button)
+        from pages.tutor.preview import StudentPreview
+        return StudentPreview(self.driver)
+
 
 class Reading(Assignment):
     """A reading assignment creation or modification."""
@@ -1029,8 +1556,7 @@ class Reading(Assignment):
         link = self.find_element(*self._see_questions_tooltip_locator)
         Utility.click_option(self.driver, element=link)
         sleep(0.25)
-        tooltip_root = self.driver.execute_script(GET_ROOT.format('tooltip'))
-        return ReadingQuestionTooltip(self, tooltip_root)
+        return ReadingQuestionTooltip(self)
 
     def what_do_students_see(self):
         """Click the 'What do students see?' button.
