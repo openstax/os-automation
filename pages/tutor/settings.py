@@ -217,6 +217,7 @@ class ChangeCourseTimezone(CourseSettingsModal):
             :py:data:`~utils.tutor.Tutor.CENTRAL_TIME`
         :return: the timezone modal
         :rtype: :py:class:`ChangeCourseTimezone`
+
         :raise :py:class:`utils.tutor.TutorException`: if the timezone does not
             match an available option
 

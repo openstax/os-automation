@@ -8,6 +8,7 @@ Add/Edit/Delete Reading
 """
 
 from __future__ import annotations
+
 from time import sleep
 from typing import Dict, List, Union
 
