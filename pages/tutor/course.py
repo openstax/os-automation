@@ -338,6 +338,7 @@ class StudentCourse(TutorBase):
 
                 :return: the assignment type
                 :rtype: str
+
                 :raises :py:class:`~utils.tutor.TutorException`: if a known
                     assignment type is not found within the assignment class
 
@@ -570,6 +571,7 @@ class StudentCourse(TutorBase):
 
             :return: the list of sections in the recent forecast
             :rtype: list(:py:class:`~StudentCourse.Performance.Section`)
+
             :raises :py:class:`~utils.tutor.TutorException`: if the recent
                 topics forecast is empty
 

@@ -4,7 +4,7 @@ from pypom import Region
 from selenium.webdriver.common.by import By
 
 from pages.tutor.base import TutorLoginBase
-from pages.utils import go_to_
+from utils.utilities import go_to_
 
 
 class Policies(TutorLoginBase):

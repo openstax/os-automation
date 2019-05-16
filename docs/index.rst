@@ -28,3 +28,4 @@ Contents
    local_dev
    run_tests
    cheatsheet
+   pages/pages

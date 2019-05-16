@@ -167,6 +167,7 @@ class PerformanceForecast(TutorBase):
 
         :return: the performance forecast for the requested section or period
         :rtype: :py:class:`PerformanceForecast`
+
         :raises :py:class:`utils.tutor.TutorException`: if the name doesn't
             match an available course section
 
@@ -195,6 +196,7 @@ class PerformanceForecast(TutorBase):
 
         :return: the forecast panels
         :rtype: :py:class:`~PerformanceForecast.Guide`
+
         :raise :py:class:`~utils.tutor.TutorException`: if the guide is not
             found
 

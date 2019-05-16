@@ -510,11 +510,12 @@ class Calendar(TutorBase):
                 :param str assignment_type: the type of assignment to add
                 :return: an assignment creation page
                 :rtype: :py:class:`~pages.tutor.assignment.AddExternal` or
-                    :py:class:`~pages.tutor.assignment.AddEvent` or
-                    :py:class:`~pages.tutor.assignment.AddHomework` or
-                    :py:class:`~pages.tutor.assignment.AddReading`
+                        :py:class:`~pages.tutor.assignment.AddEvent` or
+                        :py:class:`~pages.tutor.assignment.AddHomework` or
+                        :py:class:`~pages.tutor.assignment.AddReading`
+
                 :raises :py:class:`~utils.tutor.TutorException`: if the
-                    assignment_type does not match a known assignment type
+                        assignment_type does not match a known assignment type
 
                 """
                 label = self.find_element(*self._date_label_locator)
@@ -698,16 +699,17 @@ class Calendar(TutorBase):
                 def edit_draft(self):
                     """Edit the selected assignment.
 
-                    :param str assignment_type: the type of assignment to add
                     :return: an assignment creation page if the assignment is
-                        a saved draft else None
+                             a saved draft else None
                     :rtype: :py:class:`~pages.tutor.assignment.AddExternal` or
-                        :py:class:`~pages.tutor.assignment.AddEvent` or
-                        :py:class:`~pages.tutor.assignment.AddHomework` or
-                        :py:class:`~pages.tutor.assignment.AddReading` or
-                        NoneType
+                            :py:class:`~pages.tutor.assignment.AddEvent` or
+                            :py:class:`~pages.tutor.assignment.AddHomework` or
+                            :py:class:`~pages.tutor.assignment.AddReading` or
+                            NoneType
+
                     :raises :py:class:`~utils.tutor.TutorException`: if the
-                        assignment_type does not match a known assignment type
+                            assignment type does not match a known assignment
+                            type
 
                     """
                     if self.is_draft:

@@ -151,6 +151,7 @@ class Weights(Region):
         :param bool x: (optional) ``True`` if using the 'x' close button
         :return: the scores page
         :rtype: :py:class:`Scores` or :py:class:`StudentScores`
+
         :raises :py:class:`~utils.tutor.TutorException`: if an instructor tries
             to use the 'x' close button
 
@@ -224,6 +225,7 @@ class SetWeights(Weights):
         :param value: the new value for the homework score weight
         :type value: int or str
         :return: None
+
         :raises ValueError: if value is not a number, is less than 0, or
             is greater than 100
 
@@ -264,6 +266,7 @@ class SetWeights(Weights):
         :param value: the new value for the homework progress weight
         :type value: int or str
         :return: None
+
         :raises ValueError: if value is not a number, is less than 0, or
             is greater than 100
 
@@ -304,6 +307,7 @@ class SetWeights(Weights):
         :param value: the new value for the reading score weight
         :type value: int or str
         :return: None
+
         :raises ValueError: if value is not a number, is less than 0, or
             is greater than 100
 
@@ -344,6 +348,7 @@ class SetWeights(Weights):
         :param value: the new value for the reading progress weight
         :type value: int or str
         :return: None
+
         :raises ValueError: if value is not a number, is less than 0, or
             is greater than 100
 
@@ -358,6 +363,7 @@ class SetWeights(Weights):
 
         :return: the set weights modal
         :rtype: :py:class:`SetWeights`
+
         :raises :py:class:`~utils.tutor.TutorException`: if values are set to
             thier defaults and the restore button is not available
 
@@ -417,7 +423,14 @@ class SetWeights(Weights):
             lambda _: not bool(self.find_elements(*self._dialog_locator)))
         return self.page
 
-    cancel = super().close
+    def cancel(self):
+        """Click the 'Cancel' button to close the weights dialog.
+
+        :return: the scores page
+        :rtype: :py:class:`Scores`
+
+        """
+        return super().close
 
 
 class ViewWeights(Weights):
@@ -614,6 +627,7 @@ class Scores(TutorBase):
             number of sections in the course
         :return: the scores page with the selected tab visible
         :rtype: :py:class:`Scores`
+
         :raises :py:class:`~utils.tutor.TutorException`: if a section is not
             found to match by_name
 
@@ -1300,6 +1314,7 @@ class Scores(TutorBase):
                         :py:class:`~pages.tutor.task.Homework` or
                         :py:class:`~pages.tutor.task.Reading` or
                         :py:class:`Scores`
+
                     :raises :py:class:`~utils.tutor.TutorException`: if the
                         assignment type isn't known (external, homework, or
                         reading)

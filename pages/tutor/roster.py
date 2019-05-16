@@ -44,7 +44,7 @@ class Tooltip(Region):
         will be attached in subclasses.
 
         :return: the course roster
-        :rtype: :py:class:`CourseRoster`
+        :rtype: :py:class:`~pages.tutor.course.CourseRoster`
 
         :noindex:
 
@@ -58,7 +58,14 @@ class Tooltip(Region):
 class RemoveInstructor(Tooltip):
     """Remove a current course instructor tooltip."""
 
-    remove = super()._perform_action
+    def remove(self):
+        """Remove the selected instructor from the course.
+
+        :return: the course roster
+        :rtype: :py:class:`~pages.tutor.course.CourseRoster`
+
+        """
+        return super()._perform_action
 
 
 class ChangeSection(Tooltip):
@@ -88,6 +95,7 @@ class ChangeSection(Tooltip):
         :param str section_name: the new section for the student
         :return: the course roster
         :rtype: :py:class:`CourseRoster`
+
         :raises TutorException: if the section_name does not match an active
             course section or period name
 
@@ -129,13 +137,27 @@ class ChangeSection(Tooltip):
 class DropStudent(Tooltip):
     """Drop a current student from the course tooltip."""
 
-    drop = super()._perform_action
+    def drop(self):
+        """Drop the student from the course.
+
+        :return: the course roster
+        :rtype: :py:class:`~pages.tutor.course.CourseRoster`
+
+        """
+        return super()._perform_action
 
 
 class ReAddStudent(Tooltip):
     """Re-add a dropped student to the active roster tooltip."""
 
-    restore = super()._perform_action
+    def restore(self):
+        """Readd the student to the course.
+
+        :return: the course roster
+        :rtype: :py:class:`~pages.tutor.course.CourseRoster`
+
+        """
+        return super()._perform_action
 
 
 # -------------------------------------------------------- #
@@ -286,7 +308,14 @@ class RenameSection(AddSection):
         """
         return self.section_name.get_attribute('value')
 
-    rename = super().add
+    def rename(self):
+        """Rename the current section.
+
+        :return: the course roster
+        :rtype: :py:class:`~pages.tutor.course.CourseRoster`
+
+        """
+        return super().add
 
 
 class DeleteSection(Modal):
@@ -437,6 +466,7 @@ class CourseRoster(TutorBase):
                 row position (e.g. ``position = 1`` is the first instructor)
             :return: the instructor row
             :rtype: :py:class:`~CourseRoster.Teachers.Teacher`
+
             :raises TutorException: if a match isn't found
 
             """
@@ -509,6 +539,7 @@ class CourseRoster(TutorBase):
             :return: the course roster displaying the selected course section
                 roster
             :rtype: :py:class:`CourseRoster`
+
             :raises :py:class:`~utils.tutor.TutorException`: if the name does
                 not match an existing tab name or if the position is not
                 between 1 and number of active tabs
@@ -733,6 +764,7 @@ class CourseRoster(TutorBase):
                 :return: the change section tooltip if section is not provided
                     else the course roster
                 :rtype: :py:class:`ChangeSection` or :py:class:`CourseRoster`
+
                 :raises :py:class:`~utils.tutor.TutorException`: if no section
                     or period matches the requested section
 

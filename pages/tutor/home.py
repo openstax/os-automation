@@ -64,6 +64,7 @@ class TutorHome(TutorLoginBase):
 
         :return: the user's dashboard
         :rtype: :py:class:`~pages.tutor.dashboard.Dashboard`
+
         :raises :py:class:`~selenium.common.exceptions.NoSuchElementException`:
             if the login bar is not found
 
