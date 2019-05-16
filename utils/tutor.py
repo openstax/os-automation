@@ -6,6 +6,11 @@ from selenium.common.exceptions import WebDriverException
 class Tutor(object):
     """Tutor shared variables."""
 
+    # Assignment
+
+    IMMEDIATE = 'instantly after the student answers each question'
+    DUE_AT = 'only after due date/time passes'
+
     # Calendar
 
     AFTER_TERM = 'after-term'
