@@ -7,16 +7,15 @@ Externals, Events, Homeworks, and Readings
 from __future__ import annotations
 
 from time import sleep
-from typing import Dict, Union
+from typing import Dict, List, Union
 
 from pypom import Region
-from selenium.common.exceptions import NoSuchElementException
+# from selenium.common.exceptions import NoSuchElementException
 from selenium.webdriver.common.by import By
-from selenium.webdriver.remote.webelement import WebElement
 
 from pages.tutor.base import TutorBase
 from pages.tutor.course import StudentCourse
-from pages.web.errata import ErrataForm
+# from pages.web.errata import ErrataForm
 from utils.tutor import Tutor, TutorException
 from utils.utilities import Utility, go_to_
 
@@ -76,6 +75,8 @@ class Assignment(TutorBase):
 
         """
         body_root = self.find_element(*self._assignment_body_locator)
+        if self.assignment_type == Tutor.HOMEWORK:
+            return self.Content(self, body_root).pane
         return self.Content(self, body_root)
 
     @property
@@ -275,3 +276,201 @@ class External(Assignment):
             Utility.switch_to(self.driver, element=link)
             sleep(1)
             return url
+
+
+class Homework(Assignment):
+    """A collection of assessments selected by the course instructor."""
+
+    class Content(Region):
+        """The assessment pane."""
+
+        _is_free_response_locator = (
+            By.CSS_SELECTOR, '[class*=FreeResponse]')
+        _is_multipart_locator = (
+            By.CSS_SELECTOR, '[class*=MultipartGroup]')
+        _is_multiple_choice_locator = (
+            By.CSS_SELECTOR, '[class*=ExerciseQuestion]')
+
+        @property
+        def pane(self):
+            """Access the question pane."""
+            multipart = self.find_elements(*self._is_multipart_locator)
+            if multipart:
+                from regions.tutor.assessment import MultipartQuestion
+                return MultipartQuestion(self, multipart[0])
+            free_response = self.find_elements(*self._is_free_response_locator)
+            if free_response:
+                from regions.tutor.assessment import FreeResponse
+                return FreeResponse(self, free_response[0])
+            multiple_choice = self.find_element(
+                *self._is_multiple_choice_locator)
+            from regions.tutor.assessment import MultipleChoice
+            return MultipleChoice(self, multiple_choice)
+
+    class Nav(Region):
+        """The homework step navigation."""
+
+        _homework_step_locator = (By.CSS_SELECTOR, '.breadcrumbs-wrapper span')
+
+        @property
+        def steps(self) -> List[Homework.Nav.Step]:
+            """Access the individual homework steps.
+
+            :return: the list of available steps
+            :rtype: list(:py:class:`~pages.tutor.task.Homework.Nav.Step`)
+
+            """
+            return [self.Step(self, crumb)
+                    for crumb
+                    in self.find_elements(*self._homework_step_locator)]
+
+        class Step(Region):
+            """A homework step, review, or completion."""
+
+            @property
+            def title(self) -> str:
+                """Return the homework step title.
+
+                :return: the homework step title
+                :rtype: str
+
+                """
+                return self.root.get_attribute('title')
+
+            @property
+            def step_id(self) -> str:
+                """Return the step identification number.
+
+                :return: the homework step ID number
+                :rtype: str
+
+                """
+                return self.root.get_attribute('data-step-id')
+
+            @property
+            def index(self) -> int:
+                """Return the exercise step index.
+
+                :return: the exercise step index number or ``-1`` for non-
+                    exercise steps
+                :rtype: int
+
+                """
+                index = self.root.get_attribute('data-step-index')
+                return int(index) if index else -1
+
+            @property
+            def step_type(self) -> str:
+                """Return the step type.
+
+                :return: the step type
+                    :py:data:`~utils.tutor.Tutor.EXERCISE` or
+                    :py:data:`~utils.tutor.Tutor.REVIEW_CARD` or
+                    :py:data:`~utils.tutor.Tutor.END_CARD`
+                :rtype: str
+
+                """
+                classes = self.root.get_attribute('class')
+                if 'breadcrumb-exercise' in classes:
+                    return Tutor.EXERCISE
+                elif 'individual-review' in classes:
+                    return Tutor.REVIEW_CARD
+                elif 'breadcrumb-end' in classes:
+                    return Tutor.END_CARD
+                return TutorException(f'Step type not found in "{classes}"')
+
+            @property
+            def answered(self) -> bool:
+                """Return True if the step is answered.
+
+                :return: ``True`` if the step is answered, otherwise ``False``
+                :rtype: bool
+
+                """
+                return 'completed' in self.root.get_attribute('class')
+
+            @property
+            def correctness(self) -> str:
+                """Return the correctness for the step.
+
+                :return: the correctness (answered correctly or incorrectly) of
+                    the step if past the due date and answered
+                    :py:data:`~utils.tutor.Tutor.CORRECT` or
+                    :py:data:`~utils.tutor.Tutor.INCORRECT` or
+                    :py:data:`~utils.tutor.Tutor.NOT_ANSWERED` or
+                    :py:data:`~utils.tutor.Tutor.NOT_GRADED`
+                :rtype: str
+
+                """
+                if not self.answered:
+                    return Tutor.NOT_ANSWERED
+                classes = self.root.get_attribute('class')
+                if 'status-correct' in classes:
+                    return Tutor.CORRECT
+                elif 'status-incorrect' in classes:
+                    return Tutor.INCORRECT
+                return Tutor.NOT_GRADED
+
+            @property
+            def selection(self) -> str:
+                """Return the selection type for the assessment.
+
+                :return: the selection type for the assessment question or
+                    :py:data:`~utils.tutor.Tutor.NOT_A_QUESTION` for an
+                    interstitial card; standard responses will be
+                    :py:data:`~utils.tutor.Tutor.CORE` or
+                    :py:data:`~utils.tutor.Tutor.PERSONALIZED` or
+                    :py:data:`~utils.tutor.Tutor.SPACED_PRACTICE`
+                :rtype: str
+
+                """
+                classes = self.root.get_attribute('class')
+                if 'core' in classes:
+                    return Tutor.CORE
+                elif 'personalized' in classes:
+                    return Tutor.PERSONALIZED
+                elif 'spaced' in classes:
+                    return Tutor.SPACED_PRACTICE
+                return Tutor.NOT_A_QUESTION
+
+            @property
+            def is_active(self) -> bool:
+                """Return True if the step is currently selected and active.
+
+                :return: ``True`` if the step is active and displayed in the
+                    body, otherwise ``False``
+                :rtype: bool
+
+                """
+                return 'active' in self.root.get_attribute('class')
+
+            def select(self) -> Homework:
+                """Select the step to display it in the main body.
+
+                :return: the homework assignment with the selected step active
+                :rtype: :py:class:`~pages.tutor.task.Homework`
+
+                """
+                Utility.click_option(self.driver, element=self.root)
+                sleep(1)
+                return self.page.page
+
+
+class Reading(Assignment):
+    """A collection of book sections selected by the course instructor."""
+
+    class Nav(Region):
+        """The reading progress bar."""
+
+        _progress_bar_locator = (By.CSS_SELECTOR, '.progressbar')
+
+        @property
+        def progress(self) -> int:
+            """Return the current assignment progress.
+
+            :return: the current assignment progress percentage out of 100
+            :rtype: int
+
+            """
+            return int(self.find_element(*self._progress_bar_locator)
+                       .get_attribute('aria-valuenow'))

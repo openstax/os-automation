@@ -166,6 +166,19 @@ class Tutor(object):
     AS_NUMBER = 'number'
     AS_PERCENTAGE = 'percentage'
 
+    # Tasks
+    CORE = 'core assessment'
+    CORRECT = 'correct answer'
+    END_CARD = 'assignment complete'
+    EXERCISE = 'exercise'
+    INCORRECT = 'incorrect answer'
+    NOT_A_QUESTION = 'not a question step'
+    NOT_ANSWERED = 'assessment not answered'
+    NOT_GRADED = 'not graded'
+    PERSONALIZED = 'personalized assessment'
+    REVIEW_CARD = 'review card step'
+    SPACED_PRACTICE = 'spaced practice assessment'
+
 
 class TutorException(WebDriverException):
     """A generic exception for Tutor."""
