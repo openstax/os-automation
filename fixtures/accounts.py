@@ -14,6 +14,8 @@ def accounts_base_url(request):
                 config.getini('accounts_base_url'))
     instance = (config.getoption('instance') or
                 config.getini('instance'))
+    if instance == 'unique':
+        return base_url
     if instance and base_url:
         segments = base_url.split(SPLIT)
         insert = ('' if instance.startswith('prod') else
