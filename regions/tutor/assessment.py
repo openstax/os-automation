@@ -13,6 +13,7 @@ from selenium.webdriver.remote.webelement import WebElement
 from pages.tutor.base import TutorBase
 from pages.tutor.reference import ReferenceBook
 from pages.web.errata import ErrataForm
+from utils.tutor import TutorException
 from utils.utilities import Utility, go_to_
 
 ByLocator = Tuple[str, str]
@@ -554,3 +555,39 @@ class MultipleChoice(QuestionBase):
             button = self.find_element(*self._answer_button_locator)
             Utility.click_option(self.driver, element=button)
             sleep(0.5)
+
+
+class MultipartQuestion(Region):
+    """A multi-part assessment with two or more questions."""
+
+    _question_locator = (By.CSS_SELECTOR, '[class*=MultipartGroup] > div')
+    _is_free_response_locator = (By.CSS_SELECTOR, '[class*=FreeResponse]')
+    _is_multiple_choice_locator = (
+                                By.CSS_SELECTOR, '[class*=ExerciseQuestion]')
+
+    @property
+    def questions(self) -> List[QuestionBase]:
+        """Access the list of questions.
+
+        :return: the list of questions within the multi-part assessment
+        :rtype: list(:py:class:`~regions.tutor.assessment.QuestionBase`)
+
+        :raises :py:class:`~utils.tutor.TutorException`: if a task step doesn't
+            match a free response or multiple choice question or if no
+            assessment segments are found
+
+        """
+        parts = []
+        for question in self.find_elements(*self._question_locator):
+            if question.find_elements(*self._is_free_response_locator):
+                parts.append(FreeResponse(self, question))
+            elif question.find_elements(*self._is_multiple_choice_locator):
+                parts.append(MultipleChoice(self, question))
+            else:
+                tag = question.get_attribute('data-task-step-id')
+                raise TutorException(
+                    f'Unknown assessment type in task step {tag}')
+        if not parts:
+            raise TutorException('No multi-part steps found in "{0}"'
+                                 .format(self.driver.current_url))
+        return parts
