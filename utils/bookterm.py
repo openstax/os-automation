@@ -59,7 +59,6 @@ class Biology2e(OpenStaxBook):
 
     def __init__(self) -> None:
         """Initialize the term group."""
-
         self._book_title = "Biology 2e"
         self._terms = {
             # TODO - add the biology book terms
@@ -71,7 +70,6 @@ class CollegePhysics(OpenStaxBook):
 
     def __init__(self) -> None:
         """Initialize the term group."""
-
         self._book_title = "College Physics"
         self._terms = {
             "1.1": {
@@ -3291,7 +3289,6 @@ class IntroductionToSociology2e(OpenStaxBook):
 
     def __init__(self) -> None:
         """Initialize the term group."""
-
         self._book_title = "Introduction To Sociology 2e"
         self._terms = {
             "1.1": {

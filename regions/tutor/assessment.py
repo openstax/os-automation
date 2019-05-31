@@ -8,9 +8,12 @@ from typing import Dict, List, Tuple, Union
 from pypom import Region
 from selenium.common.exceptions import NoSuchElementException
 from selenium.webdriver.common.by import By
+from selenium.webdriver.remote.webelement import WebElement
 
 from pages.tutor.base import TutorBase
+from pages.tutor.reference import ReferenceBook
 from pages.web.errata import ErrataForm
+from utils.tutor import TutorException
 from utils.utilities import Utility, go_to_
 
 ByLocator = Tuple[str, str]
@@ -355,3 +358,236 @@ class DetailedAssessment(Assessment):
         button = self.find_element(*self._report_an_error_button_locator)
         Utility.switch_to(self.driver, element=button)
         return go_to_(ErrataForm(self.driver))
+
+
+class QuestionBase(Region):
+    """Shared assessment resources for student responses."""
+
+    _question_stem_locator = (By.CSS_SELECTOR, '[class*=QuestionStem]')
+    _answer_button_locator = (By.CSS_SELECTOR, '.btn-primary')
+    _exercise_id_locator = (By.CSS_SELECTOR, '.exercise-identifier-link')
+    _suggest_a_correction_link_locator = (By.CSS_SELECTOR, '[href*=errata]')
+    _view_book_section_link_locator = (By.CSS_SELECTOR, '.reference')
+    _book_section_number_locator = (By.CSS_SELECTOR, '.chapter-section')
+    _book_section_title_locator = (By.CSS_SELECTOR, '.title')
+
+    @property
+    def step_id(self) -> str:
+        """Return the step identification string.
+
+        :return: the step ID number
+        :rtype: str
+
+        """
+        return self.root.get_attribute('data-task-step-id')
+
+    @property
+    def stem(self) -> str:
+        """Return the question stem.
+
+        :return: the question stem
+        :rtype: str
+
+        """
+        return (self.find_element(*self._question_stem_locator)
+                .get_attribute('textContent'))
+
+    @property
+    def answer_button(self) -> WebElement:
+        """Return the 'Answer' button element.
+
+        :return: the answer button
+        :rtype: :py:class:`~selenium.webdriver.remote.webelement.WebElement`
+
+        """
+        return self.find_element(*self._answer_button_locator)
+
+    @property
+    def exercise_id(self) -> str:
+        """Return the Exercises ID.
+
+        :return: the Exercises assessment ID and version
+        :rtype: str
+
+        """
+        return self.find_element(*self._exercise_id_locator).text.split()[1]
+
+    def suggest_a_correction(self) -> ErrataForm:
+        """Click on the 'Suggest a correction' link.
+
+        :return: the OpenStax.org errata form
+        :rtype: :py:class:`~pages.web.errata.ErrataForm`
+
+        """
+        link = self.find_element(*self._suggest_a_correction_link_locator)
+        Utility.switch_to(self.driver, element=link)
+        sleep(1)
+        return go_to_(ErrataForm(self.driver))
+
+    def view_reference(self) -> ReferenceBook:
+        """Click on the associated book section name.
+
+        :return: the reference book showing the requested chapter section
+        :rtype: :py:class:`~pages.tutor.reference.RefernceBook`
+
+        """
+        link = self.find_element(*self._view_book_section_link_locator)
+        Utility.switch_to(self.driver, element=link)
+        sleep(1)
+        return go_to_(ReferenceBook(self.driver, base_url=self.page.base_url))
+
+    @property
+    def chapter_section(self) -> str:
+        """Return the book chapter and section number for the associated step.
+
+        :return: the book chapter and section number containing the question
+            explanation
+        :rtype: str
+
+        """
+        return self.find_element(*self._chapter_number_locator).text
+
+    @property
+    def section_title(self) -> str:
+        """Return the book section title for the associated step.
+
+        :return: the title for the book section containing the question
+            explanation
+        :rtype: str
+
+        """
+        return self.find_element(*self._book_section_title_locator).text
+
+
+class FreeResponse(QuestionBase):
+    """A free response step for an assessment."""
+
+    _free_response_box_locator = (By.CSS_SELECTOR, 'textarea')
+
+    @property
+    def free_response(self) -> str:
+        """Return the current free response text.
+
+        :return: the current free response answer text
+        :rtype: str
+
+        """
+        return (self.find_element(*self._free_response_box_locator)
+                .get_attribute('textContent'))
+
+    @free_response.setter
+    def free_response(self, answer) -> None:
+        """Send the free response answer to the text box.
+
+        Use the javascript value assignment just in case we need to overwrite
+        a previous answer.
+
+        :return: None
+
+        """
+        box = self.find_element(*self._free_response_box_locator)
+        self.driver.execute_script(f'arguments[0].value = "{answer}";', box)
+
+
+class MultipleChoice(QuestionBase):
+    """A mutiple choice response step for an assessment."""
+
+    _question_answer_locator = (By.CSS_SELECTOR, '.openstax-answer')
+
+    @property
+    def answers(self) -> List[MultipleChoice.Answer]:
+        r"""Access the available multiple choice answers.
+
+        :return: the list of available multiple choice answers
+        :rtype: \
+            list(:py:class:`~regions.tutor.assessment.MultipleChoice.Answer)
+
+        """
+        return [self.Answer(self, option)
+                for option
+                in self.find_elements(*self._question_answer_locator)]
+
+    class Answer(Region):
+        """A multiple choice answer."""
+
+        _answer_button_locator = (By.CSS_SELECTOR, '.answer-input-box')
+        _answer_letter_locator = (By.CSS_SELECTOR, '.answer-letter')
+        _answer_content_locator = (By.CSS_SELECTOR, '.answer-content')
+
+        @property
+        def answer_id(self) -> str:
+            """Return the answer ID.
+
+            :return: the answer ID
+            :rtype: str
+
+            """
+            return (self.find_element(*self._answer_button_locator)
+                    .get_attribute('id'))
+
+        @property
+        def letter(self) -> str:
+            """Return the answer letter.
+
+            :return: the answer letter
+            :rtype: str
+
+            """
+            return self.find_element(*self._answer_letter_locator).text
+
+        @property
+        def answer(self) -> str:
+            """Return the answer content.
+
+            :return: the answer content
+            :rtype: str
+
+            """
+            return (self.find_element(*self._answer_content_locator)
+                    .get_attribute('textContent'))
+
+        def select(self) -> None:
+            """Click on the button to select the answer.
+
+            :return: None
+
+            """
+            button = self.find_element(*self._answer_button_locator)
+            Utility.click_option(self.driver, element=button)
+            sleep(0.5)
+
+
+class MultipartQuestion(Region):
+    """A multi-part assessment with two or more questions."""
+
+    _question_locator = (By.CSS_SELECTOR, '[class*=MultipartGroup] > div')
+    _is_free_response_locator = (By.CSS_SELECTOR, '[class*=FreeResponse]')
+    _is_multiple_choice_locator = (
+                                By.CSS_SELECTOR, '[class*=ExerciseQuestion]')
+
+    @property
+    def questions(self) -> List[QuestionBase]:
+        """Access the list of questions.
+
+        :return: the list of questions within the multi-part assessment
+        :rtype: list(:py:class:`~regions.tutor.assessment.QuestionBase`)
+
+        :raises :py:class:`~utils.tutor.TutorException`: if a task step doesn't
+            match a free response or multiple choice question or if no
+            assessment segments are found
+
+        """
+        parts = []
+        for question in self.find_elements(*self._question_locator):
+            if question.find_elements(*self._is_free_response_locator):
+                parts.append(FreeResponse(self, question))
+            elif question.find_elements(*self._is_multiple_choice_locator):
+                parts.append(MultipleChoice(self, question))
+            else:
+                tag = question.get_attribute('data-task-step-id')
+                raise TutorException(
+                    f'Unknown assessment type in task step {tag}')
+        if not parts:
+            raise TutorException('No multi-part steps found in "{0}"'
+                                 .format(self.driver.current_url))
+        return parts
