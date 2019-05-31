@@ -27,6 +27,7 @@ DEV = 'dev'
 QA = 'qa'
 STAGING = 'staging'
 PROD = ['prod', 'production']
+UNIQUE = 'unique'
 
 
 @pytest.fixture(scope='module')
@@ -88,7 +89,7 @@ def _data_return(request, target):
     config = request.config
     instance = config.getoption('instance').lower()
     name = 0
-    if target in SINGLETON or instance == DEV:
+    if target in SINGLETON or instance == DEV or instance == UNIQUE:
         password = 1
     else:
         if instance == QA:
