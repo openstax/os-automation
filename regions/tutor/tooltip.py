@@ -56,8 +56,9 @@ class Tooltip(Region):
 
     def close(self):
         """Click on the window close button."""
+        Page = self.page.__class__
         Utility.click_option(self.driver, element=self.window_close)
-        return self.page(self.driver, self.page.base_url)
+        return Page(self.driver, self.page.base_url)
 
     @property
     def previous_tooltip(self):
@@ -83,8 +84,8 @@ class Tooltip(Region):
         Utility.click_option(self.driver, element=self.next_tooltip)
         sleep(0.5)
         tooltip = self.driver.execute_script(
-            "return document.querySelector({0});"
-            .format(self._joyride_root_selector))
+            'return document.querySelector("{joyride}");'
+            .format(joyride=self._joyride_root_selector))
         if tooltip:
             return Tooltip(self.page, tooltip)
         return self.page(self.driver, self.page.base_url)

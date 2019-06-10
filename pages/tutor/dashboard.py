@@ -77,7 +77,7 @@ class Dashboard(TutorBase):
         """Select the create course tile.
 
         :return: the course creation wizard
-        :rtype: :py:class:`~pages.tutor.new_course.CloneCourse`
+        :rtype: :py:class:`~pages.tutor.new_course.NewCourse`
 
         """
         tile = self.find_elements(*self._create_tile_locator)
@@ -87,8 +87,8 @@ class Dashboard(TutorBase):
         link = tile[0].find_element(By.CSS_SELECTOR, 'a')
         Utility.scroll_to(self.driver, element=tile[0], shift=-80)
         Utility.click_option(self.driver, element=link)
-        from pages.tutor.new_course import CloneCourse
-        return go_to_(CloneCourse(self.driver, self.base_url))
+        from pages.tutor.new_course import NewCourse
+        return go_to_(NewCourse(self.driver, self.base_url))
 
     @property
     def preview_courses(self):

@@ -81,6 +81,23 @@ class Tutor(object):
     IN_TERM = 'in-term'
     TODAY = 'today'
 
+    # Course Creation
+    AP_BIOLOGY = 'Biology For AP® Courses'
+    AP_PHYSICS = 'College Physics for AP® Courses'
+    APUSH = 'AP® U.S. History'
+    BIOLOGY = 'Biology 2e'
+    PHYSICS = 'College Physics'
+    SOCIOLOGY = 'Introduction to Sociology 2e'
+
+    BOOKS = [BIOLOGY, PHYSICS, SOCIOLOGY]
+
+    FALL = 'Fall'
+    SPRING = 'Spring'
+    SUMMER = 'Summer'
+    WINTER = 'Winter'
+
+    TERMS = [SPRING, SUMMER, FALL, WINTER]
+
     # Course Settings
 
     STUDENT_ACCESS = 0
@@ -98,6 +115,9 @@ class Tutor(object):
     INDIANA = 'Indiana (East)'
     MOUNTAIN_TIME = 'Mountain Time (US & Canada)'
     PACIFIC_TIME = 'Pacific Time (US & Canada)'
+
+    TIMEZONE = [HAWAII, ALASKA, PACIFIC_TIME, ARIZONA, MOUNTAIN_TIME,
+                CENTRAL_TIME, EASTERN_TIME, INDIANA, ATLANTIC]
 
     # Course Page
 

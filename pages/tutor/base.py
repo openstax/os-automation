@@ -56,7 +56,7 @@ class TutorShared(Page):
         :rtype: bool
 
         """
-        return self.loaded.is_displayed()
+        return self.loaded
 
     @property
     def nav(self):

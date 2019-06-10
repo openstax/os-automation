@@ -7,6 +7,7 @@ from selenium.webdriver.common.by import By
 
 from pages.tutor.base import TutorBase
 from regions.tutor.notification import Notifications
+from regions.tutor.tooltip import Tooltip
 from utils.tutor import Tutor, TutorException
 from utils.utilities import Utility, go_to_
 
@@ -14,9 +15,12 @@ from utils.utilities import Utility, go_to_
 class Calendar(TutorBase):
     """The instructor course calendar."""
 
+    _joyride_root_selector = (By.CSS_SELECTOR, '.joyride')
     _banner_locator = (By.CSS_SELECTOR, '.course-page header')
     _assignment_sidebar_locator = (By.CSS_SELECTOR, '.add-assignment-sidebar')
     _calendar_body_locator = (By.CSS_SELECTOR, '.month-body')
+
+    _loading_message_selector = '.calendar-loading'
 
     # ---------------------------------------------------- #
     # Banner / Header
@@ -81,7 +85,7 @@ class Calendar(TutorBase):
         return self.Sidebar(self, sidebar)
 
     # ---------------------------------------------------- #
-    # Assignment sidebar
+    # The monthly calendar
     # ---------------------------------------------------- #
 
     @property
@@ -94,6 +98,56 @@ class Calendar(TutorBase):
         """
         calendar = self.find_element(*self._calendar_body_locator)
         return self.Calendar(self, calendar)
+
+    # ---------------------------------------------------- #
+    # Calendar helper functions
+    # ---------------------------------------------------- #
+
+    @property
+    def loaded(self) -> bool:
+        """Return True when the loading message goes away.
+
+        :return: ``True`` when the loading message goes away
+        :rtype: bool
+
+        :noindex:
+
+        """
+        return not bool(self.driver.execute_script(
+            'return document.querySelectorAll("{loading}");'
+            .format(loading=self._loading_message_selector)))
+
+    def clear_training_wheels(self) -> None:
+        """Clear any joyride modals.
+
+        :return: None
+
+        """
+        while self.find_elements(*self._joyride_root_selector):
+            tooltip = Tooltip(self, self.find_element(
+                *self._joyride_root_selector))
+            tooltip.close()
+            sleep(1)
+
+    def add_assignment(assignment: str, name: str, description: str,
+                       open_on: str, due_on: str, action: str) -> None:
+        """Create a new assignment.
+
+        :TODO: fill parameter list
+        :return: None
+
+        """
+        # if the assignment menu is close
+        #     open it
+        # click on the assignment type
+        # wait for the add assignment page to load
+        # fill out the name
+        # fill out the description
+        # select the open date
+        # select the due date
+        # click the action
+        # wait for the calendar to load
+        # wait for the assignment to complete publishing/saving
 
     # ---------------------------------------------------- #
     # Instructor course regions
