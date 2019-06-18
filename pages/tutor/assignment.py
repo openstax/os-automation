@@ -24,7 +24,7 @@ from pages.tutor.preview import StudentPreview
 from pages.tutor.reference import ReferenceBook
 from pages.tutor.settings import CourseSettings
 from regions.tutor.assessment import Assessment
-from utils.tutor import TutorException
+from utils.tutor import Tutor, TutorException, get_date_times
 from utils.utilities import Utility, go_to_
 
 # -------------------------------------------------------- #
@@ -32,7 +32,7 @@ from utils.utilities import Utility, go_to_
 # -------------------------------------------------------- #
 
 # return True if the field error message is displayed
-DISPLAYED = 'return getComputedStyle(arguments[0]).display != none;'
+DISPLAYED = 'return getComputedStyle(arguments[0]).display != "none";'
 # get the modal and tooltip root that is a neighbor of the React root element
 GET_ROOT = 'return document.querySelector("[role={0}]");'
 # wait until the loading animation (bouncing books) is gone
@@ -156,240 +156,138 @@ class HomeworkTutorSelectionsTooltip(ButtonTooltip):
 class OpenToClose(Region):
     """The open and close dates and times rows."""
 
-    _open_date_time_locator = (By.CSS_SELECTOR, '.col-md-6:nth-child(1)')
-    _close_date_time_locator = (By.CSS_SELECTOR, '.col-md-6:nth-child(2)')
+    _section_name_locator = (By.CSS_SELECTOR, '.period')
+    _section_checkbox_locator = (By.CSS_SELECTOR, '[type=checkbox]')
+    _open_date_locator = (
+        By.CSS_SELECTOR, '.-assignment-open-date input:not([readonly])')
+    _open_time_locator = (
+        By.CSS_SELECTOR, '.-assignment-open-time input')
+    _due_date_locator = (
+        By.CSS_SELECTOR, '.-assignment-due-date input:not([readonly])')
+    _due_time_locator = (
+        By.CSS_SELECTOR, '.-assignment-due-time input')
 
     @property
-    def open(self) -> OpenToClose.DateTime:
-        """Access the open date and time.
+    def name(self) -> str:
+        """Return the section name.
 
-        :return: a date and time set
-        :rtype: :py:class:`~OpenToClose.DateTime`
+        :return: the section name
+        :rtype: str
 
         """
-        open_root = self.find_element(*self._open_date_time_locator)
-        return self.DateTime(self, open_root)
+        return (self.find_element(*self._section_name_locator)
+                .get_attribute('textContent'))
 
     @property
-    def close(self) -> OpenToClose.DateTime:
-        """Access the due date and time.
+    def checkbox(self) -> WebElement:
+        """Return the section checkbox.
 
-        :return: a date and time set
-        :rtype: :py:class:`~OpenToClose.DateTime`
+        :return: the section checkbox
+        :rtype: :py:class:`~selenium.webdriver.remote.webelement.WebElement`
 
         """
-        due_root = self.find_element(*self._close_date_time_locator)
-        return self.DateTime(self, due_root)
+        return self.find_element(*self._section_checkbox_locator)
 
-    class DateTime(Region):
-        """A assignment date and time set."""
+    @property
+    def is_checked(self) -> bool:
+        """Return True if the section checkbox is currently checked.
 
-        _date_locator = (
-            By.CSS_SELECTOR, '.-assignment-open-date , .-assignment-due-date')
-        _time_locator = (
-            By.CSS_SELECTOR, '.-assignment-open-time , .-assignment-due-time')
+        :return: ``True`` if the section checkbox is checked, otherwise
+            ``False``
+        :rtype: bool
 
-        @property
-        def date(self) -> OpenToClose.DateTime.Date:
-            """Access the date field.
+        """
+        return self.driver.execute_script(
+            'return arguments[0].checked == "true";', self.checkbox)
 
-            :return: the date portion of a date time set
-            :rtype: :py:class:`~OpenToClose.DateTime.Date`
+    def toggle(self) -> None:
+        """Click on the section checkbox.
 
-            """
-            date_root = self.find_element(*self._date_locator)
-            return self.Date(self, date_root)
+        :return: None
 
-        @property
-        def time(self) -> OpenToClose.DateTime.Time:
-            """Access the time field.
+        """
+        Utility.click_option(self.driver, element=self.checkbox)
 
-            :return: the time portion of a date time set
-            :rtype: :py:class:`~OpenToClose.DateTime.Time`
+    @property
+    def open_date(self) -> WebElement:
+        """Return the 'Open Date' input box.
 
-            """
-            time_root = self.find_element(*self._time_locator)
-            return self.Time(self, time_root)
+        :return: the open date input box
+        :rtype: :py:class:`~selenium.webdriver.remote.webelement.WebElement`
 
-        class Date(Region):
-            """An assignment date."""
+        """
+        return self.find_element(*self._open_date_locator)
 
-            class Calendar(Region):
-                """A mini-calendar to select a date."""
+    @property
+    def open_time(self) -> WebElement:
+        """Return the 'Open Time' input box.
 
-                _current_month_locator = (
-                    By.CSS_SELECTOR, '[class*="current-month"]')
-                _month_year_locator = (
-                    By.CSS_SELECTOR, '.react-datepicker__month')
-                _previous_month_arrow_locator = (
-                    By.CSS_SELECTOR, '[class*="navigation--previous"]')
-                _next_month_arrow_locator = (
-                    By.CSS_SELECTOR, '[class*="navigation--next"]')
-                _day_locator = (
-                    By.CSS_SELECTOR,
-                    '.react-datepicker__day:not([class*=disabled])')
+        :return: the open time input box
+        :rtype: :py:class:`~selenium.webdriver.remote.webelement.WebElement`
 
-                @property
-                def current(self) -> str:
-                    """Return the calendar's current month and year.
+        """
+        return self.find_element(*self._open_time_locator)
 
-                    :return: the mini-calendar's month and year
-                    :rtype: str
+    @property
+    def due_date(self) -> WebElement:
+        """Return the 'Due Date' input box.
 
-                    """
-                    return self.find_element(*self._current_month_locator).text
+        :return: the due date input box
+        :rtype: :py:class:`~selenium.webdriver.remote.webelement.WebElement`
 
-                @property
-                def year(self) -> int:
-                    """Return the calendar year.
+        """
+        return self.find_element(*self._due_date_locator)
 
-                    :return: the calendar year
-                    :rtype: int
+    @property
+    def due_time(self) -> WebElement:
+        """Return the 'Due Time' input box.
 
-                    """
-                    return int(self.find_element(*self._month_year_locator)
-                               .get_attribute('aria-label')
-                               .split('-')[1])
+        :return: the due time input box
+        :rtype: :py:class:`~selenium.webdriver.remote.webelement.WebElement`
 
-                @property
-                def month(self) -> int:
-                    """Return the calendar month.
+        """
+        return self.find_element(*self._due_time_locator)
 
-                    :return: the calendar month as a number
-                    :rtype: int
+    def set(self, open_on: str, open_at: str, due_on: str, due_at: str) \
+            -> None:
+        """Set the open and close dates/times.
 
-                    """
-                    return int(self.find_element(*self._month_year_locator)
-                               .get_attribute('aria-label')
-                               .split('-')[2])
+        :param str open_on: a ``MM/DD/YYYY`` date to open the assignment
+        :param str open_at: a ``hh:mm xm`` time to open the assignment
+        :param str due_on: a ``MM/DD/YYYY`` date the assignment is due
+        :param str due_at: a ``hh:mm xm`` time the assignment is due
+        :return: None
 
-                def previous_month(self) -> OpenToClose.DateTime.Date.Calendar:
-                    """Click on the left arrow to view the previous month.
+        """
+        self._set_field(self.open_date, open_on)
+        self._set_field(self.open_time, open_at)
+        self._set_field(self.due_date, due_on)
+        self._set_field(self.due_time, due_at)
 
-                    :return: the mini-calendar with the previous month, if the
-                        previous month is an option
-                    :rtype: :py:class:`~OpenToClose.DateTime.Date.Calendar`
+    def _set_field(self, field: WebElement, value: str) -> None:
+        r"""Set the requested form field to the new value.
 
-                    """
-                    arrow = self.find_elements(
-                        *self._previous_month_arrow_locator)
-                    if arrow:
-                        Utility.click_option(self.driver, element=arrow)
-                        sleep(0.5)
-                    return self
+        :param field: the form field to modify
+        :param str value: the new field value
+        :type field: :py:class:`~selenium.webdriver.remote \
+                                .webelement.WebElement`
+        :return: None
 
-                def next_month(self) -> OpenToClose.DateTime.Date.Calendar:
-                    """Click on the right arrow to view the next month.
-
-                    :return: the mini-calendar with the following month, if the
-                        next month is an option
-                    :rtype: :py:class:`~OpenToClose.DateTime.Date.Calendar`
-
-                    """
-                    arrow = self.find_elements(
-                        *self._next_month_arrow_locator)
-                    if arrow:
-                        Utility.click_option(self.driver, element=arrow)
-                        sleep(0.5)
-                    return self
-
-                @property
-                def days(self) -> List[WebElement]:
-                    r"""Return the list of valid, selectable days.
-
-                    :return: the days available for selection
-                    :rtype: list(:py:class:`~selenium.webdriver.remote \
-                                            .webelement.WebElement`)
-
-                    """
-                    return self.find_elements(*self._day_locator)
-
-                def select(self, day: Union[str, int]) -> Assignment:
-                    """Select a calendar date by clicking on the day.
-
-                    :param day: the single day to select
-                    :type day: str or int
-                    :return: the assignment
-                    :rtype: :py:class:`Assignment`
-                    :raise :py:class:`utils.tutor.TutorException`: if the
-                        specified day is not an option
-
-                    """
-                    for date in self.days:
-                        if date.text == str(day):
-                            Utility.click_option(self.driver, element=date)
-                            sleep(0.25)
-                            return self.page.page.page.page
-                    raise TutorException('"{0}" is not an available option'
-                                         .format(day))
-
-        class Time(Region):
-            """An assignment time."""
-
-            _label_locator = (By.CSS_SELECTOR, '.floating-label')
-            _current_time_locator = (By.CSS_SELECTOR, 'input')
-            _set_as_default_locator = (By.CSS_SELECTOR, 'button')
-
-            @property
-            def label(self) -> str:
-                """Return the floating label.
-
-                :return: the floating input label
-                :rtype: str
-
-                """
-                return self.find_element(*self._label_locator).text
-
-            @property
-            def time(self) -> str:
-                """Return the currently assigned time.
-
-                :return: the current value for the time input box
-                :rtype: str
-
-                """
-                return (self.find_element(*self._current_time_locator)
-                        .get_attribute('value'))
-
-            @time.setter
-            def time(self, new_time: str) -> None:
-                """Set the time value.
-
-                .. note::
-
-                   The time should be given as a string formatted to
-                   'HH:MM(a/p)'. Some valid options: '9:21a', '11:59p'
-
-                :param str new_time: the new time to assign
-                :return: None
-
-                """
-                time_field = self.find_element(*self._current_time_locator)
-                Utility.click_option(self.driver, element=time_field)
-                for _ in range(8):
-                    time_field.send_keys(Keys.RIGHT)
-                from platform import system
-                KEY = Keys.BACKSPACE if system() != 'Darwin' else Keys.DELETE
-                for _ in range(8):
-                    time_field.send_keys(KEY)
-                time_field.send_keys(new_time)
-
-            def set_as_default(self) -> Assignment:
-                """Click the 'Set as default' button.
-
-                :return: the assignment page
-                :rtype: :py:class:`Assignment`
-                :raise TutorException: if the current time is already the
-                    default value
-
-                """
-                try:
-                    link = self.find_element(*self._set_as_default_locator)
-                    Utility.click_option(self.driver, element=link)
-                    return self.page.page.page
-                except NoSuchElementException:
-                    raise TutorException(
-                        'The current time is already the default')
+        """
+        if not value:
+            # No value was given so skip over the field (generally time values)
+            return
+        Utility.click_option(self.driver, element=field)
+        # Clear the field first to prevent data appends
+        field.send_keys(Keys.DELETE)
+        for _ in range(len(field.get_attribute('value'))):
+            field.send_keys(Keys.BACKSPACE)
+        sleep(0.25)
+        # Send the letters/numbers individually to deal with the form
+        # validation controls
+        for char in value:
+            field.send_keys(char)
+        sleep(0.25)
 
 
 class SectionSelector(Region):
@@ -1334,6 +1232,7 @@ class Assignment(TutorBase):
     _assignment_heading_locator = (By.CSS_SELECTOR, '.card-header span')
     _close_x_locator = (By.CSS_SELECTOR, '.card-header .openstax-close-x')
 
+    # Name
     _assignment_name_locator = (
         By.CSS_SELECTOR, '#reading-title')
     _assignment_name_description_locator = (
@@ -1341,22 +1240,55 @@ class Assignment(TutorBase):
     _assignment_name_required_locator = (
         By.CSS_SELECTOR, '#reading-title ~ .hint')
 
+    # Description
     _description_locator = (
         By.CSS_SELECTOR, '.assignment-description textarea')
     _description_required_locator = (
         By.CSS_SELECTOR, '.assignment-description .hint')
 
-    _change_timezone_locator = (By.CSS_SELECTOR, '.course-time-zone')
-    _current_timezone_locator = (By.CSS_SELECTOR, '.course-time-zone span')
+    # Timezone
+    _change_timezone_locator = (
+        By.CSS_SELECTOR, '.course-time-zone')
+    _current_timezone_locator = (
+        By.CSS_SELECTOR, '.course-time-zone span')
 
-    _assign_to_all_sections_locator = (By.CSS_SELECTOR, '#hide-periods-radio')
-    _assign_by_section_locator = (By.CSS_SELECTOR, '#show-periods-radio')
-    _all_sections_tasking_plan_locator = (
-        By.CSS_SELECTOR, '.tasking-date-times')
-    _section_tasking_plan_locator = (
+    # Section open and due dates and times
+    _all_sections_radio_button_locator = (
+        By.CSS_SELECTOR, '#hide-periods-radio')
+    _all_sections_plan_locator = (
+        By.CSS_SELECTOR, '.common')
+
+    _individual_sections_radio_button_locator = (
+        By.CSS_SELECTOR, '#show-periods-radio')
+    _individual_sections_plan_locator = (
         By.CSS_SELECTOR, '.tasking-plan')
+    _section_name_locator = (
+        By.CSS_SELECTOR, '.period')
+    _section_checkbox_locator = (
+        By.CSS_SELECTOR, '[type=checkbox]')
+
     _tasking_date_time_error_locator = (
         By.CSS_SELECTOR, '.tasking-date-times .hint')
+
+    # Assignment controls
+    _publish_button_locator = (
+        By.CSS_SELECTOR, '.-publish')
+    _save_as_draft_button_locator = (
+        By.CSS_SELECTOR, '.-save')
+    _cancel_button_locator = (
+        By.CSS_SELECTOR, '[data-tour-anchor-id*=cancel] button')
+    _delete_button_locator = (
+        By.CSS_SELECTOR, '.delete-assignment')
+
+    @property
+    def loaded(self) -> bool:
+        """Return True when the assignment name field is found.
+
+        :return: ``True`` when the assignment name field is located
+        :rtype: bool
+
+        """
+        return bool(self.find_elements(*self._assignment_name_locator))
 
     # ---------------------------------------------------- #
     # Heading
@@ -1499,7 +1431,8 @@ class Assignment(TutorBase):
         :rtype: :py:class:`Assignment`
 
         """
-        radio_option = self.find_element(*self._assign_to_all_sections_locator)
+        radio_option = self.find_element(
+            *self._all_sections_radio_button_locator)
         Utility.click_option(self.driver, element=radio_option)
         sleep(0.25)
         return self
@@ -1511,7 +1444,8 @@ class Assignment(TutorBase):
         :rtype: :py:class:`Assignment`
 
         """
-        radio_option = self.find_element(*self._assign_by_section_locator)
+        radio_option = self.find_element(
+            *self._individual_sections_radio_button_locator)
         Utility.click_option(self.driver, element=radio_option)
         sleep(0.25)
         return self
@@ -1527,13 +1461,46 @@ class Assignment(TutorBase):
             list(:py:class:`~Assignment.SectionOpenToClose`)
 
         """
-        sections = self.find_elements(*self._section_tasking_plan_locator)
+        sections = self.find_elements(*self._individual_sections_plan_locator)
         if sections:
             return [self.SectionOpenToClose(self, section)
                     for section in sections]
-        all_sections = self.find_element(
-            *self._all_sections_tasking_plan_locator)
+        all_sections = self.find_element(*self._all_sections_plan_locator)
         return OpenToClose(self, all_sections)
+
+    def set_assignment_dates(self, data: dict) -> None:
+        """Set the assignment open and close dates/times.
+
+        :param dict data: the data package containing the section open and due
+            date and time information
+        :return: None
+
+        """
+        if Tutor.ALL in data:
+            # override the rest of the data and use the 'All Sections' open/due
+            open_on, open_at, due_on, due_at = get_date_times(
+                self.driver, data.get(Tutor.ALL))
+            # make sure all sections is selected
+            self.all_sections()
+            # set the dates and times
+            self.open_and_due.set(open_on, open_at, due_on, due_at)
+
+            return
+
+        # Set each section
+        self.individual_sections()
+
+        for section in self.open_and_due:
+            name = section.name
+            if name not in data and section.is_checked:
+                # uncheck the section and move on
+                section.toggle()
+                continue
+
+            open_on, open_at, due_on, due_at = get_date_times(
+                self.driver, data.get(name))
+            # set the dates and times
+            section.set(open_on, open_at, due_on, due_at)
 
     @property
     def errors(self) -> List[str]:
@@ -1545,18 +1512,71 @@ class Assignment(TutorBase):
         """
         errors = []
         name = self.find_elements(*self._assignment_name_required_locator)
-        if name and self.driver.execute_script(DISPLAYED, name[0]):
-            errors.append('Name: {0}'.format(name[0].text))
+        if name:
+            if self.driver.execute_script(DISPLAYED, name[0]):
+                errors.append(f'Name: {name[0].text}')
         description = self.find_elements(*self._description_required_locator)
-        if description and self.driver.execute_script(DISPLAYED,
-                                                      description[0]):
-            errors.append('Description: {0}'.format(description[0].text))
+        if description:
+            if self.driver.execute_script(DISPLAYED, description[0]):
+                errors.append(f'Description: {description[0].text}')
         date_time_errors = (
             self.find_elements(*self._tasking_date_time_error_locator))
         for issue in date_time_errors:
             if self.driver.execute_script(DISPLAYED, issue):
-                errors.append('DateTime: {0}'.format(issue.text))
+                field = issue.find_element(
+                    By.XPATH, '../div[@class="floating-label"]')
+                errors.append(f'{field.text}: {issue.text}')
         return errors
+
+    # ---------------------------------------------------- #
+    # Footer
+    # ---------------------------------------------------- #
+
+    def publish(self) -> Calendar:
+        """Click the 'Publish' assignment button.
+
+        :return: the instructor's calendar
+        :rtype: :py:class:`~pages.tutor.calendar.Calendar`
+
+        """
+        button = self.find_element(*self._publish_button_locator)
+        Utility.click_option(self.driver, element=button)
+        sleep(0.5)
+        if self.errors:
+            raise TutorException(f'Assignment error(s): {self.errors}')
+        calendar = go_to_(Calendar(self.driver, self.base_url))
+        return calendar
+
+    def save_as_draft(self) -> Calendar:
+        """Click the 'Save as Draft' assignment button.
+
+        :return: the instructor's calendar
+        :rtype: :py:class:`~pages.tutor.calendar.Calendar`
+
+        """
+        raise NotImplementedError()
+
+    def cancel(self) -> Calendar:
+        """Click the 'Cancel' assignment button.
+
+        :return: the instructor's calendar
+        :rtype: :py:class:`~pages.tutor.calendar.Calendar`
+
+        """
+        raise NotImplementedError()
+
+    def delete(self) -> Calendar:
+        """Click the 'Delete' assignment button.
+
+        :return: the instructor's calendar
+        :rtype: :py:class:`~pages.tutor.calendar.Calendar`
+
+        """
+        raise NotImplementedError()
+
+    # ---------------------------------------------------- #
+    # Regions
+    # ---------------------------------------------------- #
 
     class SectionOpenToClose(Region):
         """Open and due dates and times for a particular course section."""
@@ -1566,7 +1586,7 @@ class Assignment(TutorBase):
         _open_date_time_locator = (By.CSS_SELECTOR, '.tasking-date-times')
 
         @property
-        def section(self) -> str:
+        def name(self) -> str:
             """Return the section name.
 
             :return: the section name
@@ -1607,8 +1627,7 @@ class Assignment(TutorBase):
             :rtype: :py:class:`OpenToClose`
 
             """
-            datetime_root = self.find_element(*self._open_date_time_locator)
-            return OpenToClose(self, datetime_root)
+            return OpenToClose(self, self.root)
 
 
 # -------------------------------------------------------- #

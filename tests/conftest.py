@@ -119,7 +119,8 @@ def pytest_addoption(parser):
             os.getenv('STUDENT_PASSWORD_DEV'),
             os.getenv('STUDENT_PASSWORD_QA'),
             os.getenv('STUDENT_PASSWORD_STAGING'),
-            os.getenv('STUDENT_PASSWORD_PROD')],
+            os.getenv('STUDENT_PASSWORD_PROD'),
+            os.getenv('STUDENT_PASSWORD_UNIQUE')],
         help='OpenStax test student account')
     user_options.addoption(
         '--teacher',
@@ -130,7 +131,8 @@ def pytest_addoption(parser):
             os.getenv('TEACHER_PASSWORD_DEV'),
             os.getenv('TEACHER_PASSWORD_QA'),
             os.getenv('TEACHER_PASSWORD_STAGING'),
-            os.getenv('TEACHER_PASSWORD_PROD')],
+            os.getenv('TEACHER_PASSWORD_PROD'),
+            os.getenv('TEACHER_PASSWORD_UNIQUE')],
         help='OpenStax test instructor account')
     user_options.addoption(
         '--admin',
@@ -141,7 +143,8 @@ def pytest_addoption(parser):
             os.getenv('ADMIN_PASSWORD_DEV'),
             os.getenv('ADMIN_PASSWORD_QA'),
             os.getenv('ADMIN_PASSWORD_STAGING'),
-            os.getenv('ADMIN_PASSWORD_PROD')],
+            os.getenv('ADMIN_PASSWORD_PROD'),
+            os.getenv('ADMIN_PASSWORD_UNIQUE')],
         help='OpenStax test administrative account')
     user_options.addoption(
         '--content',
@@ -152,7 +155,8 @@ def pytest_addoption(parser):
             os.getenv('CONTENT_PASSWORD_DEV'),
             os.getenv('CONTENT_PASSWORD_QA'),
             os.getenv('CONTENT_PASSWORD_STAGING'),
-            os.getenv('CONTENT_PASSWORD_PROD')],
+            os.getenv('CONTENT_PASSWORD_PROD'),
+            os.getenv('CONTENT_PASSWORD_UNIQUE')],
         help='OpenStax test content manager account')
     user_options.addoption(
         '--salesforce',

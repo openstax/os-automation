@@ -18,11 +18,22 @@ from utils.utilities import Utility, go_to_
 class CloneCourse(TutorBase):
     """Clone an existing course."""
 
+    _loaded_pane_locator = (By.CSS_SELECTOR, '.new-course-wizard')
     _heading_locator = (By.CSS_SELECTOR, '.card-header')
     _cancel_button_locator = (By.CSS_SELECTOR, '.cancel')
     _back_button_locator = (By.CSS_SELECTOR, '.back')
     _continue_button_locator = (By.CSS_SELECTOR, '.next')
     _is_course_estimation_pane_locator = (By.CSS_SELECTOR, '.numbers')
+
+    @property
+    def loaded(self) -> bool:
+        """Return True when the new course wizard root is found.
+
+        :return: ``True`` when the new course wizard root element is located
+        :rtype: bool
+
+        """
+        return bool(self.find_elements(*self._loaded_pane_locator))
 
     @property
     def heading(self) -> str:
@@ -130,7 +141,7 @@ class CloneCourse(TutorBase):
 
         @property
         def terms(self) -> List[CloneCourse.Term.Term]:
-            """Access the available course terms.
+            r"""Access the available course terms.
 
             :return: the list of course terms available for new courses
             :rtype: list(:py:class:`~pages.tutor.new_course \
@@ -248,8 +259,9 @@ class CloneCourse(TutorBase):
 
             """
             name_box = self.find_element(*self._course_name_input_locator)
-            self.driver.execute_script(
-                f'arguments[0].value = "{name}";', name_box)
+            Utility.clear_field(self.driver, field=name_box)
+            sleep(0.25)
+            name_box.send_keys(name)
 
         @property
         def timezone(self) -> str:

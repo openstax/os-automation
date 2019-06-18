@@ -1,6 +1,8 @@
 """An instructor course page with calendar."""
 
+from datetime import datetime
 from time import sleep
+from typing import Dict, Tuple, Union
 
 from pypom import Region
 from selenium.webdriver.common.by import By
@@ -11,6 +13,9 @@ from regions.tutor.tooltip import Tooltip
 from utils.tutor import Tutor, TutorException
 from utils.utilities import Utility, go_to_
 
+DateTime = Tuple[Union[str, datetime], str]
+Timeframe = Dict[str, Tuple[DateTime, DateTime]]
+
 
 class Calendar(TutorBase):
     """The instructor course calendar."""
@@ -19,6 +24,7 @@ class Calendar(TutorBase):
     _banner_locator = (By.CSS_SELECTOR, '.course-page header')
     _assignment_sidebar_locator = (By.CSS_SELECTOR, '.add-assignment-sidebar')
     _calendar_body_locator = (By.CSS_SELECTOR, '.month-body')
+    _is_publishing_locator = (By.CSS_SELECTOR, '.is-publishing')
 
     _loading_message_selector = '.calendar-loading'
 
@@ -113,9 +119,11 @@ class Calendar(TutorBase):
         :noindex:
 
         """
-        return not bool(self.driver.execute_script(
-            'return document.querySelectorAll("{loading}");'
-            .format(loading=self._loading_message_selector)))
+        return ((self.find_element(By.CSS_SELECTOR, '.calendar-container')
+                 .is_displayed()) and
+                'calendar-loading' not in (
+                    self.find_element(By.CSS_SELECTOR, '.calendar-container')
+                    .get_attribute('class')))
 
     def clear_training_wheels(self) -> None:
         """Clear any joyride modals.
@@ -129,25 +137,72 @@ class Calendar(TutorBase):
             tooltip.close()
             sleep(1)
 
-    def add_assignment(assignment: str, name: str, description: str,
-                       open_on: str, due_on: str, action: str) -> None:
+    def add_assignment(self,
+                       assignment: str,
+                       name: str,
+                       assign_to: Timeframe,
+                       description: str = "",
+                       action: str = Tutor.PUBLISH
+                       ) -> None:
         """Create a new assignment.
 
         :TODO: fill parameter list
         :return: None
 
+        :raises :py:class:`~utils.tutor.TutorException`: if the assignment type
+            does not match existing assignment types
+
         """
-        # if the assignment menu is close
-        #     open it
-        # click on the assignment type
-        # wait for the add assignment page to load
-        # fill out the name
-        # fill out the description
-        # select the open date
-        # select the due date
+        # Expand the assignment menu if it is not already open
+        if not self.sidebar.is_open:
+            self.banner.add_assignment()
+
+        # Select the assignment type
+        try:
+            {Tutor.EVENT:    self.sidebar.add_event,
+             Tutor.EXTERNAL: self.sidebar.add_external,
+             Tutor.HOMEWORK: self.sidebar.add_homework,
+             Tutor.READING:  self.sidebar.add_reading, }[assignment]()
+        except KeyError:
+            raise TutorException(f'"{assignment}" not a valid assignment type')
+
+        # Wait for the assignment creation page to load
+        if assignment == Tutor.EVENT:
+            from pages.tutor.assignment import Event as Destination
+        elif assignment == Tutor.EXTERNAL:
+            from pages.tutor.assignment import External as Destination
+        elif assignment == Tutor.HOMEWORK:
+            from pages.tutor.assignment import Homework as Destination
+        else:
+            from pages.tutor.assignment import Reading as Destination
+        assign = go_to_(Destination(self.driver, self.base_url))
+
+        # Enter the assignment name
+        assign.name = name
+
+        # Enter the description, if included
+        if description:
+            assign.description = description
+
+        # select the assignment open and due dates and times
+        assign.set_assignment_dates(assign_to)
+
         # click the action
+        try:
+            {Tutor.PUBLISH: assign.publish,
+             Tutor.DRAFT: assign.save_as_draft,
+             Tutor.CANCEL: assign.cancel,
+             Tutor.DELETE: assign.delete, }[action]()
+        except KeyError:
+            raise TutorException(f'"{action}" not a valid assignment action')
+
         # wait for the calendar to load
+        calendar = go_to_(Calendar(self.driver, self.base_url))
+
         # wait for the assignment to complete publishing/saving
+        calendar.wait.until(
+            lambda _: not self.driver.find_elements(
+                *self._is_publishing_locator))
 
     # ---------------------------------------------------- #
     # Instructor course regions
@@ -158,8 +213,8 @@ class Calendar(TutorBase):
 
         _title_locator = (By.CSS_SELECTOR, '.title')
         _course_term_locator = (By.CSS_SELECTOR, '.subtitle')
-        _notification_bar_locator = (
-                                By.CSS_SELECTOR, '.openstax-notifications-bar')
+        _notification_bar_locator = (By.CSS_SELECTOR,
+                                     '.openstax-notifications-bar')
         _assignment_toggle_locator = (By.CSS_SELECTOR, '.sidebar-toggle')
         _browse_the_book_locator = (By.CSS_SELECTOR, '.reference')
         _question_library_locator = (By.CSS_SELECTOR, '[href$=questions]')
@@ -397,16 +452,16 @@ class Calendar(TutorBase):
             """
             if assignment_type == Tutor.EXTERNAL:
                 locator = self._add_external_locator
-                from pages.tutor.assignment import AddExternal as Assignment
+                from pages.tutor.assignment import External as Assignment
             elif assignment_type == Tutor.EVENT:
                 locator = self._add_event_locator
-                from pages.tutor.assignment import AddEvent as Assignment
+                from pages.tutor.assignment import Event as Assignment
             elif assignment_type == Tutor.HOMEWORK:
                 locator = self._add_homework_locator
-                from pages.tutor.assignment import AddHomework as Assignment
+                from pages.tutor.assignment import Homework as Assignment
             elif assignment_type == Tutor.READING:
                 locator = self._add_reading_locator
-                from pages.tutor.assignment import AddReading as Assignment
+                from pages.tutor.assignment import Reading as Assignment
             else:
                 raise TutorException('"{0}" is not a known assignment type.'
                                      .format(assignment_type))

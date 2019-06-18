@@ -4,8 +4,7 @@ These cover a wide range of features to satisfy end-to-end
 testing for high priority areas.
 """
 
-from datetime import datetime, timedelta
-from time import sleep
+from datetime import datetime
 
 from pages.tutor.home import TutorHome
 from tests.markers import nondestructive, skip_test, test_case, tutor
@@ -17,6 +16,7 @@ from utils.utilities import Utility
 @tutor
 def test_create_and_clone_a_course(tutor_base_url, selenium, teacher):
     """Test creating and cloning courses."""
+    # SETUP:
     book = Tutor.BOOKS[Utility.random(0, len(Tutor.BOOKS) - 1)]
     term = Tutor.TERMS[Utility.random(0, len(Tutor.TERMS) - 1)]
     today = datetime.now()
@@ -25,8 +25,6 @@ def test_create_and_clone_a_course(tutor_base_url, selenium, teacher):
     total_sections = Utility.random(1, 4)
     estimated_students = Utility.random(1, 500)
     event_name = f"Event_{today.year}{today.month:02}{today.day:02}"
-    opens_on = (today + timedelta(days=1)).strftime("%m/%d/%Y")
-    closes_on = (today + timedelta(days=2)).strftime("%m/%d/%Y")
 
     # GIVEN: a verified Tutor instructor viewing their dashboard
     home = TutorHome(selenium, tutor_base_url).open()
@@ -41,21 +39,26 @@ def test_create_and_clone_a_course(tutor_base_url, selenium, teacher):
     # AND:   enter the number of course sections, estimated number of students,
     #        and click the 'Continue' button
     # AND:   click through any training wheel modals
-    sleep(0.1)
     new_course = courses.create_a_course()
+
     new_course.course.select_by_title(book)
     new_course.next()
+
     new_course.term.select_by_term(term)
     new_course.next()
+
     if new_course.clone_possible:
         new_course.new_or_clone.create_a_new_course()
         new_course.next()
+
     new_course.name.name = course_name
     new_course.name.timezone = timezone
     new_course.next()
+
     new_course.details.sections = total_sections
     new_course.details.students = estimated_students
     calendar = new_course.next()
+
     calendar.clear_training_wheels()
 
     # THEN:  the instructor calendar is displayed for the new course
@@ -76,21 +79,26 @@ def test_create_and_clone_a_course(tutor_base_url, selenium, teacher):
         assignment=Tutor.EVENT,
         name=event_name,
         description="assignment clone test",
-        open_on=opens_on,
-        due_on=closes_on,
+        assign_to={Tutor.ALL: Tutor.RANDOM, },
         action=Tutor.PUBLISH
     )
+
     dashboard = calendar.nav.menu.view_my_courses()
-    selection = dashboard.current_courses.select_course_by_name(course_name)
-    clone_course = selection.course_clone()
-    clone_course.term.term = term
+
+    selection = dashboard.current_courses.get_course_tile(course_name)
+    clone_course = selection.copy_this_course()
+
+    clone_course.term.select_by_term(term)
     clone_course.next()
+
     clone_course.name.name = course_name + " Clone"
     clone_course.name.timezone = timezone
     clone_course.next()
+
     clone_course.details.sections = total_sections
     clone_course.details.students = estimated_students
     calendar = clone_course.next()
+
     calendar.clear_training_wheels()
 
     # THEN:  the instructor calendar is displayed for the new course

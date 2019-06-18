@@ -98,6 +98,8 @@ def _data_return(request, target):
             password = 3
         elif instance in PROD:
             password = 4
+        elif instance == UNIQUE:
+            password = 5
         else:
             raise ValueError('Unknown instance request: %s' % instance)
     user = (config.getoption(target) or config.getini(target))

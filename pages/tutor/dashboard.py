@@ -1,11 +1,13 @@
 """The dashboard (course picker) page object."""
 
+from __future__ import annotations
+
 from pypom import Region
 from selenium.common.exceptions import NoSuchElementException
 from selenium.webdriver.common.by import By
 
 from pages.tutor.base import TutorBase
-from utils.tutor import Tutor
+from utils.tutor import Tutor, TutorException
 from utils.utilities import Utility, go_to_
 
 
@@ -110,7 +112,6 @@ class Dashboard(TutorBase):
         """
         return self._get_section(self._past_courses_locator)
 
-    @property
     def _get_section(self, locator):
         """Return the past courses section.
 
@@ -259,6 +260,19 @@ class Courses(Region):
         """
         return [self.Course(self, element)
                 for element in self.find_elements(*self._course_locator)]
+
+    def get_course_tile(self, name: str) -> Courses.Course:
+        """Return a course tile by matching the course name.
+
+        :param str name: the course name to match
+        :return: the course picker course tile
+        :rtype: :py:class:`~pages.tutor.dashboard.Courses.Course`
+
+        """
+        for course in self.courses:
+            if course.title == name:
+                return course
+        raise TutorException(f'No course found matching "{name}"')
 
     def select_course_by_name(self, name, ignore_case=False, latest=True):
         """Select a course by the course name.
@@ -491,7 +505,7 @@ class Courses(Region):
             return go_to_(StudentCourse(self.driver,
                                         self.page.page.base_url))
 
-        def clone_course(self):
+        def copy_this_course(self):
             """Clone the selected course.
 
             :return: the course cloning wizard
@@ -507,7 +521,9 @@ class Courses(Region):
             ActionChains(self.driver) \
                 .move_to_element(self.course_brand) \
                 .pause(1) \
-                .move_to_element(self.course_clone) \
+                .move_to_element(
+                    self.find_element(By.CSS_SELECTOR, '.btn-sm')) \
+                .pause(1) \
                 .click() \
                 .perform()
             from pages.tutor.new_course import CloneCourse
