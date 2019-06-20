@@ -234,7 +234,7 @@ def pytest_collection_modifyitems(config, items):
     deselected = []
     remaining = []
     for item in items:
-        if '<Function test_case>' in str(item):
+        if 'Function test_case' in str(item):
             deselected.append(item)
             continue
         if run_smoke_tests:
@@ -247,7 +247,7 @@ def pytest_collection_modifyitems(config, items):
                 continue
         if skip_flake:
             item_name = str(item)
-            if 'Function test_case' in item_name or 'Flake8Item' in item_name:
+            if 'Flake8Item' in item_name:
                 deselected.append(item)
                 continue
         if run_systems:

@@ -12,6 +12,7 @@ from utils.tutor import Tutor
 from utils.utilities import Utility
 
 
+@skip_test
 @test_case('C485035')
 @tutor
 def test_create_and_clone_a_course(tutor_base_url, selenium, teacher):
@@ -115,69 +116,197 @@ def test_create_and_clone_a_course(tutor_base_url, selenium, teacher):
                           in calendar.sidebar.copied_assignments])
 
 
-@skip_test
 @test_case('C485036')
 @tutor
 def test_edit_course_settings_and_manage_course_students(
-        tutor_base_url, selenium, teacher):
+        tutor_base_url, selenium, store):
     """Test course settings and student management."""
+    # SETUP:
+    test_data = store.get('C485036')
+    user = test_data.get('username')
+    if '-dev.' in tutor_base_url:
+        password = test_data.get('password_dev')
+    elif '-qa.' in tutor_base_url:
+        password = test_data.get('password_qa')
+    elif '-staging.' in tutor_base_url:
+        password = test_data.get('password_staging')
+    elif 'tutor.' in tutor_base_url:
+        password = test_data.get('password_prod')
+    else:
+        password = test_data.get('password_unique')
+    course_name = test_data.get('course_name')
+    new_course_name = course_name + ' modified'
+    new_timezone = Tutor.TIMEZONE[Utility.random(0, len(Tutor.TIMEZONE) - 1)]
+    new_section_name = Utility.random_hex(8)
+    edited_section_name = Utility.random_hex(12)
+    new_student_id = Utility.random_hex(10, lower=True)
+
     # GIVEN: a Tutor teacher viewing their course calendar
+    home = TutorHome(selenium, tutor_base_url).open()
+    courses = home.log_in(user, password)
+    calendar = courses.go_to_course(course_name)
 
     # WHEN:  they select 'Course Settings' from the 'Menu'
+    settings = calendar.nav.menu.view_the_course_settings()
 
     # THEN:  the 'Course settings' page is displayed
     # AND:   an enrollment URL is displayed for each course section
+    assert(settings.is_displayed)
+    assert('settings' in settings.location)
+
+    for section in settings.content.sections:
+        assert(section.enrollment_url), \
+            f'No enrollment URL found for section "{section.name}"'
 
     # WHEN:  they click on the pencil icon to the right of the course name
     # AND:   edit the course name in the 'Rename Course' pop up box and click
     #        the 'Rename' button
+    rename = settings.edit_course_name()
+
+    rename.name = new_course_name
+    rename.rename()
 
     # THEN:  the course name is changed
+    name = settings.course_name
+    assert(name == new_course_name), \
+        f'Course name ({name}) not changed to "{new_course_name}"'
+
+    # reset the course name
+    rename = settings.edit_course_name()
+    rename.name = course_name
+    rename.rename()
 
     # WHEN:  they click on the 'DATES AND TIME' tab
     # AND:   click on the pencil icon to the right of the time zone
     # AND:   select a timezone radio button and click the 'Save' button
+    dates_and_times = settings.dates_and_time()
+
+    timezone = dates_and_times.edit_timezone()
+
+    timezone.select_timezone(new_timezone)
+    timezone.save()
 
     # THEN:  the timezone is changed
+    zone = dates_and_times.timezone
+    assert(zone == new_timezone), \
+        f'Timezone ({zone}) not changed to "{new_timezone}"'
+
+    # reset the timezone
+    timezone = dates_and_times.edit_timezone()
+    timezone.select_timezone()
+    timezone.save()
 
     # WHEN:  they select 'Course Roster' from the 'Menu'
+    course_roster = settings.nav.menu.view_the_course_roster()
 
     # THEN:  the 'Course roster' page is displayed
+    assert(course_roster.is_displayed)
+    assert('roster' in course_roster.location)
 
     # WHEN:  they click on the '+ Add Instructor' link
+    add_instructor = course_roster.instructors.add_instructor()
 
     # THEN:  the instructor enrollment URL is displayed in a pop up box
+    assert(add_instructor.url), 'Instructor registration URL not available'
 
     # WHEN:  they click on the 'x'
-    # AND:   click on the 'Add Section' link
-    # AND:   enter a section name and click the 'Add' button
+    # AND:   click on the 'Add Section' link, enter a section name and click
+    #        the 'Add' button
+    add_instructor.close()
+
+    course_roster.roster.add_section(new_section_name)
 
     # THEN:  the section is added
+    assert(new_section_name in [section.name
+                                for section
+                                in course_roster.roster.sections]), \
+        f'Section "{new_section_name}" not found'
 
-    # WHEN:  they click on the 'Rename' link
-    # AND:   enter a section name and click the 'Rename' button
+    # WHEN:  they click on the 'Rename' link enter a section name and click
+    #        the 'Rename' button
+    course_roster.roster.select_section(new_section_name)
+    course_roster.roster.rename_section(edited_section_name)
 
     # THEN:  the section name is changed
+    assert(edited_section_name in [section.name
+                                   for section
+                                   in course_roster.roster.sections]), \
+        f'Section "{edited_section_name}" not found'
 
-    # WHEN:  they click on the pencil icon in the 'Student ID' column
-    # AND:   enter an ID and send the tab key
+    # reset the section list
+    course_roster.roster.delete_section()
+
+    # WHEN:  they click on the pencil icon in the 'Student ID' column enter an
+    #        ID and send the tab key
+    students = course_roster.roster.students
+    student = students[Utility.random(0, len(students) - 1)]
+    student_name = student.name
+    student_id = student.student_id
+    current_section = course_roster.roster.current_section
+    other_sections = [section.name
+                      for section
+                      in course_roster.roster.sections]
+    other_sections.remove(current_section)
+    new_section = other_sections[Utility.random(0, len(other_sections) - 1)]
+    student.student_id = new_student_id
 
     # THEN:  the ID is changed
+    new_id = student.student_id
+    assert(new_id == new_student_id), (
+        f'ID for student {student_name} not changed ' +
+        f'({new_id} != {new_student_id})')
 
-    # WHEN:  they click the 'Change Section' link for a student
-    # AND:   select a different section
+    # reset the ID
+    student.student_id = student_id
+
+    # WHEN:  they click the 'Change Section' link for a student select a
+    #        different section
+    # AND:   view the selected section
+    student.change_section(new_section)
+
+    course_roster.roster.select_section(new_section)
 
     # THEN:  the student is moved to the selected section
+    assert(student_name in [student.name
+                            for student
+                            in course_roster.roster.students]), \
+        f"{student_name} ({student_id}) not found in period {new_section}"
 
-    # WHEN:  they click the 'Drop' link for a student
-    # AND:   click the 'Drop' button
+    # move the student back to their original section
+    ([student
+      for student
+      in course_roster.roster.students
+      if student.name == student_name and student.student_id == student_id]
+     [0].change_section(current_section))
+    course_roster.roster.select_section(current_section)
+
+    # WHEN:  they click the 'Drop' link for a student and click the 'Drop'
+    #        button
+    students = course_roster.roster.students
+    student = students[Utility.random(0, len(students) - 1)]
+    student_name = student.name
+    student_id = student.student_id
+    student.drop()
 
     # THEN:  the student is moved to the 'Dropped Students' list
+    assert(student_name in [student.name
+                            for student
+                            in course_roster.roster.dropped_students]), \
+        f"{student_name} ({student_id}) not found in the dropped students list"
 
-    # WHEN:  they click the 'Add Back to Active Roster` link for a student
-    # AND:   click the 'Add <student name>?' button
+    # WHEN:  they click the 'Add Back to Active Roster` link for a student and
+    #        click the 'Add <student name>?' button
+    ([student
+      for student
+      in course_roster.roster.dropped_students
+      if student.name == student_name and student.student_id == student_id]
+     [0].add_back_to_active_roster())
 
     # THEN:  the student is moved to the active roster
+    assert(student_name in [student.name
+                            for student
+                            in course_roster.roster.students]), \
+        f"{student_name} ({student_id}) not found in the active students list"
 
 
 @skip_test
@@ -207,6 +336,10 @@ def test_course_registration_and_initial_assignment_creation_timing(
     # WHEN:  the loading spinner goes away
 
     # THEN:  assignments are populated in 'THIS WEEK' and/or 'ALL PAST WORK'
+
+    import time
+    time.sleep(5)
+    assert(False), '*** Reached Test End ***'
 
 
 @skip_test

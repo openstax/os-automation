@@ -140,7 +140,7 @@ class Dashboard(TutorBase):
             :py:class:`~pages.tutor.course.StudentCourse`
 
         """
-        course = self.courses_region.courses[0]
+        course = self.current_courses.courses[0]
         is_teacher = course.is_teacher
         course.go_to_course()
         if is_teacher:
@@ -148,6 +148,37 @@ class Dashboard(TutorBase):
             return go_to_(Calendar(self.driver, self.base_url))
         from pages.tutor.course import StudentCourse
         return go_to_(StudentCourse(self.driver, self.base_url))
+
+    def go_to_course(self, name: str):
+        """Go to a specific course.
+
+        :param str name: the course name to select
+        :return: the calendar (teacher) or current week (student) page for the
+            specific course
+        :rtype: :py:class:`~pages.tutor.calendar.Calendar` or
+            :py:class:`~pages.tutor.course.StudentCourse`
+
+        :raises :py:class:`~utils.tutor.TutorException`: if no previous course
+            or current course exists or if a course does not match ``name``
+
+        """
+        # Look through current courses first
+        try:
+            for course in self.current_courses.courses:
+                if course.title == name:
+                    return course.go_to_course()
+        except AssertionError:
+            pass
+
+        # Then try previous courses
+        try:
+            for course in self.past_courses.courses:
+                if course.title == name:
+                    return course.go_to_course()
+        except AssertionError:
+            pass
+
+        raise TutorException(f'No course found matching "{name}"')
 
     @property
     def tooltips_displayed(self):
@@ -496,14 +527,13 @@ class Courses(Region):
                 :py:class:`~pages.tutor.course.StudentCourse`
 
             """
-            self.find_element(*self._card_locator).click()
             if self.is_teacher:
-                from pages.tutor.calendar import Calendar
-                return go_to_(Calendar(self.driver,
-                                       self.page.page.base_url))
-            from pages.tutor.course import StudentCourse
-            return go_to_(StudentCourse(self.driver,
-                                        self.page.page.base_url))
+                from pages.tutor.calendar import Calendar as Destination
+            else:
+                from pages.tutor.course import StudentCourse as Destination
+            card = self.find_element(*self._card_locator)
+            Utility.click_option(self.driver, element=card)
+            return go_to_(Destination(self.driver, self.page.page.base_url))
 
         def copy_this_course(self):
             """Clone the selected course.

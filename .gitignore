@@ -26,6 +26,8 @@ wheels/
 MANIFEST
 .DS_Store
 .gitignore.swp
+store/store
+store/*.yml
 
 # PyInstaller
 #  Usually these files are written by a python script from a template
