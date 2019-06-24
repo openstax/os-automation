@@ -3,13 +3,15 @@
 import re
 from datetime import datetime
 from time import sleep
+from typing import List
 
 from pypom import Region
-from selenium.common.exceptions import NoSuchElementException
+from selenium.common.exceptions import NoSuchElementException, TimeoutException
 from selenium.webdriver.common.by import By
 
 from pages.tutor.base import TutorBase
 from regions.tutor.notification import Notifications
+from regions.tutor.tooltip import Tooltip
 from utils.tutor import Tutor, TutorException
 from utils.utilities import Utility, go_to_
 
@@ -17,6 +19,7 @@ from utils.utilities import Utility, go_to_
 class StudentCourse(TutorBase):
     """The weekly course view for students."""
 
+    _joyride_root_selector = (By.CSS_SELECTOR, '.joyride')
     _notification_bar_locator = (
                                 By.CSS_SELECTOR, '.openstax-notifications-bar')
     _banner_locator = (By.CSS_SELECTOR, '.course-title-banner')
@@ -27,6 +30,8 @@ class StudentCourse(TutorBase):
     _survey_locator = (By.CSS_SELECTOR, '.research-surveys')
     _performance_guide_locator = (By.CSS_SELECTOR, '.progress-guide')
     _reference_book_locator = (By.CSS_SELECTOR, 'a.browse-the-book')
+    _pending_assignments_locator = (By.CSS_SELECTOR, '.pending')
+    _assignment_name_locator = (By.CSS_SELECTOR, '.row div.title')
 
     # ---------------------------------------------------- #
     # Notifications
@@ -104,7 +109,7 @@ class StudentCourse(TutorBase):
         toggle = self.find_element(*self._all_past_work_locator)
         Utility.click_option(self.driver, element=toggle)
         sleep(0.5)
-        return self.page
+        return self
 
     @property
     def weeks(self):
@@ -176,6 +181,54 @@ class StudentCourse(TutorBase):
         Utility.switch_to(self.driver, element=self.reference_book)
         from pages.tutor.reference import ReferenceBook
         return go_to_(ReferenceBook(self.driver, self.base_url))
+
+    def clear_training_wheels(self) -> None:
+        """Clear any joyride modals.
+
+        :return: None
+
+        """
+        while Utility.has_children(
+                self.find_element(*self._joyride_root_selector)):
+            tooltip = Tooltip(self, self.find_element(
+                *self._joyride_root_selector))
+            tooltip.next()
+            sleep(1)
+
+    def wait_for_assignments(self, max_time: int = 10) -> bool:
+        """Return True if assignments are built within the max time.
+
+        As assignments are built when a student enrolls, wait until the
+        'pending' state is gone from the week.
+
+        :param int max_time: the maximum number of minutes to wait for any
+            open assignments to be built for the student
+        :return: ``True`` if the ``pending`` state is removed before the timer
+            runs out
+        :rtype: bool
+
+        """
+        for _ in range(max_time):
+            try:
+                self.wait.until(
+                    lambda _: not bool(self.find_elements(
+                        *self._pending_assignments_locator)))
+                return True
+            except TimeoutException:
+                pass
+        return False
+
+    @property
+    def assignment_names(self) -> List[str]:
+        """Return a list of assignment names on the dashboard.
+
+        :return: the name for each assignment displayed on the current week
+        :rtype: list(str)
+
+        """
+        return [assignment.get_attribute('textContent')
+                for assignment
+                in self.find_elements(*self._assignment_name_locator)]
 
     # ---------------------------------------------------- #
     # Student Course Regions

@@ -76,6 +76,56 @@ class States(object):
     WISCONSIN = 'Wisconsin'
     WYOMING = 'Wyoming'
 
+    abbreviation = {
+        'AL': ALABAMA, 'AK': ALASKA, 'AS': AMERICAN_SAMOA, 'AZ': ARIZONA,
+        'AR': ARKANSAS,
+        'CA': CALIFORNIA, 'CO': COLORADO, 'CT': CONNECTICUT,
+        'DE': DELAWARE, 'DC': DISTRICT_OF_COLUMBIA,
+        'FL': FLORIDA,
+        'GA': GEORGIA, 'GU': GUAM,
+        'HI': HAWAII,
+        'ID': IDAHO, 'IL': ILLINOIS, 'IN': INDIANA, 'IA': IOWA,
+        'KS': KANSAS, 'KY': KENTUCKY,
+        'LA': LOUISIANA,
+        'ME': MAINE, 'MD': MARYLAND, 'MA': MASSACHUSETTS, 'MI': MICHIGAN,
+        'MN': MINNESOTA, 'MS': MISSISSIPPI, 'MO': MISSOURI, 'MT': MONTANA,
+        'NE': NEBRASKA, 'NV': NEVADA, 'NH': NEW_HAMPSHIRE, 'NJ': NEW_JERSEY,
+        'NM': NEW_MEXICO, 'NY': NEW_YORK, 'NC': NORTH_CAROLINA,
+        'ND': NORTH_DAKOTA, 'MP': NORTHERN_MARIANA_ISLANDS,
+        'OH': OHIO, 'OK': OKLAHOMA, 'OR': OREGON,
+        'PA': PENNSYLVANIA, 'PR': PUERTO_RICO,
+        'RI': RHODE_ISLAND,
+        'SC': SOUTH_CAROLINA, 'SD': SOUTH_DAKOTA,
+        'TN': TENNESSEE, 'TX': TEXAS,
+        'UT': UTAH,
+        'VT': VERMONT, 'VI': VIRGIN_ISLANDS, 'VA': VIRGINIA,
+        'WA': WASHINGTON, 'WV': WEST_VIRGINIA, 'WI': WISCONSIN, 'WY': WYOMING,
+    }
+
+    @classmethod
+    def from_abbreviation(cls, abbreviation: str) -> str:
+        """Return the full state name from its abbreviation.
+
+        .. note:
+
+            Return Texas if a non-OpenStax Tutor Beta available location is
+            requested (ie Canadian provinces)
+
+        :param str abbreviation: the 2-character abbreviation for the state or
+            U.S. territory
+        :return: the full name for the state or territory
+        :rtype: str
+
+        """
+        if len(abbreviation) > 2:
+            if abbreviation not in cls.abbreviation.values():
+                return cls.TEXAS
+            return abbreviation
+        try:
+            return cls.abbreviation[abbreviation]
+        except KeyError:
+            return cls.TEXAS
+
 
 class Tutor(object):
     """Tutor shared variables."""
@@ -175,6 +225,11 @@ class Tutor(object):
     IS_TEACHER = 'is teacher'
 
     # Enrollment
+    ADDRESS = 0
+    CITY = 1
+    STATE = 2
+    ZIP = 3
+
     @classmethod
     def states(cls):
         """Return the district, state, and territory options.

@@ -643,6 +643,11 @@ class Card(object):
             )
         )
 
+    def generic(self):
+        """Return a random, valid test card."""
+        cards = self.get_by()
+        return cards[randint(0, len(cards) - 1)]
+
 
 class Status(object):
     """Card states."""

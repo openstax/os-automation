@@ -4,15 +4,18 @@ These cover a wide range of features to satisfy end-to-end
 testing for high priority areas.
 """
 
-from datetime import datetime
+from datetime import datetime, timedelta
 
+from pages.tutor.enrollment import Enrollment, StudentID
 from pages.tutor.home import TutorHome
-from tests.markers import nondestructive, skip_test, test_case, tutor
-from utils.tutor import Tutor
-from utils.utilities import Utility
+# from tests.markers import nondestructive, skip_test, test_case, tutor
+from tests.markers import test_case, tutor
+from utils.email import RestMail
+from utils.tutor import States, Tutor
+from utils.utilities import Card, Utility
 
 
-@skip_test
+# @skip_test
 @test_case('C485035')
 @tutor
 def test_create_and_clone_a_course(tutor_base_url, selenium, teacher):
@@ -116,6 +119,7 @@ def test_create_and_clone_a_course(tutor_base_url, selenium, teacher):
                           in calendar.sidebar.copied_assignments])
 
 
+# @skip_test
 @test_case('C485036')
 @tutor
 def test_edit_course_settings_and_manage_course_students(
@@ -309,40 +313,123 @@ def test_edit_course_settings_and_manage_course_students(
         f"{student_name} ({student_id}) not found in the active students list"
 
 
-@skip_test
+# @skip_test
 @test_case('C485037')
-@nondestructive
 @tutor
 def test_course_registration_and_initial_assignment_creation_timing(
-        tutor_base_url, selenium):
+        tutor_base_url, selenium, store):
     """Test student enrollment and initial assignment creation time."""
+    # SETUP:
+    test_data = store.get('C485037')
+    enrollment_url = test_data.get('enrollment_url')
+    if '-dev.' in tutor_base_url:
+        enrollment_url = test_data.get('enrollment_url_dev')
+        production_payments = False
+    elif '-qa.' in tutor_base_url:
+        enrollment_url = test_data.get('enrollment_url_qa')
+        production_payments = False
+    elif '-staging.' in tutor_base_url:
+        enrollment_url = test_data.get('enrollment_url_staging')
+        production_payments = True
+    elif 'tutor.' in tutor_base_url:
+        enrollment_url = test_data.get('enrollment_url_prod')
+        production_payments = True
+    else:
+        enrollment_url = test_data.get('enrollment_url_unique')
+        production_payments = True
+    _, first_name, last_name, suffix = Utility.random_name()
+    email = RestMail(
+        f"{first_name}.{last_name}.{Utility.random_hex(3)}".lower())
+    email.empty()
+    password = Utility.random_hex(8)
+    school = 'Automation'
+    student_id = Utility.random(100000000, 999999999)
+    home_address = Utility.random_address()
+    max_time_to_wait = 10  # minutes
+    expected_assignments = ['Reading Creation', 'Homework Creation',
+                            'External Creation', 'Event Creation']
+
     # GIVEN: a user viewing the Tutor home page
+    TutorHome(selenium, tutor_base_url).open()
 
     # WHEN:  they go to the student enrollment URL
     # AND:   click the 'Get started' button
     # AND:   sign up for an account
     # AND:   enter the student ID and click the 'Continue' button
     # AND:   click the 'I agree' button
-    # IF:    using a production-based instance
+    # IF:    using a production-based Payments instance (Prod/Staging/Unique)
     #  THEN: click the 'Try free for 14 days' button
     #  ELSE: fill out the purchase form address, city, state, zip code,
     #        credit  card  number, expiration date, CVV code, billing zip
     #        code, and click the 'Purchase' button
     # AND:   click the 'Access your course' button
     # AND:   click through any training wheel modals
+    selenium.get(enrollment_url)
+    enrollment = Enrollment(selenium, tutor_base_url)
+
+    signup = enrollment.get_started()
+
+    signup.account_signup(
+        destination=tutor_base_url,
+        email=email.address,
+        name=['', first_name, last_name, suffix],
+        password=password,
+        school=school,
+        tutor=True)
+
+    identification = StudentID(selenium, tutor_base_url)
+    identification.student_id = student_id
+    privacy = identification._continue()
+
+    buy_access = privacy.i_agree()
+
+    if production_payments:
+        free_trial = buy_access.try_free()
+        course_page = free_trial.access_your_course()
+    else:
+        credit_card = Card().generic()
+        expiration = datetime.now() + timedelta(
+            weeks=Utility.random(0, 5 * 52))  # exp between today and 5 years
+        purchase = buy_access.buy_access_now()
+        purchase.address = home_address[Tutor.ADDRESS]
+        purchase.city = home_address[Tutor.CITY]
+        purchase.state = States.from_abbreviation(home_address[Tutor.STATE])
+        purchase.mailing_zip = home_address[Tutor.ZIP]
+        purchase.card_number = credit_card.get('number')
+        purchase.expiration_date = expiration.strftime("%m/%y")
+        purchase.cvv = credit_card.get('cvv')
+        purchase.billing_zip_code = home_address[Tutor.ZIP]
+        confirmation = purchase.purchase()
+        course_page = confirmation.access_your_course()
+
+    course_page.clear_training_wheels()
 
     # THEN:  the current week dashboard is displayed
+    assert(course_page.is_displayed)
 
     # WHEN:  the loading spinner goes away
+    assignments_made = course_page.wait_for_assignments(max_time_to_wait)
 
     # THEN:  assignments are populated in 'THIS WEEK' and/or 'ALL PAST WORK'
+    assert(assignments_made), \
+        f'Assignment creation still pending after {max_time_to_wait} minutes'
+    assignments = course_page.assignment_names
+    new_assignments = expected_assignments.copy()
+    for assignment in assignments:
+        if assignment in new_assignments:
+            new_assignments.remove(assignment)
+    if new_assignments:
+        # there are still assignments; look in past assignments
+        course_page.view_all_past_work()
+        assignments = course_page.assignment_names
+        for assignment in assignments:
+            if assignment in new_assignments:
+                new_assignments.remove(assignment)
+    assert(not new_assignments), \
+        f'Not all assignments found: {new_assignments}'
 
-    import time
-    time.sleep(5)
-    assert(False), '*** Reached Test End ***'
 
-
-@skip_test
+'''@skip_test
 @test_case('C485038')
 @tutor
 def test_assignment_creation_readings(tutor_base_url, selenium):
@@ -377,6 +464,10 @@ def test_assignment_creation_readings(tutor_base_url, selenium):
 
     # THEN:  the course calendar is displayed
     # AND:   the modified reading name is displayed on tomorrow's date box
+
+    import time
+    time.sleep(5)
+    assert(False), '*** Reached Test End ***'
 
 
 @skip_test
@@ -422,6 +513,10 @@ def test_assignment_creation_homework(tutor_base_url, selenium):
     # AND:   the homework name is displayed on the selected date box and is
     #        not prefixed with 'draft'
 
+    import time
+    time.sleep(5)
+    assert(False), '*** Reached Test End ***'
+
 
 @skip_test
 @test_case('C485050')
@@ -460,6 +555,10 @@ def test_assignment_creation_external(tutor_base_url, selenium):
     # AND:   the external assignment name is no longer displayed on the
     #        selected date box
 
+    import time
+    time.sleep(5)
+    assert(False), '*** Reached Test End ***'
+
 
 @skip_test
 @test_case('C485051')
@@ -482,6 +581,10 @@ def test_assignment_creation_event(tutor_base_url, selenium):
 
     # THEN:  the course calendar is displayed
     # AND:   the event name is displayed on the first due date box
+
+    import time
+    time.sleep(5)
+    assert(False), '*** Reached Test End ***'
 
 
 @skip_test
@@ -540,6 +643,10 @@ def test_student_task_reading_assignment(tutor_base_url, selenium):
     # THEN:  the 'THIS WEEK' dashboard is displayed
     # AND:   the reading assignment progress is 'Complete'
 
+    import time
+    time.sleep(5)
+    assert(False), '*** Reached Test End ***'
+
 
 @skip_test
 @test_case('C485040')
@@ -560,6 +667,10 @@ def test_student_task_homework_assignment(tutor_base_url, selenium):
     # THEN:  the student dashboard is displayed
     # AND:   the homework assignment progress is 'N/N answered' or 'X/Y
     #        correct'
+
+    import time
+    time.sleep(5)
+    assert(False), '*** Reached Test End ***'
 
 
 @skip_test
@@ -593,6 +704,10 @@ def test_student_task_practice(tutor_base_url, selenium):
     # WHEN:  they click the 'Practice my weakest topics' button
 
     # THEN:  a practice session with between 1 - 5 questions is displayed
+
+    import time
+    time.sleep(5)
+    assert(False), '*** Reached Test End ***'
 
 
 @skip_test
@@ -657,6 +772,10 @@ def test_teacher_viewing_student_scores(tutor_base_url, selenium, teacher):
 
     # THEN:  the spreadsheet is downloaded
 
+    import time
+    time.sleep(5)
+    assert(False), '*** Reached Test End ***'
+
 
 @skip_test
 @test_case('C485043')
@@ -680,6 +799,10 @@ def test_student_viewing_student_scores(tutor_base_url, selenium, student):
 
     # THEN:  the weights modal is closed
 
+    import time
+    time.sleep(5)
+    assert(False), '*** Reached Test End ***'
+
 
 @skip_test
 @test_case('C485044')
@@ -698,6 +821,10 @@ def test_teacher_viewing_the_course_performance_forecast(
     # AND:   weaker areas and each chapter are displayed
     # AND:   each chapter and section displayed show a progress bar or 'Not
     #        enough exercises completed' message
+
+    import time
+    time.sleep(5)
+    assert(False), '*** Reached Test End ***'
 
 
 @skip_test
@@ -722,3 +849,8 @@ def test_student_viewing_their_performance_forecast(
     #        get forecast' button
 
     # THEN:  a practice session is loaded for the selected chapter
+
+    import time
+    time.sleep(5)
+    assert(False), '*** Reached Test End ***'
+'''

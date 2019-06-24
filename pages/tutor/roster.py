@@ -349,6 +349,7 @@ class DeleteSection(Modal):
         Utility.click_option(self.driver, element=button)
         sleep(0.25)
         self.wait.until(expect.staleness_of(self.root))
+        sleep(1)
         return self.page
 
     def cancel(self):
@@ -886,6 +887,7 @@ class CourseRoster(TutorBase):
                 tooltip_root = self.driver.execute_script(
                     GET_ROOT.format('tooltip'))
                 tooltip = ChangeSection(self.page.page, tooltip_root)
+                sleep(1)
                 return tooltip.switch_to(section) if section else tooltip
 
             def drop(self, drop_student=True):

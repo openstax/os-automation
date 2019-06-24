@@ -131,11 +131,12 @@ class Calendar(TutorBase):
         :return: None
 
         """
-        while self.find_elements(*self._joyride_root_selector):
-            tooltip = Tooltip(self, self.find_element(
-                *self._joyride_root_selector))
-            tooltip.close()
-            sleep(1)
+        joyride = self.find_elements(*self._joyride_root_selector)
+        if not joyride or not Utility.has_children(joyride[0]):
+            return
+        Tooltip(self, joyride[0]).next()
+        sleep(1)
+        return self.clear_training_wheels()
 
     def add_assignment(self,
                        assignment: str,
