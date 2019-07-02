@@ -8,8 +8,7 @@ from datetime import datetime, timedelta
 
 from pages.tutor.enrollment import Enrollment, StudentID
 from pages.tutor.home import TutorHome
-# from tests.markers import nondestructive, skip_test, test_case, tutor
-from tests.markers import test_case, tutor
+from tests.markers import skip_test, test_case, tutor
 from utils.email import RestMail
 from utils.tutor import States, Tutor
 from utils.utilities import Card, Utility
@@ -429,17 +428,42 @@ def test_course_registration_and_initial_assignment_creation_timing(
         f'Not all assignments found: {new_assignments}'
 
 
-'''@skip_test
+# @skip_test
 @test_case('C485038')
 @tutor
-def test_assignment_creation_readings(tutor_base_url, selenium):
+def test_assignment_creation_readings(tutor_base_url, selenium, store):
     """Test publishing a reading.
 
-    Start a new reading from the assignment menu, publish it, edit it and
-    rename it.
+    Start a new reading from the assignment menu, publish, edit and rename it.
 
     """
+    # SETUP:
+    test_data = store.get('C485038')
+    user = test_data.get('username')
+    if '-dev.' in tutor_base_url:
+        password = test_data.get('password_dev')
+    elif '-qa.' in tutor_base_url:
+        password = test_data.get('password_qa')
+    elif '-staging.' in tutor_base_url:
+        password = test_data.get('password_staging')
+    elif 'tutor.' in tutor_base_url:
+        password = test_data.get('password_prod')
+    else:
+        password = test_data.get('password_unique')
+    course_name = test_data.get('course_name')
+    assignment_name = f'Auto Reading - {Utility.random_hex(5)}'
+    assignment_edit_name = assignment_name + ' (Edited)'
+    description = f'Assignment description for {assignment_name}'
+    today = datetime.now()
+    tomorrow = today + timedelta(days=1)
+    dates_and_times = {Tutor.ALL: (today, (tomorrow, '1200p')), }
+    chapters = [1, None][Utility.random(0, 1)]
+    sections = Utility.random(2, 6)
+
     # GIVEN: a Tutor teacher viewing their course calendar
+    home = TutorHome(selenium, tutor_base_url).open()
+    courses = home.log_in(user, password)
+    calendar = courses.go_to_course(course_name)
 
     # WHEN:  they open the 'Add Assignment' taskbar
     # AND:   click on the 'Add Reading' link
@@ -449,73 +473,191 @@ def test_assignment_creation_readings(tutor_base_url, selenium):
     #        button
     # AND:   select a chapter or 2+ individual sections and click the 'Add
     #        Readings' button
+    if not calendar.sidebar.is_open:
+        calendar.banner.add_assignment()
+
+    assignment = calendar.sidebar.add_reading()
+
+    assignment.name = assignment_name
+    assignment.description = description
+    assignment.set_assignment_dates(dates_and_times)
+
+    # Using the internal function to exercise both chapter and section options
+    # either select 1 random chapter, or, when ``chapters == None``, select
+    # between 2 and 6, inclusive, random, sequential book sections
+    group = assignment.add_readings_by(chapters=chapters, sections=sections)
 
     # THEN:  the selected readings should be displayed under the currently
     #        selected table
+    sections_selected = [section.number
+                         for section
+                         in assignment.reading_list]
+    assert(len(group) == (chapters or sections))
+    if chapters:
+        chapter = group[0].split('.')[0]
+        for section in sections_selected:
+            assert(section.startswith(str(chapter))), \
+                f'Section {section} not in chapter {chapter}'
+    else:
+        assert(len(group) == len(sections_selected))
+        for section in sections_selected:
+            assert(section in group), \
+                f'Section {section} not in the requested list ({group})'
 
     # WHEN:  they click the 'Publish' button
+    calendar = assignment.publish()
 
     # THEN:  the course calendar is displayed
     # AND:   the new reading name is displayed on tomorrow's date box
+    assert(calendar.is_displayed())
+    assert('month' in calendar.location)
+
+    assert(assignment_name in calendar.assignments(by_name=True)), \
+        f'"{assignment_name}" not found'
+    assert(assignment_name in calendar.assignments_on(tomorrow,
+                                                      by_name=True)), (
+        f'"{assignment_name}" not on the expected due date '
+        f'({tomorrow.strftime("%m/%d/%Y")})')
 
     # WHEN:  they click the reading name and then click 'View Assignment'
     #        button
     # AND:   enter a new assignment name and click the 'Save' button
+    quick_look = calendar.assignment(name=assignment_name).edit()
+    assignment_edit = quick_look.view_assignment()
+
+    assignment_edit.name = assignment_edit_name
+    calendar = assignment_edit.save()
 
     # THEN:  the course calendar is displayed
     # AND:   the modified reading name is displayed on tomorrow's date box
+    assert(calendar.is_displayed())
+    assert('month' in calendar.location)
 
-    import time
-    time.sleep(5)
-    assert(False), '*** Reached Test End ***'
+    assert(assignment_edit_name in calendar.assignments(by_name=True)), \
+        f'"{assignment_edit_name}" not found'
+    assert(assignment_edit_name in calendar.assignments_on(tomorrow,
+                                                           by_name=True)), (
+        f'"{assignment_edit_name}" not on the expected due date ' +
+        f'({tomorrow.strftime("%m/%d/%Y")})')
 
 
-@skip_test
+# @skip_test
 @test_case('C485049')
 @tutor
-def test_assignment_creation_homework(tutor_base_url, selenium):
+def test_assignment_creation_homework(tutor_base_url, selenium, store):
     """Test publishing each assignment type.
 
     Start a new homework from the calendar date, save it as a draft, then
     publish it.
 
     """
+    # SETUP:
+    test_data = store.get('C485049')
+    user = test_data.get('username')
+    if '-dev.' in tutor_base_url:
+        password = test_data.get('password_dev')
+    elif '-qa.' in tutor_base_url:
+        password = test_data.get('password_qa')
+    elif '-staging.' in tutor_base_url:
+        password = test_data.get('password_staging')
+    elif 'tutor.' in tutor_base_url:
+        password = test_data.get('password_prod')
+    else:
+        password = test_data.get('password_unique')
+    course_name = test_data.get('course_name')
+    assignment_name = f'Auto Homework - {Utility.random_hex(5)}'
+    description = f'Assignment description for {assignment_name}'
+    feedback = [Tutor.DUE_AT, Tutor.IMMEDIATE][Utility.random(0, 1)]
+    sections = Utility.random(2, 3)
+    questions_per_section = Utility.random(1, 3)
+
     # GIVEN: a Tutor teacher viewing their course calendar
+    home = TutorHome(selenium, tutor_base_url).open()
+    courses = home.log_in(user, password)
+    calendar = courses.go_to_course(course_name)
 
     # WHEN:  they click on an available date box on the calendar
     # AND:   click on the 'Add Homework' link
+    days = [day
+            for day
+            in calendar.calendar.days
+            if day.tense != Tutor.IN_PAST]
+    day = days[Utility.random(0, len(days) - 1)]
+    date = day.date
+
+    homework = day.add_assignment(Tutor.HOMEWORK)
 
     # THEN:  the due date should match the selected date box
+    due_on = homework.open_and_due.due_date.get_attribute('value')
+    assert(due_on == date.strftime("%m/%d/%Y")), \
+        f'The due date ({due_on}) does not match the expected date ({date})'
 
     # WHEN:  they fill out the assignment name and description, select a 'Show
     #        feedback' option, and click the '+ Select Problems' button
-    # AND:   select 2-3 non-introductory sections and click the 'Show
-    #        Problems' button
+    # AND:   select 2-3 sections and click the 'Show Problems' button
+    homework.name = assignment_name
+    homework.description = description
+    homework.feedback = feedback
+
+    problem_selector = homework.add_assessments_by(sections=sections)
 
     # THEN:  the selected section buttons are displayed in the secondary
     #        toolbar
+    selected_sections = problem_selector.toolbar.sections
+    assert(len(selected_sections) == sections), (
+        'Section selections ({0}) do not match expectation ({1})'
+        .format([section.number for section in selected_sections],
+                sections))
 
     # WHEN:  they select 1-3 assessments from each available section
+    options_selected = 0
+    for section in problem_selector.sections:
+        for exercise in Utility.sample(section.assessments,
+                                       questions_per_section):
+            exercise.add_question()
+            options_selected += 1
 
     # THEN:  the 'My Selections' shows the total number of assessments selected
+    assert(problem_selector.toolbar.my_selections == options_selected), \
+        f'My Selections does not match the actual assessment selections'
 
     # WHEN:  they click on the 'Next' button
     # AND:   click on the 'Save as Draft' button
+    homework = problem_selector.toolbar.next()
+
+    calendar = homework.save_as_draft()
 
     # THEN:  the course calendar is displayed
     # AND:   the new homework name is displayed on the selected date box and
     #        is prefixed with 'draft'
+    assert(calendar.is_displayed())
+    assert('month' in calendar.location)
+
+    assert(assignment_name in calendar.assignments(by_name=True)), \
+        f'"{assignment_name}" not found'
+    assert(assignment_name in calendar.assignments_on(date, by_name=True)), (
+        '"{name}" not on the expected due date ({date})'
+        .format(name=assignment_name, date=date.strftime("%m/%d/%Y")))
 
     # WHEN:  they click on the homework name
     # AND:   click the 'Publish' button
+    assignment_edit = calendar.assignment(name=assignment_name).edit()
+
+    calendar = assignment_edit.publish()
 
     # THEN:  the course calendar is displayed
     # AND:   the homework name is displayed on the selected date box and is
     #        not prefixed with 'draft'
+    assert(calendar.is_displayed())
+    assert('month' in calendar.location)
 
-    import time
-    time.sleep(5)
-    assert(False), '*** Reached Test End ***'
+    assert(assignment_name in calendar.assignments(by_name=True)), \
+        f'"{assignment_name}" not found'
+    assert(assignment_name in calendar.assignments_on(date, by_name=True)), (
+        '"{name}" not on the expected due date ({date})'
+        .format(name=assignment_name, date=date.strftime("%m/%d/%Y")))
+    assert(not calendar.assignment(assignment_name).is_draft), \
+        f'"{assignment_name}" is still a draft assignment'
 
 
 @skip_test
@@ -560,7 +702,7 @@ def test_assignment_creation_external(tutor_base_url, selenium):
     assert(False), '*** Reached Test End ***'
 
 
-@skip_test
+'''@skip_test
 @test_case('C485051')
 @tutor
 def test_assignment_creation_event(tutor_base_url, selenium):

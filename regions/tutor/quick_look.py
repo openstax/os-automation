@@ -48,15 +48,24 @@ class QuickLookBase(Region):
 class QuickLook(QuickLookBase):
     """The quick look analytics modal."""
 
-    _assignment_sections_locator = (By.CSS_SELECTOR, '.nav-tabs li')
-    _event_sections_locator = (By.CSS_SELECTOR, '.event-stats strong')
-    _no_students_locator = (By.CSS_SELECTOR, '.no-students')
-    _no_students_info_locator = (By.CSS_SELECTOR, '.no-students p')
-    _course_settings_locator = (By.CSS_SELECTOR, '.no-students a')
-    _body_data_locator = (By.CSS_SELECTOR, '.task-stats-data')
-    _review_metrics_locator = (By.CSS_SELECTOR, '[href*=metrics]')
-    _view_assignment_locator = (By.CSS_SELECTOR, '.modal-footer button')
-    _assignment_link_locator = (By.CSS_SELECTOR, '.modal-footer button')
+    _assignment_sections_locator = (
+        By.CSS_SELECTOR, '.nav-tabs li')
+    _event_sections_locator = (
+        By.CSS_SELECTOR, '.event-stats strong')
+    _no_students_locator = (
+        By.CSS_SELECTOR, '.no-students')
+    _no_students_info_locator = (
+        By.CSS_SELECTOR, '.no-students p')
+    _course_settings_locator = (
+        By.CSS_SELECTOR, '.no-students a')
+    _body_data_locator = (
+        By.CSS_SELECTOR, '.task-stats-data')
+    _review_metrics_locator = (
+        By.CSS_SELECTOR, '[href*=metrics]')
+    _view_assignment_locator = (
+        By.CSS_SELECTOR, f'.modal-footer a:not({_review_metrics_locator[1]})')
+    _assignment_link_locator = (
+        By.CSS_SELECTOR, '.modal-footer button')
 
     # ---------------------------------------------------- #
     # Section navigation
@@ -120,13 +129,13 @@ class QuickLook(QuickLookBase):
         button = self.find_element(*self._view_assignment_locator)
         button_url = button.get_attribute('href')
         if Tutor.EVENT in button_url:
-            from pages.tutor.edit import EditEvent as Edit
+            from pages.tutor.assignment import Event as Edit
         elif Tutor.EXTERNAL in button_url:
-            from pages.tutor.edit import EditExternal as Edit
+            from pages.tutor.assignment import External as Edit
         elif Tutor.HOMEWORK in button_url:
-            from pages.tutor.edit import EditHomework as Edit
+            from pages.tutor.assignment import Homework as Edit
         elif Tutor.READING in button_url:
-            from pages.tutor.edit import EditReading as Edit
+            from pages.tutor.assignment import Reading as Edit
         else:
             raise ValueError('{url} contains an unknown assignment type'
                              .format(url=button_url))

@@ -256,7 +256,19 @@ class PurchaseConfirmation(IframeModal):
         :rtype: bool
 
         """
-        return sleep(1) or (bool(self.order_number) and bool(self.total))
+        # Intermittant load failures due to timing; check vals below until the
+        # root cause is found.
+        try:
+            number = self.order_number
+        except Exception:
+            number = None
+        try:
+            total = self.total
+        except Exception:
+            total = None
+        print(f'Order number: {number}\nTotal: {total}')
+        # return bool(self.order_number) and bool(self.total)
+        return bool(number) and bool(total)
 
     @property
     def content(self) -> str:

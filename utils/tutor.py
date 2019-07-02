@@ -313,6 +313,9 @@ def to_date_time_string(to_format: Union[str, DateFormat]) -> Tuple[str, str]:
     else:
         raise TutorException(f'Unknown date time format: "{to_format}"')
 
+    if isinstance(date, datetime):
+        date = date.strftime('%m/%d/%Y')
+
     # Fix some time prefixes that the form widget can't handle well
     if not time.startswith('01') and time.startswith('0'):
         time = time[1:]

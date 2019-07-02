@@ -296,6 +296,7 @@ class SectionSelector(Region):
     _title_locator = (By.CSS_SELECTOR, '.card-header')
     _close_x_locator = (By.CSS_SELECTOR, '.close')
     _chapter_locator = (By.CSS_SELECTOR, '.chapter')
+    _section_locator = (By.CSS_SELECTOR, '[data-section-id]')
     _add_readings_button_locator = (By.CSS_SELECTOR, '.show-problems')
     _cancel_button_locator = (By.CSS_SELECTOR, '.btn-default')
 
@@ -311,7 +312,7 @@ class SectionSelector(Region):
 
         """
         sleep(0.25)
-        return self.execute_script(ANIMATION) is None
+        return self.driver.execute_script(ANIMATION) is None
 
     @property
     def title(self) -> str:
@@ -346,6 +347,18 @@ class SectionSelector(Region):
         return [self.Chapter(self, chapter)
                 for chapter in self.find_elements(*self._chapter_locator)]
 
+    @property
+    def sections(self) -> List[SectionSelector.Chapter.Section]:
+        r"""Access the individual book sections.
+
+        :return: the list of book sections ignoring the chapters
+        :rtype: list(:py:class:`~pages.tutor.assignment \
+                                .SectionSelector.Chapter.Section`)
+
+        """
+        return [self.Chapter.Section(self, section)
+                for section in self.find_elements(*self._section_locator)]
+
     def add_readings(self) -> Union[Assignment, ExerciseSelector]:
         """Click the 'Add Readings' / 'Show Problems' button.
 
@@ -363,7 +376,7 @@ class SectionSelector(Region):
         selector_root = self.driver.execute_script(
             'return document.querySelector("{0}");'
             .format(self._exercise_selection_selector))
-        return ExerciseSelector(self, selector_root)
+        return ExerciseSelector(self.page, selector_root)
 
     show_problems = add_readings
 
@@ -432,7 +445,7 @@ class SectionSelector(Region):
 
             """
             checkbox = self.find_element(*self._check_state_locator)
-            return 'checked' in checkbox.get_attribute('class')
+            return 'unchecked' not in checkbox.get_attribute('class')
 
         @property
         def number(self) -> str:
@@ -491,10 +504,22 @@ class SectionSelector(Region):
                 :rtype: :py:class:`SectionSelector`
 
                 """
+                visibility = (self.root.find_element(By.XPATH, './..')
+                              .get_attribute('class'))
+                if 'show' not in visibility:
+                    chapter_bar = self.root.find_element(By.XPATH, './../..')
+                    Utility.click_option(self.driver, element=chapter_bar)
+                    sleep(0.4)
                 checkbox = self.find_element(*self._section_checkbox_locator)
                 Utility.click_option(self.driver, element=checkbox)
                 sleep(0.75)
-                return self.page.page
+                # if viewing the section of a chapter, return the chapter's
+                # parent page
+                if isinstance(self.page, Region):
+                    return self.page.page
+                # if viewing the section individually, return the immediate
+                # parent
+                return self.page
 
             @property
             def checked(self) -> bool:
@@ -516,20 +541,30 @@ class SectionSelector(Region):
                 :rtype: bool
 
                 """
-                return bool(self.find_elements(*self._section_number_locator))
+                return not bool(self.find_elements(
+                    *self._section_number_locator))
 
             @property
             def number(self) -> str:
                 """Return the section number.
 
-                :return: the section number if it exists or an empty string if
-                    it does not exist
+                :return: the section number if it exists, chapter number plus
+                    '.0' if it is an introductory section, or an empty string
+                    if it does not exist for an end-of-chapter object
                 :rtype: str
 
                 """
                 if self.is_unnumbered:
+                    if 'Introduction to' in self.title:
+                        chapter_number = (
+                            self.find_element(By.XPATH, './../..')
+                            .find_element(By.CSS_SELECTOR, 'div:first-child')
+                            .get_attribute('data-chapter-section'))
+                        return f'{chapter_number}.0'
                     return ''
-                return self.find_element(*self._section_number_locator).text
+                return (self.find_element(*self._section_number_locator)
+                        .get_attribute('textContent')
+                        .strip())
 
             @property
             def title(self) -> str:
@@ -539,7 +574,9 @@ class SectionSelector(Region):
                 :rtype: str
 
                 """
-                return self.find_element(*self._section_title_locator).text
+                return (self.find_element(*self._section_title_locator)
+                        .get_attribute('textContent')
+                        .strip())
 
 
 class ExerciseSelector(Region):
@@ -548,6 +585,18 @@ class ExerciseSelector(Region):
     _book_section_locator = (By.CSS_SELECTOR, '.exercise-sections')
 
     _secondary_toolbar_root_selector = '.exercise-controls-bar'
+
+    @property
+    def loaded(self) -> bool:
+        """Wait until the loading animation is done.
+
+        :return: ``True`` when the loading animation is not found, otherwise
+            ``False``
+        :rtype: bool
+
+        """
+        sleep(0.25)
+        return self.driver.execute_script(ANIMATION) is None
 
     @property
     def toolbar(self) -> ExerciseSelector.Toolbar:
@@ -577,7 +626,7 @@ class ExerciseSelector(Region):
         """The assessment selection toolbar."""
 
         _previous_section_arrow_locator = (By.CSS_SELECTOR, '.prev')
-        _sections_list_locator = (By.CSS_SELECTOR, '.section')
+        _sections_list_locator = (By.CSS_SELECTOR, '.sectionizer .section')
         _next_section_arrow_locator = (By.CSS_SELECTOR, '.next')
         _total_problems_locator = (By.CSS_SELECTOR, '.num.total h2')
         _my_selections_locator = (By.CSS_SELECTOR, '.num.mine h2')
@@ -587,6 +636,8 @@ class ExerciseSelector(Region):
             By.CSS_SELECTOR, '.sectionizer ~ button')
         _exercise_selection_root_locator = (
             By.CSS_SELECTOR, '.homework-plan-exercise-select-topics')
+        _next_button_locator = (By.CSS_SELECTOR, '.review-exercises')
+        _cancel_button_locator = (By.CSS_SELECTOR, '.cancel-add')
 
         def previous_section(self) -> ExerciseSelector:
             """Click on the previous section left arrow.
@@ -722,6 +773,30 @@ class ExerciseSelector(Region):
             selection_root = self.find_element(
                 *self._exercise_selection_root_locator)
             return SectionSelector(self.page.page, selection_root)
+
+        def next(self) -> Homework:
+            """Click the 'Next' button.
+
+            :return: the homework builder with the question review visible
+            :rtype: :py:class:`~pages.tutor.assignment.Homework`
+
+            """
+            button = self.find_element(*self._next_button_locator)
+            Utility.click_option(self.driver, element=button)
+            sleep(0.3)
+            return self.page.page
+
+        def cancel(self) -> Homework:
+            """Click the 'Cancel' button.
+
+            :return: the homework builder
+            :rtype: :py:class:`~pages.tutor.assignment.Homework`
+
+            """
+            button = self.find_element(*self._cancel_button_locator)
+            Utility.click_option(self.driver, element=button)
+            sleep(0.3)
+            return self.page.page
 
         class Section(Region):
             """A selected book section button in the toolbar."""
@@ -1011,6 +1086,9 @@ class ExerciseTableReview(Region):
         _multipart_stimulus_locator = (By.CSS_SELECTOR, '.stimulus')
         _question_locator = (By.CSS_SELECTOR, '.openstax-question')
         _exercise_tag_locator = (By.CSS_SELECTOR, '.exercise-tag')
+        _include_assessment_locator = (
+            By.CSS_SELECTOR, '.action.include , .action.exclude')
+        _assessment_details_locator = (By.CSS_SELECTOR, '.action.details')
 
         @property
         def position(self) -> int:
@@ -1118,6 +1196,46 @@ class ExerciseTableReview(Region):
                 key, value = tag.split(':', 1)
                 tags[key] = value
             return tags
+
+        def add_question(self) -> None:
+            """Include the assessment in the selection.
+
+            :return: None
+
+            """
+            self._selection_toggle('Add question')
+
+        def remove_question(self) -> None:
+            """Remove the assessment from the selection.
+
+            :return: None
+
+            """
+            self._selection_toggle('Remove question')
+
+        def _selection_toggle(self, option: str) -> None:
+            """Add or remove an assessment from the selection.
+
+            :param str option: the expected button content
+            :return: None
+
+            """
+            button = self.find_element(*self._include_assessment_locator)
+            if option == button.get_attribute('textContent'):
+                Utility.click_option(self.driver, element=button)
+            return
+
+        def question_details(self) -> None:
+            """View the assessment detailed card view.
+
+            :return: the assessment card detailed view
+            :rtype: QuestionDetails
+
+            """
+            button = self.find_element(*self._assessment_details_locator)
+            Utility.click_option(self.driver, element=button)
+            sleep(0.25)
+            raise NotImplementedError()
 
         class Question(Region):
             """An individual question within an assessment item."""
@@ -1545,7 +1663,12 @@ class Assignment(TutorBase):
         if self.errors:
             raise TutorException(f'Assignment error(s): {self.errors}')
         calendar = go_to_(Calendar(self.driver, self.base_url))
+        calendar.wait.until(
+            lambda _: not self.driver.find_elements(
+                *calendar._is_publishing_locator))
         return calendar
+
+    save = publish
 
     def save_as_draft(self) -> Calendar:
         """Click the 'Save as Draft' assignment button.
@@ -1554,7 +1677,17 @@ class Assignment(TutorBase):
         :rtype: :py:class:`~pages.tutor.calendar.Calendar`
 
         """
-        raise NotImplementedError()
+        name = self.name
+        button = self.find_element(*self._save_as_draft_button_locator)
+        Utility.click_option(self.driver, element=button)
+        sleep(0.5)
+        if self.errors:
+            raise(TutorException(f'Assignment error(s): {self.errors}'))
+        calendar = go_to_(Calendar(self.driver, self.base_url))
+        calendar.wait.until(
+            lambda _: (name in calendar.assignments(by_name=True) and
+                       calendar.assignment(name).is_draft))
+        return calendar
 
     def cancel(self) -> Calendar:
         """Click the 'Cancel' assignment button.
@@ -1694,7 +1827,7 @@ class External(Assignment):
         :rtype: list(str)
 
         """
-        errors = super().errors()
+        errors = super().errors
         url = self.find_elements(*self._assignment_url_required_locator)
         if url and self.driver.execute_script(DISPLAYED, url[0]):
             errors.append('URL: {0}'.format(url[0].text))
@@ -1705,7 +1838,7 @@ class Homework(Assignment):
     """A homework assignment creation or modification."""
 
     _feedback_select_menu_locator = (By.CSS_SELECTOR, '#feedback-select')
-    _select_problems_button_locator = (By.CSS_SELECTOR, '#problem-select')
+    _select_problems_button_locator = (By.CSS_SELECTOR, '#problems-select')
     _problems_required_locator = (By.CSS_SELECTOR, '.problems-required')
     _homework_plan_root_locator = (
         By.CSS_SELECTOR, '.homework-plan-select-topics')
@@ -1718,11 +1851,60 @@ class Homework(Assignment):
         :rtype: :py:class:`SectionSelector`
 
         """
-        button = self.find_element(*self._add_readings_button_locator)
+        button = self.find_element(*self._select_problems_button_locator)
         Utility.click_option(self.driver, element=button)
         sleep(1)
-        selector_root = self.find_element(*self._reading_plan_root_locator)
+        selector_root = self.find_element(*self._homework_plan_root_locator)
         return SectionSelector(self, selector_root)
+
+    def add_assessments_by(self,
+                           chapters: Union[int, List[str], List[int]] = None,
+                           sections: Union[int, List[str], List[float]] = None
+                           ) -> List[str]:
+        """Narrow assessment selection to certain chapters or sections.
+
+        .. note:
+
+            ``chapters`` and ``sections`` are exclusive; if ``chapters`` is
+            set then ``sections`` is ignored
+
+        :param chapters: a number of chapters or a list of specific chapters to
+            select assessments from
+        :param sections: a number of sections or a list of specific sections to
+            select assessments from
+        :type chapters: int or list(str) or list(int)
+        :type sections: int or list(str) or list(float)
+        :return: the list of chapters or sections selected as strings
+        :rtype: list(str)
+
+        """
+        if chapters:
+            # if chapters is set, ignore sections
+            sections = None
+        selector = self.select_problems()
+        options = [option.number
+                   for option
+                   in (selector.chapters if chapters else selector.sections)]
+        if isinstance(chapters, int) or isinstance(sections, int):
+            # We need a random selection of chapters or sections so find a
+            # random starting position that will keep us from running beyond
+            # the end of the options list
+            start = Utility.random(0, len(options) - (chapters or sections))
+            selections = options[start:start + (chapters or sections)]
+        else:
+            selections = (chapters or sections)
+        group = selector.chapters if chapters else selector.sections
+        for selection in selections:
+            try:
+                # Get the position of a choice then click on its checkbox
+                index = options.index(str(selection))
+                group[index].select()
+            except ValueError:
+                raise TutorException(
+                    f"{'Chapter' if chapters else 'Section'} " +
+                    f'"{selection}" not a valid option')
+            sleep(0.3)
+        return selector.show_problems()
 
     @property
     def problem_error(self) -> str:
@@ -1732,7 +1914,7 @@ class Homework(Assignment):
         :rtype: str
 
         """
-        return self.find_element(*self._readings_required_locator).text
+        return self.find_element(*self._problems_required_locator).text
 
     @property
     def errors(self) -> List[str]:
@@ -1742,10 +1924,10 @@ class Homework(Assignment):
         :rtype: list(str)
 
         """
-        errors = super().errors()
-        url = self.find_elements(*self._readings_required_locator)
-        if url and self.driver.execute_script(DISPLAYED, url[0]):
-            errors.append('Readings: {0}'.format(url[0].text))
+        errors = super().errors
+        problems = self.find_elements(*self._problems_required_locator)
+        if problems and self.driver.execute_script(DISPLAYED, problems[0]):
+            errors.append('Problems: {0}'.format(problems[0].text))
         return errors
 
     def what_do_students_see(self) -> StudentPreview:
@@ -1799,6 +1981,56 @@ class Reading(Assignment):
         selector_root = self.find_element(*self._reading_plan_root_locator)
         return SectionSelector(self, selector_root)
 
+    def add_readings_by(self,
+                        chapters: Union[int, List[str], List[int]] = None,
+                        sections: Union[int, List[str], List[float]] = None) \
+            -> List[str]:
+        """Add chapters or sections to a reading assignment.
+
+        .. note:
+
+            ``chapters`` and ``sections`` are exclusive; if ``chapters`` is
+            set then ``sections`` is ignored
+
+        :param chapters: a number of chapters or a list of specific chapters to
+            add to the reading
+        :param sections: a number of sections or a list of specific sections to
+            add to the reading
+        :type chapters: int or list(str) or list(int)
+        :type sections: int or list(str) or list(float)
+        :return: the list of chapters or sections selected as strings
+        :rtype: list(str)
+
+        """
+        if chapters:
+            # if chapters is set, ignore sections
+            sections = None
+        selector = self.add_readings()
+        options = [option.number
+                   for option
+                   in (selector.chapters if chapters else selector.sections)]
+        if isinstance(chapters, int) or isinstance(sections, int):
+            # We need a random selection of chapters or sections so find a
+            # random starting position that will keep us from running beyond
+            # the end of the options list
+            start = Utility.random(0, len(options) - (chapters or sections))
+            selections = options[start:start + (chapters or sections)]
+        else:
+            selections = (chapters or sections)
+        group = selector.chapters if chapters else selector.sections
+        for selection in selections:
+            try:
+                # Get the position of a choice then click on its checkbox
+                index = options.index(str(selection))
+                group[index].select()
+            except ValueError:
+                raise TutorException(
+                    f"{'Chapter' if chapters else 'Section'} " +
+                    f'"{selection}" not a valid option')
+            sleep(0.3)
+        selector.add_readings()
+        return [str(option) for option in selections]
+
     @property
     def readings_error(self) -> str:
         """Return the readings required error message.
@@ -1817,10 +2049,10 @@ class Reading(Assignment):
         :rtype: list(str)
 
         """
-        errors = super().errors()
-        url = self.find_elements(*self._readings_required_locator)
-        if url and self.driver.execute_script(DISPLAYED, url[0]):
-            errors.append('Readings: {0}'.format(url[0].text))
+        errors = super().errors
+        readings = self.find_elements(*self._readings_required_locator)
+        if readings and self.driver.execute_script(DISPLAYED, readings[0]):
+            errors.append('Readings: {0}'.format(readings[0].text))
         return errors
 
     def why_cant_i_see_the_questions(self) -> ReadingQuestionTooltip:
@@ -1863,8 +2095,11 @@ class Reading(Assignment):
             :rtype: str
 
             """
-            return (self.find_element(*self._chapter_section_number_locator)
-                    .text)
+            number = (self.find_element(*self._chapter_section_number_locator)
+                      .text)
+            if 'Introduction to' in self.title:
+                return f'{number}.0'
+            return number
 
         @property
         def title(self) -> str:
