@@ -149,6 +149,59 @@ class HomeworkTutorSelectionsTooltip(ButtonTooltip):
     pass
 
 
+class DeleteConfirmation(Region):
+    """The assignment deletion confirmation dialog box."""
+
+    _title_locator = (By.CSS_SELECTOR, '.modal-title')
+    _close_button_locator = (By.CSS_SELECTOR, '.close')
+    _content_locator = (By.CSS_SELECTOR, '.modal-body')
+    _delete_button_locator = (By.CSS_SELECTOR, '.modal-footer .async-button')
+    _cancel_button_locator = (By.CSS_SELECTOR, '.modal-footer .btn-primary')
+
+    @property
+    def root(self) -> WebElement:
+        """Return the root element for the dialog box.
+
+        :return: the root of the dialog boxes
+        :rtype: :py:class:`~selenium.webdriver.remote.webelement.WebElement`
+
+        """
+        return self.driver.execute_script(GET_ROOT.format('dialog'))
+
+    @property
+    def title(self) -> str:
+        """Return the dialog box title.
+
+        :return: the dialog box title
+        :rtype: str
+
+        """
+        return self.find_element(*self._title_locator).text
+
+    @property
+    def content(self) -> str:
+        """Return the dialog box text content.
+
+        :return: the dialog box content text
+        :rtype: str
+
+        """
+        return (self.find_element(*self._content_locator)
+                .get_attribute('textContent'))
+
+    def delete(self) -> Calendar:
+        """Click the 'Delete' button.
+
+        :return: the instructor's calendar after deleting the assignment
+        :rtype: :py:class:`~pages.tutor.calendar.Calendar`
+
+        """
+        button = self.find_element(*self._delete_button_locator)
+        Utility.click_option(self.driver, element=button)
+        sleep(0.5)
+        return go_to_(Calendar(self.driver, self.page.base_url))
+
+
 # -------------------------------------------------------- #
 # Assignment shared properties
 # -------------------------------------------------------- #
@@ -1698,14 +1751,22 @@ class Assignment(TutorBase):
         """
         raise NotImplementedError()
 
-    def delete(self) -> Calendar:
+    def delete(self, confirm: bool = False) -> Calendar:
         """Click the 'Delete' assignment button.
 
-        :return: the instructor's calendar
-        :rtype: :py:class:`~pages.tutor.calendar.Calendar`
+        :param bool confirm: (optional) click the delete confirmation button
+            on the pop up dialog box
+        :return: the instructor's calendar if confirmed otherwise the delete
+            assignment confirmation dialog box
+        :rtype: :py:class:`~pages.tutor.calendar.Calendar` or
+            :py:class:`~pages.tutor.assignment.DeleteConfirmation`
 
         """
-        raise NotImplementedError()
+        button = self.find_element(*self._delete_button_locator)
+        Utility.click_option(self.driver, element=button)
+        sleep(0.25)
+        dialog = DeleteConfirmation(self)
+        return dialog.delete() if confirm else dialog
 
     # ---------------------------------------------------- #
     # Regions
@@ -1793,12 +1854,11 @@ class External(Assignment):
                 .get_attribute('value'))
 
     @assignment_url.setter
-    def assignment_url(self, url: str) -> External:
+    def assignment_url(self, url: str) -> None:
         """Set the assignment URL.
 
         :param str url: the new assignment URL
-        :return: the assignment wizard
-        :rtype: :py:class:`External`
+        :return: None
 
         """
         url_input = self.find_element(*self._assignment_url_locator)
@@ -1807,7 +1867,6 @@ class External(Assignment):
             sleep(0.25)
         url_input.send_keys(url)
         sleep(0.25)
-        return self.page
 
     @property
     def url_error(self) -> str:

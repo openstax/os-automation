@@ -824,6 +824,16 @@ class Calendar(TutorBase):
             _add_assignment_selector = 'a[data-assignment-type={0}]'
 
             @property
+            def number(self):
+                """Return the calendar day number element.
+
+                :return: the day's label
+                :rtype: WebElement
+
+                """
+                return self.find_element(*self._date_label_locator)
+
+            @property
             def date(self) -> datetime:
                 """Return the date.
 

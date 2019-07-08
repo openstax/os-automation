@@ -226,7 +226,8 @@ class IframeModal(Modal):
         purchase = self.find_element(*self._base_iframe_locator)
         self.driver.switch_to.frame(purchase)
         if inner_frame:
-            second_frame = self.find_element(*inner_frame)
+            second_frame = self.wait.until(
+                lambda _: self.find_element(*inner_frame))
             self.driver.switch_to.frame(second_frame)
         self.find_element(*locator).send_keys(value)
         if inner_frame:

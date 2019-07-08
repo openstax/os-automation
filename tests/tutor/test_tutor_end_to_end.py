@@ -8,13 +8,12 @@ from datetime import datetime, timedelta
 
 from pages.tutor.enrollment import Enrollment, StudentID
 from pages.tutor.home import TutorHome
-from tests.markers import skip_test, test_case, tutor
+from tests.markers import nondestructive, test_case, tutor
 from utils.email import RestMail
 from utils.tutor import States, Tutor
 from utils.utilities import Card, Utility
 
 
-# @skip_test
 @test_case('C485035')
 @tutor
 def test_create_and_clone_a_course(tutor_base_url, selenium, teacher):
@@ -118,7 +117,6 @@ def test_create_and_clone_a_course(tutor_base_url, selenium, teacher):
                           in calendar.sidebar.copied_assignments])
 
 
-# @skip_test
 @test_case('C485036')
 @tutor
 def test_edit_course_settings_and_manage_course_students(
@@ -248,7 +246,8 @@ def test_edit_course_settings_and_manage_course_students(
     current_section = course_roster.roster.current_section
     other_sections = [section.name
                       for section
-                      in course_roster.roster.sections]
+                      in course_roster.roster.sections
+                      if section.name != edited_section_name]
     other_sections.remove(current_section)
     new_section = other_sections[Utility.random(0, len(other_sections) - 1)]
     student.student_id = new_student_id
@@ -312,7 +311,6 @@ def test_edit_course_settings_and_manage_course_students(
         f"{student_name} ({student_id}) not found in the active students list"
 
 
-# @skip_test
 @test_case('C485037')
 @tutor
 def test_course_registration_and_initial_assignment_creation_timing(
@@ -428,7 +426,6 @@ def test_course_registration_and_initial_assignment_creation_timing(
         f'Not all assignments found: {new_assignments}'
 
 
-# @skip_test
 @test_case('C485038')
 @tutor
 def test_assignment_creation_readings(tutor_base_url, selenium, store):
@@ -541,7 +538,6 @@ def test_assignment_creation_readings(tutor_base_url, selenium, store):
         f'({tomorrow.strftime("%m/%d/%Y")})')
 
 
-# @skip_test
 @test_case('C485049')
 @tutor
 def test_assignment_creation_homework(tutor_base_url, selenium, store):
@@ -660,50 +656,104 @@ def test_assignment_creation_homework(tutor_base_url, selenium, store):
         f'"{assignment_name}" is still a draft assignment'
 
 
-@skip_test
 @test_case('C485050')
 @tutor
-def test_assignment_creation_external(tutor_base_url, selenium):
+def test_assignment_creation_external(tutor_base_url, selenium, store):
     """Test publishing each assignment type.
 
     Start a new external assignment by drag-and-drop onto the calendar date,
     publish it, then delete it.
 
     """
+    # SETUP:
+    test_data = store.get('C485050')
+    user = test_data.get('username')
+    if '-dev.' in tutor_base_url:
+        password = test_data.get('password_dev')
+    elif '-qa.' in tutor_base_url:
+        password = test_data.get('password_qa')
+    elif '-staging.' in tutor_base_url:
+        password = test_data.get('password_staging')
+    elif 'tutor.' in tutor_base_url:
+        password = test_data.get('password_prod')
+    else:
+        password = test_data.get('password_unique')
+    course_name = test_data.get('course_name')
+    assignment_name = f'Auto External - {Utility.random_hex(5)}'
+    description = f'Assignment description for {assignment_name}'
+    assignment_url = tutor_base_url
+
     # GIVEN: a Tutor teacher viewing their course calendar
+    home = TutorHome(selenium, tutor_base_url).open()
+    courses = home.log_in(user, password)
+    calendar = courses.go_to_course(course_name)
 
     # WHEN:  they open the 'Add Assignment' taskbar
+    if not calendar.sidebar.is_open:
+        calendar.banner.add_assignment()
+
+    ''' Bypass the drag-and-drop method as it cannot be accurately reproduced
+        in Tutor; click on the bar instead leaving the drag-and-drop to manual
+        testing.
     # AND:   click and drap the 'Add External Assignment' bar onto an
-    #        available date box on the calendar
+    #        available date box on the calendar '''
+
+    days = [day
+            for day
+            in calendar.calendar.days
+            if day.tense == Tutor.IN_FUTURE]
+    day = days[Utility.random(0, len(days) - 1)]
+    date = day.date
+
+    external = day.add_assignment(Tutor.EXTERNAL)
 
     # THEN:  the due date should match the selected date box
+    due_on = external.open_and_due.due_date.get_attribute('value')
+    assert(due_on == date.strftime("%m/%d/%Y")), \
+        f'The due date ({due_on}) does not match the expected date ({date})'
 
     # WHEN:  they fill out the assignment name, description, and assignment
     #        URL, and click the 'Publish' button
+    external.name = assignment_name
+    external.description = description
+    external.assignment_url = assignment_url
+    calendar = external.publish()
 
     # THEN:  the course calendar is displayed
     # AND:   the new external assignment name is displayed on the selected
     #        date box
+    assert(calendar.is_displayed())
+    assert('month' in calendar.location)
+
+    assert(assignment_name in calendar.assignments(by_name=True)), \
+        f'"{assignment_name}" not found'
+    assert(assignment_name in calendar.assignments_on(date, by_name=True)), (
+        '"{name}" not on the expected due date ({date})'
+        .format(name=assignment_name, date=date.strftime("%m/%d/%Y")))
 
     # WHEN:  they click on the assignment name
     # AND:   click the 'Edit Assignment' button
+    quick_look = calendar.assignment(name=assignment_name).edit()
+    external = quick_look.view_assignment()
 
     # THEN:  the 'Edit External Assignment' window is displayed
+    assert('external' in external.location)
 
     # WHEN:  they click the 'Delete' button and click the 'Delete' button in
     #        the pop up
+    calendar = external.delete(confirm=True)
 
     # THEN:  the course calendar is displayed
     # AND:   the external assignment name is no longer displayed on the
     #        selected date box
+    assert(calendar.is_displayed())
+    assert('month' in calendar.location)
 
-    import time
-    time.sleep(5)
-    assert(False), '*** Reached Test End ***'
+    assert(assignment_name not in calendar.assignments(by_name=True)), \
+        f'"{assignment_name}" still on the calendar'
 
 
-'''@skip_test
-@test_case('C485051')
+'''@test_case('C485051')
 @tutor
 def test_assignment_creation_event(tutor_base_url, selenium):
     """Test publishing each assignment type.
@@ -726,11 +776,10 @@ def test_assignment_creation_event(tutor_base_url, selenium):
 
     import time
     time.sleep(5)
-    assert(False), '*** Reached Test End ***'
+    assert(False), '*** Reached Test End ***'''
 
 
-@skip_test
-@test_case('C485039')
+'''@test_case('C485039')
 @tutor
 def test_student_task_reading_assignment(tutor_base_url, selenium):
     """Test a student working a reading assignment.
@@ -787,11 +836,10 @@ def test_student_task_reading_assignment(tutor_base_url, selenium):
 
     import time
     time.sleep(5)
-    assert(False), '*** Reached Test End ***'
+    assert(False), '*** Reached Test End ***'''
 
 
-@skip_test
-@test_case('C485040')
+'''@test_case('C485040')
 @tutor
 def test_student_task_homework_assignment(tutor_base_url, selenium):
     """Test a student working a homework assignment.
@@ -812,11 +860,10 @@ def test_student_task_homework_assignment(tutor_base_url, selenium):
 
     import time
     time.sleep(5)
-    assert(False), '*** Reached Test End ***'
+    assert(False), '*** Reached Test End ***'''
 
 
-@skip_test
-@test_case('C485041')
+'''@test_case('C485041')
 @tutor
 def test_student_task_practice(tutor_base_url, selenium):
     """Test a student working a practice question set.
@@ -849,11 +896,10 @@ def test_student_task_practice(tutor_base_url, selenium):
 
     import time
     time.sleep(5)
-    assert(False), '*** Reached Test End ***'
+    assert(False), '*** Reached Test End ***'''
 
 
-@skip_test
-@test_case('C485042')
+'''@test_case('C485042')
 @tutor
 def test_teacher_viewing_student_scores(tutor_base_url, selenium, teacher):
     """Test an instructor viewing the course scores page.
@@ -916,11 +962,10 @@ def test_teacher_viewing_student_scores(tutor_base_url, selenium, teacher):
 
     import time
     time.sleep(5)
-    assert(False), '*** Reached Test End ***'
+    assert(False), '*** Reached Test End ***'''
 
 
-@skip_test
-@test_case('C485043')
+'''@test_case('C485043')
 @nondestructive
 @tutor
 def test_student_viewing_student_scores(tutor_base_url, selenium, student):
@@ -943,11 +988,10 @@ def test_student_viewing_student_scores(tutor_base_url, selenium, student):
 
     import time
     time.sleep(5)
-    assert(False), '*** Reached Test End ***'
+    assert(False), '*** Reached Test End ***'''
 
 
-@skip_test
-@test_case('C485044')
+'''@test_case('C485044')
 @nondestructive
 @tutor
 def test_teacher_viewing_the_course_performance_forecast(
@@ -966,11 +1010,10 @@ def test_teacher_viewing_the_course_performance_forecast(
 
     import time
     time.sleep(5)
-    assert(False), '*** Reached Test End ***'
+    assert(False), '*** Reached Test End ***'''
 
 
-@skip_test
-@test_case('C485045')
+'''@test_case('C485045')
 @tutor
 def test_student_viewing_their_performance_forecast(
         tutor_base_url, selenium, student):
@@ -994,5 +1037,4 @@ def test_student_viewing_their_performance_forecast(
 
     import time
     time.sleep(5)
-    assert(False), '*** Reached Test End ***'
-'''
+    assert(False), '*** Reached Test End ***'''
