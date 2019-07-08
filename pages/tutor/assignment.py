@@ -1671,7 +1671,7 @@ class Assignment(TutorBase):
             open_on, open_at, due_on, due_at = get_date_times(
                 self.driver, data.get(name))
             # set the dates and times
-            section.set(open_on, open_at, due_on, due_at)
+            section.open_to_close.set(open_on, open_at, due_on, due_at)
 
     @property
     def errors(self) -> List[str]:
@@ -1789,7 +1789,7 @@ class Assignment(TutorBase):
             """
             return self.find_element(*self._section_id_locator).text
 
-        def select(self) -> Assignment:
+        def toggle(self) -> Assignment:
             """Click on the section checkbox.
 
             :return: the assignment page
@@ -1802,7 +1802,7 @@ class Assignment(TutorBase):
             return self.page
 
         @property
-        def checked(self) -> bool:
+        def is_checked(self) -> bool:
             """Return True if the section checkbox is checked.
 
             :return: ``True`` if the checkbox is checked, otherwise ``False``

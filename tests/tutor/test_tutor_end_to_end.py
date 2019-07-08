@@ -8,7 +8,7 @@ from datetime import datetime, timedelta
 
 from pages.tutor.enrollment import Enrollment, StudentID
 from pages.tutor.home import TutorHome
-from tests.markers import nondestructive, test_case, tutor
+from tests.markers import test_case, tutor
 from utils.email import RestMail
 from utils.tutor import States, Tutor
 from utils.utilities import Card, Utility
@@ -753,16 +753,42 @@ def test_assignment_creation_external(tutor_base_url, selenium, store):
         f'"{assignment_name}" still on the calendar'
 
 
-'''@test_case('C485051')
+@test_case('C485051')
 @tutor
-def test_assignment_creation_event(tutor_base_url, selenium):
+def test_assignment_creation_event(tutor_base_url, selenium, store):
     """Test publishing each assignment type.
 
     Start a new event from the assignment menu, switch it to individual section
     assignment, then publish it.
 
     """
+    # SETUP:
+    test_data = store.get('C485051')
+    user = test_data.get('username')
+    if '-dev.' in tutor_base_url:
+        password = test_data.get('password_dev')
+    elif '-qa.' in tutor_base_url:
+        password = test_data.get('password_qa')
+    elif '-staging.' in tutor_base_url:
+        password = test_data.get('password_staging')
+    elif 'tutor.' in tutor_base_url:
+        password = test_data.get('password_prod')
+    else:
+        password = test_data.get('password_unique')
+    course_name = test_data.get('course_name')
+    assignment_name = f'Auto Event - {Utility.random_hex(5)}'
+    description = f'Assignment description for {assignment_name}'
+    today = datetime.now()
+    two_days_from_today = today + timedelta(days=2)
+    dates_and_times = {
+        '1st': (today + timedelta(days=1), today + timedelta(days=2)),
+        '2nd': (today + timedelta(days=2), today + timedelta(days=3)),
+        '3rd': (today + timedelta(days=3), today + timedelta(days=4)), }
+
     # GIVEN: a Tutor teacher viewing their course calendar
+    home = TutorHome(selenium, tutor_base_url).open()
+    courses = home.log_in(user, password)
+    calendar = courses.go_to_course(course_name)
 
     # WHEN:  they open the 'Add Assignment' taskbar
     # AND:   click the 'Add Event' link
@@ -770,13 +796,27 @@ def test_assignment_creation_event(tutor_base_url, selenium):
     #        to the right of 'Individual Sections', set the open dates to
     #        today +1, +2, ..., and the due dates to today +2, +3, ..., and
     #        click the 'Publish' button
+    if not calendar.sidebar.is_open:
+        calendar.banner.add_assignment()
+
+    assignment = calendar.sidebar.add_event()
+
+    assignment.name = assignment_name
+    assignment.description = description
+    assignment.set_assignment_dates(dates_and_times)
+    calendar = assignment.publish()
 
     # THEN:  the course calendar is displayed
     # AND:   the event name is displayed on the first due date box
+    assert(calendar.is_displayed())
+    assert('month' in calendar.location)
 
-    import time
-    time.sleep(5)
-    assert(False), '*** Reached Test End ***'''
+    assert(assignment_name in calendar.assignments(by_name=True)), \
+        f'"{assignment_name}" not found'
+    assert(assignment_name in calendar.assignments_on(two_days_from_today,
+                                                      by_name=True)), (
+        f'"{assignment_name}" not on the first expected due date '
+        f'({two_days_from_today.strftime("%m/%d/%Y")})')
 
 
 '''@test_case('C485039')
