@@ -7,8 +7,10 @@ from typing import Dict, List, Tuple, Union
 
 from pypom import Region
 from selenium.common.exceptions import NoSuchElementException
+from selenium.common.exceptions import StaleElementReferenceException  # NOQA
 from selenium.webdriver.common.by import By
 from selenium.webdriver.remote.webelement import WebElement
+from selenium.webdriver.support import expected_conditions as expect
 
 from pages.tutor.base import TutorBase
 from pages.tutor.reference import ReferenceBook
@@ -402,6 +404,18 @@ class QuestionBase(Region):
         """
         return self.find_element(*self._answer_button_locator)
 
+    def answer(self) -> None:
+        """Click the 'Answer' button.
+
+        :return: None
+
+        """
+        sleep(0.33)
+        Utility.click_option(self.driver, element=self.answer_button)
+        sleep(1)
+
+    _continue = answer
+
     @property
     def exercise_id(self) -> str:
         """Return the Exercises ID.
@@ -445,7 +459,7 @@ class QuestionBase(Region):
         :rtype: str
 
         """
-        return self.find_element(*self._chapter_number_locator).text
+        return self.find_element(*self._book_section_number_locator).text
 
     @property
     def section_title(self) -> str:
@@ -463,6 +477,9 @@ class FreeResponse(QuestionBase):
     """A free response step for an assessment."""
 
     _free_response_box_locator = (By.CSS_SELECTOR, 'textarea')
+    _nudge_message_locator = (
+        By.CSS_SELECTOR,
+        '[class*=Nudge] > [class*=Title], [class*=Nudge] > [class*=Message]')
 
     @property
     def free_response(self) -> str:
@@ -486,7 +503,34 @@ class FreeResponse(QuestionBase):
 
         """
         box = self.find_element(*self._free_response_box_locator)
-        self.driver.execute_script(f'arguments[0].value = "{answer}";', box)
+        self.driver.execute_script(f'arguments[0].value = "";', box)
+        sleep(0.2)
+        try:
+            box.send_keys(answer)
+        except StaleElementReferenceException:
+            box = self.find_element(*self._free_response_box_locator)
+            box.send_keys(answer)
+        sleep(0.33)
+
+    @property
+    def nudge(self) -> str:
+        """Return the answer validation nudge message.
+
+        :return: the answer validation nudge message or an empty string
+        :rtype: str
+
+        """
+        return ' '.join([message.get_attribute('textContent')
+                        for message
+                        in self.find_elements(*self._nudge_message_locator)])
+
+    def reanswer(self) -> None:
+        """Click the 'Reanswer' button.
+
+        :return: None
+
+        """
+        self.answer()
 
 
 class MultipleChoice(QuestionBase):
@@ -506,6 +550,17 @@ class MultipleChoice(QuestionBase):
         return [self.Answer(self, option)
                 for option
                 in self.find_elements(*self._question_answer_locator)]
+
+    def random_answer(self) -> None:
+        """Select a random answer for the question.
+
+        :return: None
+
+        """
+        sleep(0.25)
+        answers = self.answers
+        answers[Utility.random(0, len(answers) - 1)].select()
+        sleep(0.25)
 
     class Answer(Region):
         """A multiple choice answer."""
@@ -552,9 +607,11 @@ class MultipleChoice(QuestionBase):
             :return: None
 
             """
-            button = self.find_element(*self._answer_button_locator)
+            button = self.wait.until(
+                expect.presence_of_element_located(
+                    self._answer_button_locator))
             Utility.click_option(self.driver, element=button)
-            sleep(0.5)
+            sleep(0.75)
 
 
 class MultipartQuestion(Region):

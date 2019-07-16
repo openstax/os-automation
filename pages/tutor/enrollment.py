@@ -889,6 +889,7 @@ class StudentID(Page):
             sleep(1)
             if dialog_root:
                 break
+        sleep(1)
         if 'Privacy Policy' in self.driver.page_source:
             return PrivacyPolicy(course, dialog_root)
         elif dialog_root:

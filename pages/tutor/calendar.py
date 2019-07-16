@@ -159,21 +159,16 @@ class Assignment(Region):
             link = self.find_element(*self._edit_draft_locator)
             Utility.click_option(self.driver, element=link)
             if assignment_type == Tutor.EVENT:
-                from pages.tutor.assignment import Event \
-                    as Assignment
+                from pages.tutor.assignment import Event as Assignment
             elif assignment_type == Tutor.EXTERNAL:
-                from pages.tutor.assignment import External \
-                    as Assignment
+                from pages.tutor.assignment import External as Assignment
             elif assignment_type == Tutor.HOMEWORK:
-                from pages.tutor.assignment import Homework \
-                    as Assignment
+                from pages.tutor.assignment import Homework as Assignment
             elif assignment_type == Tutor.READING:
-                from pages.tutor.assignment import Reading \
-                    as Assignment
+                from pages.tutor.assignment import Reading as Assignment
             else:
                 raise TutorException(
-                    '"{0}" is not a known assignment type.'
-                    .format(assignment_type))
+                    f'"{assignment_type}" is not a known assignment type.')
             target = self
             from pypom import Page
             while not isinstance(target, Page):

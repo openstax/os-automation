@@ -3,8 +3,8 @@
 
 import argparse
 import os
-import pyAesCrypt
 
+import pyAesCrypt
 
 parser = argparse.ArgumentParser(prog="encode",
                                  description="Encrypt a data store.")

@@ -16,6 +16,145 @@ from utils.tutor import Tutor, TutorException
 from utils.utilities import Utility, go_to_
 
 
+class AssignmentBar(Region):
+    """A student assignment."""
+
+    _title_locator = (By.CSS_SELECTOR, '.title')
+    _due_date_time_locator = (By.CSS_SELECTOR, '.due-at time')
+    _status_locator = (
+                    By.CSS_SELECTOR, '[data-tour-anchor-id*=progress]')
+    _secondary_status_locator = (
+                            By.CSS_SELECTOR, '[class*=LateCaption]')
+    _lateness_locator = (By.CSS_SELECTOR, '.feedback svg')
+
+    _course_term_selector = '.course-title-banner'
+
+    @property
+    def title(self):
+        """Return the assignment name.
+
+        :return: the assignment name
+        :rtype: str
+
+        """
+        return self.find_element(*self._title_locator).text
+
+    @property
+    def style(self):
+        """Return the assignment type.
+
+        :return: the assignment type
+        :rtype: str
+
+        :raises :py:class:`~utils.tutor.TutorException`: if a known
+            assignment type is not found within the assignment class
+
+        """
+        assignment_type = self.root.get_attribute('class')
+        if Tutor.EVENT in assignment_type:
+            return Tutor.EVENT
+        elif Tutor.EXTERNAL in assignment_type:
+            return Tutor.EXTERNAL
+        elif Tutor.HOMEWORK in assignment_type:
+            return Tutor.HOMEWORK
+        elif Tutor.READING in assignment_type:
+            return Tutor.READING
+        else:
+            raise TutorException(
+                '"{0}" does not contain a known assignment type'
+                .format(assignment_type))
+
+    @property
+    def url(self):
+        """Return the assignment access URL.
+
+        :return: the assignment URL
+        :rtype: str
+
+        """
+        return self.root.get_attribute('href')
+
+    @property
+    def due(self):
+        """Return the assignment due date and time.
+
+        :return: the assignment due date and time, timezone-aware
+        :rtype: :py:class:`~datetime.datetime`
+
+        """
+        date_and_time = self.find_element(
+            *self._due_date_time_locator).text
+        script = ('return document.querySelector("{0}")'
+                  .format(self._course_term_selector))
+        term, year = (self.driver.execute_script(script)
+                      .get_attribute("data-term").split())
+        year = int(year)
+        if term.lower() == "winter":
+            date = date_and_time.split(",")[0].lower()
+            if "jan" in date or "feb" in date or "mar" in date:
+                year = year + 1
+        date_time = ("{date} {year}, {time} {timezone}"
+                     .format(date=date_and_time[3:].split(",")[0],
+                             year=year,
+                             time=date_and_time.split()[-1],
+                             timezone="CST"))
+        return datetime.strptime(date_time, "%b %d %Y, %I:%M%p %Z")
+
+    @property
+    def progress(self):
+        """Return the assignment progress status.
+
+        :return: the student's progress on the assignment
+        :rtype: str
+
+        """
+        return self.find_element(*self._status_locator).text
+
+    @property
+    def late_work(self):
+        """Return the homework secondary status line.
+
+        :return: the secondary status line text for homeworks
+        :rtype: str
+
+        """
+        return self.find_element(*self._secondary_status_locator).text
+
+    @property
+    def lateness(self):
+        """Return the assignment on time or late status.
+
+        :return: whether the assignment is on time or late
+        :rtype: str
+        :raises ValueError: if the icon color for the clock does not
+            match the color for a late assignment or the color for a
+            late assignment with accepted work
+
+        """
+        try:
+            late = self.find_element(*self._lateness_locator)
+        except NoSuchElementException:
+            return Tutor.ON_TIME
+        icon = late.get_attribute('class')
+        if 'exclamation-circle' in icon:
+            return Tutor.DUE_SOON
+        elif 'clock' in icon:
+            color = icon.get_attribute('color')
+            if color == Tutor.LATE_COLOR:
+                return Tutor.LATE
+            elif color == Tutor.ACCEPTED_COLOR:
+                return Tutor.ACCEPTED_LATE
+            else:
+                error = ('"{color}" not {late} ({late_color}) '
+                         'nor {accepted} ({accepted_color})')
+                ValueError(
+                    error.format(color=color,
+                                 late=Tutor.LATE,
+                                 late_color=Tutor.LATE_COLOR,
+                                 accepted=Tutor.ACCEPTED_LATE,
+                                 accepted_color=Tutor.ACCEPTED_COLOR))
+
+
 class StudentCourse(TutorBase):
     """The weekly course view for students."""
 
@@ -32,6 +171,8 @@ class StudentCourse(TutorBase):
     _reference_book_locator = (By.CSS_SELECTOR, 'a.browse-the-book')
     _pending_assignments_locator = (By.CSS_SELECTOR, '.pending')
     _assignment_name_locator = (By.CSS_SELECTOR, '.row div.title')
+    _assignment_link_locator = (By.CSS_SELECTOR, 'a.row')
+    _assignment_bar_locator = (By.CSS_SELECTOR, '.task.row')
 
     # ---------------------------------------------------- #
     # Notifications
@@ -47,6 +188,22 @@ class StudentCourse(TutorBase):
         """
         notes = self.find_element(*self._notification_bar_locator)
         return Notifications(self, notes)
+
+    def clear_training_wheels(self) -> None:
+        """Clear any joyride modals.
+
+        :return: None
+
+        """
+        try:
+            while Utility.has_children(
+                    self.find_element(*self._joyride_root_selector)):
+                tooltip = Tooltip(self, self.find_element(
+                    *self._joyride_root_selector))
+                tooltip.next()
+                sleep(1)
+        except NoSuchElementException:
+            sleep(0.5)
 
     # ---------------------------------------------------- #
     # Course overview
@@ -122,6 +279,92 @@ class StudentCourse(TutorBase):
         return [self.Week(self, period)
                 for period in self.find_elements(*self._period_locator)]
 
+    def wait_for_assignments(self, max_time: int = 10) -> bool:
+        """Return True if assignments are built within the max time.
+
+        As assignments are built when a student enrolls, wait until the
+        'pending' state is gone from the week.
+
+        :param int max_time: the maximum number of minutes to wait for any
+            open assignments to be built for the student
+        :return: ``True`` if the ``pending`` state is removed before the timer
+            runs out
+        :rtype: bool
+
+        """
+        for _ in range(max_time):
+            try:
+                self.wait.until(
+                    lambda _: not bool(self.find_elements(
+                        *self._pending_assignments_locator)))
+                return True
+            except TimeoutException:
+                pass
+        return False
+
+    @property
+    def assignment_names(self) -> List[str]:
+        """Return a list of assignment names on the dashboard.
+
+        :return: the name for each assignment displayed on the current week
+        :rtype: list(str)
+
+        """
+        return [assignment.get_attribute('textContent')
+                for assignment
+                in self.find_elements(*self._assignment_name_locator)]
+
+    def select_assignment(self, name: str, _type: str = None):
+        """Click on an assignment.
+
+        :param str name: the assignment's name
+        :param str _type: (optional) the assignment's type
+        :return: the assignment task page(s)
+        :rtype: :py:class:`~pages.tutor.task.Assignment`
+
+        """
+        for assignment in self.find_elements(*self._assignment_link_locator):
+            if name in assignment.get_attribute('textContent'):
+                description = assignment.get_attribute('class')
+                if _type and _type not in description:
+                    continue
+                if Tutor.EVENT in description:
+                    from pages.tutor.task import Event as Destination
+                elif Tutor.EXTERNAL in description:
+                    from pages.tutor.task import EXTERNAL as Destination
+                elif Tutor.HOMEWORK in description:
+                    from pages.tutor.task import Homework as Destination
+                elif Tutor.READING in description:
+                    from pages.tutor.task import Reading as Destination
+                else:
+                    raise TutorException(
+                        f'Unknown assignment type in "{description}"')
+                Utility.click_option(self.driver, element=assignment)
+                sleep(1)
+                return go_to_(Destination(self.driver, self.base_url))
+        raise TutorException(f'"{name}" not found in the currently ' +
+                             'available assignments')
+
+    def assignment_bar(self, name: str, _type: str = None):
+        """Return the assignment bar for an assignment.
+
+        :param str name: the assignment's name
+        :param str _type: (optional) the assignment's type
+        :return: the assignment status bar
+        :rtype: :py:class:`~pages.tutor.task.AssignmentBar`
+
+        """
+        assignments = [AssignmentBar(self, bar)
+                       for bar
+                       in self.find_elements(*self._assignment_bar_locator)]
+        for assignment in assignments:
+            if assignment.title == name:
+                if _type and assignment.style != _type:
+                    continue
+                return assignment
+        raise TutorException(f'"{name}" not found in the currently ' +
+                             'available assignments')
+
     # ---------------------------------------------------- #
     # Sidebar
     # ---------------------------------------------------- #
@@ -182,54 +425,6 @@ class StudentCourse(TutorBase):
         from pages.tutor.reference import ReferenceBook
         return go_to_(ReferenceBook(self.driver, self.base_url))
 
-    def clear_training_wheels(self) -> None:
-        """Clear any joyride modals.
-
-        :return: None
-
-        """
-        while Utility.has_children(
-                self.find_element(*self._joyride_root_selector)):
-            tooltip = Tooltip(self, self.find_element(
-                *self._joyride_root_selector))
-            tooltip.next()
-            sleep(1)
-
-    def wait_for_assignments(self, max_time: int = 10) -> bool:
-        """Return True if assignments are built within the max time.
-
-        As assignments are built when a student enrolls, wait until the
-        'pending' state is gone from the week.
-
-        :param int max_time: the maximum number of minutes to wait for any
-            open assignments to be built for the student
-        :return: ``True`` if the ``pending`` state is removed before the timer
-            runs out
-        :rtype: bool
-
-        """
-        for _ in range(max_time):
-            try:
-                self.wait.until(
-                    lambda _: not bool(self.find_elements(
-                        *self._pending_assignments_locator)))
-                return True
-            except TimeoutException:
-                pass
-        return False
-
-    @property
-    def assignment_names(self) -> List[str]:
-        """Return a list of assignment names on the dashboard.
-
-        :return: the name for each assignment displayed on the current week
-        :rtype: list(str)
-
-        """
-        return [assignment.get_attribute('textContent')
-                for assignment
-                in self.find_elements(*self._assignment_name_locator)]
-
     # ---------------------------------------------------- #
     # Student Course Regions
     # ---------------------------------------------------- #
@@ -275,7 +470,7 @@ class StudentCourse(TutorBase):
             """
             return self.find_element(*self._course_term_locator).text
 
-    class Weeks(Region):
+    class Week(Region):
         """Assignments listed by week."""
 
         _banner_locator = (By.CSS_SELECTOR, '.row:first-child')
@@ -298,10 +493,10 @@ class StudentCourse(TutorBase):
             """Access the assignment bars.
 
             :return: the list of assignments
-            :rtype: list(:py:class:`~StudentCourse.Weeks.Assignment`)
+            :rtype: list(:py:class:`~pages.tutor.course.AssignmentBar`)
 
             """
-            return [self.Assignment(self, line)
+            return [AssignmentBar(self, line)
                     for line in self.find_elements(*self._assignments_locator)]
 
         @property
@@ -361,144 +556,6 @@ class StudentCourse(TutorBase):
                 if self.is_upcoming:
                     return self.find_element(*self._title_locator).text
                 return "{start}–{end}".format(start=self.start, end=self.end)
-
-        class Assignment(Region):
-            """A student assignment."""
-
-            _title_locator = (By.CSS_SELECTOR, '.title')
-            _due_date_time_locator = (By.CSS_SELECTOR, '.due-at time')
-            _status_locator = (
-                            By.CSS_SELECTOR, '[data-tour-anchor-id*=progress]')
-            _secondary_status_locator = (
-                                    By.CSS_SELECTOR, '[class*=LateCaption]')
-            _lateness_locator = (By.CSS_SELECTOR, '.feedback svg')
-
-            _course_term_selector = '.course-title-banner'
-
-            @property
-            def title(self):
-                """Return the assignment name.
-
-                :return: the assignment name
-                :rtype: str
-
-                """
-                return self.find_element(*self._title_locator).text
-
-            @property
-            def style(self):
-                """Return the assignment type.
-
-                :return: the assignment type
-                :rtype: str
-
-                :raises :py:class:`~utils.tutor.TutorException`: if a known
-                    assignment type is not found within the assignment class
-
-                """
-                assignment_type = self.root.get_attribute('class')
-                if Tutor.EVENT in assignment_type:
-                    return Tutor.EVENT
-                elif Tutor.EXTERNAL in assignment_type:
-                    return Tutor.EXTERNAL
-                elif Tutor.HOMEWORK in assignment_type:
-                    return Tutor.HOMEWORK
-                elif Tutor.READING in assignment_type:
-                    return Tutor.READING
-                else:
-                    raise TutorException(
-                        '"{0}" does not contain a known assignment type'
-                        .format(assignment_type))
-
-            @property
-            def url(self):
-                """Return the assignment access URL.
-
-                :return: the assignment URL
-                :rtype: str
-
-                """
-                return self.root.get_attribute('href')
-
-            @property
-            def due(self):
-                """Return the assignment due date and time.
-
-                :return: the assignment due date and time, timezone-aware
-                :rtype: :py:class:`~datetime.datetime`
-
-                """
-                date_and_time = self.find_element(
-                    *self._due_date_time_locator).text
-                script = ('return document.querySelector("{0}")'
-                          .format(self._course_term_selector))
-                term, year = (self.driver.execute_script(script)
-                              .get_attribute("data-term").split())
-                year = int(year)
-                if term.lower() == "winter":
-                    date = date_and_time.split(",")[0].lower()
-                    if "jan" in date or "feb" in date or "mar" in date:
-                        year = year + 1
-                date_time = ("{date} {year}, {time} {timezone}"
-                             .format(date=date_and_time[3:].split(",")[0],
-                                     year=year,
-                                     time=date_and_time.split()[-1],
-                                     timezone="CST"))
-                return datetime.strptime(date_time, "%b %d %Y, %I:%M%p %Z")
-
-            @property
-            def progress(self):
-                """Return the assignment progress status.
-
-                :return: the student's progress on the assignment
-                :rtype: str
-
-                """
-                return self.find_element(*self._status_locator).text
-
-            @property
-            def late_work(self):
-                """Return the homework secondary status line.
-
-                :return: the secondary status line text for homeworks
-                :rtype: str
-
-                """
-                return self.find_element(*self._secondary_status_locator).text
-
-            @property
-            def lateness(self):
-                """Return the assignment on time or late status.
-
-                :return: whether the assignment is on time or late
-                :rtype: str
-                :raises ValueError: if the icon color for the clock does not
-                    match the color for a late assignment or the color for a
-                    late assignment with accepted work
-
-                """
-                try:
-                    late = self.find_element(*self._lateness_locator)
-                except NoSuchElementException:
-                    return Tutor.ON_TIME
-                icon = late.get_attribute('class')
-                if 'exclamation-circle' in icon:
-                    return Tutor.DUE_SOON
-                elif 'clock' in icon:
-                    color = icon.get_attribute('color')
-                    if color == Tutor.LATE_COLOR:
-                        return Tutor.LATE
-                    elif color == Tutor.ACCEPTED_COLOR:
-                        return Tutor.ACCEPTED_LATE
-                    else:
-                        error = ('"{color}" not {late} ({late_color}) '
-                                 'nor {accepted} ({accepted_color})')
-                        ValueError(
-                            error.format(color=color,
-                                         late=Tutor.LATE,
-                                         late_color=Tutor.LATE_COLOR,
-                                         accepted=Tutor.ACCEPTED_LATE,
-                                         accepted_color=Tutor.ACCEPTED_COLOR))
 
         class Key(Region):
             """An icon and descriptor for assignment lateness."""

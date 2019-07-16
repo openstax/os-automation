@@ -6,12 +6,15 @@ testing for high priority areas.
 
 from datetime import datetime, timedelta
 
+from autochomsky import chomsky
+
 from pages.tutor.enrollment import Enrollment, StudentID
 from pages.tutor.home import TutorHome
 from tests.markers import test_case, tutor
+from utils.bookterm import CollegePhysics
 from utils.email import RestMail
 from utils.tutor import States, Tutor
-from utils.utilities import Card, Utility
+from utils.utilities import Actions, Card, Utility
 
 
 @test_case('C485035')
@@ -318,7 +321,6 @@ def test_course_registration_and_initial_assignment_creation_timing(
     """Test student enrollment and initial assignment creation time."""
     # SETUP:
     test_data = store.get('C485037')
-    enrollment_url = test_data.get('enrollment_url')
     if '-dev.' in tutor_base_url:
         enrollment_url = test_data.get('enrollment_url_dev')
         production_payments = False
@@ -819,64 +821,198 @@ def test_assignment_creation_event(tutor_base_url, selenium, store):
         f'({two_days_from_today.strftime("%m/%d/%Y")})')
 
 
-'''@test_case('C485039')
+@test_case('C485039')
 @tutor
-def test_student_task_reading_assignment(tutor_base_url, selenium):
+def test_student_task_reading_assignment(tutor_base_url, selenium, store):
     """Test a student working a reading assignment.
 
-    While working the assignment, free response answer validation,
+    While working the assignment free response answer validation,
     highlighting, and annotation will also be checked.
 
     """
+    # SETUP:
+    test_data = store.get('C485039')
+    if '-dev.' in tutor_base_url:
+        enrollment_url = test_data.get('enrollment_url_dev')
+    elif '-qa.' in tutor_base_url:
+        enrollment_url = test_data.get('enrollment_url_qa')
+    elif '-staging.' in tutor_base_url:
+        enrollment_url = test_data.get('enrollment_url_staging')
+    elif 'tutor.' in tutor_base_url:
+        enrollment_url = test_data.get('enrollment_url_prod')
+    else:
+        enrollment_url = test_data.get('enrollment_url_unique')
+    _, first_name, last_name, suffix = Utility.random_name()
+    email = RestMail(
+        f"{first_name}.{last_name}.{Utility.random_hex(3)}".lower())
+    email.empty()
+    password = Utility.random_hex(8)
+    school = 'Automation'
+    student_id = Utility.random(100000000, 999999999)
+    assignment_name = test_data.get('assignment_name')
+    annotation_text = chomsky()
+    free_response_giberish = Utility.random_hex(30)
+
     # GIVEN: a Tutor student enrolled in a course with a reading assignment
+    selenium.get(enrollment_url)
+    enrollment = Enrollment(selenium, tutor_base_url)
+    signup = enrollment.get_started()
+    signup.account_signup(
+        destination=tutor_base_url,
+        email=email.address,
+        name=['', first_name, last_name, suffix],
+        password=password,
+        school=school,
+        tutor=True)
+    identification = StudentID(selenium, tutor_base_url)
+    identification.student_id = student_id
+    privacy = identification._continue()
+    course_page = privacy.i_agree()
+    course_page.clear_training_wheels()
+    course_page.wait_for_assignments()
+    course_page.clear_training_wheels()
+    if assignment_name not in course_page.assignment_names:
+        course_page.view_all_past_work()
+        course_page.clear_training_wheels()
 
     # WHEN:  they click on the assignment name
+    reading = course_page.select_assignment(assignment_name)
+    reading.clear_training_wheels()
 
     # THEN:  the first task step is displayed
+    assert(reading.is_displayed())
+    assert('step/1' in reading.location), (
+        f"Not at the reading's ({assignment_name}) " +
+        f"first step: {reading.location}")
 
     # WHEN:  they select a section of text
     # AND:   click the highlighter icon
+    Actions(selenium) \
+        .move_to_element(reading.body.paragraphs[0]) \
+        .click_and_hold() \
+        .move_by_offset(Utility.random(-20, 20) * 10 + 5, 0) \
+        .release() \
+        .perform()
+
+    reading.highlight()
 
     # THEN:  a text highlight in included
+    assert(len(reading.content_highlights) == 1), \
+        'No highlights found on the page'
 
     # WHEN:  they select a different section of text
     # AND:   click the speech bubble icon
     # AND:   enter text in the annotation box and click the check mark button
+    Actions(selenium) \
+        .move_to_element(reading.body.paragraphs[1]) \
+        .click_and_hold() \
+        .move_by_offset(Utility.random(-15, 15) * 10 + 5,
+                        Utility.random(-2, 2) * 33 + 16) \
+        .release() \
+        .perform()
+
+    annotation = reading.annotate()
+
+    annotation.text = annotation_text
+    reading = annotation.save()
 
     # THEN:  a text highlight is included
     # AND:   a speech bubble icon is displayed to the right of the highlight
+    assert(len(reading.content_highlights) == 2), (
+        f'{len(reading.content_highlights)} highlight(s) found on the page')
+
+    assert(reading.sidebar_buttons), \
+        f'No annotation text bubbles found in the sidebar'
 
     # WHEN:  they click the highlight summary icon
+    Utility.scroll_top(selenium)
+    note_summary = reading.highlights()
 
     # THEN:  the highlight and the annotation are displayed
+    assert(note_summary.is_displayed())
+    assert(len(note_summary.notes) == 2)
 
     # WHEN:  they click the highlight summary icon
-    # AND:   advance through the assignment unti a two-step question is reached
+    # AND:   advance through the assignment until a two-step question is
+    #        reached
     # AND:   enter random text in the text area and click the 'Answer' button
+    Utility.scroll_top(selenium)
+    reading = reading.highlights()
+
+    while not reading.body.is_free_response:
+        if reading.body.is_multiple_choice:
+            reading.body.pane.random_answer()
+            reading.body.pane.answer()
+            reading.body.pane._continue()
+        else:
+            reading = reading.body.next_page()
+
+    reading.body.pane.free_response = free_response_giberish
+    reading.body.pane.answer()
 
     # THEN:  the answer verification flags the answer
+    assert(reading.body.pane.nudge), \
+        'Response verification message not displayed'
 
     # WHEN:  they enter new text is in the text area and click the 'Re-answer'
     #        button
+    reading.body.pane.free_response = (
+        CollegePhysics()
+        .get_term(reading.body.pane.chapter_section)[1])
+    reading.body.pane.reanswer()
 
     # THEN:  the multiple choice answers are displayed
+    assert(reading.body.is_multiple_choice), \
+        'Multiple choice answer options not found'
 
     # WHEN:  they proceed through the rest of the assignment reaching the 'You
     #        are done.' step
     # AND:   click the milestones icon
+    reading.body.pane.random_answer()
+    reading.body.pane.answer()
+    reading.body.pane._continue()
+    while not reading.body.assignment_complete:
+        if reading.body.next_page_available:
+            reading.body.next_page()
+        elif reading.body.is_multiple_choice:
+            reading.body.pane.random_answer()
+            reading.body.pane.answer()
+        elif reading.body.has_correct_answer:
+            reading.body.pane._continue()
+        elif reading.body.is_free_response:
+            reading.body.pane.free_response = (
+                CollegePhysics()
+                .get_term(reading.body.pane.chapter_section)[1])
+            reading.body.pane.answer()
+
+    milestones = reading.milestones()
 
     # THEN:  the milestones are displayed
     # AND:   there is a card for each step
+    assert(milestones.is_displayed()), \
+        'Milestone overlay not displayed'
+
+    assert(milestones.milestones), \
+        'No milestone cards found'
 
     # WHEN:  they click the milestones icon
     # AND:   click the 'Back to Dashboard' button
+    reading = reading.milestones()
+
+    this_week = reading.body.back_to_dashboard()
+    this_week.reload()  # force a fresh to get any new dashboard data
+    if assignment_name not in this_week.assignment_names:
+        this_week.view_all_past_work()
 
     # THEN:  the 'THIS WEEK' dashboard is displayed
     # AND:   the reading assignment progress is 'Complete'
+    assert(this_week.is_displayed()), \
+        'Not viewing the student work dashboard'
 
-    import time
-    time.sleep(5)
-    assert(False), '*** Reached Test End ***'''
+    finished_assignment = this_week.assignment_bar(assignment_name)
+    assert(finished_assignment.progress == 'Complete'), (
+        f'Progress incorrect for {assignment_name}: '
+        f'"{finished_assignment.progress}"')
 
 
 '''@test_case('C485040')
@@ -890,8 +1026,9 @@ def test_student_task_homework_assignment(tutor_base_url, selenium):
     """
     # GIVEN: a Tutor student enrolled in a course with a homework assignment
 
-    # WHEN:  they click on the assignment name
-    # AND:   work each step
+    # WHEN:  they follow the assignment URL
+    # AND:   work each step (two-step, multiple choice-only, multi-part) and
+    #        the spaced or personalized assessments
     # AND:   click the 'Back to Dashboard' button
 
     # THEN:  the student dashboard is displayed

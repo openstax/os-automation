@@ -183,6 +183,8 @@ class Utility(object):
         :param element: a webelement
         :returns: True if the element has one or more child elements
         """
+        if not element:
+            return False
         return len(element.find_elements('xpath', './*')) > 0
 
     @classmethod
@@ -441,9 +443,9 @@ class Utility(object):
 
         """
         max_size = len(original_list)
-        if sample_size > max_size or sample_size < 0:
+        if sample_size >= max_size or sample_size < 0:
             return original_list
-        return sample(original_list, min(sample_size, max_size))
+        return sample(original_list, sample_size)
 
     @classmethod
     def scroll_bottom(cls, driver):
