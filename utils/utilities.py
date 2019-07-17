@@ -2,7 +2,7 @@
 
 from http.client import responses
 from platform import system
-from random import randint
+from random import randint, sample
 from time import sleep
 from warnings import warn
 
@@ -183,6 +183,8 @@ class Utility(object):
         :param element: a webelement
         :returns: True if the element has one or more child elements
         """
+        if not element:
+            return False
         return len(element.find_elements('xpath', './*')) > 0
 
     @classmethod
@@ -428,6 +430,24 @@ class Utility(object):
                         element = driver.find_element(*locator)
 
     @classmethod
+    def sample(cls, original_list: list, sample_size: int) -> list:
+        """Return a sample of the original list.
+
+        If the sample size is greater than the list size or the sample size is
+        negative, return the original list.
+
+        :param list original_list: the base list
+        :param int sample_size: the maximum number of items to return
+        :return: the sample from the original list
+        :rtype: list
+
+        """
+        max_size = len(original_list)
+        if sample_size >= max_size or sample_size < 0:
+            return original_list
+        return sample(original_list, sample_size)
+
+    @classmethod
     def scroll_bottom(cls, driver):
         """Scroll to the bottom of the browser screen."""
         driver.execute_script(
@@ -642,6 +662,11 @@ class Card(object):
                 _use_list
             )
         )
+
+    def generic(self):
+        """Return a random, valid test card."""
+        cards = self.get_by()
+        return cards[randint(0, len(cards) - 1)]
 
 
 class Status(object):

@@ -5,6 +5,7 @@ from time import sleep
 from pypom import Region
 from selenium.common.exceptions import NoSuchElementException
 from selenium.webdriver.common.by import By
+from selenium.webdriver.support import expected_conditions as expect
 
 from pages.tutor.base import TutorBase
 from utils.tutor import Tutor, TutorException
@@ -79,6 +80,8 @@ class Tab(Region):
     _name_locator = (By.CSS_SELECTOR, 'h2')
     _select_tab_locator = (By.CSS_SELECTOR, 'a')
 
+    _settings_body_selector = '.student-access , .dates-and-times'
+
     @property
     def name(self):
         """Return the name listed on the tab.
@@ -106,10 +109,18 @@ class Tab(Region):
         :rtype: :py:class:`CourseSettings`
 
         """
+        tab_name = self.name.lower()
         tab = self.find_element(*self._select_tab_locator)
         Utility.click_option(self.driver, element=tab)
         sleep(0.25)
-        return self.page
+        if 'student' in tab_name:
+            Destination = CourseSettings.StudentAccess
+        else:
+            Destination = CourseSettings.DatesAndTime
+        content_root = self.driver.execute_script(
+            'return document.querySelector("' +
+            f'{self._settings_body_selector}");')
+        return Destination(self.page, content_root)
 
 
 class Vendor(Region):
@@ -178,6 +189,7 @@ class CourseSettingsModal(Region):
         button = self.find_element(*locator)
         Utility.click_option(self.driver, element=button)
         sleep(0.25)
+        self.wait.until(expect.staleness_of(self.root))
         return self.page
 
 
@@ -419,6 +431,7 @@ class RenameCourse(CourseSettingsModal):
         Utility.clear_field(self.driver, field=field)
         sleep(0.25)
         field.send_keys(name)
+        sleep(0.75)
         return self
 
     def rename(self):
@@ -442,11 +455,21 @@ class CourseSettings(TutorBase):
     _course_name_locator = (By.CSS_SELECTOR, '.course-settings-title')
     _edit_course_name_button_locator = (
         By.CSS_SELECTOR, '.course-settings-title button')
-    _tab_locator = (By.CSS_SELECTOR, '[role=tab] a')
+    _tab_locator = (By.CSS_SELECTOR, '[role=tab]')
     _active_page_tab_locator = (By.CSS_SELECTOR, '.nav-tabs li.active h2')
     _course_term_locator = (By.CSS_SELECTOR, '.course-settings-term')
     _settings_body_locator = (
-        By.CSS_SELECTOR, '.student-access , .dates-and-times')
+        By.CSS_SELECTOR, Tab._settings_body_selector)
+
+    @property
+    def loaded(self) -> bool:
+        """Return True when the settings page active nav tab is found.
+
+        :return: ``True`` when the internal active nav tab is found
+        :rtype: bool
+
+        """
+        return bool(self.find_elements(*self._active_page_tab_locator))
 
     @property
     def page_title(self):
@@ -492,6 +515,22 @@ class CourseSettings(TutorBase):
         return [Tab(self, option)
                 for option in self.find_elements(*self._tab_locator)]
 
+    def student_access(self) -> None:
+        """Click on the 'STUDENT ACCESS' tab.
+
+        :return: None
+
+        """
+        return (sleep(0.5) or self.tabs[Tutor.STUDENT_ACCESS].select())
+
+    def dates_and_time(self) -> None:
+        """Click on the 'DATES AND TIME' tab.
+
+        :return: None
+
+        """
+        return (sleep(0.5) or self.tabs[Tutor.DATES_AND_TIME].select())
+
     @property
     def term(self):
         """Return the course term.
@@ -511,9 +550,11 @@ class CourseSettings(TutorBase):
             :py:class:`~CourseSettings.DatesAndTime`
 
         """
-        active = self.find_element(*self._active_page_tab_locator).text.lower()
+        active = (self.find_element(*self._active_page_tab_locator)
+                  .get_attribute('textContent')
+                  .lower())
         body_root = self.find_element(*self._settings_body_locator)
-        if 'dates' in active:
+        if 'access' in active:
             return self.StudentAccess(self, body_root).panel
         return self.DatesAndTime(self, body_root)
 

@@ -17,9 +17,12 @@ class Tooltip(Region):
     _subheading_locator = (By.CSS_SELECTOR, '.sub-heading')
     _content_locator = (By.CSS_SELECTOR, '[class*=main] p')
     _column_locator = (By.CSS_SELECTOR, '.column')
-    _close_tooltip_locator = (By.CSS_SELECTOR, '[class*=close]')
-    _previous_button_locator = (By.CSS_SELECTOR, '[class*="--secondary"]')
-    _continue_button_locator = (By.CSS_SELECTOR, '[class*="--primary"]')
+    _close_tooltip_locator = (
+        By.CSS_SELECTOR, '[class*=close] , [data-type=close]')
+    _previous_button_locator = (
+        By.CSS_SELECTOR, '[class*="--secondary"] , [data-type=back]')
+    _continue_button_locator = (
+        By.CSS_SELECTOR, '[class*="--primary"] , [data-type=next]')
     _view_later_button_locator = (By.CSS_SELECTOR, '[class*="--skip"]')
 
     @property
@@ -56,8 +59,9 @@ class Tooltip(Region):
 
     def close(self):
         """Click on the window close button."""
+        Page = self.page.__class__
         Utility.click_option(self.driver, element=self.window_close)
-        return self.page(self.driver, self.page.base_url)
+        return Page(self.driver, self.page.base_url)
 
     @property
     def previous_tooltip(self):
@@ -83,11 +87,11 @@ class Tooltip(Region):
         Utility.click_option(self.driver, element=self.next_tooltip)
         sleep(0.5)
         tooltip = self.driver.execute_script(
-            "return document.querySelector({0});"
-            .format(self._joyride_root_selector))
+            'return document.querySelector("{joyride}");'
+            .format(joyride=self._joyride_root_selector))
         if tooltip:
             return Tooltip(self.page, tooltip)
-        return self.page(self.driver, self.page.base_url)
+        return self.page
 
     @property
     def skip(self):
@@ -97,7 +101,7 @@ class Tooltip(Region):
     def view_later(self):
         """Click on the 'View later' button."""
         Utility.click_option(self.driver, element=self.skip)
-        return self.page(self.driver, self.page.base_url)
+        return self.page
 
     class Column(Region):
         """A display column."""

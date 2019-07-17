@@ -1,10 +1,13 @@
 """The instructor's course roster management page."""
 
+from __future__ import annotations
+
 from time import sleep
 
 from pypom import Region
 from selenium.common.exceptions import NoSuchElementException
 from selenium.webdriver.common.by import By
+from selenium.webdriver.support import expected_conditions as expect
 
 from pages.tutor.base import TutorBase
 from utils.tutor import TutorException
@@ -51,7 +54,8 @@ class Tooltip(Region):
         """
         button = self.find_element(*self._action_button_locator)
         Utility.click_option(self.driver, element=button)
-        sleep(1)
+        sleep(0.25)
+        self.wait.until(expect.staleness_of(self.root))
         return self.page
 
 
@@ -65,7 +69,7 @@ class RemoveInstructor(Tooltip):
         :rtype: :py:class:`~pages.tutor.course.CourseRoster`
 
         """
-        return super()._perform_action
+        return self._perform_action()
 
 
 class ChangeSection(Tooltip):
@@ -109,29 +113,29 @@ class ChangeSection(Tooltip):
             '"{0}" is not a valid section name (case-sensitive match)'
             .format(section_name))
 
-        class Section(Region):
-            """An available section for a student."""
+    class Section(Region):
+        """An available section for a student."""
 
-            @property
-            def name(self):
-                """Return the section name.
+        @property
+        def name(self):
+            """Return the section name.
 
-                :return: the section name
-                :rtype: str
+            :return: the section name
+            :rtype: str
 
-                """
-                return self.root.text
+            """
+            return self.root.get_attribute('textContent')
 
-            def select(self):
-                """Click on the section name to transfer the student.
+        def select(self):
+            """Click on the section name to transfer the student.
 
-                :return: the course roster
-                :rtype: :py:class:`CourseRoster`
+            :return: the course roster
+            :rtype: :py:class:`CourseRoster`
 
-                """
-                Utility.click_option(self.driver, element=self.root)
-                sleep(1)
-                return self.page.page
+            """
+            Utility.click_option(self.driver, element=self.root)
+            sleep(1)
+            return self.page.page
 
 
 class DropStudent(Tooltip):
@@ -144,7 +148,7 @@ class DropStudent(Tooltip):
         :rtype: :py:class:`~pages.tutor.course.CourseRoster`
 
         """
-        return super()._perform_action
+        return self._perform_action()
 
 
 class ReAddStudent(Tooltip):
@@ -157,7 +161,7 @@ class ReAddStudent(Tooltip):
         :rtype: :py:class:`~pages.tutor.course.CourseRoster`
 
         """
-        return super()._perform_action
+        return self._perform_action()
 
 
 # -------------------------------------------------------- #
@@ -192,7 +196,8 @@ class Modal(Region):
         """
         button = self.find_element(*self._close_button_locator)
         Utility.click_option(self.driver, element=button)
-        sleep(1)
+        sleep(0.25)
+        self.wait.until(expect.staleness_of(self.root))
         return self.page
 
     @property
@@ -291,7 +296,8 @@ class AddSection(Modal):
         """
         button = self.find_element(*self._add_section_button_locator)
         Utility.click_option(self.driver, element=button)
-        sleep(1)
+        sleep(0.25)
+        self.wait.until(expect.staleness_of(self.root))
         return self.page
 
 
@@ -315,7 +321,7 @@ class RenameSection(AddSection):
         :rtype: :py:class:`~pages.tutor.course.CourseRoster`
 
         """
-        return super().add
+        return self.add()
 
 
 class DeleteSection(Modal):
@@ -341,6 +347,8 @@ class DeleteSection(Modal):
         """
         button = self.find_element(*self._delete_button_locator)
         Utility.click_option(self.driver, element=button)
+        sleep(0.25)
+        self.wait.until(expect.staleness_of(self.root))
         sleep(1)
         return self.page
 
@@ -353,7 +361,8 @@ class DeleteSection(Modal):
         """
         button = self.find_element(*self._cancel_button_locator)
         Utility.click_option(self.driver, element=button)
-        sleep(1)
+        sleep(0.25)
+        self.wait.until(expect.staleness_of(self.root))
         return self.page
 
 
@@ -366,7 +375,10 @@ class User(Region):
 
     _first_name_locator = (By.CSS_SELECTOR, 'td:first-child')
     _last_name_locator = (By.CSS_SELECTOR, 'td:nth-child(2)')
-    _remove_user_locator = (By.XPATH, '//a[*[@data-icon="ban"]]')
+    _remove_instructor_user_locator = (
+        By.CSS_SELECTOR, '.actions a:first-child')
+    _remove_student_user_locator = (
+        By.CSS_SELECTOR, '.actions a:nth-child(2)')
 
     @property
     def first_name(self):
@@ -399,16 +411,18 @@ class User(Region):
         :rtype: NoneType or :py:class:`Tooltip`
 
         """
-        button = self.find_element(*self._remove_user_locator)
+        locator = self._remove_student_user_locator if student \
+            else self._remove_instructor_user_locator
+        button = self.find_element(*locator)
         Utility.click_option(self.driver, element=button)
         tooltip_root = self.driver.execute_script(GET_ROOT.format('tooltip'))
         if student:
-            popup = self.DropStudent(self, tooltip_root)
+            popup = DropStudent(self, tooltip_root)
             if return_tooltip:
                 return popup
             popup.drop()
         else:
-            popup = self.RemoveInstructor(self, tooltip_root)
+            popup = RemoveInstructor(self, tooltip_root)
             if return_tooltip:
                 return popup
             popup.remove()
@@ -422,6 +436,68 @@ class CourseRoster(TutorBase):
     _course_term_locator = (By.CSS_SELECTOR, '.course-settings-term')
     _instructor_section_locator = (By.CSS_SELECTOR, '.teachers')
     _student_roster_section_locator = (By.CSS_SELECTOR, '.periods')
+
+    @property
+    def loaded(self) -> bool:
+        """Return True when the instructor list is populated.
+
+        :return: ``True`` when at least one instructor is found
+        :rtype: bool
+
+        """
+        return bool(self.instructors.instructors)
+
+    @property
+    def title(self) -> str:
+        """Return the page title.
+
+        :return: the page title
+        :rtype: str
+
+        """
+        return self.find_element(*self._page_title_locator).text
+
+    @property
+    def course_name(self) -> str:
+        """Return the course name.
+
+        :return: the course name
+        :rtype: str
+
+        """
+        return self.find_element(*self._course_title_locator).text
+
+    @property
+    def course_term(self) -> str:
+        """Return the course term.
+
+        :return: the course term
+        :rtype: str
+
+        """
+        return self.find_element(*self._course_term_locator).text
+
+    @property
+    def instructors(self) -> CourseRoster.Teachers:
+        """Access the 'Instructors' table.
+
+        :return: the instructors table region
+        :rtype: :py:class:`~pages.tutor.roster.CourseRoster.Teachers`
+
+        """
+        teachers_table = self.find_element(*self._instructor_section_locator)
+        return self.Teachers(self, teachers_table)
+
+    @property
+    def roster(self) -> CourseRoster.Roster:
+        """Access the student roster table.
+
+        :return: the student rosters
+        :rtype: :py:class:`~pages.tutor.roster.CourseRoster.Roster`
+
+        """
+        roster = self.find_element(*self._student_roster_section_locator)
+        return self.Roster(self, roster)
 
     class Teachers(Region):
         """The 'Instructors' table."""
@@ -510,6 +586,7 @@ class CourseRoster(TutorBase):
         _add_section_link_locator = (By.CSS_SELECTOR, '.add-period')
         _rename_section_link_locator = (By.CSS_SELECTOR, '.rename-period')
         _delete_section_link_locator = (By.CSS_SELECTOR, '.delete-period')
+        _active_section_name_locator = (By.CSS_SELECTOR, '.active h2')
         _student_row_locator = (By.CSS_SELECTOR, '.students tbody tr')
         _dropped_student_row_locator = (
             By.CSS_SELECTOR, '.dropped-students tbody tr')
@@ -643,6 +720,17 @@ class CourseRoster(TutorBase):
             return modal.delete() if delete else modal
 
         @property
+        def current_section(self) -> str:
+            """Return the name of the currently selected course section.
+
+            :return: the current course section name
+            :rtype: str
+
+            """
+            return (self.find_element(*self._active_section_name_locator)
+                    .get_attribute('textContent'))
+
+        @property
         def students(self):
             """Access the student rows.
 
@@ -680,7 +768,8 @@ class CourseRoster(TutorBase):
                 :rtype: str
 
                 """
-                return self.find_element(*self._section_name_locator).text
+                return (self.find_element(*self._section_name_locator)
+                        .get_attribute('textContent'))
 
             @property
             def is_active(self):
@@ -710,14 +799,30 @@ class CourseRoster(TutorBase):
         class Student(User):
             """A student row with actions."""
 
+            _student_first_name_locator = (By.CSS_SELECTOR, 'td:first-child')
+            _student_last_name_locator = (By.CSS_SELECTOR, 'td:nth-child(2)')
             _student_id_locator = (By.CSS_SELECTOR, '.identifier')
             _student_id_input_box_locator = (
                 By.CSS_SELECTOR, '.student-id input')
             _edit_student_id_locator = (By.CSS_SELECTOR, '.student-id a')
             _change_section_link_locator = (
-                By.XPATH, '//a[*[@data-icon="clock"]]')
+                By.CSS_SELECTOR, '.actions a:first-child')
+            _drop_student_link_locator = (
+                By.CSS_SELECTOR, '.actions a:nth-child(2)')
             _readd_student_link_locator = (
-                By.XPATH, '//a[*[@data-icon="user-plus"]]')
+                By.CSS_SELECTOR, '.actions a:first-child')
+
+            @property
+            def name(self) -> str:
+                """Return the student's full name.
+
+                :return: the student's first and last name
+                :rtype: str
+
+                """
+                first = self.find_element(*self._student_first_name_locator)
+                last = self.find_element(*self._student_last_name_locator)
+                return f"{first.text} {last.text}"
 
             @property
             def student_id(self):
@@ -752,6 +857,12 @@ class CourseRoster(TutorBase):
                     *self._student_id_input_box_locator)
                 Utility.clear_field(self.driver, id_field)
                 if _id:
+                    edit_button = self.find_element(
+                        *self._edit_student_id_locator)
+                    Utility.click_option(self.driver, element=edit_button)
+                    sleep(0.25)
+                    id_field = self.find_element(
+                        *self._student_id_input_box_locator)
                     id_field.send_keys(_id)
                 id_field.send_keys(Keys.TAB)
                 return self.page.page
@@ -772,9 +883,11 @@ class CourseRoster(TutorBase):
                 change_button = self.find_element(
                     *self._change_section_link_locator)
                 Utility.click_option(self.driver, element=change_button)
+                sleep(0.25)
                 tooltip_root = self.driver.execute_script(
                     GET_ROOT.format('tooltip'))
                 tooltip = ChangeSection(self.page.page, tooltip_root)
+                sleep(1)
                 return tooltip.switch_to(section) if section else tooltip
 
             def drop(self, drop_student=True):
@@ -803,6 +916,7 @@ class CourseRoster(TutorBase):
                 readd_button = self.find_element(
                     *self._readd_student_link_locator)
                 Utility.click_option(self.driver, element=readd_button)
+                sleep(0.25)
                 tooltip_root = self.driver.execute_script(
                     GET_ROOT.format('tooltip'))
                 tooltip = ReAddStudent(self.page.page, tooltip_root)

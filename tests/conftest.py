@@ -30,22 +30,35 @@ def pytest_addoption(parser):
     user_options = parser.getgroup('users', 'User accounts for testing')
     product_options = parser.getgroup('products', 'Products to test')
 
+    settings = parser
+
     # Runtime options
     selenium_options.addoption(
         '--headless',
         action='store_true',
         default=os.getenv('HEADLESS', False),
         help='Enable headless mode for Chrome and Firefox.')
+    settings.addini(
+        'headless_browsing',
+        help='Enable headless mode for Chrome and Firefox.')
     selenium_options.addoption(
         '--instance',
         action='store',
         default=os.getenv('INSTANCE', 'qa'),
         help='Use a specific instance set.')
+    settings.addini(
+        'instance',
+        default='qa',
+        help='Use a specific instance set.')
     selenium_options.addoption(
         '--no-sandbox',
         action='store_true',
         default=os.getenv('NO_SANDBOX', False),
-        help="disable chrome's sandbox.")
+        help="disable Chrome's sandbox.")
+    settings.addini(
+        'no_sandbox',
+        default=False,
+        help="disable Chrome's sandbox.")
     selenium_options.addoption(
         '--print-page-source-on-failure',
         action='store_true',
@@ -66,9 +79,17 @@ def pytest_addoption(parser):
         action='store_true',
         default=False,
         help='Run deployment smoke tests;\noption overrides other flags.')
+    settings.addini(
+        'smoke_test',
+        default=False,
+        help='Run deployment smoke tests;\noption overrides other flags.')
     selenium_options.addoption(
         '--randomize',
         action='store_true',
+        default=False,
+        help='Randomize the test ordering.')
+    settings.addini(
+        'randomize',
         default=False,
         help='Randomize the test ordering.')
     selenium_options.addoption(
@@ -76,6 +97,13 @@ def pytest_addoption(parser):
         action='store_true',
         default=False,
         help='Strip Flake8 and generic test_case tests from the run.')
+    settings.addini(
+        'strip_flake8',
+        default=False,
+        help='Strip Flake8 and generic test_case tests from the run.')
+    settings.addini(
+        'testrail',
+        help='Submit the test results to a TestRail instance.')
 
     # Base URL options
     url_options.addoption(
@@ -84,11 +112,17 @@ def pytest_addoption(parser):
         default=os.getenv('ACCOUNTS_BASE_URL', None),
         dest='accounts_base_url',
         help='OpenStax Accounts homepage base URL')
+    settings.addini(
+        'accounts_base_url',
+        help='OpenStax Accounts homepage base URL')
     url_options.addoption(
         '--exercises-base-url',
         action='store',
         default=os.getenv('EXERCISES_BASE_URL', None),
         dest='exercises_base_url',
+        help='OpenStax Exercises homepage base URL')
+    settings.addini(
+        'exercises_base_url',
         help='OpenStax Exercises homepage base URL')
     url_options.addoption(
         '--payments-base-url',
@@ -96,11 +130,17 @@ def pytest_addoption(parser):
         default=os.getenv('PAYMENTS_BASE_URL', None),
         dest='payments_base_url',
         help='OpenStax Tutor Payments base URL')
+    settings.addini(
+        'payments_base_url',
+        help='OpenStax Tutor Payments base URL')
     url_options.addoption(
         '--tutor-base-url',
         action='store',
         default=os.getenv('TUTOR_BASE_URL', None),
         dest='tutor_base_url',
+        help='OpenStax Tutor homepage base URL')
+    settings.addini(
+        'tutor_base_url',
         help='OpenStax Tutor homepage base URL')
     url_options.addoption(
         '--web-base-url',
@@ -108,51 +148,58 @@ def pytest_addoption(parser):
         default=os.getenv('WEB_BASE_URL', None),
         dest='web_base_url',
         help='OpenStax Web homepage base URL')
+    settings.addini(
+        'web_base_url',
+        help='OpenStax Web homepage base URL')
 
     # User options
     user_options.addoption(
         '--student',
         action='store',
-        nargs=2,
+        nargs='+',
         default=[
             os.getenv('STUDENT_USER'),
             os.getenv('STUDENT_PASSWORD_DEV'),
             os.getenv('STUDENT_PASSWORD_QA'),
             os.getenv('STUDENT_PASSWORD_STAGING'),
-            os.getenv('STUDENT_PASSWORD_PROD')],
+            os.getenv('STUDENT_PASSWORD_PROD'),
+            os.getenv('STUDENT_PASSWORD_UNIQUE')],
         help='OpenStax test student account')
     user_options.addoption(
         '--teacher',
         action='store',
-        nargs=2,
+        nargs='+',
         default=[
             os.getenv('TEACHER_USER'),
             os.getenv('TEACHER_PASSWORD_DEV'),
             os.getenv('TEACHER_PASSWORD_QA'),
             os.getenv('TEACHER_PASSWORD_STAGING'),
-            os.getenv('TEACHER_PASSWORD_PROD')],
+            os.getenv('TEACHER_PASSWORD_PROD'),
+            os.getenv('TEACHER_PASSWORD_UNIQUE')],
         help='OpenStax test instructor account')
     user_options.addoption(
         '--admin',
         action='store',
-        nargs=2,
+        nargs='+',
         default=[
             os.getenv('ADMIN_USER'),
             os.getenv('ADMIN_PASSWORD_DEV'),
             os.getenv('ADMIN_PASSWORD_QA'),
             os.getenv('ADMIN_PASSWORD_STAGING'),
-            os.getenv('ADMIN_PASSWORD_PROD')],
+            os.getenv('ADMIN_PASSWORD_PROD'),
+            os.getenv('ADMIN_PASSWORD_UNIQUE')],
         help='OpenStax test administrative account')
     user_options.addoption(
         '--content',
         action='store',
-        nargs=2,
+        nargs='+',
         default=[
             os.getenv('CONTENT_USER'),
             os.getenv('CONTENT_PASSWORD_DEV'),
             os.getenv('CONTENT_PASSWORD_QA'),
             os.getenv('CONTENT_PASSWORD_STAGING'),
-            os.getenv('CONTENT_PASSWORD_PROD')],
+            os.getenv('CONTENT_PASSWORD_PROD'),
+            os.getenv('CONTENT_PASSWORD_UNIQUE')],
         help='OpenStax test content manager account')
     user_options.addoption(
         '--salesforce',
@@ -200,7 +247,7 @@ def pytest_addoption(parser):
         '--systems',
         action='store',
         nargs='+',
-        default=[
+        default=[  # default to run all systems
             'accounts', 'biglearn', 'exercises',
             'payments', 'support', 'tutor', 'web'],
         help=(
@@ -212,25 +259,31 @@ def pytest_addoption(parser):
 def pytest_collection_modifyitems(config, items):
     """Runtime test options."""
     # Runtime markers
-    run_smoke_tests = config.getoption('--smoke-test')
-    shuffle_tests = config.getoption('--randomize')
-    testrail = config.getoption('--testrail')
-    skip_flake = config.getoption('--strip-flake')
+    run_smoke_tests = (config.getoption('--smoke-test') or
+                       config.getini('smoke_test'))
+    shuffle_tests = (config.getoption('--randomize') or
+                     config.getini('randomize'))
+    testrail = (config.getoption('--testrail') or
+                config.getini('testrail'))
+    skip_flake = (config.getoption('--strip-flake') or
+                  config.getini('strip_flake8'))
 
     run_social = config.getoption('--run-social')
     mark_run_social = pytest.mark.skip(reason='Skipping non-social tests.')
     skip_social = config.getoption('--skip-social')
     mark_skip_social = pytest.mark.skip(reason='Skipping social login tests.')
 
-    run_systems = config.getoption('--systems')
+    run_systems = (config.getoption('--systems') or
+                   config.getini('systems'))
 
-    headless_mode = config.getoption('--headless')
+    headless_mode = (config.getoption('--headless') or
+                     config.getini('headless_browsing'))
 
     # Throw out other ignored tests
     deselected = []
     remaining = []
     for item in items:
-        if '<Function test_case>' in str(item):
+        if 'Function test_case' in str(item):
             deselected.append(item)
             continue
         if run_smoke_tests:
@@ -243,7 +296,7 @@ def pytest_collection_modifyitems(config, items):
                 continue
         if skip_flake:
             item_name = str(item)
-            if 'Function test_case' in item_name or 'Flake8Item' in item_name:
+            if 'Flake8Item' in item_name:
                 deselected.append(item)
                 continue
         if run_systems:

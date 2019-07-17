@@ -91,6 +91,7 @@ class Signup(AccountsBase):
 
     def account_signup(self, email,
                        password=None, _type='Student', provider='restmail',
+                       tutor=False, destination=None,
                        **kwargs):
         """Single signup entry point.
 
@@ -108,6 +109,8 @@ class Signup(AccountsBase):
                 'google': Google Gmail
                 'guerrilla': Guerrilla Mail
                 'restmail': RestMail API mail
+            tutor (bool): A Tutor signup
+            destination (str): a URL destination if not Accounts
             **kwargs: Arbitrary keyword arguments
                 'email_password': (str) Webmail login password
                 'name': user name fields
@@ -154,7 +157,8 @@ class Signup(AccountsBase):
         instructor = _type == Signup.INSTRUCTOR
 
         # select user type and email
-        self.user_type.role = _type
+        if not tutor:
+            self.user_type.role = _type
         self.user_type.email = email
         self.next()
         sleep(0.5)
@@ -285,7 +289,8 @@ class Signup(AccountsBase):
         '''
         if not kwargs.get('news'):
             self.user.toggle_news()
-        self.user.agree_to_terms()
+        if not tutor:
+            self.user.agree_to_terms()
         sleep(0.25)
         self.next()
         if non_student_role:
@@ -296,8 +301,13 @@ class Signup(AccountsBase):
             self.notice.get_confirmation_email()
             self.next()
 
+        if tutor:
+            from pages.tutor.enrollment import StudentID
+            return go_to_(
+                StudentID(self.driver,
+                          base_url=destination if destination else None))
         from pages.accounts.profile import Profile
-        return go_to_(Profile(self.driver, self.base_url))
+        return go_to_(Profile(self.driver, base_url=self.base_url))
 
     def instructor_access(self, role, school_email, phone_number, school,
                           webpage, students=None, using=None, interests=None,

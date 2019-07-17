@@ -1,22 +1,208 @@
 """An instructor course page with calendar."""
 
+from __future__ import annotations
+
+from datetime import datetime
 from time import sleep
+from typing import Dict, List, Tuple, Union
 
 from pypom import Region
 from selenium.webdriver.common.by import By
 
 from pages.tutor.base import TutorBase
 from regions.tutor.notification import Notifications
+from regions.tutor.tooltip import Tooltip
 from utils.tutor import Tutor, TutorException
 from utils.utilities import Utility, go_to_
+
+DateTime = Tuple[Union[str, datetime], str]
+Timeframe = Dict[str, Tuple[DateTime, DateTime]]
+
+
+class Assignment(Region):
+    """An individual student assignment or event."""
+
+    _plan_locator = (By.CSS_SELECTOR, '.plan')
+    _title_locator = (By.CSS_SELECTOR, '[data-opens-at]')
+    _edit_draft_locator = (By.CSS_SELECTOR, 'a')
+    _flagged_assignment_locator = (By.CSS_SELECTOR, '[data-opens-at] svg')
+
+    @property
+    def style(self):
+        """Return the assignment color display type.
+
+        :returns: the assignment type
+        :rtype: str
+
+        """
+        return (self.root.get_attribute('class')
+                .split('type-')[-1]
+                .split()[0])
+
+    @property
+    def span(self):
+        """Return the number of days this week the event spans.
+
+        :returns: the number of days in the week the assignment
+            spans
+        :rtype: int
+
+        """
+        return int(self.root.get_attribute('class')
+                   .split('span-')[-1]
+                   .split()[0])
+
+    @property
+    def plan(self):
+        """Return the assignment plan element.
+
+        :return: the assignment plan
+        :rtype:
+            :py:class:
+            `selenium.webdriver.remote.webelement.WebElement`
+
+        """
+        return self.find_element(*self._plan_locator)
+
+    @property
+    def is_published(self):
+        """Return True if the assignment is published.
+
+        :return: ``True`` if the assignment is published,
+            else ``False``
+        :rtype: bool
+
+        """
+        return 'is-published' in self.plan.get_attribute('class')
+
+    @property
+    def is_draft(self):
+        """Return True if the assignment is a saved draft.
+
+        :return: ``True`` if the assignment is a saved draft,
+            else ``False``
+        :rtype: bool
+
+        """
+        return 'is-draft' in self.plan.get_attribute('class')
+
+    @property
+    def is_open(self):
+        """Return True if the assignment is open for work.
+
+        :return: ``True`` if the assignment is currently open for
+            work, else ``False``
+        :rtype: bool
+
+        """
+        return 'is-open' in self.plan.get_attribute('class')
+
+    @property
+    def plan_id(self):
+        """Return the assignment plan ID.
+
+        :return: the assignment plan identification number
+        :rtype: str
+
+        """
+        return self.plan.get_attribute('data-plan-id')
+
+    @property
+    def assignment_type(self):
+        """Return the assignment type.
+
+        :return: the assignment type
+        :rtype: str
+
+        """
+        return self.plan.get_attribute('data-assignment-type')
+
+    @property
+    def opens_on(self):
+        """Return the date the assignment opens on.
+
+        :return: the date the assignment opens for work
+        :rtype: str
+
+        """
+        return (self.find_element(*self._title_locator)
+                .get_attribute('data-opens-at'))
+
+    @property
+    def title(self):
+        """Return the assignment title.
+
+        :return: the assignment title
+        :rtype: str
+
+        """
+        return self.find_element(*self._title_locator).text
+
+    def edit(self):
+        """Edit the selected assignment.
+
+        :return: an assignment creation page if the assignment is
+                 a saved draft else display the quick look assignment modal
+        :rtype: :py:class:`~pages.tutor.assignment.AddExternal` or
+                :py:class:`~pages.tutor.assignment.AddEvent` or
+                :py:class:`~pages.tutor.assignment.AddHomework` or
+                :py:class:`~pages.tutor.assignment.AddReading` or
+                :py:class:`~regions.tutor.quick_look.QuickLook`
+
+        :raises :py:class:`~utils.tutor.TutorException`: if the
+                assignment type does not match a known assignment
+                type
+
+        """
+        if self.is_draft:
+            assignment_type = self.assignment_type
+            link = self.find_element(*self._edit_draft_locator)
+            Utility.click_option(self.driver, element=link)
+            if assignment_type == Tutor.EVENT:
+                from pages.tutor.assignment import Event as Assignment
+            elif assignment_type == Tutor.EXTERNAL:
+                from pages.tutor.assignment import External as Assignment
+            elif assignment_type == Tutor.HOMEWORK:
+                from pages.tutor.assignment import Homework as Assignment
+            elif assignment_type == Tutor.READING:
+                from pages.tutor.assignment import Reading as Assignment
+            else:
+                raise TutorException(
+                    f'"{assignment_type}" is not a known assignment type.')
+            target = self
+            from pypom import Page
+            while not isinstance(target, Page):
+                target = target.page
+            return go_to_(Assignment(self.driver, target.base_url))
+        Utility.click_option(self.driver, element=self.root)
+        sleep(0.5)
+        from regions.tutor.quick_look import QuickLook
+        return QuickLook(self.page)
+
+    @property
+    def flagged(self):
+        """Return True if the trouble flag is present.
+
+        :return: ``True`` if the assignment has a trouble flag
+            displayed on the calendar, else ``False``
+        :rtype: bool
+
+        """
+        return bool(
+            self.find_elements(*self._flagged_assignment_locator))
 
 
 class Calendar(TutorBase):
     """The instructor course calendar."""
 
+    _joyride_root_selector = (By.CSS_SELECTOR, '.joyride')
     _banner_locator = (By.CSS_SELECTOR, '.course-page header')
     _assignment_sidebar_locator = (By.CSS_SELECTOR, '.add-assignment-sidebar')
     _calendar_body_locator = (By.CSS_SELECTOR, '.month-body')
+    _is_publishing_locator = (By.CSS_SELECTOR, '.is-publishing')
+    _assignment_locator = (By.CSS_SELECTOR, '.event')
+
+    _loading_message_selector = '.calendar-loading'
 
     # ---------------------------------------------------- #
     # Banner / Header
@@ -81,7 +267,7 @@ class Calendar(TutorBase):
         return self.Sidebar(self, sidebar)
 
     # ---------------------------------------------------- #
-    # Assignment sidebar
+    # The monthly calendar
     # ---------------------------------------------------- #
 
     @property
@@ -93,7 +279,169 @@ class Calendar(TutorBase):
 
         """
         calendar = self.find_element(*self._calendar_body_locator)
-        return self.Calendar(self, calendar)
+        return self.CalendarMonth(self, calendar)
+
+    # ---------------------------------------------------- #
+    # Calendar helper functions
+    # ---------------------------------------------------- #
+
+    @property
+    def loaded(self) -> bool:
+        """Return True when the loading message goes away.
+
+        :return: ``True`` when the loading message goes away
+        :rtype: bool
+
+        :noindex:
+
+        """
+        return ((self.find_element(By.CSS_SELECTOR, '.calendar-container')
+                 .is_displayed()) and
+                'calendar-loading' not in (
+                    self.find_element(By.CSS_SELECTOR, '.calendar-container')
+                    .get_attribute('class')))
+
+    def clear_training_wheels(self) -> None:
+        """Clear any joyride modals.
+
+        :return: None
+
+        """
+        joyride = self.find_elements(*self._joyride_root_selector)
+        if not joyride or not Utility.has_children(joyride[0]):
+            return
+        Tooltip(self, joyride[0]).next()
+        sleep(1)
+        return self.clear_training_wheels()
+
+    def add_assignment(self,
+                       assignment: str,
+                       name: str,
+                       assign_to: Timeframe,
+                       description: str = "",
+                       action: str = Tutor.PUBLISH
+                       ) -> None:
+        """Create a new assignment.
+
+        :TODO: fill parameter list
+        :return: None
+
+        :raises :py:class:`~utils.tutor.TutorException`: if the assignment type
+            does not match existing assignment types
+
+        """
+        # Expand the assignment menu if it is not already open
+        if not self.sidebar.is_open:
+            self.banner.add_assignment()
+
+        # Select the assignment type
+        try:
+            {Tutor.EVENT:    self.sidebar.add_event,
+             Tutor.EXTERNAL: self.sidebar.add_external,
+             Tutor.HOMEWORK: self.sidebar.add_homework,
+             Tutor.READING:  self.sidebar.add_reading, }[assignment]()
+        except KeyError:
+            raise TutorException(f'"{assignment}" not a valid assignment type')
+
+        # Wait for the assignment creation page to load
+        if assignment == Tutor.EVENT:
+            from pages.tutor.assignment import Event as Destination
+        elif assignment == Tutor.EXTERNAL:
+            from pages.tutor.assignment import External as Destination
+        elif assignment == Tutor.HOMEWORK:
+            from pages.tutor.assignment import Homework as Destination
+        else:
+            from pages.tutor.assignment import Reading as Destination
+        assign = go_to_(Destination(self.driver, self.base_url))
+
+        # Enter the assignment name
+        assign.name = name
+
+        # Enter the description, if included
+        if description:
+            assign.description = description
+
+        # select the assignment open and due dates and times
+        assign.set_assignment_dates(assign_to)
+
+        # click the action
+        try:
+            {Tutor.PUBLISH: assign.publish,
+             Tutor.DRAFT: assign.save_as_draft,
+             Tutor.CANCEL: assign.cancel,
+             Tutor.DELETE: assign.delete, }[action]()
+        except KeyError:
+            raise TutorException(f'"{action}" not a valid assignment action')
+
+        # wait for the calendar to load
+        calendar = go_to_(Calendar(self.driver, self.base_url))
+
+        # wait for the assignment to complete publishing/saving
+        calendar.wait.until(
+            lambda _: not self.driver.find_elements(
+                *self._is_publishing_locator))
+
+    def assignments(self, by_name: bool = False) \
+            -> Union[List[Assignment], List[str]]:
+        r"""Return a list of assignments.
+
+        :param bool by_name: (optional) request the list of assignment names
+            currently displayed in the calendar
+        :return: the list of assignments or assignment names
+        :rtype: list(:py:class:`~pages.tutor.calendar \
+                     .Calendar.CalendarMonth.Day.Assignment`) or list(str)
+
+        """
+        assignments = [Assignment(self, ribbon)
+                       for ribbon
+                       in self.find_elements(*self._assignment_locator)]
+        if not by_name:
+            return assignments
+        return [assignment.title for assignment in assignments]
+
+    def assignment(self, name: str) -> Assignment:
+        """Return the assignment from its name.
+
+        :param str name: the assignment name or title
+        :return: the assignment
+        :rtype: :py:class:`~pages.tutor.calendar.Assignment`
+
+        :raises :py:class:`~utils.tutor.TutorException` if an assignment does
+            not match ``name``
+
+        """
+        for assignment in self.assignments():
+            if assignment.title == name:
+                return assignment
+        raise TutorException(f'No assignment found matching "{name}"')
+
+    def assignments_on(self, date: datetime, by_name: bool = False) \
+            -> Union[List[str], List[Assignment]]:
+        """Return the assignments on a particular date.
+
+        .. note:
+
+            Only looks at the current month
+            TODO: add a calendar rotation to pull the assignments for dates in
+                  different months
+
+        :param date: a specific date
+        :param bool by_name: (optional) return the assignment names found on
+            the date instead of the assignments
+        :type date: :py:class:`~datetime.datetime`
+        :return: the list of assignments on that date or the list of
+            assignment names on that date
+        :rtype: list(:py:class:`~pages.tutor.calendar.Assignment`)
+
+        """
+        selector = f'[data-date="{date.strftime("%Y%m%d")}"]'
+        due_date = self.find_element(By.CSS_SELECTOR, selector)
+        assignments = [Assignment(self, ribbon)
+                       for ribbon
+                       in due_date.find_elements(*self._assignment_locator)]
+        if not by_name:
+            return assignments
+        return [assignment.title for assignment in assignments]
 
     # ---------------------------------------------------- #
     # Instructor course regions
@@ -104,8 +452,8 @@ class Calendar(TutorBase):
 
         _title_locator = (By.CSS_SELECTOR, '.title')
         _course_term_locator = (By.CSS_SELECTOR, '.subtitle')
-        _notification_bar_locator = (
-                                By.CSS_SELECTOR, '.openstax-notifications-bar')
+        _notification_bar_locator = (By.CSS_SELECTOR,
+                                     '.openstax-notifications-bar')
         _assignment_toggle_locator = (By.CSS_SELECTOR, '.sidebar-toggle')
         _browse_the_book_locator = (By.CSS_SELECTOR, '.reference')
         _question_library_locator = (By.CSS_SELECTOR, '[href$=questions]')
@@ -343,16 +691,16 @@ class Calendar(TutorBase):
             """
             if assignment_type == Tutor.EXTERNAL:
                 locator = self._add_external_locator
-                from pages.tutor.assignment import AddExternal as Assignment
+                from pages.tutor.assignment import External as Assignment
             elif assignment_type == Tutor.EVENT:
                 locator = self._add_event_locator
-                from pages.tutor.assignment import AddEvent as Assignment
+                from pages.tutor.assignment import Event as Assignment
             elif assignment_type == Tutor.HOMEWORK:
                 locator = self._add_homework_locator
-                from pages.tutor.assignment import AddHomework as Assignment
+                from pages.tutor.assignment import Homework as Assignment
             elif assignment_type == Tutor.READING:
                 locator = self._add_reading_locator
-                from pages.tutor.assignment import AddReading as Assignment
+                from pages.tutor.assignment import Reading as Assignment
             else:
                 raise TutorException('"{0}" is not a known assignment type.'
                                      .format(assignment_type))
@@ -471,6 +819,27 @@ class Calendar(TutorBase):
             _add_assignment_selector = 'a[data-assignment-type={0}]'
 
             @property
+            def number(self):
+                """Return the calendar day number element.
+
+                :return: the day's label
+                :rtype: WebElement
+
+                """
+                return self.find_element(*self._date_label_locator)
+
+            @property
+            def date(self) -> datetime:
+                """Return the date.
+
+                :return: the day as a date
+                :rtype: :py:class:`~datetime.datetime`
+
+                """
+                return datetime.strptime(self.root.get_attribute('data-date'),
+                                         "%Y%m%d")
+
+            @property
             def term(self):
                 """Return whether the date is in or out of the term.
 
@@ -523,19 +892,19 @@ class Calendar(TutorBase):
                 sleep(0.5)
                 if assignment_type == Tutor.EVENT:
                     assignment = Tutor.EVENT
-                    from pages.tutor.assignment import AddEvent \
+                    from pages.tutor.assignment import Event \
                         as Assignment
                 elif assignment_type == Tutor.EXTERNAL:
                     assignment = Tutor.EXTERNAL
-                    from pages.tutor.assignment import AddExternal \
+                    from pages.tutor.assignment import External \
                         as Assignment
                 elif assignment_type == Tutor.HOMEWORK:
                     assignment = Tutor.HOMEWORK
-                    from pages.tutor.assignment import AddHomework \
+                    from pages.tutor.assignment import Homework \
                         as Assignment
                 elif assignment_type == Tutor.READING:
                     assignment = Tutor.READING
-                    from pages.tutor.assignment import AddReading \
+                    from pages.tutor.assignment import Reading \
                         as Assignment
                 elif assignment_type is None:
                     # just open the pop up menu
@@ -546,8 +915,8 @@ class Calendar(TutorBase):
                         .format(assignment_type))
                 if assignment:
                     button = self.driver.execute_script(
-                        'return document.querySelector("arguments[0]");',
-                        self._add_assignment_selector.format(assignment))
+                        'return document.querySelector("{}");'.format(
+                            self._add_assignment_selector.format(assignment)))
                     Utility.click_option(self.driver, element=button)
                     return go_to_(Assignment(self.driver,
                                              self.page.page.base_url))
@@ -572,177 +941,6 @@ class Calendar(TutorBase):
                     list(:py:class:`~Calendar.CalendarMonth.Day.Assignment`)
 
                 """
-                return [self.Assignment(self, event)
+                return [Assignment(self, event)
                         for event
                         in self.find_elements(*self._assignment_locator)]
-
-            class Assignment(Region):
-                """An individual student assignment or event."""
-
-                _plan_locator = (By.CSS_SELECTOR, '.plan')
-                _title_locator = (By.CSS_SELECTOR, '[data-opens-at]')
-                _edit_draft_locator = (By.CSS_SELECTOR, 'a')
-                _flagged_assignment_locator = (
-                                        By.CSS_SELECTOR, '[data-opens-at] svg')
-
-                @property
-                def style(self):
-                    """Return the assignment color display type.
-
-                    :returns: the assignment type
-                    :rtype: str
-
-                    """
-                    return (self.root.get_attribute('class')
-                            .split('type-')[-1]
-                            .split()[0])
-
-                @property
-                def span(self):
-                    """Return the number of days this week the event spans.
-
-                    :returns: the number of days in the week the assignment
-                        spans
-                    :rtype: int
-
-                    """
-                    return int(self.root.get_attribute('class')
-                               .split('span-')[-1]
-                               .split()[0])
-
-                @property
-                def plan(self):
-                    """Return the assignment plan element.
-
-                    :return: the assignment plan
-                    :rtype:
-                        :py:class:
-                        `selenium.webdriver.remote.webelement.WebElement`
-
-                    """
-                    return self.find_element(*self._plan_locator)
-
-                @property
-                def is_published(self):
-                    """Return True if the assignment is published.
-
-                    :return: ``True`` if the assignment is published,
-                        else ``False``
-                    :rtype: bool
-
-                    """
-                    return 'is-published' in self.plan.get_attribute('class')
-
-                @property
-                def is_draft(self):
-                    """Return True if the assignment is a saved draft.
-
-                    :return: ``True`` if the assignment is a saved draft,
-                        else ``False``
-                    :rtype: bool
-
-                    """
-                    return 'is-draft' in self.plan.get_attribute('class')
-
-                @property
-                def is_open(self):
-                    """Return True if the assignment is open for work.
-
-                    :return: ``True`` if the assignment is currently open for
-                        work, else ``False``
-                    :rtype: bool
-
-                    """
-                    return 'is-open' in self.plan.get_attribute('class')
-
-                @property
-                def plan_id(self):
-                    """Return the assignment plan ID.
-
-                    :return: the assignment plan identification number
-                    :rtype: str
-
-                    """
-                    return self.plan.get_attribute('data-plan-id')
-
-                @property
-                def assignment_type(self):
-                    """Return the assignment type.
-
-                    :return: the assignment type
-                    :rtype: str
-
-                    """
-                    return self.plan.get_attribute('data-assignment-type')
-
-                @property
-                def opens_on(self):
-                    """Return the date the assignment opens on.
-
-                    :return: the date the assignment opens for work
-                    :rtype: str
-
-                    """
-                    return (self.find_element(*self._title_locator)
-                            .get_attribute('data-opens-at'))
-
-                @property
-                def title(self):
-                    """Return the assignment title.
-
-                    :return: the assignment title
-                    :rtype: str
-
-                    """
-                    return self.find_element(*self._title_locator).text
-
-                def edit_draft(self):
-                    """Edit the selected assignment.
-
-                    :return: an assignment creation page if the assignment is
-                             a saved draft else None
-                    :rtype: :py:class:`~pages.tutor.assignment.AddExternal` or
-                            :py:class:`~pages.tutor.assignment.AddEvent` or
-                            :py:class:`~pages.tutor.assignment.AddHomework` or
-                            :py:class:`~pages.tutor.assignment.AddReading` or
-                            NoneType
-
-                    :raises :py:class:`~utils.tutor.TutorException`: if the
-                            assignment type does not match a known assignment
-                            type
-
-                    """
-                    if self.is_draft:
-                        assignment_type = self.assignment_type
-                        link = self.find_element(*self._edit_draft_locator)
-                        Utility.click_option(self.driver, element=link)
-                        if assignment_type == Tutor.EVENT:
-                            from pages.tutor.assignment import AddEvent \
-                                as Assignment
-                        elif assignment_type == Tutor.EXTERNAL:
-                            from pages.tutor.assignment import AddExternal \
-                                as Assignment
-                        elif assignment_type == Tutor.HOMEWORK:
-                            from pages.tutor.assignment import AddHomework \
-                                as Assignment
-                        elif assignment_type == Tutor.READING:
-                            from pages.tutor.assignment import AddReading \
-                                as Assignment
-                        else:
-                            raise TutorException(
-                                '"{0}" is not a known assignment type.'
-                                .format(assignment_type))
-                        return go_to_(Assignment(self.driver,
-                                                 self.page.page.page.base_url))
-
-                @property
-                def flagged(self):
-                    """Return True if the trouble flag is present.
-
-                    :return: ``True`` if the assignment has a trouble flag
-                        displayed on the calendar, else ``False``
-                    :rtype: bool
-
-                    """
-                    return bool(
-                        self.find_elements(*self._flagged_assignment_locator))

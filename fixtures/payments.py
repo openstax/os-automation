@@ -14,10 +14,11 @@ def payments_base_url(request):
                 config.getini('payments_base_url'))
     instance = (config.getoption('instance') or
                 config.getini('instance')).lower()
+    if instance == 'unique':
+        return base_url
     if instance and base_url:
         segments = base_url.split(SPLIT)
-        insert = ('' if instance.startswith('prod') else
-                  '-{instance}'.format(instance=instance))
+        insert = ('' if instance.startswith('prod') else f'-{instance}')
         return '{0}{2}{3}{1}'.format(*segments, SPLIT, insert)
     if base_url is not None:
         return base_url

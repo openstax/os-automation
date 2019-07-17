@@ -87,9 +87,11 @@ def google_signup(request):
 def _data_return(request, target):
     """Retrieve user account information from the environment file."""
     config = request.config
-    instance = config.getoption('instance').lower()
+    instance = (config.getoption('instance').lower() or
+                config.getini('instance').lower())
+    user = (config.getoption(target) or config.getini(target))
     name = 0
-    if target in SINGLETON or instance == DEV or instance == UNIQUE:
+    if target in SINGLETON or instance == DEV or len(user) == 2:
         password = 1
     else:
         if instance == QA:
@@ -98,6 +100,8 @@ def _data_return(request, target):
             password = 3
         elif instance in PROD:
             password = 4
+        elif instance == UNIQUE:
+            password = 5
         else:
             raise ValueError('Unknown instance request: %s' % instance)
     user = (config.getoption(target) or config.getini(target))

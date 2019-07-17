@@ -24,7 +24,7 @@ from pages.tutor.preview import StudentPreview
 from pages.tutor.reference import ReferenceBook
 from pages.tutor.settings import CourseSettings
 from regions.tutor.assessment import Assessment
-from utils.tutor import TutorException
+from utils.tutor import Tutor, TutorException, get_date_times
 from utils.utilities import Utility, go_to_
 
 # -------------------------------------------------------- #
@@ -32,7 +32,7 @@ from utils.utilities import Utility, go_to_
 # -------------------------------------------------------- #
 
 # return True if the field error message is displayed
-DISPLAYED = 'return getComputedStyle(arguments[0]).display != none;'
+DISPLAYED = 'return getComputedStyle(arguments[0]).display != "none";'
 # get the modal and tooltip root that is a neighbor of the React root element
 GET_ROOT = 'return document.querySelector("[role={0}]");'
 # wait until the loading animation (bouncing books) is gone
@@ -149,6 +149,59 @@ class HomeworkTutorSelectionsTooltip(ButtonTooltip):
     pass
 
 
+class DeleteConfirmation(Region):
+    """The assignment deletion confirmation dialog box."""
+
+    _title_locator = (By.CSS_SELECTOR, '.modal-title')
+    _close_button_locator = (By.CSS_SELECTOR, '.close')
+    _content_locator = (By.CSS_SELECTOR, '.modal-body')
+    _delete_button_locator = (By.CSS_SELECTOR, '.modal-footer .async-button')
+    _cancel_button_locator = (By.CSS_SELECTOR, '.modal-footer .btn-primary')
+
+    @property
+    def root(self) -> WebElement:
+        """Return the root element for the dialog box.
+
+        :return: the root of the dialog boxes
+        :rtype: :py:class:`~selenium.webdriver.remote.webelement.WebElement`
+
+        """
+        return self.driver.execute_script(GET_ROOT.format('dialog'))
+
+    @property
+    def title(self) -> str:
+        """Return the dialog box title.
+
+        :return: the dialog box title
+        :rtype: str
+
+        """
+        return self.find_element(*self._title_locator).text
+
+    @property
+    def content(self) -> str:
+        """Return the dialog box text content.
+
+        :return: the dialog box content text
+        :rtype: str
+
+        """
+        return (self.find_element(*self._content_locator)
+                .get_attribute('textContent'))
+
+    def delete(self) -> Calendar:
+        """Click the 'Delete' button.
+
+        :return: the instructor's calendar after deleting the assignment
+        :rtype: :py:class:`~pages.tutor.calendar.Calendar`
+
+        """
+        button = self.find_element(*self._delete_button_locator)
+        Utility.click_option(self.driver, element=button)
+        sleep(0.5)
+        return go_to_(Calendar(self.driver, self.page.base_url))
+
+
 # -------------------------------------------------------- #
 # Assignment shared properties
 # -------------------------------------------------------- #
@@ -156,240 +209,138 @@ class HomeworkTutorSelectionsTooltip(ButtonTooltip):
 class OpenToClose(Region):
     """The open and close dates and times rows."""
 
-    _open_date_time_locator = (By.CSS_SELECTOR, '.col-md-6:nth-child(1)')
-    _close_date_time_locator = (By.CSS_SELECTOR, '.col-md-6:nth-child(2)')
+    _section_name_locator = (By.CSS_SELECTOR, '.period')
+    _section_checkbox_locator = (By.CSS_SELECTOR, '[type=checkbox]')
+    _open_date_locator = (
+        By.CSS_SELECTOR, '.-assignment-open-date input:not([readonly])')
+    _open_time_locator = (
+        By.CSS_SELECTOR, '.-assignment-open-time input')
+    _due_date_locator = (
+        By.CSS_SELECTOR, '.-assignment-due-date input:not([readonly])')
+    _due_time_locator = (
+        By.CSS_SELECTOR, '.-assignment-due-time input')
 
     @property
-    def open(self) -> OpenToClose.DateTime:
-        """Access the open date and time.
+    def name(self) -> str:
+        """Return the section name.
 
-        :return: a date and time set
-        :rtype: :py:class:`~OpenToClose.DateTime`
+        :return: the section name
+        :rtype: str
 
         """
-        open_root = self.find_element(*self._open_date_time_locator)
-        return self.DateTime(self, open_root)
+        return (self.find_element(*self._section_name_locator)
+                .get_attribute('textContent'))
 
     @property
-    def close(self) -> OpenToClose.DateTime:
-        """Access the due date and time.
+    def checkbox(self) -> WebElement:
+        """Return the section checkbox.
 
-        :return: a date and time set
-        :rtype: :py:class:`~OpenToClose.DateTime`
+        :return: the section checkbox
+        :rtype: :py:class:`~selenium.webdriver.remote.webelement.WebElement`
 
         """
-        due_root = self.find_element(*self._close_date_time_locator)
-        return self.DateTime(self, due_root)
+        return self.find_element(*self._section_checkbox_locator)
 
-    class DateTime(Region):
-        """A assignment date and time set."""
+    @property
+    def is_checked(self) -> bool:
+        """Return True if the section checkbox is currently checked.
 
-        _date_locator = (
-            By.CSS_SELECTOR, '.-assignment-open-date , .-assignment-due-date')
-        _time_locator = (
-            By.CSS_SELECTOR, '.-assignment-open-time , .-assignment-due-time')
+        :return: ``True`` if the section checkbox is checked, otherwise
+            ``False``
+        :rtype: bool
 
-        @property
-        def date(self) -> OpenToClose.DateTime.Date:
-            """Access the date field.
+        """
+        return self.driver.execute_script(
+            'return arguments[0].checked == "true";', self.checkbox)
 
-            :return: the date portion of a date time set
-            :rtype: :py:class:`~OpenToClose.DateTime.Date`
+    def toggle(self) -> None:
+        """Click on the section checkbox.
 
-            """
-            date_root = self.find_element(*self._date_locator)
-            return self.Date(self, date_root)
+        :return: None
 
-        @property
-        def time(self) -> OpenToClose.DateTime.Time:
-            """Access the time field.
+        """
+        Utility.click_option(self.driver, element=self.checkbox)
 
-            :return: the time portion of a date time set
-            :rtype: :py:class:`~OpenToClose.DateTime.Time`
+    @property
+    def open_date(self) -> WebElement:
+        """Return the 'Open Date' input box.
 
-            """
-            time_root = self.find_element(*self._time_locator)
-            return self.Time(self, time_root)
+        :return: the open date input box
+        :rtype: :py:class:`~selenium.webdriver.remote.webelement.WebElement`
 
-        class Date(Region):
-            """An assignment date."""
+        """
+        return self.find_element(*self._open_date_locator)
 
-            class Calendar(Region):
-                """A mini-calendar to select a date."""
+    @property
+    def open_time(self) -> WebElement:
+        """Return the 'Open Time' input box.
 
-                _current_month_locator = (
-                    By.CSS_SELECTOR, '[class*="current-month"]')
-                _month_year_locator = (
-                    By.CSS_SELECTOR, '.react-datepicker__month')
-                _previous_month_arrow_locator = (
-                    By.CSS_SELECTOR, '[class*="navigation--previous"]')
-                _next_month_arrow_locator = (
-                    By.CSS_SELECTOR, '[class*="navigation--next"]')
-                _day_locator = (
-                    By.CSS_SELECTOR,
-                    '.react-datepicker__day:not([class*=disabled])')
+        :return: the open time input box
+        :rtype: :py:class:`~selenium.webdriver.remote.webelement.WebElement`
 
-                @property
-                def current(self) -> str:
-                    """Return the calendar's current month and year.
+        """
+        return self.find_element(*self._open_time_locator)
 
-                    :return: the mini-calendar's month and year
-                    :rtype: str
+    @property
+    def due_date(self) -> WebElement:
+        """Return the 'Due Date' input box.
 
-                    """
-                    return self.find_element(*self._current_month_locator).text
+        :return: the due date input box
+        :rtype: :py:class:`~selenium.webdriver.remote.webelement.WebElement`
 
-                @property
-                def year(self) -> int:
-                    """Return the calendar year.
+        """
+        return self.find_element(*self._due_date_locator)
 
-                    :return: the calendar year
-                    :rtype: int
+    @property
+    def due_time(self) -> WebElement:
+        """Return the 'Due Time' input box.
 
-                    """
-                    return int(self.find_element(*self._month_year_locator)
-                               .get_attribute('aria-label')
-                               .split('-')[1])
+        :return: the due time input box
+        :rtype: :py:class:`~selenium.webdriver.remote.webelement.WebElement`
 
-                @property
-                def month(self) -> int:
-                    """Return the calendar month.
+        """
+        return self.find_element(*self._due_time_locator)
 
-                    :return: the calendar month as a number
-                    :rtype: int
+    def set(self, open_on: str, open_at: str, due_on: str, due_at: str) \
+            -> None:
+        """Set the open and close dates/times.
 
-                    """
-                    return int(self.find_element(*self._month_year_locator)
-                               .get_attribute('aria-label')
-                               .split('-')[2])
+        :param str open_on: a ``MM/DD/YYYY`` date to open the assignment
+        :param str open_at: a ``hh:mm xm`` time to open the assignment
+        :param str due_on: a ``MM/DD/YYYY`` date the assignment is due
+        :param str due_at: a ``hh:mm xm`` time the assignment is due
+        :return: None
 
-                def previous_month(self) -> OpenToClose.DateTime.Date.Calendar:
-                    """Click on the left arrow to view the previous month.
+        """
+        self._set_field(self.open_date, open_on)
+        self._set_field(self.open_time, open_at)
+        self._set_field(self.due_date, due_on)
+        self._set_field(self.due_time, due_at)
 
-                    :return: the mini-calendar with the previous month, if the
-                        previous month is an option
-                    :rtype: :py:class:`~OpenToClose.DateTime.Date.Calendar`
+    def _set_field(self, field: WebElement, value: str) -> None:
+        r"""Set the requested form field to the new value.
 
-                    """
-                    arrow = self.find_elements(
-                        *self._previous_month_arrow_locator)
-                    if arrow:
-                        Utility.click_option(self.driver, element=arrow)
-                        sleep(0.5)
-                    return self
+        :param field: the form field to modify
+        :param str value: the new field value
+        :type field: :py:class:`~selenium.webdriver.remote \
+                                .webelement.WebElement`
+        :return: None
 
-                def next_month(self) -> OpenToClose.DateTime.Date.Calendar:
-                    """Click on the right arrow to view the next month.
-
-                    :return: the mini-calendar with the following month, if the
-                        next month is an option
-                    :rtype: :py:class:`~OpenToClose.DateTime.Date.Calendar`
-
-                    """
-                    arrow = self.find_elements(
-                        *self._next_month_arrow_locator)
-                    if arrow:
-                        Utility.click_option(self.driver, element=arrow)
-                        sleep(0.5)
-                    return self
-
-                @property
-                def days(self) -> List[WebElement]:
-                    r"""Return the list of valid, selectable days.
-
-                    :return: the days available for selection
-                    :rtype: list(:py:class:`~selenium.webdriver.remote \
-                                            .webelement.WebElement`)
-
-                    """
-                    return self.find_elements(*self._day_locator)
-
-                def select(self, day: Union[str, int]) -> Assignment:
-                    """Select a calendar date by clicking on the day.
-
-                    :param day: the single day to select
-                    :type day: str or int
-                    :return: the assignment
-                    :rtype: :py:class:`Assignment`
-                    :raise :py:class:`utils.tutor.TutorException`: if the
-                        specified day is not an option
-
-                    """
-                    for date in self.days:
-                        if date.text == str(day):
-                            Utility.click_option(self.driver, element=date)
-                            sleep(0.25)
-                            return self.page.page.page.page
-                    raise TutorException('"{0}" is not an available option'
-                                         .format(day))
-
-        class Time(Region):
-            """An assignment time."""
-
-            _label_locator = (By.CSS_SELECTOR, '.floating-label')
-            _current_time_locator = (By.CSS_SELECTOR, 'input')
-            _set_as_default_locator = (By.CSS_SELECTOR, 'button')
-
-            @property
-            def label(self) -> str:
-                """Return the floating label.
-
-                :return: the floating input label
-                :rtype: str
-
-                """
-                return self.find_element(*self._label_locator).text
-
-            @property
-            def time(self) -> str:
-                """Return the currently assigned time.
-
-                :return: the current value for the time input box
-                :rtype: str
-
-                """
-                return (self.find_element(*self._current_time_locator)
-                        .get_attribute('value'))
-
-            @time.setter
-            def time(self, new_time: str) -> None:
-                """Set the time value.
-
-                .. note::
-
-                   The time should be given as a string formatted to
-                   'HH:MM(a/p)'. Some valid options: '9:21a', '11:59p'
-
-                :param str new_time: the new time to assign
-                :return: None
-
-                """
-                time_field = self.find_element(*self._current_time_locator)
-                Utility.click_option(self.driver, element=time_field)
-                for _ in range(8):
-                    time_field.send_keys(Keys.RIGHT)
-                from platform import system
-                KEY = Keys.BACKSPACE if system() != 'Darwin' else Keys.DELETE
-                for _ in range(8):
-                    time_field.send_keys(KEY)
-                time_field.send_keys(new_time)
-
-            def set_as_default(self) -> Assignment:
-                """Click the 'Set as default' button.
-
-                :return: the assignment page
-                :rtype: :py:class:`Assignment`
-                :raise TutorException: if the current time is already the
-                    default value
-
-                """
-                try:
-                    link = self.find_element(*self._set_as_default_locator)
-                    Utility.click_option(self.driver, element=link)
-                    return self.page.page.page
-                except NoSuchElementException:
-                    raise TutorException(
-                        'The current time is already the default')
+        """
+        if not value:
+            # No value was given so skip over the field (generally time values)
+            return
+        Utility.click_option(self.driver, element=field)
+        # Clear the field first to prevent data appends
+        field.send_keys(Keys.DELETE)
+        for _ in range(len(field.get_attribute('value'))):
+            field.send_keys(Keys.BACKSPACE)
+        sleep(0.25)
+        # Send the letters/numbers individually to deal with the form
+        # validation controls
+        for char in value:
+            field.send_keys(char)
+        sleep(0.25)
 
 
 class SectionSelector(Region):
@@ -398,6 +349,7 @@ class SectionSelector(Region):
     _title_locator = (By.CSS_SELECTOR, '.card-header')
     _close_x_locator = (By.CSS_SELECTOR, '.close')
     _chapter_locator = (By.CSS_SELECTOR, '.chapter')
+    _section_locator = (By.CSS_SELECTOR, '[data-section-id]')
     _add_readings_button_locator = (By.CSS_SELECTOR, '.show-problems')
     _cancel_button_locator = (By.CSS_SELECTOR, '.btn-default')
 
@@ -413,7 +365,7 @@ class SectionSelector(Region):
 
         """
         sleep(0.25)
-        return self.execute_script(ANIMATION) is None
+        return self.driver.execute_script(ANIMATION) is None
 
     @property
     def title(self) -> str:
@@ -448,6 +400,18 @@ class SectionSelector(Region):
         return [self.Chapter(self, chapter)
                 for chapter in self.find_elements(*self._chapter_locator)]
 
+    @property
+    def sections(self) -> List[SectionSelector.Chapter.Section]:
+        r"""Access the individual book sections.
+
+        :return: the list of book sections ignoring the chapters
+        :rtype: list(:py:class:`~pages.tutor.assignment \
+                                .SectionSelector.Chapter.Section`)
+
+        """
+        return [self.Chapter.Section(self, section)
+                for section in self.find_elements(*self._section_locator)]
+
     def add_readings(self) -> Union[Assignment, ExerciseSelector]:
         """Click the 'Add Readings' / 'Show Problems' button.
 
@@ -465,7 +429,7 @@ class SectionSelector(Region):
         selector_root = self.driver.execute_script(
             'return document.querySelector("{0}");'
             .format(self._exercise_selection_selector))
-        return ExerciseSelector(self, selector_root)
+        return ExerciseSelector(self.page, selector_root)
 
     show_problems = add_readings
 
@@ -534,7 +498,7 @@ class SectionSelector(Region):
 
             """
             checkbox = self.find_element(*self._check_state_locator)
-            return 'checked' in checkbox.get_attribute('class')
+            return 'unchecked' not in checkbox.get_attribute('class')
 
         @property
         def number(self) -> str:
@@ -593,10 +557,22 @@ class SectionSelector(Region):
                 :rtype: :py:class:`SectionSelector`
 
                 """
+                visibility = (self.root.find_element(By.XPATH, './..')
+                              .get_attribute('class'))
+                if 'show' not in visibility:
+                    chapter_bar = self.root.find_element(By.XPATH, './../..')
+                    Utility.click_option(self.driver, element=chapter_bar)
+                    sleep(0.4)
                 checkbox = self.find_element(*self._section_checkbox_locator)
                 Utility.click_option(self.driver, element=checkbox)
                 sleep(0.75)
-                return self.page.page
+                # if viewing the section of a chapter, return the chapter's
+                # parent page
+                if isinstance(self.page, Region):
+                    return self.page.page
+                # if viewing the section individually, return the immediate
+                # parent
+                return self.page
 
             @property
             def checked(self) -> bool:
@@ -618,20 +594,30 @@ class SectionSelector(Region):
                 :rtype: bool
 
                 """
-                return bool(self.find_elements(*self._section_number_locator))
+                return not bool(self.find_elements(
+                    *self._section_number_locator))
 
             @property
             def number(self) -> str:
                 """Return the section number.
 
-                :return: the section number if it exists or an empty string if
-                    it does not exist
+                :return: the section number if it exists, chapter number plus
+                    '.0' if it is an introductory section, or an empty string
+                    if it does not exist for an end-of-chapter object
                 :rtype: str
 
                 """
                 if self.is_unnumbered:
+                    if 'Introduction to' in self.title:
+                        chapter_number = (
+                            self.find_element(By.XPATH, './../..')
+                            .find_element(By.CSS_SELECTOR, 'div:first-child')
+                            .get_attribute('data-chapter-section'))
+                        return f'{chapter_number}.0'
                     return ''
-                return self.find_element(*self._section_number_locator).text
+                return (self.find_element(*self._section_number_locator)
+                        .get_attribute('textContent')
+                        .strip())
 
             @property
             def title(self) -> str:
@@ -641,7 +627,9 @@ class SectionSelector(Region):
                 :rtype: str
 
                 """
-                return self.find_element(*self._section_title_locator).text
+                return (self.find_element(*self._section_title_locator)
+                        .get_attribute('textContent')
+                        .strip())
 
 
 class ExerciseSelector(Region):
@@ -650,6 +638,18 @@ class ExerciseSelector(Region):
     _book_section_locator = (By.CSS_SELECTOR, '.exercise-sections')
 
     _secondary_toolbar_root_selector = '.exercise-controls-bar'
+
+    @property
+    def loaded(self) -> bool:
+        """Wait until the loading animation is done.
+
+        :return: ``True`` when the loading animation is not found, otherwise
+            ``False``
+        :rtype: bool
+
+        """
+        sleep(0.25)
+        return self.driver.execute_script(ANIMATION) is None
 
     @property
     def toolbar(self) -> ExerciseSelector.Toolbar:
@@ -679,7 +679,7 @@ class ExerciseSelector(Region):
         """The assessment selection toolbar."""
 
         _previous_section_arrow_locator = (By.CSS_SELECTOR, '.prev')
-        _sections_list_locator = (By.CSS_SELECTOR, '.section')
+        _sections_list_locator = (By.CSS_SELECTOR, '.sectionizer .section')
         _next_section_arrow_locator = (By.CSS_SELECTOR, '.next')
         _total_problems_locator = (By.CSS_SELECTOR, '.num.total h2')
         _my_selections_locator = (By.CSS_SELECTOR, '.num.mine h2')
@@ -689,6 +689,8 @@ class ExerciseSelector(Region):
             By.CSS_SELECTOR, '.sectionizer ~ button')
         _exercise_selection_root_locator = (
             By.CSS_SELECTOR, '.homework-plan-exercise-select-topics')
+        _next_button_locator = (By.CSS_SELECTOR, '.review-exercises')
+        _cancel_button_locator = (By.CSS_SELECTOR, '.cancel-add')
 
         def previous_section(self) -> ExerciseSelector:
             """Click on the previous section left arrow.
@@ -824,6 +826,30 @@ class ExerciseSelector(Region):
             selection_root = self.find_element(
                 *self._exercise_selection_root_locator)
             return SectionSelector(self.page.page, selection_root)
+
+        def next(self) -> Homework:
+            """Click the 'Next' button.
+
+            :return: the homework builder with the question review visible
+            :rtype: :py:class:`~pages.tutor.assignment.Homework`
+
+            """
+            button = self.find_element(*self._next_button_locator)
+            Utility.click_option(self.driver, element=button)
+            sleep(0.3)
+            return self.page.page
+
+        def cancel(self) -> Homework:
+            """Click the 'Cancel' button.
+
+            :return: the homework builder
+            :rtype: :py:class:`~pages.tutor.assignment.Homework`
+
+            """
+            button = self.find_element(*self._cancel_button_locator)
+            Utility.click_option(self.driver, element=button)
+            sleep(0.3)
+            return self.page.page
 
         class Section(Region):
             """A selected book section button in the toolbar."""
@@ -1113,6 +1139,9 @@ class ExerciseTableReview(Region):
         _multipart_stimulus_locator = (By.CSS_SELECTOR, '.stimulus')
         _question_locator = (By.CSS_SELECTOR, '.openstax-question')
         _exercise_tag_locator = (By.CSS_SELECTOR, '.exercise-tag')
+        _include_assessment_locator = (
+            By.CSS_SELECTOR, '.action.include , .action.exclude')
+        _assessment_details_locator = (By.CSS_SELECTOR, '.action.details')
 
         @property
         def position(self) -> int:
@@ -1220,6 +1249,46 @@ class ExerciseTableReview(Region):
                 key, value = tag.split(':', 1)
                 tags[key] = value
             return tags
+
+        def add_question(self) -> None:
+            """Include the assessment in the selection.
+
+            :return: None
+
+            """
+            self._selection_toggle('Add question')
+
+        def remove_question(self) -> None:
+            """Remove the assessment from the selection.
+
+            :return: None
+
+            """
+            self._selection_toggle('Remove question')
+
+        def _selection_toggle(self, option: str) -> None:
+            """Add or remove an assessment from the selection.
+
+            :param str option: the expected button content
+            :return: None
+
+            """
+            button = self.find_element(*self._include_assessment_locator)
+            if option == button.get_attribute('textContent'):
+                Utility.click_option(self.driver, element=button)
+            return
+
+        def question_details(self) -> None:
+            """View the assessment detailed card view.
+
+            :return: the assessment card detailed view
+            :rtype: QuestionDetails
+
+            """
+            button = self.find_element(*self._assessment_details_locator)
+            Utility.click_option(self.driver, element=button)
+            sleep(0.25)
+            raise NotImplementedError()
 
         class Question(Region):
             """An individual question within an assessment item."""
@@ -1334,6 +1403,7 @@ class Assignment(TutorBase):
     _assignment_heading_locator = (By.CSS_SELECTOR, '.card-header span')
     _close_x_locator = (By.CSS_SELECTOR, '.card-header .openstax-close-x')
 
+    # Name
     _assignment_name_locator = (
         By.CSS_SELECTOR, '#reading-title')
     _assignment_name_description_locator = (
@@ -1341,22 +1411,55 @@ class Assignment(TutorBase):
     _assignment_name_required_locator = (
         By.CSS_SELECTOR, '#reading-title ~ .hint')
 
+    # Description
     _description_locator = (
         By.CSS_SELECTOR, '.assignment-description textarea')
     _description_required_locator = (
         By.CSS_SELECTOR, '.assignment-description .hint')
 
-    _change_timezone_locator = (By.CSS_SELECTOR, '.course-time-zone')
-    _current_timezone_locator = (By.CSS_SELECTOR, '.course-time-zone span')
+    # Timezone
+    _change_timezone_locator = (
+        By.CSS_SELECTOR, '.course-time-zone')
+    _current_timezone_locator = (
+        By.CSS_SELECTOR, '.course-time-zone span')
 
-    _assign_to_all_sections_locator = (By.CSS_SELECTOR, '#hide-periods-radio')
-    _assign_by_section_locator = (By.CSS_SELECTOR, '#show-periods-radio')
-    _all_sections_tasking_plan_locator = (
-        By.CSS_SELECTOR, '.tasking-date-times')
-    _section_tasking_plan_locator = (
+    # Section open and due dates and times
+    _all_sections_radio_button_locator = (
+        By.CSS_SELECTOR, '#hide-periods-radio')
+    _all_sections_plan_locator = (
+        By.CSS_SELECTOR, '.common')
+
+    _individual_sections_radio_button_locator = (
+        By.CSS_SELECTOR, '#show-periods-radio')
+    _individual_sections_plan_locator = (
         By.CSS_SELECTOR, '.tasking-plan')
+    _section_name_locator = (
+        By.CSS_SELECTOR, '.period')
+    _section_checkbox_locator = (
+        By.CSS_SELECTOR, '[type=checkbox]')
+
     _tasking_date_time_error_locator = (
         By.CSS_SELECTOR, '.tasking-date-times .hint')
+
+    # Assignment controls
+    _publish_button_locator = (
+        By.CSS_SELECTOR, '.-publish')
+    _save_as_draft_button_locator = (
+        By.CSS_SELECTOR, '.-save')
+    _cancel_button_locator = (
+        By.CSS_SELECTOR, '[data-tour-anchor-id*=cancel] button')
+    _delete_button_locator = (
+        By.CSS_SELECTOR, '.delete-assignment')
+
+    @property
+    def loaded(self) -> bool:
+        """Return True when the assignment name field is found.
+
+        :return: ``True`` when the assignment name field is located
+        :rtype: bool
+
+        """
+        return bool(self.find_elements(*self._assignment_name_locator))
 
     # ---------------------------------------------------- #
     # Heading
@@ -1499,7 +1602,8 @@ class Assignment(TutorBase):
         :rtype: :py:class:`Assignment`
 
         """
-        radio_option = self.find_element(*self._assign_to_all_sections_locator)
+        radio_option = self.find_element(
+            *self._all_sections_radio_button_locator)
         Utility.click_option(self.driver, element=radio_option)
         sleep(0.25)
         return self
@@ -1511,7 +1615,8 @@ class Assignment(TutorBase):
         :rtype: :py:class:`Assignment`
 
         """
-        radio_option = self.find_element(*self._assign_by_section_locator)
+        radio_option = self.find_element(
+            *self._individual_sections_radio_button_locator)
         Utility.click_option(self.driver, element=radio_option)
         sleep(0.25)
         return self
@@ -1527,13 +1632,46 @@ class Assignment(TutorBase):
             list(:py:class:`~Assignment.SectionOpenToClose`)
 
         """
-        sections = self.find_elements(*self._section_tasking_plan_locator)
+        sections = self.find_elements(*self._individual_sections_plan_locator)
         if sections:
             return [self.SectionOpenToClose(self, section)
                     for section in sections]
-        all_sections = self.find_element(
-            *self._all_sections_tasking_plan_locator)
+        all_sections = self.find_element(*self._all_sections_plan_locator)
         return OpenToClose(self, all_sections)
+
+    def set_assignment_dates(self, data: dict) -> None:
+        """Set the assignment open and close dates/times.
+
+        :param dict data: the data package containing the section open and due
+            date and time information
+        :return: None
+
+        """
+        if Tutor.ALL in data:
+            # override the rest of the data and use the 'All Sections' open/due
+            open_on, open_at, due_on, due_at = get_date_times(
+                self.driver, data.get(Tutor.ALL))
+            # make sure all sections is selected
+            self.all_sections()
+            # set the dates and times
+            self.open_and_due.set(open_on, open_at, due_on, due_at)
+
+            return
+
+        # Set each section
+        self.individual_sections()
+
+        for section in self.open_and_due:
+            name = section.name
+            if name not in data and section.is_checked:
+                # uncheck the section and move on
+                section.toggle()
+                continue
+
+            open_on, open_at, due_on, due_at = get_date_times(
+                self.driver, data.get(name))
+            # set the dates and times
+            section.open_to_close.set(open_on, open_at, due_on, due_at)
 
     @property
     def errors(self) -> List[str]:
@@ -1545,18 +1683,94 @@ class Assignment(TutorBase):
         """
         errors = []
         name = self.find_elements(*self._assignment_name_required_locator)
-        if name and self.driver.execute_script(DISPLAYED, name[0]):
-            errors.append('Name: {0}'.format(name[0].text))
+        if name:
+            if self.driver.execute_script(DISPLAYED, name[0]):
+                errors.append(f'Name: {name[0].text}')
         description = self.find_elements(*self._description_required_locator)
-        if description and self.driver.execute_script(DISPLAYED,
-                                                      description[0]):
-            errors.append('Description: {0}'.format(description[0].text))
+        if description:
+            if self.driver.execute_script(DISPLAYED, description[0]):
+                errors.append(f'Description: {description[0].text}')
         date_time_errors = (
             self.find_elements(*self._tasking_date_time_error_locator))
         for issue in date_time_errors:
             if self.driver.execute_script(DISPLAYED, issue):
-                errors.append('DateTime: {0}'.format(issue.text))
+                field = issue.find_element(
+                    By.XPATH, '../div[@class="floating-label"]')
+                errors.append(f'{field.text}: {issue.text}')
         return errors
+
+    # ---------------------------------------------------- #
+    # Footer
+    # ---------------------------------------------------- #
+
+    def publish(self) -> Calendar:
+        """Click the 'Publish' assignment button.
+
+        :return: the instructor's calendar
+        :rtype: :py:class:`~pages.tutor.calendar.Calendar`
+
+        """
+        button = self.find_element(*self._publish_button_locator)
+        Utility.click_option(self.driver, element=button)
+        sleep(0.5)
+        if self.errors:
+            raise TutorException(f'Assignment error(s): {self.errors}')
+        calendar = go_to_(Calendar(self.driver, self.base_url))
+        calendar.wait.until(
+            lambda _: not self.driver.find_elements(
+                *calendar._is_publishing_locator))
+        return calendar
+
+    save = publish
+
+    def save_as_draft(self) -> Calendar:
+        """Click the 'Save as Draft' assignment button.
+
+        :return: the instructor's calendar
+        :rtype: :py:class:`~pages.tutor.calendar.Calendar`
+
+        """
+        name = self.name
+        button = self.find_element(*self._save_as_draft_button_locator)
+        Utility.click_option(self.driver, element=button)
+        sleep(0.5)
+        if self.errors:
+            raise(TutorException(f'Assignment error(s): {self.errors}'))
+        calendar = go_to_(Calendar(self.driver, self.base_url))
+        calendar.wait.until(
+            lambda _: (name in calendar.assignments(by_name=True) and
+                       calendar.assignment(name).is_draft))
+        return calendar
+
+    def cancel(self) -> Calendar:
+        """Click the 'Cancel' assignment button.
+
+        :return: the instructor's calendar
+        :rtype: :py:class:`~pages.tutor.calendar.Calendar`
+
+        """
+        raise NotImplementedError()
+
+    def delete(self, confirm: bool = False) -> Calendar:
+        """Click the 'Delete' assignment button.
+
+        :param bool confirm: (optional) click the delete confirmation button
+            on the pop up dialog box
+        :return: the instructor's calendar if confirmed otherwise the delete
+            assignment confirmation dialog box
+        :rtype: :py:class:`~pages.tutor.calendar.Calendar` or
+            :py:class:`~pages.tutor.assignment.DeleteConfirmation`
+
+        """
+        button = self.find_element(*self._delete_button_locator)
+        Utility.click_option(self.driver, element=button)
+        sleep(0.25)
+        dialog = DeleteConfirmation(self)
+        return dialog.delete() if confirm else dialog
+
+    # ---------------------------------------------------- #
+    # Regions
+    # ---------------------------------------------------- #
 
     class SectionOpenToClose(Region):
         """Open and due dates and times for a particular course section."""
@@ -1566,7 +1780,7 @@ class Assignment(TutorBase):
         _open_date_time_locator = (By.CSS_SELECTOR, '.tasking-date-times')
 
         @property
-        def section(self) -> str:
+        def name(self) -> str:
             """Return the section name.
 
             :return: the section name
@@ -1575,7 +1789,7 @@ class Assignment(TutorBase):
             """
             return self.find_element(*self._section_id_locator).text
 
-        def select(self) -> Assignment:
+        def toggle(self) -> Assignment:
             """Click on the section checkbox.
 
             :return: the assignment page
@@ -1588,7 +1802,7 @@ class Assignment(TutorBase):
             return self.page
 
         @property
-        def checked(self) -> bool:
+        def is_checked(self) -> bool:
             """Return True if the section checkbox is checked.
 
             :return: ``True`` if the checkbox is checked, otherwise ``False``
@@ -1607,8 +1821,7 @@ class Assignment(TutorBase):
             :rtype: :py:class:`OpenToClose`
 
             """
-            datetime_root = self.find_element(*self._open_date_time_locator)
-            return OpenToClose(self, datetime_root)
+            return OpenToClose(self, self.root)
 
 
 # -------------------------------------------------------- #
@@ -1641,12 +1854,11 @@ class External(Assignment):
                 .get_attribute('value'))
 
     @assignment_url.setter
-    def assignment_url(self, url: str) -> External:
+    def assignment_url(self, url: str) -> None:
         """Set the assignment URL.
 
         :param str url: the new assignment URL
-        :return: the assignment wizard
-        :rtype: :py:class:`External`
+        :return: None
 
         """
         url_input = self.find_element(*self._assignment_url_locator)
@@ -1655,7 +1867,6 @@ class External(Assignment):
             sleep(0.25)
         url_input.send_keys(url)
         sleep(0.25)
-        return self.page
 
     @property
     def url_error(self) -> str:
@@ -1675,7 +1886,7 @@ class External(Assignment):
         :rtype: list(str)
 
         """
-        errors = super().errors()
+        errors = super().errors
         url = self.find_elements(*self._assignment_url_required_locator)
         if url and self.driver.execute_script(DISPLAYED, url[0]):
             errors.append('URL: {0}'.format(url[0].text))
@@ -1686,7 +1897,7 @@ class Homework(Assignment):
     """A homework assignment creation or modification."""
 
     _feedback_select_menu_locator = (By.CSS_SELECTOR, '#feedback-select')
-    _select_problems_button_locator = (By.CSS_SELECTOR, '#problem-select')
+    _select_problems_button_locator = (By.CSS_SELECTOR, '#problems-select')
     _problems_required_locator = (By.CSS_SELECTOR, '.problems-required')
     _homework_plan_root_locator = (
         By.CSS_SELECTOR, '.homework-plan-select-topics')
@@ -1699,11 +1910,60 @@ class Homework(Assignment):
         :rtype: :py:class:`SectionSelector`
 
         """
-        button = self.find_element(*self._add_readings_button_locator)
+        button = self.find_element(*self._select_problems_button_locator)
         Utility.click_option(self.driver, element=button)
         sleep(1)
-        selector_root = self.find_element(*self._reading_plan_root_locator)
+        selector_root = self.find_element(*self._homework_plan_root_locator)
         return SectionSelector(self, selector_root)
+
+    def add_assessments_by(self,
+                           chapters: Union[int, List[str], List[int]] = None,
+                           sections: Union[int, List[str], List[float]] = None
+                           ) -> List[str]:
+        """Narrow assessment selection to certain chapters or sections.
+
+        .. note:
+
+            ``chapters`` and ``sections`` are exclusive; if ``chapters`` is
+            set then ``sections`` is ignored
+
+        :param chapters: a number of chapters or a list of specific chapters to
+            select assessments from
+        :param sections: a number of sections or a list of specific sections to
+            select assessments from
+        :type chapters: int or list(str) or list(int)
+        :type sections: int or list(str) or list(float)
+        :return: the list of chapters or sections selected as strings
+        :rtype: list(str)
+
+        """
+        if chapters:
+            # if chapters is set, ignore sections
+            sections = None
+        selector = self.select_problems()
+        options = [option.number
+                   for option
+                   in (selector.chapters if chapters else selector.sections)]
+        if isinstance(chapters, int) or isinstance(sections, int):
+            # We need a random selection of chapters or sections so find a
+            # random starting position that will keep us from running beyond
+            # the end of the options list
+            start = Utility.random(0, len(options) - (chapters or sections))
+            selections = options[start:start + (chapters or sections)]
+        else:
+            selections = (chapters or sections)
+        group = selector.chapters if chapters else selector.sections
+        for selection in selections:
+            try:
+                # Get the position of a choice then click on its checkbox
+                index = options.index(str(selection))
+                group[index].select()
+            except ValueError:
+                raise TutorException(
+                    f"{'Chapter' if chapters else 'Section'} " +
+                    f'"{selection}" not a valid option')
+            sleep(0.3)
+        return selector.show_problems()
 
     @property
     def problem_error(self) -> str:
@@ -1713,7 +1973,7 @@ class Homework(Assignment):
         :rtype: str
 
         """
-        return self.find_element(*self._readings_required_locator).text
+        return self.find_element(*self._problems_required_locator).text
 
     @property
     def errors(self) -> List[str]:
@@ -1723,10 +1983,10 @@ class Homework(Assignment):
         :rtype: list(str)
 
         """
-        errors = super().errors()
-        url = self.find_elements(*self._readings_required_locator)
-        if url and self.driver.execute_script(DISPLAYED, url[0]):
-            errors.append('Readings: {0}'.format(url[0].text))
+        errors = super().errors
+        problems = self.find_elements(*self._problems_required_locator)
+        if problems and self.driver.execute_script(DISPLAYED, problems[0]):
+            errors.append('Problems: {0}'.format(problems[0].text))
         return errors
 
     def what_do_students_see(self) -> StudentPreview:
@@ -1780,6 +2040,56 @@ class Reading(Assignment):
         selector_root = self.find_element(*self._reading_plan_root_locator)
         return SectionSelector(self, selector_root)
 
+    def add_readings_by(self,
+                        chapters: Union[int, List[str], List[int]] = None,
+                        sections: Union[int, List[str], List[float]] = None) \
+            -> List[str]:
+        """Add chapters or sections to a reading assignment.
+
+        .. note:
+
+            ``chapters`` and ``sections`` are exclusive; if ``chapters`` is
+            set then ``sections`` is ignored
+
+        :param chapters: a number of chapters or a list of specific chapters to
+            add to the reading
+        :param sections: a number of sections or a list of specific sections to
+            add to the reading
+        :type chapters: int or list(str) or list(int)
+        :type sections: int or list(str) or list(float)
+        :return: the list of chapters or sections selected as strings
+        :rtype: list(str)
+
+        """
+        if chapters:
+            # if chapters is set, ignore sections
+            sections = None
+        selector = self.add_readings()
+        options = [option.number
+                   for option
+                   in (selector.chapters if chapters else selector.sections)]
+        if isinstance(chapters, int) or isinstance(sections, int):
+            # We need a random selection of chapters or sections so find a
+            # random starting position that will keep us from running beyond
+            # the end of the options list
+            start = Utility.random(0, len(options) - (chapters or sections))
+            selections = options[start:start + (chapters or sections)]
+        else:
+            selections = (chapters or sections)
+        group = selector.chapters if chapters else selector.sections
+        for selection in selections:
+            try:
+                # Get the position of a choice then click on its checkbox
+                index = options.index(str(selection))
+                group[index].select()
+            except ValueError:
+                raise TutorException(
+                    f"{'Chapter' if chapters else 'Section'} " +
+                    f'"{selection}" not a valid option')
+            sleep(0.3)
+        selector.add_readings()
+        return [str(option) for option in selections]
+
     @property
     def readings_error(self) -> str:
         """Return the readings required error message.
@@ -1798,10 +2108,10 @@ class Reading(Assignment):
         :rtype: list(str)
 
         """
-        errors = super().errors()
-        url = self.find_elements(*self._readings_required_locator)
-        if url and self.driver.execute_script(DISPLAYED, url[0]):
-            errors.append('Readings: {0}'.format(url[0].text))
+        errors = super().errors
+        readings = self.find_elements(*self._readings_required_locator)
+        if readings and self.driver.execute_script(DISPLAYED, readings[0]):
+            errors.append('Readings: {0}'.format(readings[0].text))
         return errors
 
     def why_cant_i_see_the_questions(self) -> ReadingQuestionTooltip:
@@ -1844,8 +2154,11 @@ class Reading(Assignment):
             :rtype: str
 
             """
-            return (self.find_element(*self._chapter_section_number_locator)
-                    .text)
+            number = (self.find_element(*self._chapter_section_number_locator)
+                      .text)
+            if 'Introduction to' in self.title:
+                return f'{number}.0'
+            return number
 
         @property
         def title(self) -> str:

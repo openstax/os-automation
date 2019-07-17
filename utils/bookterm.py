@@ -38,7 +38,7 @@ class OpenStaxBook(object):
         if not terms:
             raise BookIndexError('No terms found in section {0} of {1}'
                                  .format(section, self.book_title))
-        keys = self._terms.get(section).keys()
+        keys = list(terms.keys())
         term = keys[randint(0, len(keys) - 1)]
         return (term, terms.get(term))
 
@@ -223,6 +223,20 @@ class CollegePhysics(OpenStaxBook):
                     "acceleration that results in a decrease in velocity",
                 "instantaneous acceleration":
                     "acceleration at a specific point in time", },
+            "2.5": {
+                "acceleration":
+                    "a = Δv/Δt",
+                "displacement":
+                    "depends on the square of the elapsed time when "
+                    "acceleration is not zero",
+                "final velocity":
+                    "depends on how large the acceleration is and how long it "
+                    "lasts", },
+            "2.6": {
+                "unreasonable results":
+                    "some problems have results that are unreasonable because "
+                    "one premise is unreasonable or because certain premises "
+                    "are inconsistent with one another", },
             "2.7": {
                 "acceleration due to gravity":
                     "acceleration of an object as a result of gravity",
@@ -243,6 +257,15 @@ class CollegePhysics(OpenStaxBook):
                 "y-intercept":
                     "the y-value when x=0, or when the graph crosses the "
                     "y-axis", },
+            "3.1": {
+                "independence of motion":
+                    "the horizontal and vertical components of two-"
+                    "dimensional motion are independent of each other",
+                "projectile motion":
+                    "the motion of an object thrown or projected into the air "
+                    "and subject to only the acceleration due to gravity",
+                "vectors":
+                    "quantities that have both magnitude and direction", },
             "3.2": {
                 "commutative":
                     "refers to the interchangeability of order in a function; "
@@ -405,6 +428,15 @@ class CollegePhysics(OpenStaxBook):
                     "when a rope supports the weight of an object, the force "
                     "on the object due to the rope is called a tension "
                     "force", },
+            "4.6": {
+                "free-body diagram":
+                    "a diagram showing the system of interest and all of the "
+                    "external forces",
+                "problem solving":
+                    "understand and apply physical principles", },
+            "4.7": {
+                "Newton's laws of motion":
+                    "forces produce accelerations", },
             "4.8": {
                 "carrier particles":
                     "a fundamental particle of nature that is surrounded by a "
@@ -540,6 +572,18 @@ class CollegePhysics(OpenStaxBook):
                     "force is directly proportional to the product of their "
                     "masses and inversely proportional to the square of the "
                     "distance between them", },
+            "6.6": {
+                "Kepler's First Law":
+                    "the orbit of each planet about the Sun is an ellipse "
+                    "with the Sun at one focus",
+                "Kepler's Second Law":
+                    "each planet moves so that an imaginary line drawn from "
+                    "the Sun to the planet sweeps out equal areas in equal "
+                    "times",
+                "Kepler's Third Law":
+                    "the ratio of the squares of the periods of any two "
+                    "planets about the Sun is equal to the ratio of the cubes "
+                    "of their average distances from the Sun", },
             "7": {
                 "conservation of energy":
                     "energy can neither be created nor destroyed",
@@ -689,6 +733,9 @@ class CollegePhysics(OpenStaxBook):
             "8.6": {
                 "point masses":
                     "structureless particles with no rotation or spin", },
+            "8.7": {
+                "acceleration of a rocket":
+                    "a = v_e/m * Δm/Δt - g", },
             "9.1": {
                 "dynamic equilibrium":
                     "a state of equilibrium in which the net external force "
@@ -728,6 +775,10 @@ class CollegePhysics(OpenStaxBook):
                 "mechanical advantage":
                     "the ratio of output to input forces for any simple "
                     "machine", },
+            "9.6": {
+                "muscle pairs":
+                    "can only contract so one is the flexor and one is the"
+                    "extensor", },
             "10.1": {
                 "angular acceleration":
                     "the rate of change of angular velocity with time",

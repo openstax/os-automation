@@ -107,6 +107,18 @@ class PrivacyPolicy(Modal):
     _i_agree_button_locator = (By.CSS_SELECTOR, '.btn-primary')
 
     @property
+    def loaded(self) -> bool:
+        """Return True when 'Terms of Service' is found on the page.
+
+        :return: ``True`` when the terms of service is found in the page text
+        :rtype: bool
+
+        """
+        return ('Terms of Service'
+                in (self.find_element(*self._modal_content_locator)
+                    .get_attribute('textContent')))
+
+    @property
     def heading(self) -> str:
         """Return the modal heading.
 
@@ -156,7 +168,7 @@ class PrivacyPolicy(Modal):
         button = self.find_element(*self._i_agree_button_locator)
         Utility.click_option(self.driver, element=button)
         sleep(1.25)
-        course = StudentCourse(self.driver, base_url=self.base_url)
+        course = StudentCourse(self.driver, base_url=self.page.base_url)
         dialog_root = self.driver.execute_script(GET_ROOT.format('dialog'))
         if dialog_root:
             return BuyAccess(course, dialog_root)
@@ -214,7 +226,8 @@ class IframeModal(Modal):
         purchase = self.find_element(*self._base_iframe_locator)
         self.driver.switch_to.frame(purchase)
         if inner_frame:
-            second_frame = self.find_element(*inner_frame)
+            second_frame = self.wait.until(
+                lambda _: self.find_element(*inner_frame))
             self.driver.switch_to.frame(second_frame)
         self.find_element(*locator).send_keys(value)
         if inner_frame:
@@ -234,6 +247,29 @@ class PurchaseConfirmation(IframeModal):
     _tax_total_locator = (By.CSS_SELECTOR, '.tax span:last-child')
     _sales_total_locator = (By.CSS_SELECTOR, '.total span:last-child')
     _access_your_course_button_locator = (By.CSS_SELECTOR, 'button')
+
+    @property
+    def loaded(self) -> bool:
+        """Return True when the content is present in the iframe.
+
+        :return: ``True`` when the content in the payment confirmation iframe
+            is present
+        :rtype: bool
+
+        """
+        # Intermittant load failures due to timing; check vals below until the
+        # root cause is found.
+        try:
+            number = self.order_number
+        except Exception:
+            number = None
+        try:
+            total = self.total
+        except Exception:
+            total = None
+        print(f'Order number: {number}\nTotal: {total}')
+        # return bool(self.order_number) and bool(self.total)
+        return bool(number) and bool(total)
 
     @property
     def content(self) -> str:
@@ -383,6 +419,16 @@ class PurchaseForm(IframeModal):
     _cancel_purchase_button_locator = (By.CSS_SELECTOR, '.cancel')
 
     @property
+    def loaded(self) -> bool:
+        """Return True when the form fields are found.
+
+        :return: ``True`` when the form fields and iframes are found
+        :rtype: bool
+
+        """
+        return (sleep(1) or self.find_elements(By.TAG_NAME, 'iframe'))
+
+    @property
     def product_title(self) -> str:
         """Return the product title being purchased.
 
@@ -430,7 +476,7 @@ class PurchaseForm(IframeModal):
         :return: None
 
         """
-        self._set_value(self._address_locator, city_name)
+        self._set_value(self._city_locator, city_name)
 
     @property
     def state(self) -> str:
@@ -682,14 +728,15 @@ class PurchaseForm(IframeModal):
         """
         purchase = self.find_element(*self._base_iframe_locator)
         self.driver.switch_to.frame(purchase)
-        button = self.find_element(*self._purchase_button_locator)
+        button = self.wait.until(
+            lambda _: self.find_element(*self._purchase_button_locator))
         Utility.click_option(self.driver, element=button)
         sleep(1)
-        errors = self.error_messages
         self.driver.switch_to.default_content()
+        errors = self.error_messages
         if errors:
             return errors
-        return FreeTrial(self.page)
+        return PurchaseConfirmation(self.page)
 
     def cancel(self) -> FreeTrial:
         """Click on the 'Cancel' purchase button.
@@ -754,8 +801,8 @@ class Enrollment(Page):
         Utility.click_option(self.driver, element=button)
         sleep(1)
         if 'accounts' in self.driver.current_url:
-            return AccountSignup(self)
-        return StudentID(self, base_url=self.base_url)
+            return AccountSignup(self.driver)
+        return StudentID(self.driver, base_url=self.base_url)
 
 
 class StudentID(Page):
@@ -763,10 +810,21 @@ class StudentID(Page):
 
     URL_TEMPLATE = '/enroll/start/{enrollment_code}'
 
+    _student_id_icon_locator = (By.CSS_SELECTOR, '.student-id-icon')
     _course_name_locator = (By.CSS_SELECTOR, '.title h4')
     _student_id_input_locator = (By.CSS_SELECTOR, '.inputs input')
     _continue_button_locator = (By.CSS_SELECTOR, '.btn-success')
     _add_it_later_link_locator = (By.CSS_SELECTOR, '.cancel')
+
+    @property
+    def loaded(self) -> bool:
+        """Return True when the student ID badge element is found.
+
+        :return: ``True`` when the student ID icon is found
+        :rtype: bool
+
+        """
+        return bool(self.find_elements(*self._student_id_icon_locator))
 
     @property
     def course_name(self) -> str:
@@ -826,7 +884,12 @@ class StudentID(Page):
         Utility.click_option(self.driver, element=button)
         sleep(1.25)
         course = StudentCourse(self.driver, base_url=self.base_url)
-        dialog_root = self.driver.execute_script(GET_ROOT.format('dialog'))
+        for _ in range(5):
+            dialog_root = self.driver.execute_script(GET_ROOT.format('dialog'))
+            sleep(1)
+            if dialog_root:
+                break
+        sleep(1)
         if 'Privacy Policy' in self.driver.page_source:
             return PrivacyPolicy(course, dialog_root)
         elif dialog_root:
