@@ -118,8 +118,6 @@ class Assignment(TutorBase):
 
         """
         body_root = self.find_element(*self._assignment_body_locator)
-        if self.assignment_type == Tutor.HOMEWORK:
-            return self.Content(self, body_root).pane
         return self.Content(self, body_root)
 
     @property
@@ -175,10 +173,81 @@ class Assignment(TutorBase):
     class Content(Region):
         """A placeholder for the assignment body."""
 
-        def __init__(self):
-            """Override the initialization to toss an implementation error."""
-            raise NotImplementedError("Must use an individual assignment type,"
-                                      " not Assignment")
+        _is_free_response_locator = (By.CSS_SELECTOR, '[class*=FreeResponse]')
+        _is_multiple_choice_locator = (By.CSS_SELECTOR, '.answers-table')
+        _correctness_shown_locator = (By.CSS_SELECTOR, '.has-correct-answer')
+        _assignment_completion_locator = (By.CSS_SELECTOR, '.task-steps-end')
+        _interstitial_card_locator = (By.CSS_SELECTOR,
+                                      '.openstax-spaced-practice-intro , '
+                                      '.openstax-individual-review-intro , '
+                                      '.openstax-two-step-intro , '
+                                      '.openstax-personalized-intro')
+
+        @property
+        def is_free_response(self) -> bool:
+            """Return True if the current step contains a free response box.
+
+            :return: ``True`` if the current assignment step contains a free
+                response text box
+            :rtype: bool
+
+            """
+            return bool(self.find_elements(*self._is_free_response_locator))
+
+        @property
+        def is_multiple_choice(self) -> bool:
+            """Return True if the current shows multiple choice answers.
+
+            :return: ``True`` if the current assignment step contains mutliple
+                choice answers
+            :rtype: bool
+
+            """
+            return bool(self.find_elements(*self._is_multiple_choice_locator))
+
+        @property
+        def has_correct_answer(self) -> bool:
+            """Return True if the correct answer is displayed.
+
+            :return: ``True`` if the correct answer is displayed; may include
+                answer feedback
+            :rtype: bool
+
+            """
+            return bool(self.find_elements(*self._correctness_shown_locator))
+
+        @property
+        def is_assessment(self) -> bool:
+            """Return True if the current step is an assessment.
+
+            :return: ``True`` if an assessment is displayed in the content
+                frame
+            :rtype: bool
+
+            """
+            return self.is_free_response or self.is_multiple_choice
+
+        @property
+        def is_interstitial(self) -> bool:
+            """Return True if the current step is a transition car.
+
+            :return: ``True`` if an interstitial card is displayed in the
+                content
+            :rtype: bool
+
+            """
+            return bool(self.find_elements(*self._interstitial_card_locator))
+
+        @property
+        def assignment_complete(self) -> bool:
+            """Return True if the assignment completion step is displayed.
+
+            :return: ``True`` if the assignment completion card is displayed
+            :rtype: bool
+
+            """
+            return bool(self.find_elements(
+                *self._assignment_completion_locator))
 
     class Footer(Region):
         """The assignment footer."""
@@ -347,19 +416,26 @@ class External(Assignment):
 class Homework(Assignment):
     """A collection of assessments selected by the course instructor."""
 
-    class Content(Region):
+    class Content(Assignment.Content):
         """The assessment pane."""
 
+        _continue_button_locator = (
+            By.CSS_SELECTOR, 'button.btn-primary , button.continue')
         _is_free_response_locator = (
             By.CSS_SELECTOR, '[class*=FreeResponse]')
         _is_multipart_locator = (
             By.CSS_SELECTOR, '[class*=MultipartGroup]')
         _is_multiple_choice_locator = (
             By.CSS_SELECTOR, '[class*=ExerciseQuestion]')
+        _is_two_step_intro_locator = (
+            By.CSS_SELECTOR, '.openstax-two-step-intro')
+        _back_to_dashboard_button_locator = (
+            By.CSS_SELECTOR, '[class*=CenteredBackButton]')
 
         @property
         def pane(self):
             """Access the question pane."""
+            sleep(0.33)
             multipart = self.find_elements(*self._is_multipart_locator)
             if multipart:
                 from regions.tutor.assessment import MultipartQuestion
@@ -368,10 +444,66 @@ class Homework(Assignment):
             if free_response:
                 from regions.tutor.assessment import FreeResponse
                 return FreeResponse(self, free_response[0])
-            multiple_choice = self.find_element(
+            multiple_choice = self.find_elements(
                 *self._is_multiple_choice_locator)
-            from regions.tutor.assessment import MultipleChoice
-            return MultipleChoice(self, multiple_choice)
+            if multiple_choice:
+                from regions.tutor.assessment import MultipleChoice
+                return MultipleChoice(self, multiple_choice[0])
+            # No assessment found; wait
+            sleep(1)
+            return self.pane
+
+        def _continue(self) -> Homework:
+            """Click the 'Continue' button within the current step.
+
+            :return: the next homework step
+            :rtype: :py:class:`~pages.tutor.task.Homework`
+
+            """
+            sleep(0.75)
+            button = self.find_element(*self._continue_button_locator)
+            try:
+                Utility.click_option(self.driver, element=button)
+            except NoSuchElementException:
+                sleep(1)
+                try:
+                    Utility.click_option(self.driver, element=button)
+                except NoSuchElementException:
+                    raise TutorException(
+                        f'Could not continue ({self.page.location})')
+            sleep(1)
+            return Homework(self.driver, base_url=self.page.base_url)
+
+        @property
+        def is_two_step_intro(self) -> bool:
+            """Return True if the two-step introduction is displayed.
+
+            :return: ``True`` if the two-step question intersticial card is
+                the current step
+            :rtype: bool
+
+            """
+            return bool(self.find_elements(*self._is_two_step_intro_locator))
+
+        def back_to_dashboard(self) -> StudentCourse:
+            """Click on the 'Back to Dashboard' button.
+
+            :return: the student course page
+            :rtype: :py:class:`~pages.tutor.course.StudentCourse`
+
+            :raises :py:class:`~utils.tutor.TutorException`: if the reading
+                assignment is not at the completion card (final) step
+
+            """
+            try:
+                button = self.find_element(
+                    *self._back_to_dashboard_button_locator)
+                Utility.click_option(self.driver, element=button)
+                sleep(1)
+                return go_to_(
+                    StudentCourse(self.driver, base_url=self.page.base_url))
+            except NoSuchElementException:
+                raise TutorException("Assignment not complete")
 
     class Nav(Region):
         """The homework step navigation."""
@@ -801,16 +933,12 @@ class Reading(Assignment):
                 .format(self.page._overlay_page_locator[1]))
             return self.page.Highlights(self, overlay_root)
 
-    class Content(Region):
+    class Content(Assignment.Content):
         """The reading assignment body."""
 
         _previous_page_arrow_locator = (By.CSS_SELECTOR, '.prev')
         _next_page_arrow_locator = (By.CSS_SELECTOR, '.next')
         _loading_card_locator = (By.CSS_SELECTOR, '[class*=LoadingCard]')
-        _is_multiple_choice_locator = (By.CSS_SELECTOR, '.answers-table')
-        _correctness_shown_locator = (By.CSS_SELECTOR, '.has-correct-answer')
-        _is_free_response_locator = (By.CSS_SELECTOR, '[class*=FreeResponse]')
-        _assignment_completion_locator = (By.CSS_SELECTOR, '.task-steps-end')
         _reading_content_locator = (By.CSS_SELECTOR, '#paged-content')
         _image_caption_locator = (By.CSS_SELECTOR, '.os-caption-container')
         _paragraph_locator = (By.CSS_SELECTOR, '.annotater-content p[id]')
@@ -881,61 +1009,6 @@ class Reading(Assignment):
 
             """
             return bool(self.find_elements(*self._loading_card_locator))
-
-        @property
-        def is_free_response(self) -> bool:
-            """Return True if the current step contains a free response box.
-
-            :return: ``True`` if the current assignment step contains a free
-                response text box
-            :rtype: bool
-
-            """
-            return bool(self.find_elements(*self._is_free_response_locator))
-
-        @property
-        def is_multiple_choice(self) -> bool:
-            """Return True if the current shows multiple choice answers.
-
-            :return: ``True`` if the current assignment step contains mutliple
-                choice answers
-            :rtype: bool
-
-            """
-            return bool(self.find_elements(*self._is_multiple_choice_locator))
-
-        @property
-        def has_correct_answer(self) -> bool:
-            """Return True if the correct answer is displayed.
-
-            :return: ``True`` if the correct answer is displayed; may include
-                answer feedback
-            :rtype: bool
-
-            """
-            return bool(self.find_elements(*self._correctness_shown_locator))
-
-        @property
-        def is_assessment(self) -> bool:
-            """Return True if the current step is an assessment.
-
-            :return: ``True`` if an assessment is displayed in the content
-                frame
-            :rtype: bool
-
-            """
-            return self.is_free_response or self.is_multiple_choice
-
-        @property
-        def assignment_complete(self) -> bool:
-            """Return True if the assignment completion step is displayed.
-
-            :return: ``True`` if the assignment completion card is displayed
-            :rtype: bool
-
-            """
-            return bool(self.find_elements(
-                *self._assignment_completion_locator))
 
         @property
         def pane(self) -> Union[str, FreeResponse, MultipleChoice]:

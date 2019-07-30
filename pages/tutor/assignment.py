@@ -10,7 +10,7 @@ Add/Edit/Delete Reading
 from __future__ import annotations
 
 from time import sleep
-from typing import Dict, List, Union
+from typing import Dict, List, Tuple, Union
 
 from pypom import Region
 from selenium.common.exceptions import NoSuchElementException
@@ -26,6 +26,8 @@ from pages.tutor.settings import CourseSettings
 from regions.tutor.assessment import Assessment
 from utils.tutor import Tutor, TutorException, get_date_times
 from utils.utilities import Utility, go_to_
+
+Selector = Tuple[By, str]
 
 # -------------------------------------------------------- #
 # Javascript page requests
@@ -212,13 +214,13 @@ class OpenToClose(Region):
     _section_name_locator = (By.CSS_SELECTOR, '.period')
     _section_checkbox_locator = (By.CSS_SELECTOR, '[type=checkbox]')
     _open_date_locator = (
-        By.CSS_SELECTOR, '.-assignment-open-date input:not([readonly])')
+        By.CSS_SELECTOR, '[id*="open-date"]')
     _open_time_locator = (
-        By.CSS_SELECTOR, '.-assignment-open-time input')
+        By.CSS_SELECTOR, '[id*="open-time"]')
     _due_date_locator = (
-        By.CSS_SELECTOR, '.-assignment-due-date input:not([readonly])')
+        By.CSS_SELECTOR, '[id*="due-date"]')
     _due_time_locator = (
-        By.CSS_SELECTOR, '.-assignment-due-time input')
+        By.CSS_SELECTOR, '[id*="due-time"]')
 
     @property
     def name(self) -> str:
@@ -312,34 +314,39 @@ class OpenToClose(Region):
         :return: None
 
         """
-        self._set_field(self.open_date, open_on)
-        self._set_field(self.open_time, open_at)
-        self._set_field(self.due_date, due_on)
-        self._set_field(self.due_time, due_at)
+        self._set_field('due_date', self._due_date_locator, due_on)
+        self._set_field('due_time', self._due_time_locator, due_at)
+        self._set_field('open_date', self._open_date_locator, open_on)
+        self._set_field('open_time', self._open_time_locator, open_at)
 
-    def _set_field(self, field: WebElement, value: str) -> None:
+    def _set_field(self, send_field: str, selector: Selector, value: str) \
+            -> None:
         r"""Set the requested form field to the new value.
 
-        :param field: the form field to modify
+        :param str send_field: the form field to modify
         :param str value: the new field value
-        :type field: :py:class:`~selenium.webdriver.remote \
-                                .webelement.WebElement`
         :return: None
 
         """
+        # from selenium.common.exceptions import StaleElementReferenceException
         if not value:
             # No value was given so skip over the field (generally time values)
             return
-        Utility.click_option(self.driver, element=field)
-        # Clear the field first to prevent data appends
-        field.send_keys(Keys.DELETE)
-        for _ in range(len(field.get_attribute('value'))):
-            field.send_keys(Keys.BACKSPACE)
-        sleep(0.25)
-        # Send the letters/numbers individually to deal with the form
-        # validation controls
-        for char in value:
-            field.send_keys(char)
+        if 'time' in send_field:
+            self.driver.execute_script(f'arguments[0].value= "";',
+                                       self.find_element(*selector))
+        else:
+            old_value = self.find_element(*selector).get_attribute('value')
+            clear = ([Keys.BACKSPACE] * len(old_value) +
+                     [Keys.DELETE] * len(old_value))
+        Utility.click_option(self.driver, element=self.find_element(*selector))
+
+        if 'time' not in send_field:
+            self.find_element(*selector).send_keys(clear)
+            sleep(0.25)
+
+        for ch in value:
+            self.find_element(*selector).send_keys(ch)
         sleep(0.25)
 
 
@@ -350,7 +357,8 @@ class SectionSelector(Region):
     _close_x_locator = (By.CSS_SELECTOR, '.close')
     _chapter_locator = (By.CSS_SELECTOR, '.chapter')
     _section_locator = (By.CSS_SELECTOR, '[data-section-id]')
-    _add_readings_button_locator = (By.CSS_SELECTOR, '.show-problems')
+    _add_readings_button_locator = (
+        By.CSS_SELECTOR, '#add-section-to-reading , #add-sections-to-homework')
     _cancel_button_locator = (By.CSS_SELECTOR, '.btn-default')
 
     _exercise_selection_selector = '.homework-builder-view'
@@ -1405,11 +1413,11 @@ class Assignment(TutorBase):
 
     # Name
     _assignment_name_locator = (
-        By.CSS_SELECTOR, '#reading-title')
+        By.CSS_SELECTOR, '#title')
     _assignment_name_description_locator = (
-        By.CSS_SELECTOR, '#reading-title ~ div .instructions')
+        By.CSS_SELECTOR, '#title ~ div .instructions')
     _assignment_name_required_locator = (
-        By.CSS_SELECTOR, '#reading-title ~ .hint')
+        By.CSS_SELECTOR, '#title ~ .hint')
 
     # Description
     _description_locator = (
@@ -1432,7 +1440,7 @@ class Assignment(TutorBase):
     _individual_sections_radio_button_locator = (
         By.CSS_SELECTOR, '#show-periods-radio')
     _individual_sections_plan_locator = (
-        By.CSS_SELECTOR, '.tasking-plan')
+        By.CSS_SELECTOR, '[class*=StyledTasking]')
     _section_name_locator = (
         By.CSS_SELECTOR, '.period')
     _section_checkbox_locator = (
@@ -1443,9 +1451,9 @@ class Assignment(TutorBase):
 
     # Assignment controls
     _publish_button_locator = (
-        By.CSS_SELECTOR, '.-publish')
+        By.CSS_SELECTOR, '[data-tour-anchor-id*=save] button')
     _save_as_draft_button_locator = (
-        By.CSS_SELECTOR, '.-save')
+        By.CSS_SELECTOR, '[data-tour-anchor-id*=draft] button')
     _cancel_button_locator = (
         By.CSS_SELECTOR, '[data-tour-anchor-id*=cancel] button')
     _delete_button_locator = (
@@ -1605,7 +1613,7 @@ class Assignment(TutorBase):
         radio_option = self.find_element(
             *self._all_sections_radio_button_locator)
         Utility.click_option(self.driver, element=radio_option)
-        sleep(0.25)
+        sleep(0.5)
         return self
 
     def individual_sections(self) -> Assignment:
@@ -1618,7 +1626,7 @@ class Assignment(TutorBase):
         radio_option = self.find_element(
             *self._individual_sections_radio_button_locator)
         Utility.click_option(self.driver, element=radio_option)
-        sleep(0.25)
+        sleep(0.5)
         return self
 
     @property
@@ -1633,7 +1641,7 @@ class Assignment(TutorBase):
 
         """
         sections = self.find_elements(*self._individual_sections_plan_locator)
-        if sections:
+        if len(sections) > 1:
             return [self.SectionOpenToClose(self, section)
                     for section in sections]
         all_sections = self.find_element(*self._all_sections_plan_locator)
@@ -1897,10 +1905,10 @@ class Homework(Assignment):
     """A homework assignment creation or modification."""
 
     _feedback_select_menu_locator = (By.CSS_SELECTOR, '#feedback-select')
-    _select_problems_button_locator = (By.CSS_SELECTOR, '#problems-select')
+    _select_problems_button_locator = (By.CSS_SELECTOR, '#select-sections')
     _problems_required_locator = (By.CSS_SELECTOR, '.problems-required')
     _homework_plan_root_locator = (
-        By.CSS_SELECTOR, '.homework-plan-select-topics')
+        By.CSS_SELECTOR, '.homework-plan-exercise-select-sections')
     _what_do_students_see_button_locator = (By.CSS_SELECTOR, '.preview-btn')
 
     def select_problems(self) -> SectionSelector:
@@ -2008,11 +2016,11 @@ class Reading(Assignment):
         By.CSS_SELECTOR, '.selected-reading-list .selected-section')
     _readings_required_locator = (By.CSS_SELECTOR, '.readings-required')
     _add_readings_button_locator = (
-        By.CSS_SELECTOR, '#reading-select')
+        By.CSS_SELECTOR, '#select-sections')
     _reading_plan_root_locator = (
-        By.CSS_SELECTOR, '.reading-plan-select-topics')
+        By.CSS_SELECTOR, '.reading-plan-select-sections')
     _see_questions_tooltip_locator = (
-        By.CSS_SELECTOR, '#reading-select ~ button')
+        By.CSS_SELECTOR, '#select-sections ~ button')
     _what_do_students_see_button_locator = (By.CSS_SELECTOR, '.preview-btn')
 
     @property

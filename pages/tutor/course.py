@@ -354,6 +354,7 @@ class StudentCourse(TutorBase):
         :rtype: :py:class:`~pages.tutor.task.AssignmentBar`
 
         """
+        sleep(0.5)
         assignments = [AssignmentBar(self, bar)
                        for bar
                        in self.find_elements(*self._assignment_bar_locator)]
