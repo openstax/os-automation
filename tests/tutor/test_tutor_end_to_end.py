@@ -587,7 +587,12 @@ def test_assignment_creation_homework(tutor_base_url, selenium, store):
     homework = day.add_assignment(Tutor.HOMEWORK)
 
     # THEN:  the due date should match the selected date box
-    due_on = homework.open_and_due.due_date.get_attribute('value')
+    open_and_due = homework.open_and_due
+    if not isinstance(open_and_due, list):
+        due_on = homework.open_and_due.due_date.get_attribute('value')
+    else:
+        due_on = (homework.open_and_due[0]
+                  .open_to_close.due_date.get_attribute('value'))
     assert(due_on == date.strftime("%m/%d/%Y")), \
         f'The due date ({due_on}) does not match the expected date ({date})'
 
@@ -603,9 +608,14 @@ def test_assignment_creation_homework(tutor_base_url, selenium, store):
     # THEN:  the selected section buttons are displayed in the secondary
     #        toolbar
     selected_sections = problem_selector.toolbar.sections
-    assert(len(selected_sections) == sections), (
-        'Section selections ({0}) do not match expectation ({1})'
+    # may be the number or sections or one less than the number of sections if
+    # an introductory section is included
+    assert(len(selected_sections) == sections - 1 or
+           len(selected_sections) == sections), (
+        'Section selections '
+        '({0}) do not match the expected number of sections ({1} or {2})'
         .format([section.number for section in selected_sections],
+                sections - 1,
                 sections))
 
     # WHEN:  they select 1-3 assessments from each available section

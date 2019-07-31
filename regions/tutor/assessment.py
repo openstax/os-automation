@@ -439,8 +439,9 @@ class QuestionBase(Region):
         """
         # pause for the feedback to arrive
         current_page = self.driver.current_url
-        sleep(2)
+        sleep(3)
         self.answer(multipart)
+        sleep(1)
         if self.driver.current_url == current_page:
             self.answer_button.send_keys(Keys.RETURN)
             sleep(1)
