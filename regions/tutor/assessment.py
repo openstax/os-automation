@@ -9,6 +9,7 @@ from pypom import Region
 from selenium.common.exceptions import NoSuchElementException
 from selenium.common.exceptions import StaleElementReferenceException  # NOQA
 from selenium.webdriver.common.by import By
+from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.remote.webelement import WebElement
 from selenium.webdriver.support import expected_conditions as expect
 
@@ -366,12 +367,14 @@ class QuestionBase(Region):
     """Shared assessment resources for student responses."""
 
     _question_stem_locator = (By.CSS_SELECTOR, '[class*=QuestionStem]')
-    _answer_button_locator = (By.CSS_SELECTOR, '.btn-primary')
+    _question_answer_button_locator = (By.CSS_SELECTOR, '.btn-primary')
     _exercise_id_locator = (By.CSS_SELECTOR, '.exercise-identifier-link')
     _suggest_a_correction_link_locator = (By.CSS_SELECTOR, '[href*=errata]')
     _view_book_section_link_locator = (By.CSS_SELECTOR, '.reference')
     _book_section_number_locator = (By.CSS_SELECTOR, '.chapter-section')
     _book_section_title_locator = (By.CSS_SELECTOR, '.title')
+    _correct_answer_shown_locator = (
+        By.CSS_SELECTOR, '.has-correct-answer , .answer-correct')
 
     @property
     def step_id(self) -> str:
@@ -402,19 +405,53 @@ class QuestionBase(Region):
         :rtype: :py:class:`~selenium.webdriver.remote.webelement.WebElement`
 
         """
-        return self.find_element(*self._answer_button_locator)
+        return self.find_element(*self._question_answer_button_locator)
 
-    def answer(self) -> None:
+    def answer(self, multipart: bool = False) -> None:
         """Click the 'Answer' button.
 
+        :param bool multipart: if ``True``, skip the staleness check because
+            the screen doesn't change between multi-part assessment questions
         :return: None
 
         """
         sleep(0.33)
-        Utility.click_option(self.driver, element=self.answer_button)
+        answer_button = self.answer_button
+        Utility.click_option(self.driver, element=answer_button)
+        if not multipart:
+            sleep(1)
+            try:
+                self.wait.until(lambda _: (
+                    'Re-' not in answer_button.get_attribute('textContent') or
+                    'Continue' not
+                    in answer_button.get_attribute('textContent')))
+            except StaleElementReferenceException:
+                pass
+        else:
+            sleep(1.5)
         sleep(1)
 
-    _continue = answer
+    def _continue(self, multipart: bool = False) -> None:
+        """Click the 'Continue' button.
+
+        :param bool multipart: if ``True``, skip the staleness check because
+            the screen doesn't change between multi-part assessment questions
+        :return: None
+
+        """
+        # pause for the feedback to arrive
+        current_page = self.driver.current_url
+        wait = 3.0  # seconds
+        pause = 0.5  # seconds
+        for _ in range(int(wait / pause)):
+            if self.find_elements(*self._correct_answer_shown_locator):
+                break
+            sleep(pause)
+        self.answer(multipart)
+        sleep(1)
+        if self.driver.current_url == current_page:
+            self.answer_button.send_keys(Keys.RETURN)
+            sleep(1)
 
     @property
     def exercise_id(self) -> str:
@@ -471,6 +508,28 @@ class QuestionBase(Region):
 
         """
         return self.find_element(*self._book_section_title_locator).text
+
+    @property
+    def is_multiple_choice(self) -> bool:
+        """Return True if the assessment is a MultipleChoice question.
+
+        :return: ``True`` if the assessment is an instance of a multiple choice
+            question
+        :rtype: bool
+
+        """
+        return isinstance(self, MultipleChoice)
+
+    @property
+    def is_free_response(self) -> bool:
+        """Return True if the assessment is a FreeResponse question.
+
+        :return: ``True`` if the assessment is an instance of a free response
+            question
+        :rtype: bool
+
+        """
+        return isinstance(self, FreeResponse)
 
 
 class FreeResponse(QuestionBase):

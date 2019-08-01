@@ -61,9 +61,11 @@ class QuickLook(QuickLookBase):
     _body_data_locator = (
         By.CSS_SELECTOR, '.task-stats-data')
     _review_metrics_locator = (
-        By.CSS_SELECTOR, '[href*=metrics]')
+        By.CSS_SELECTOR, '.modal-footer [href*=metrics]')
+    _view_scores_locator = (
+        By.CSS_SELECTOR, '.modal-footer [href*=scores]')
     _view_assignment_locator = (
-        By.CSS_SELECTOR, f'.modal-footer a:not({_review_metrics_locator[1]})')
+        By.CSS_SELECTOR, f'.modal-footer [href*=assign]')
     _assignment_link_locator = (
         By.CSS_SELECTOR, '.modal-footer button')
 
@@ -123,6 +125,17 @@ class QuickLook(QuickLookBase):
         Utility.click_option(self.driver, element=button)
         from pages.tutor.review_metrics import Metrics
         return go_to_(Metrics(self.driver, self.page.base_url))
+
+    def view_scores(self):
+        """Click on the 'View Scores' button.
+
+        External assignments only
+
+        """
+        button = self.find_element(*self._view_scores_locator)
+        Utility.click_option(self.driver, element=button)
+        from pages.tutor.scores import Scores
+        return go_to_(Scores(self.driver, self.page.base_url))
 
     def view_assignment(self):
         """Click on the 'View Assignment' or 'View Event' button."""

@@ -319,8 +319,6 @@ def to_date_time_string(to_format: Union[str, DateFormat]) -> Tuple[str, str]:
     # Fix some time prefixes that the form widget can't handle well
     if not time.startswith('01') and time.startswith('0'):
         time = time[1:]
-    elif time.startswith('1:'):
-        time = f'0{time}'
 
     return (date, time)
 
@@ -347,9 +345,7 @@ def get_date_times(driver: Webdriver,
     """
     # Handle a random date in the future or today
     if option == Tutor.RANDOM:
-        base_date = driver.find_element(
-            By.CSS_SELECTOR,
-            '.-assignment-open-date input:not([readonly])')
+        base_date = driver.find_element(By.CSS_SELECTOR, '[id*="open-date"]')
         _open = datetime.strptime(
             '{date} {time}'.format(
                 date=base_date.get_attribute('value'),

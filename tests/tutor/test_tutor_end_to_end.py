@@ -10,6 +10,7 @@ from autochomsky import chomsky
 
 from pages.tutor.enrollment import Enrollment, StudentID
 from pages.tutor.home import TutorHome
+from pages.tutor.task import Homework
 from tests.markers import test_case, tutor
 from utils.bookterm import CollegePhysics
 from utils.email import RestMail
@@ -586,7 +587,12 @@ def test_assignment_creation_homework(tutor_base_url, selenium, store):
     homework = day.add_assignment(Tutor.HOMEWORK)
 
     # THEN:  the due date should match the selected date box
-    due_on = homework.open_and_due.due_date.get_attribute('value')
+    open_and_due = homework.open_and_due
+    if not isinstance(open_and_due, list):
+        due_on = homework.open_and_due.due_date.get_attribute('value')
+    else:
+        due_on = (homework.open_and_due[0]
+                  .open_to_close.due_date.get_attribute('value'))
     assert(due_on == date.strftime("%m/%d/%Y")), \
         f'The due date ({due_on}) does not match the expected date ({date})'
 
@@ -602,9 +608,14 @@ def test_assignment_creation_homework(tutor_base_url, selenium, store):
     # THEN:  the selected section buttons are displayed in the secondary
     #        toolbar
     selected_sections = problem_selector.toolbar.sections
-    assert(len(selected_sections) == sections), (
-        'Section selections ({0}) do not match expectation ({1})'
+    # may be the number or sections or one less than the number of sections if
+    # an introductory section is included
+    assert(len(selected_sections) == sections - 1 or
+           len(selected_sections) == sections), (
+        'Section selections '
+        '({0}) do not match the expected number of sections ({1} or {2})'
         .format([section.number for section in selected_sections],
+                sections - 1,
                 sections))
 
     # WHEN:  they select 1-3 assessments from each available section
@@ -1015,29 +1026,144 @@ def test_student_task_reading_assignment(tutor_base_url, selenium, store):
         f'"{finished_assignment.progress}"')
 
 
-'''@test_case('C485040')
+@test_case('C485040')
 @tutor
-def test_student_task_homework_assignment(tutor_base_url, selenium):
+def test_student_task_homework_assignment(tutor_base_url, selenium, store):
     """Test a student working a homework assignment.
 
     This will include standard two-step, standard multiple choice and
     multi-part assessments.
 
     """
+    # SETUP:
+    test_data = store.get('C485040')
+    if '-dev.' in tutor_base_url:
+        enrollment_url = test_data.get('enrollment_url_dev')
+        assignment_url = test_data.get('assignment_url_dev')
+    elif '-qa.' in tutor_base_url:
+        enrollment_url = test_data.get('enrollment_url_qa')
+        assignment_url = test_data.get('assignment_url_qa')
+    elif '-staging.' in tutor_base_url:
+        enrollment_url = test_data.get('enrollment_url_staging')
+        assignment_url = test_data.get('assignment_url_staging')
+    elif 'tutor.' in tutor_base_url:
+        enrollment_url = test_data.get('enrollment_url_prod')
+        assignment_url = test_data.get('assignment_url_prod')
+    else:
+        enrollment_url = test_data.get('enrollment_url_unique')
+        assignment_url = test_data.get('assignment_url_unique')
+    _, first_name, last_name, suffix = Utility.random_name()
+    email = RestMail(
+        f"{first_name}.{last_name}.{Utility.random_hex(3)}".lower())
+    email.empty()
+    password = Utility.random_hex(8)
+    school = 'Automation'
+    student_id = Utility.random(100000000, 999999999)
+    assignment_name = test_data.get('assignment_name')
+
     # GIVEN: a Tutor student enrolled in a course with a homework assignment
+    selenium.get(enrollment_url)
+    enrollment = Enrollment(selenium, tutor_base_url)
+    signup = enrollment.get_started()
+    signup.account_signup(
+        destination=tutor_base_url,
+        email=email.address,
+        name=['', first_name, last_name, suffix],
+        password=password,
+        school=school,
+        tutor=True)
+    identification = StudentID(selenium, tutor_base_url)
+    identification.student_id = student_id
+    privacy = identification._continue()
+    course_page = privacy.i_agree()
+    course_page.clear_training_wheels()
+    course_page.wait_for_assignments()
+    course_page.clear_training_wheels()
 
     # WHEN:  they follow the assignment URL
-    # AND:   work each step (two-step, multiple choice-only, multi-part) and
-    #        the spaced or personalized assessments
+    # AND:   work the free response assessment
+    # AND:   work the multiple choice-only assessment
+    # AND:   work the multi-part assessment
+    # AND:   work each remaining step
     # AND:   click the 'Back to Dashboard' button
+    selenium.get(assignment_url)
+    homework = Homework(selenium, tutor_base_url)
+    homework.clear_training_wheels()
+
+    # answer the standard, two-step assessment
+    if homework.body.is_two_step_intro:
+        # move beyond the intersticial card, if it appears for the student
+        homework.body._continue()
+    free_response = homework.body.pane
+    free_response.free_response = (
+        CollegePhysics()
+        .get_term(free_response.chapter_section)[1])
+    free_response.answer()
+    multiple_choice = homework.body.pane
+    multiple_choice.random_answer()
+    multiple_choice.answer()
+    multiple_choice._continue()
+
+    # answer the multiple choice assessment
+    multiple_choice_only = homework.body.pane
+    multiple_choice_only.random_answer()
+    multiple_choice_only.answer()
+    multiple_choice_only._continue()
+
+    # answer each question of the multipart assessment
+    multipart = homework.body.pane
+    questions = len(multipart.questions)
+    for index, question in enumerate(multipart.questions):
+        not_last_question = index + 1 < questions
+        if question.is_multiple_choice:
+            question.random_answer()
+            question.answer()
+            question._continue(not_last_question)
+        elif question.has_correct_answer:
+            question._continue(not_last_question)
+        elif question.is_free_response:
+            question.free_response = (
+                CollegePhysics()
+                .get_term(question.body.pane.chapter_section)[1])
+            question.answer()
+            question.random_answer()
+            question.answer()
+            question._continue(not_last_question)
+
+    # continue through the rest of the assignment
+    while not homework.body.assignment_complete:
+        if homework.body.is_interstitial or homework.body.has_correct_answer:
+            homework.body._continue()
+        elif homework.body.is_multiple_choice:
+            homework.body.pane.random_answer()
+            homework.body.pane.answer()
+            homework.body.pane._continue()
+        elif homework.body.is_free_response:
+            homework.body.pane.free_response = (
+                CollegePhysics()
+                .get_term(homework.body.pane.chapter_section)[1])
+            homework.body.pane.answer()
+            homework.body.pane.random_answer()
+            homework.body.pane.answer()
+            homework.body.pane._continue()
+
+    this_week = homework.body.back_to_dashboard()
+    this_week.reload()  # force a fresh to get any new dashboard data
+    if assignment_name not in this_week.assignment_names:
+        this_week.view_all_past_work()
+        # clear the late icon pop up
+        this_week.clear_training_wheels()
 
     # THEN:  the student dashboard is displayed
     # AND:   the homework assignment progress is 'N/N answered' or 'X/Y
     #        correct'
+    assert(this_week.is_displayed()), \
+        'Not viewing the student work dashboard'
 
-    import time
-    time.sleep(5)
-    assert(False), '*** Reached Test End ***'''
+    progress = this_week.assignment_bar(assignment_name).progress
+    assert(' correct' in progress or ' answered' in progress), (
+        f'Progress incorrect for {assignment_name}: '
+        f'"{progress}"')
 
 
 '''@test_case('C485041')
