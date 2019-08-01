@@ -1346,6 +1346,7 @@ class Reading(Assignment):
         _milestone_card_locator = (By.CSS_SELECTOR, '[data-step-index]')
 
         _milestone_chart_toggle_selector = '[class*=StyledToggle]'
+        _overlay_page_selector = '.overlay.task-milestones'
 
         def is_displayed(self) -> bool:
             """Return True when the main page is hidden.
@@ -1355,11 +1356,12 @@ class Reading(Assignment):
 
             """
             sleep(0.5)
-            return self.driver.execute_script(
-                COMPUTED_STYLE.format(
-                    selector=self.page._main_content_selector,
-                    property='display',
-                    expected_value='none'))
+            overlay = self.driver.execute_script(
+                'return document.querySelector' +
+                f'("{self._overlay_page_selector}");')
+            return overlay and self.driver.execute_script(
+                'return window.getComputedStyle(arguments[0]) != "none";',
+                overlay)
 
         def close(self) -> Reading:
             """Click on the toggle to close the milestones pane.

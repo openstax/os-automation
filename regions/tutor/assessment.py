@@ -373,6 +373,8 @@ class QuestionBase(Region):
     _view_book_section_link_locator = (By.CSS_SELECTOR, '.reference')
     _book_section_number_locator = (By.CSS_SELECTOR, '.chapter-section')
     _book_section_title_locator = (By.CSS_SELECTOR, '.title')
+    _correct_answer_shown_locator = (
+        By.CSS_SELECTOR, '.has-correct-answer , .answer-correct')
 
     @property
     def step_id(self) -> str:
@@ -439,7 +441,12 @@ class QuestionBase(Region):
         """
         # pause for the feedback to arrive
         current_page = self.driver.current_url
-        sleep(3)
+        wait = 3.0  # seconds
+        pause = 0.5  # seconds
+        for _ in range(int(wait / pause)):
+            if self.find_elements(*self._correct_answer_shown_locator):
+                break
+            sleep(pause)
         self.answer(multipart)
         sleep(1)
         if self.driver.current_url == current_page:
