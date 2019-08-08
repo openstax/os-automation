@@ -8,14 +8,15 @@ from datetime import datetime, timedelta
 
 from autochomsky import chomsky
 
+from pages.tutor.course import StudentCourse
 from pages.tutor.enrollment import Enrollment, StudentID
 from pages.tutor.home import TutorHome
 from pages.tutor.task import Homework
 from tests.markers import test_case, tutor
-from utils.bookterm import CollegePhysics
+from utils import bookterm
 from utils.email import RestMail
 from utils.tutor import States, Tutor
-from utils.utilities import Actions, Card, Utility
+from utils.utilities import Actions, Card, Utility, go_to_
 
 
 @test_case('C485035')
@@ -863,6 +864,7 @@ def test_student_task_reading_assignment(tutor_base_url, selenium, store):
     assignment_name = test_data.get('assignment_name')
     annotation_text = chomsky()
     free_response_giberish = Utility.random_hex(30)
+    book = bookterm.CollegePhysics()
 
     # GIVEN: a Tutor student enrolled in a course with a reading assignment
     selenium.get(enrollment_url)
@@ -968,8 +970,7 @@ def test_student_task_reading_assignment(tutor_base_url, selenium, store):
     # WHEN:  they enter new text is in the text area and click the 'Re-answer'
     #        button
     reading.body.pane.free_response = (
-        CollegePhysics()
-        .get_term(reading.body.pane.chapter_section)[1])
+        book.get_term(reading.body.pane.chapter_section)[1])
     reading.body.pane.reanswer()
 
     # THEN:  the multiple choice answers are displayed
@@ -992,8 +993,7 @@ def test_student_task_reading_assignment(tutor_base_url, selenium, store):
             reading.body.pane._continue()
         elif reading.body.is_free_response:
             reading.body.pane.free_response = (
-                CollegePhysics()
-                .get_term(reading.body.pane.chapter_section)[1])
+                book.get_term(reading.body.pane.chapter_section)[1])
             reading.body.pane.answer()
 
     milestones = reading.milestones()
@@ -1060,6 +1060,7 @@ def test_student_task_homework_assignment(tutor_base_url, selenium, store):
     school = 'Automation'
     student_id = Utility.random(100000000, 999999999)
     assignment_name = test_data.get('assignment_name')
+    book = bookterm.CollegePhysics()
 
     # GIVEN: a Tutor student enrolled in a course with a homework assignment
     selenium.get(enrollment_url)
@@ -1096,8 +1097,7 @@ def test_student_task_homework_assignment(tutor_base_url, selenium, store):
         homework.body._continue()
     free_response = homework.body.pane
     free_response.free_response = (
-        CollegePhysics()
-        .get_term(free_response.chapter_section)[1])
+        book.get_term(free_response.chapter_section)[1])
     free_response.answer()
     multiple_choice = homework.body.pane
     multiple_choice.random_answer()
@@ -1123,8 +1123,7 @@ def test_student_task_homework_assignment(tutor_base_url, selenium, store):
             question._continue(not_last_question)
         elif question.is_free_response:
             question.free_response = (
-                CollegePhysics()
-                .get_term(question.body.pane.chapter_section)[1])
+                book.get_term(question.body.pane.chapter_section)[1])
             question.answer()
             question.random_answer()
             question.answer()
@@ -1140,8 +1139,7 @@ def test_student_task_homework_assignment(tutor_base_url, selenium, store):
             homework.body.pane._continue()
         elif homework.body.is_free_response:
             homework.body.pane.free_response = (
-                CollegePhysics()
-                .get_term(homework.body.pane.chapter_section)[1])
+                book.get_term(homework.body.pane.chapter_section)[1])
             homework.body.pane.answer()
             homework.body.pane.random_answer()
             homework.body.pane.answer()
@@ -1166,36 +1164,106 @@ def test_student_task_homework_assignment(tutor_base_url, selenium, store):
         f'"{progress}"')
 
 
-'''@test_case('C485041')
+@test_case('C485041')
 @tutor
-def test_student_task_practice(tutor_base_url, selenium):
+def test_student_task_practice(tutor_base_url, selenium, store):
     """Test a student working a practice question set.
 
     Practice a section and practice the student's weakest topics.
 
     """
+    # SETUP:
+    test_data = store.get('C485041')
+    user = test_data.get('username')
+    if '-dev.' in tutor_base_url:
+        password = test_data.get('password_dev')
+    elif '-qa.' in tutor_base_url:
+        password = test_data.get('password_qa')
+    elif '-staging.' in tutor_base_url:
+        password = test_data.get('password_staging')
+    elif 'tutor.' in tutor_base_url:
+        password = test_data.get('password_prod')
+    else:
+        password = test_data.get('password_unique')
+    book = bookterm.Biology2e()
+
     # GIVEN: a Tutor student enrolled in a course with at least one reading or
     #        homework
+    home = TutorHome(selenium, tutor_base_url).open()
+    home.log_in(user, password)
+    # only one course means the student bypasses the course picker
+    this_week = go_to_(StudentCourse(selenium, tutor_base_url))
+    this_week.clear_training_wheels()
 
     # WHEN:  they click the 'Practice more to get forecast' button or a
     #        forecast bar
+    recent_topics = this_week.performance_sidebar.sections
+    topic = Utility.random(0, len(recent_topics) - 1)
+    section = recent_topics[topic]
+    section_number = section.number
+    section_title = section.title
+    already_worked = int(section.worked.split()[0])
+    practice = section.practice()
 
     # THEN:  a practice session with between 1 - 5 questions from the selected
     #        section is displayed
+    url = practice.location
+    assert('task' in url or 'practice' in url), \
+        f'Practice session not started: {url}'
+    title = practice.footer.title
+    assert(title == 'Practice'), f'Wrong title found: {title}'
+    assessments = practice.exercises
+    assert(assessments >= 1 and assessments <= 5), \
+        f'Wrong number of assessment breadcrumbs: {assessments}'
+    assert(section_number in practice.section)
+    assert(section_title in practice.section_title)
 
     # WHEN:  they answer all questions
+    while not practice.body.assignment_complete:
+        if practice.body.is_interstitial or practice.body.has_correct_answer:
+            practice.body._continue()
+        elif practice.body.is_multiple_choice:
+            practice.body.pane.random_answer()
+            practice.body.pane.answer()
+            practice.body.pane._continue()
+        elif practice.body.is_free_response:
+            practice.body.pane.free_response = (
+                book.get_term(practice.body.pane.chapter_section)[1])
+            practice.body.pane.answer()
+            practice.body.pane.random_answer()
+            practice.body.pane.answer()
+            practice.body.pane._continue()
 
     # THEN:  the 'You are done.' card is displayed
+    assert('You are done.' in selenium.page_source)
 
     # WHEN:  they click the 'Back to Dashboard' button
+    this_week = practice.body.back_to_dashboard()
+    this_week.reload()
+    this_week.clear_training_wheels()
 
     # THEN:  the student dashboard is displayed
     # AND:   the section shows the new total of question worked for the
     #        selected section
+    assert(this_week.is_displayed()), \
+        'Not viewing the student work dashboard'
+
+    assert(this_week.performance_sidebar.sections[topic]
+           .worked.split()[0] == str(already_worked + assessments)), \
+        f'Incorrect number of worked assessments for section {section_number}'
 
     # WHEN:  they click the 'Practice my weakest topics' button
+    practice = this_week.performance_sidebar.practice_my_weakest_topics()
 
     # THEN:  a practice session with between 1 - 5 questions is displayed
+    url = practice.location
+    assert('task' in url or 'practice' in url), \
+        f'Practice session not started: {url}'
+    title = practice.footer.title
+    assert(title == 'Practice'), f'Wrong title found: {title}'
+    assessments = practice.exercises
+    assert(assessments >= 1 and assessments <= 5), \
+        f'Wrong number of assessment breadcrumbs: {assessments}'
 
     import time
     time.sleep(5)
