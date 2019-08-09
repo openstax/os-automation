@@ -11,9 +11,9 @@ from selenium.common.exceptions import NoSuchElementException
 from selenium.webdriver.common.by import By
 from selenium.webdriver.remote.webelement import WebElement
 
-from pages.tutor.base import TutorBase
 from pages.tutor.course import StudentCourse
 from pages.tutor.performance import PerformanceForecast
+from pages.tutor.task import Homework
 from pages.web.errata import ErrataForm
 from utils.tutor import TutorException
 from utils.utilities import Utility, go_to_
@@ -62,9 +62,11 @@ class ButtonTooltip(Region):
 # Practice page
 # -------------------------------------------------------- #
 
-class Practice(TutorBase):
+class Practice(Homework):
     """A practice session."""
 
+    _body_locator = (By.CSS_SELECTOR, 'body')
+    _exercise_breadcrumb_locator = (By.CSS_SELECTOR, '.breadcrumb-exercise')
     _personalized_badge_locator = (By.CSS_SELECTOR, '.personalized')
     _personalized_tooltip_locator = (By.CSS_SELECTOR, '.personalized svg')
     _question_stimulus_locator = (By.CSS_SELECTOR, '.exercise-stimulus')
@@ -80,6 +82,34 @@ class Practice(TutorBase):
     _view_book_section_link_locator = (By.CSS_SELECTOR, '.reference')
     _debug_information_locator = (
         By.CSS_SELECTOR, '.visible-when-debugging li')
+    _footer_root_locator = (
+        By.CSS_SELECTOR, '[class*=Content] ~ .tutor-navbar')
+
+    @property
+    def loaded(self) -> bool:
+        """Return True when all loading messages are done.
+
+        :return: ``True`` if no loading message is found
+        :rtype: bool
+
+        """
+        body_source = (self.find_element(*self._body_locator)
+                       .get_attribute('outerHTML'))
+        loaded = ('Loading' not in body_source and
+                  'is-loading' not in body_source)
+        if loaded:
+            sleep(1)
+        return loaded
+
+    @property
+    def exercises(self) -> int:
+        """Return the number of practice assessments.
+
+        :return: the number of assessments in this practice session
+        :rtype: int
+
+        """
+        return len(self.find_elements(*self._exercise_breadcrumb_locator))
 
     @property
     def is_personalized(self) -> bool:
@@ -226,10 +256,20 @@ class Practice(TutorBase):
         """
         return self.find_element(*self._book_section_title_locator).text
 
+    @property
+    def footer(self) -> Practice.Footer:
+        """Access the practice assignment footer.
+
+        :return: the footer region
+        :rtype: :py:class:`~pages.tutor.practice.Practice.Footer`
+
+        """
+        footer_root = self.find_element(*self._footer_root_locator)
+        return self.Footer(self, footer_root)
+
     class Footer(Region):
         """The practice session footer."""
 
-        _root_locator = (By.CSS_SELECTOR, '.tutor-navbar:last-child')
         _title_locator = (By.CSS_SELECTOR, '[class*=Title]')
         _due_at_datetime_locator = (By.CSS_SELECTOR, '[class*=DueDate]')
         _back_to_page_locator = (By.CSS_SELECTOR, '.btn-default')
