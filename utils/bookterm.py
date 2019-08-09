@@ -46,7 +46,8 @@ class OpenStaxBook(object):
     def get_term(self, section: Union[int, float, str]) -> Term:
         """Return a random term and definition from a specific section.
 
-        :param str section: the book section to pull a term from
+        :param section: the book section to pull a term from
+        :type section: int or float or str
         :return: a book term and definition
         :rtype: tuple(str, str)
 

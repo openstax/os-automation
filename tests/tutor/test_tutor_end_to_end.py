@@ -1265,10 +1265,6 @@ def test_student_task_practice(tutor_base_url, selenium, store):
     assert(assessments >= 1 and assessments <= 5), \
         f'Wrong number of assessment breadcrumbs: {assessments}'
 
-    import time
-    time.sleep(5)
-    assert(False), '*** Reached Test End ***'''
-
 
 '''@test_case('C485042')
 @tutor

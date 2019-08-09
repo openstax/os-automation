@@ -158,6 +158,7 @@ class AssignmentBar(Region):
 class StudentCourse(TutorBase):
     """The weekly course view for students."""
 
+    _body_locator = (By.CSS_SELECTOR, 'body')
     _joyride_root_selector = (By.CSS_SELECTOR, '.joyride')
     _notification_bar_locator = (
                                 By.CSS_SELECTOR, '.openstax-notifications-bar')
@@ -173,6 +174,22 @@ class StudentCourse(TutorBase):
     _assignment_name_locator = (By.CSS_SELECTOR, '.row div.title')
     _assignment_link_locator = (By.CSS_SELECTOR, 'a.row')
     _assignment_bar_locator = (By.CSS_SELECTOR, '.task.row')
+
+    @property
+    def loaded(self) -> bool:
+        """Return True when all loading messages are done.
+
+        :return: ``True`` if no loading message is found
+        :rtype: bool
+
+        """
+        body_source = (self.find_element(*self._body_locator)
+                       .get_attribute('outerHTML'))
+        loaded = ('Loading' not in body_source and
+                  'is-loading' not in body_source)
+        if loaded:
+            sleep(1)
+        return loaded
 
     # ---------------------------------------------------- #
     # Notifications
@@ -702,6 +719,33 @@ class StudentCourse(TutorBase):
             """
             return [self.Key(self, guide)
                     for guide in self.find_elements(*self._key_guide_locator)]
+
+        def practice_my_weakest_topics(self):
+            """Click the 'Practice my weakest topics' button.
+
+            :return: a practice session with assessments from 1 to 4 of the
+                student's worst performing sections
+            :rtype: :py:class:`~pages.tutor.practice.Practice`
+
+            """
+            button = self.find_element(*self._practice_weakest_locator)
+            Utility.click_option(self.driver, element=button)
+            from pages.tutor.practice import Practice
+            return go_to_(
+                Practice(self.driver, base_url=self.page.base_url))
+
+        def view_all_topics(self):
+            """Click the 'View All Topics' button.
+
+            :return: the student's performance forecast
+            :rtype: :py:class:`~pages.tutor.performance.PerformanceForecast`
+
+            """
+            button = self.find_element(*self._view_all_topics_button_locator)
+            Utility.click_option(self.driver, element=button)
+            from pages.tutor.performance import PerformanceForecast
+            return go_to_(
+                PerformanceForecast(self.driver, base_url=self.page.base_url))
 
         class Section(Region):
             """A recent performance forecast section information."""
