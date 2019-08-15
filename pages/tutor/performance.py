@@ -108,12 +108,24 @@ class BookSection(Region):
 class PerformanceForecast(TutorBase):
     """The performance forecast page."""
 
-    _page_title_locator = (By.CSS_SELECTOR, '.guide-group-title')
-    _guide_locator = (By.CSS_SELECTOR, '.guide-group-key')
     _go_back_button_locator = (By.CSS_SELECTOR, '.info a')
-    _section_tab_locator = (By.CSS_SELECTOR, '[role=tab]')
-    _no_data_locator = (By.CSS_SELECTOR, '.no-data-message')
     _group_forecast_locator = (By.CSS_SELECTOR, '.guide-group')
+    _guide_locator = (By.CSS_SELECTOR, '.guide-group-key')
+    _loading_message_locator = (
+        By.CSS_SELECTOR, '.is-loading , .loading-animation')
+    _no_data_locator = (By.CSS_SELECTOR, '.no-data-message')
+    _page_title_locator = (By.CSS_SELECTOR, '.guide-group-title')
+    _section_tab_locator = (By.CSS_SELECTOR, '[role=tab]')
+
+    @property
+    def loaded(self) -> bool:
+        """Return True when the performance forecast is loaded.
+
+        :return: ``True`` if no loading messages or elements are found
+        :rtype: bool
+
+        """
+        return not self.find_elements(*self._loading_message_locator)
 
     @property
     def title(self):
@@ -148,8 +160,17 @@ class PerformanceForecast(TutorBase):
         """
         button = self.find_element(*self._go_back_button_locator)
         Utility.click_option(self.driver, element=button)
-        sleep(1)
-        return
+
+    def back_to_scores(self):
+        """Click the 'Back to Scores' button.
+
+        :return: the scores page
+        :rtype: :py:class:`~pages.tutor.scores.Scores`
+
+        """
+        self.go_back()
+        from pages.tutor.scores import Scores
+        return go_to_(Scores(self.driver, base_url=self.base_url))
 
     @property
     def section_tabs(self):

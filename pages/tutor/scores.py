@@ -1,12 +1,17 @@
 """The student and instructor scores page."""
 
 from time import sleep
+from typing import List, Union
 
 from pypom import Region
-from selenium.common.exceptions import NoSuchElementException
+from selenium.common.exceptions import NoSuchElementException, TimeoutException
 from selenium.webdriver.common.by import By
+from selenium.webdriver.common.keys import Keys
+from selenium.webdriver.remote.webelement import WebElement
+from selenium.webdriver.support import expected_conditions as expect
 
 from pages.tutor.base import TutorBase
+from pages.tutor.performance import PerformanceForecast
 from utils.tutor import Tutor, TutorException
 from utils.utilities import Utility, go_to_
 
@@ -121,6 +126,7 @@ class LateWork(Tooltip):
         """
         button = self.find_element(*self._button_locator)
         Utility.click_option(self.driver, element=button)
+        self.wait.until(expect.staleness_of(self.root))
         return self.page
 
     accept_late_score = use_this_score
@@ -129,11 +135,35 @@ class LateWork(Tooltip):
 class Weights(Region):
     """The scores page weight scoring."""
 
-    _root_locator = (By.CSS_SELECTOR, '.set-weights')
     _heading_locator = (By.CSS_SELECTOR, '.modal-header')
     _x_button_locator = (By.CSS_SELECTOR, '.close')
     _cancel_close_button_locator = (
                             By.CSS_SELECTOR, '.modal-footer button:last-child')
+
+    _root_selector = '.set-weights.modal'
+
+    @property
+    def root(self):
+        """Return the weights modal root element.
+
+        :return: the modal root element
+        :rtype: :py:class:`~selenium.webdriver.remote.webelement.WebElement`
+
+        """
+        return self.driver.execute_script(
+            f'return document.querySelector("{self._root_selector}");')
+
+    def is_displayed(self):
+        """Return True if the weights modal root is found.
+
+        :return: ``True`` if the weights modal is found
+        :rtype: bool
+
+        """
+        try:
+            return bool(self.root)
+        except NoSuchElementException:
+            return False
 
     @property
     def heading(self):
@@ -179,6 +209,26 @@ class SetWeights(Weights):
     _weights_status_locator = (By.CSS_SELECTOR, '.weights-msg')
     _save_button_locator = (By.CSS_SELECTOR, '.async-button')
     _dialog_locator = (By.CSS_SELECTOR, '.modal-dialog')
+
+    def _set_value(self, field: WebElement, value: Union[str, int]) -> None:
+        r"""Set a weights value.
+
+        :param field: the field to modify
+        :param value: the new field value
+        :type field: \
+            :py:class:`~selenium.webdriver.remote.webelement.WebElement`
+        :type: value: str or int
+        :return: None
+
+        """
+        test = int(value)
+        if test < 0 or test > 100:
+            raise ValueError("Value must be between 0 and 100")
+        for _ in range(3):
+            field.send_keys(Keys.BACKSPACE)
+            field.send_keys(Keys.DELETE)
+        for ch in str(value):
+            field.send_keys(ch)
 
     def see_why(self):
         """Click on the 'See why' link to view the weights blog post.
@@ -230,10 +280,7 @@ class SetWeights(Weights):
             is greater than 100
 
         """
-        test = int(value)
-        if test < 0 or test > 100:
-            raise ValueError("Value must be between 0 and 100")
-        self.homework_score_input.send_keys(value)
+        self._set_value(self.homework_score_input, value)
 
     @property
     def homework_progress_input(self):
@@ -245,7 +292,7 @@ class SetWeights(Weights):
         :noindex:
 
         """
-        return self.find_element(*self._homework_score_locator)
+        return self.find_element(*self._homework_progress_locator)
 
     @property
     def homework_progress(self):
@@ -271,10 +318,7 @@ class SetWeights(Weights):
             is greater than 100
 
         """
-        test = int(value)
-        if test < 0 or test > 100:
-            raise ValueError("Value must be between 0 and 100")
-        self.homework_score_input.send_keys(value)
+        self._set_value(self.homework_progress_input, value)
 
     @property
     def reading_score_input(self):
@@ -286,7 +330,7 @@ class SetWeights(Weights):
         :noindex:
 
         """
-        return self.find_element(*self._homework_score_locator)
+        return self.find_element(*self._reading_score_locator)
 
     @property
     def reading_score(self):
@@ -312,10 +356,7 @@ class SetWeights(Weights):
             is greater than 100
 
         """
-        test = int(value)
-        if test < 0 or test > 100:
-            raise ValueError("Value must be between 0 and 100")
-        self.reading_score_input.send_keys(value)
+        self._set_value(self.reading_score_input, value)
 
     @property
     def reading_progress_input(self):
@@ -327,7 +368,7 @@ class SetWeights(Weights):
         :noindex:
 
         """
-        return self.find_element(*self._homework_score_locator)
+        return self.find_element(*self._reading_progress_locator)
 
     @property
     def reading_progress(self):
@@ -353,10 +394,7 @@ class SetWeights(Weights):
             is greater than 100
 
         """
-        test = int(value)
-        if test < 0 or test > 100:
-            raise ValueError("Value must be between 0 and 100")
-        self.reading_progress_input.send_keys(value)
+        self._set_value(self.reading_progress_input, value)
 
     def restore_default(self):
         """Reset the weight to their default.
@@ -374,6 +412,25 @@ class SetWeights(Weights):
             raise TutorException("Weights are already set to their defaults")
         Utility.click_option(self.driver, element=button)
         return self
+
+    def set(self, weights: List[int]) -> None:
+        """Assign weights to each assignment category.
+
+        :param weights: the whole number percentages for each category in
+            order - homework score, homework progress, reading score, reading
+            progress; if less that 4 numbers are provided, default remaining
+            values to 0; list elements beyond 4 will be ignored
+        :type weights: list(int)
+        :return: None
+
+        """
+        weights = weights + [0, 0, 0, 0] if isinstance(weights, list) \
+            else [100, 0, 0, 0]
+        self.homework_score = weights[0]
+        self.homework_progress = weights[1]
+        self.reading_score = weights[2]
+        self.reading_progress = weights[3]
+        sleep(0.25)
 
     @property
     def status_message(self):
@@ -419,8 +476,7 @@ class SetWeights(Weights):
             raise TutorException("Cannot save weights while they are invalid")
         button = self.find_element(*self._save_button_locator)
         Utility.click_option(self.driver, element=button)
-        self.page.wait.until(
-            lambda _: not bool(self.find_elements(*self._dialog_locator)))
+        self.page.wait.until(expect.staleness_of(self.root))
         return self.page
 
     def cancel(self):
@@ -503,19 +559,49 @@ class ViewWeights(Weights):
 class Scores(TutorBase):
     """The shared scores page elements."""
 
-    _title_locator = (By.CSS_SELECTOR, '.title')
+    _active_button_locator = (By.CSS_SELECTOR, '.active')
     _as_percentage_button_locator = (By.CSS_SELECTOR, '[value=percentage]')
     _as_number_button_locator = (By.CSS_SELECTOR, '[value=number]')
-    _active_button_locator = (By.CSS_SELECTOR, '.active')
-    _export_scores_file_locator = (By.CSS_SELECTOR, '.download')
     _export_message_locator = (By.CSS_SELECTOR, '.scores-export span')
-    _section_tab_locator = (By.CSS_SELECTOR, 'li a')
-
-    _no_data_locator = (By.CSS_SELECTOR, '.no-students p , .no-assignments p')
-    _no_data_link_locator = (By.CSS_SELECTOR, 'a:not([class])')
+    _export_scores_file_locator = (By.CSS_SELECTOR, '.ox-icon-download')
     _no_data_button_locator = (By.CSS_SELECTOR, 'a[class]')
-
+    _no_data_link_locator = (By.CSS_SELECTOR, 'a:not([class])')
+    _no_data_locator = (By.CSS_SELECTOR, '.no-students p , .no-assignments p')
+    _section_tab_locator = (By.CSS_SELECTOR, 'li a')
     _table_root_locator = (By.CSS_SELECTOR, '.scores-table')
+    _title_locator = (By.CSS_SELECTOR, 'h1[class*=Title]')
+    _toast_message_popup_locator = (By.CSS_SELECTOR, '.toast-notification')
+
+    @property
+    def loaded(self) -> bool:
+        """Return True when the scores table is found.
+
+        :return: ``True`` when the score table is loaded.
+        :rtype: bool
+
+        """
+        return bool(self.find_elements(*self._table_root_locator))
+
+    @property
+    def is_teacher(self):
+        """Return True if the current user is an instructor.
+
+        :return: ``True`` if the current user is a teacher and has access to
+            the instructor controls, else ``False``
+        :rtype: bool
+
+        """
+        return 'Student' in self.title
+
+    @property
+    def modal_open(self) -> bool:
+        """Return True if a modal is found open.
+
+        :return: ``True`` if a modal is found
+
+        """
+        return bool(self.driver.execute_script(
+            'return document.querySelectorAll(".modal");'))
 
     @property
     def title(self):
@@ -528,15 +614,25 @@ class Scores(TutorBase):
         return self.find_element(*self._title_locator).text
 
     @property
-    def is_teacher(self):
-        """Return True if the current user is an instructor.
+    def toast_seen(self) -> bool:
+        """Return True if a toast-style popup is seen.
 
-        :return: ``True`` if the current user is a teacher and has access to
-            the instructor controls, else ``False``
+        :return: ``True`` if a toast-style popup message is displayed and then
+            closed
         :rtype: bool
 
         """
-        return 'Student' in self.title
+        try:
+            toast = self.wait.until(
+                expect.presence_of_element_located(
+                    self._toast_message_popup_locator))
+        except TimeoutException:
+            return False
+        try:
+            self.wait.until(expect.staleness_of(toast))
+        except TimeoutException:
+            return False
+        return True
 
     # ---------------------------------------------------- #
     # Controls
@@ -723,7 +819,16 @@ class Scores(TutorBase):
     # Normal Scores
     # ---------------------------------------------------- #
 
-    # TODO
+    @property
+    def table(self):
+        """Access the scores table.
+
+        :return: the scores table
+        :rtype: :py:class:`~pages.tutor.scores.Scores.Table`
+
+        """
+        table_root = self.find_element(*self._table_root_locator)
+        return self.Table(self, table_root)
 
     class Section(Region):
         """A section or period tab."""
@@ -820,7 +925,8 @@ class Scores(TutorBase):
             _reading_progress_locator = (
                 By.CSS_SELECTOR, '.overview-row .reading div:last-child')
             _assignment_locator = (
-                By.CSS_SELECTOR, '[class*="cellGroupW"]:nth-child(2) ')
+                By.CSS_SELECTOR,
+                '[class*="cellGroupW"]:nth-child(2) [role=columnheader]')
 
             @property
             def _overview_root(self):
@@ -924,6 +1030,16 @@ class Scores(TutorBase):
                     return SetWeights(self.page.page, modal_root)
                 return ViewWeights(self.page.page, modal_root)
 
+            def set_weights(self):
+                """Open the weights modal.
+
+                :return: the weights modal
+                :rtype: :py:class:`~pages.tutor.scores.SetWeights` or
+                    :py:class:`~pages.tutor.scores.ViewWeights`
+
+                """
+                return self.view_weights()
+
             @property
             def course_average(self):
                 """Return the current class average.
@@ -932,8 +1048,10 @@ class Scores(TutorBase):
                 :rtype: int or str
 
                 """
-                average = self.find_element(*self._course_average_locator).text
-                return _average_helper(average)
+                average = self.find_elements(*self._course_average_locator)
+                if len(average) > 1:
+                    return _average_helper(average[1].text)
+                return _average_helper(average[0].text)
 
             @property
             def homework_average_score(self):
@@ -1168,6 +1286,8 @@ class Scores(TutorBase):
 
             _name_locator = (By.CSS_SELECTOR, '.-name')
             _student_id_locator = (By.CSS_SELECTOR, '.student-id')
+            _performance_forecast_link_locator = (
+                By.CSS_SELECTOR, 'a.name-cell')
             _course_average_locator = (By.CSS_SELECTOR, '.course')
             _homework_score_locator = (By.CSS_SELECTOR, '.homework .score')
             _homework_progress_locator = (
@@ -1199,6 +1319,21 @@ class Scores(TutorBase):
 
                 """
                 return self.find_element(*self._student_id_locator).text
+
+            def performance_forecast(self) -> PerformanceForecast:
+                """View the performance forecast for the student.
+
+                :return: the performance forecast for the individual student
+                :rtype: :py:class:`~pages.tutor \
+                                   .performance.PerformanceForecast`
+
+                """
+                link = self.find_element(
+                    *self._performance_forecast_link_locator)
+                Utility.click_option(self.driver, element=link)
+                return go_to_(
+                    PerformanceForecast(
+                        self.driver, base_url=self.page.page.base_url))
 
             @property
             def course_average(self):

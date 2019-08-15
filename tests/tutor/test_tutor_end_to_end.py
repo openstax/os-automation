@@ -5,6 +5,7 @@ testing for high priority areas.
 """
 
 from datetime import datetime, timedelta
+from typing import Union
 
 from autochomsky import chomsky
 
@@ -1266,9 +1267,28 @@ def test_student_task_practice(tutor_base_url, selenium, store):
         f'Wrong number of assessment breadcrumbs: {assessments}'
 
 
-'''@test_case('C485042')
+def valid_score(score: Union[str, int]) -> bool:
+    """Return True if the score value is valid.
+
+    .. note:
+
+       for use in scores page tests
+
+    :param score: the score to evaluate
+    :type score: str or int
+    :return: ``True`` if the score value is an expected string or a number
+        between 0 and 100
+    :rtype: bool
+
+    """
+    return (score == '---' or
+            score == 'n/a' or
+            (isinstance(score, int) and score >= 0 and score <= 100))
+
+
+@test_case('C485042')
 @tutor
-def test_teacher_viewing_student_scores(tutor_base_url, selenium, teacher):
+def test_teacher_viewing_student_scores(tutor_base_url, selenium, store):
     """Test an instructor viewing the course scores page.
 
     Review the scores for a student;
@@ -1277,59 +1297,172 @@ def test_teacher_viewing_student_scores(tutor_base_url, selenium, teacher):
     review student work.
 
     """
+    test_data = store.get('C485042')
+    user = test_data.get('username')
+    if '-dev.' in tutor_base_url:
+        password = test_data.get('password_dev')
+    elif '-qa.' in tutor_base_url:
+        password = test_data.get('password_qa')
+    elif '-staging.' in tutor_base_url:
+        password = test_data.get('password_staging')
+    elif 'tutor.' in tutor_base_url:
+        password = test_data.get('password_prod')
+    else:
+        password = test_data.get('password_unique')
+    course_name = test_data.get('course_name')
+    invalid_weights = Utility.summed_list(length=3, total=100) + [50]
+    valid_weights = Utility.summed_list(length=4, total=100)
+
     # GIVEN: a Tutor instructor with a course containing readings, homeworks,
     #        and/or external assignments with at least one student
+    home = TutorHome(selenium, tutor_base_url).open()
+    courses = home.log_in(user, password)
+    calendar = courses.go_to_course(course_name)
 
     # WHEN:  they click on the 'Student Scores' button
+    scores = calendar.banner.student_scores()
 
     # THEN:  the scores page is displayed
     # AND:   the course average, homework score average, homework progress
     #        average, reading score average, reading progress average, and
     #        each assignment are displayed
+    assert(scores.is_displayed()), 'Scores page not displayed'
+    assert('scores' in scores.location), 'Not viewing the scores page'
+
+    course_average = scores.table.heading.course_average
+    homework_score = scores.table.heading.homework_average_score
+    homework_progress = scores.table.heading.homework_average_progress
+    reading_score = scores.table.heading.reading_average_score
+    reading_progress = scores.table.heading.reading_average_progress
+    assert(valid_score(course_average)), \
+        f'Invalid course average: {course_average}'
+    assert(valid_score(homework_score)), \
+        f'Invalid homework score average: {homework_score}'
+    assert(valid_score(homework_progress)), \
+        f'Invalid homework progress average: {homework_progress}'
+    assert(valid_score(reading_score)), \
+        f'Invalid reading score average: {reading_score}'
+    assert(valid_score(reading_progress)), \
+        f'Invalid reading progress average: {reading_progress}'
+    assert(scores.table.heading.assignments), 'No assignment headers found'
 
     # WHEN:  they click the 'Set weights' link
+    previous_course_average = course_average
+    weights = scores.table.heading.set_weights()
 
     # THEN:  the score weights are displayed
+    assert(weights.is_displayed()), 'Set weights modal not displayed'
 
     # WHEN:  they change the weights to not total 100%
+    weights.set(invalid_weights)
 
     # THEN:  an information alert is displayed
+    assert(not weights.weights_are_valid), \
+        f'Weights ({invalid_weights}) not marked as invalid'
 
     # WHEN:  they click the 'Restore default' link
+    weights.restore_default()
 
     # THEN:  the weights are 100%, 0%, 0%, and 0%, respectively
+    assert(weights.homework_score == 100)
+    assert(weights.homework_progress == 0)
+    assert(weights.reading_score == 0)
+    assert(weights.reading_progress == 0)
 
     # WHEN:  they change the weights to equal 100% and click the 'Save' button
+    weights.set(valid_weights)
+    weights.save()
 
     # THEN:  the wights modal is closed and the course average is updated
+    assert(not scores.modal_open), 'Weights modal still open'
+    assert(previous_course_average != scores.table.heading.course_average), \
+        'Course average not updated'
 
     # WHEN:  they click an assignment 'Review' link
+    # expand the window width to render all assignments instead of only the
+    # ones that fit; at [width == 1024] (test default), only the most recent
+    # assignment is in the HTML
+    scores.table.heading.set_weights().restore_default().save()
+    scores.resize_window(width=2300, height=1024)
+    assignments = scores.table.heading.assignments
+    assignment_type = ''
+    while (assignment_type != Tutor.HOMEWORK and
+           assignment_type != Tutor.READING):
+        random = Utility.random(0, len(assignments) - 1)
+        random_assignment = assignments[random]
+        assignment_type = random_assignment.assignment_type
+    assignment_name = random_assignment.name
+    # ### Patch for missing toolbar
+    url = scores.location
+    # ###
+    review = random_assignment.review_assignment()
+    review.resize_window(width=1024, height=768)
 
     # THEN:  the assignment review is displayed
+    assert(review.is_displayed()), 'Review page not displayed'
+    assert('metrics' in review.location), 'Not at the assignment review page'
 
     # WHEN:  they go back to the scores page
     # AND:   click a student name
+    # ### Patch for missing toolbar
+    try:
+        from selenium.common.exceptions import NoSuchElementException
+        scores = review.toolbar.back_to_scores()
+    except NoSuchElementException:
+        from pages.tutor.scores import Scores
+        from utils.utilities import go_to_
+        selenium.get(url)
+        scores = go_to_(Scores(selenium, tutor_base_url))
+    # ###
+
+    students = scores.table.students
+    random_student = students[Utility.random(0, len(students) - 1)]
+    student_name = random_student.name
+    performance = random_student.performance_forecast()
 
     # THEN:  the student's performance forecast is displayed
+    assert(performance.is_displayed()), 'Performance forecast not displayed'
+    assert(student_name in selenium.page_source), \
+        f"Not viewing {student_name}\'s performance forecast"
 
     # WHEN:  they click the 'Back to Scores' button
     # AND:   click a late work arrow
     # AND:   click the 'Accept late score' button
+    scores = performance.back_to_scores()
+
+    students = scores.table.students
+    random_student = students[Utility.random(0, len(students) - 1)]
+    scores.resize_window(width=2300, height=1024)
+    assignments = [assignment
+                   for assignment
+                   in random_student.assignments
+                   if assignment.has_late_work]
+    random = Utility.random(0, len(assignments) - 1)
+    random_assignment = assignments[random]
+    assignment_score = random_assignment.score
+    late_work = random_assignment.view_late_work_tooltip()
+
+    late_work.accept_late_score()
 
     # THEN:  the assignment on time score is replaced by the late work score
+    assert(assignment_score != random_assignment.score), "Score not updated"
 
     # WHEN:  they click the late work arrow
     # AND:   click the 'Use this score' button
+    late_work = random_assignment.view_late_work_tooltip()
+
+    late_work.use_this_score()
 
     # THEN:  the assignment late work score is replaced by the on time score
+    assert(assignment_score == random_assignment.score), \
+        f"{assignment_name}'s score did not revert"
 
     # WHEN:  they click the scores spreadsheet download icon
+    review.resize_window(width=1024, height=768)
+    scores.export()
 
     # THEN:  the spreadsheet is downloaded
-
-    import time
-    time.sleep(5)
-    assert(False), '*** Reached Test End ***'''
+    assert(scores.toast_seen), 'Export toast message not seen'
 
 
 '''@test_case('C485043')
