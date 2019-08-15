@@ -13,7 +13,7 @@ from pages.tutor.course import StudentCourse
 from pages.tutor.enrollment import Enrollment, StudentID
 from pages.tutor.home import TutorHome
 from pages.tutor.task import Homework
-from tests.markers import test_case, tutor
+from tests.markers import nondestructive, test_case, tutor
 from utils import bookterm
 from utils.email import RestMail
 from utils.tutor import States, Tutor
@@ -1297,6 +1297,7 @@ def test_teacher_viewing_student_scores(tutor_base_url, selenium, store):
     review student work.
 
     """
+    # SETUP:
     test_data = store.get('C485042')
     user = test_data.get('username')
     if '-dev.' in tutor_base_url:
@@ -1465,30 +1466,71 @@ def test_teacher_viewing_student_scores(tutor_base_url, selenium, store):
     assert(scores.toast_seen), 'Export toast message not seen'
 
 
-'''@test_case('C485043')
+@test_case('C485043')
 @nondestructive
 @tutor
-def test_student_viewing_student_scores(tutor_base_url, selenium, student):
+def test_student_viewing_student_scores(tutor_base_url, selenium, store):
     """Test a student viewing their scores page."""
+    # SETUP:
+    test_data = store.get('C485043')
+    user = test_data.get('username')
+    if '-dev.' in tutor_base_url:
+        password = test_data.get('password_dev')
+    elif '-qa.' in tutor_base_url:
+        password = test_data.get('password_qa')
+    elif '-staging.' in tutor_base_url:
+        password = test_data.get('password_staging')
+    elif 'tutor.' in tutor_base_url:
+        password = test_data.get('password_prod')
+    else:
+        password = test_data.get('password_unique')
+    course_name = test_data.get('course_name')
+
     # GIVEN: a Tutor student with a reading, homework and external assignment
+    home = TutorHome(selenium, tutor_base_url).open()
+    courses = home.log_in(user, password)
+    # select the course if the student ends up on the course picker
+    if 'dashboard' in courses.location:
+        course = courses.go_to_course(course_name)
+    else:
+        course = courses
 
     # WHEN:  they click on the 'Scores' link in the 'Menu'
+    scores = course.nav.menu.view_student_scores()
 
     # THEN:  the scores page is displayed
     # AND:   a course average, homework score, homework progress, reading
     #        score, reading progress, and each assignment are displayed
+    assert(scores.is_displayed())
+    assert('scores' in scores.location)
 
     # WHEN:  they click the 'View weights' link
+    weights = scores.table.heading.view_weights()
+    homework_score = weights.homework_score
+    homework_progress = weights.homework_progress
+    reading_score = weights.reading_score
+    reading_progress = weights.reading_progress
+    combined = (homework_score + homework_progress +
+                reading_score + reading_progress)
 
     # THEN:  the score weights are displayed
+    assert(weights.is_displayed())
+    assert(valid_score(homework_score)), \
+        f'Invalid homework score value: {homework_score}'
+    assert(valid_score(homework_progress)), \
+        f'Invalid homework progress value: {homework_progress}'
+    assert(valid_score(reading_score)), \
+        f'Invalid reading score value: {reading_score}'
+    assert(valid_score(reading_progress)), \
+        f'Invalid reading progress value: {reading_progress}'
+    assert(combined == 100), \
+        f'Weights do not equal 100 ({combined})'
 
     # WHEN:  they click the 'Close' button
+    weights.close()
 
     # THEN:  the weights modal is closed
-
-    import time
-    time.sleep(5)
-    assert(False), '*** Reached Test End ***'''
+    assert(not weights.is_displayed()), 'Weights are still visible'
 
 
 '''@test_case('C485044')
