@@ -21,10 +21,11 @@ def selenium(request, selenium, pytestconfig):
 
         if pytestconfig.getoption('--print-page-source-on-failure'):
             # print page source on failure
-            print('\n------------------------------- '
+            print('\n------------------------------ '
                   'Begin Page Source '
-                  '-------------------------------'
-                  '** Note: <path>, <script>, & <style> tags stripped **\n\n')
+                  '------------------------------\n'
+                  '             '
+                  '** Note: <path>, <script>, & <style> tags stripped **\n')
             # the page source may be a mess so use a parser to clean it up
             soup = BeautifulSoup(selenium.page_source, 'html5lib')
             [s.extract() for s in soup(['path', 'script', 'style'])]
