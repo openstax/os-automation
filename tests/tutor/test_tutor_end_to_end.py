@@ -569,7 +569,6 @@ def test_assignment_creation_homework(tutor_base_url, selenium, store):
     assignment_name = f'Auto Homework - {Utility.random_hex(5)}'
     description = f'Assignment description for {assignment_name}'
     feedback = [Tutor.DUE_AT, Tutor.IMMEDIATE][Utility.random(0, 1)]
-    sections = Utility.random(2, 3)
     questions_per_section = Utility.random(1, 3)
 
     # GIVEN: a Tutor teacher viewing their course calendar
@@ -600,27 +599,14 @@ def test_assignment_creation_homework(tutor_base_url, selenium, store):
 
     # WHEN:  they fill out the assignment name and description, select a 'Show
     #        feedback' option, and click the '+ Select Problems' button
-    # AND:   select 2-3 sections and click the 'Show Problems' button
+    # AND:   select 1 chapter and click the 'Show Problems' button
+    # AND:   select 1-3 assessments from each available section
     homework.name = assignment_name
     homework.description = description
     homework.feedback = feedback
 
-    problem_selector = homework.add_assessments_by(sections=sections)
+    problem_selector = homework.add_assessments_by(chapters=1)
 
-    # THEN:  the selected section buttons are displayed in the secondary
-    #        toolbar
-    selected_sections = problem_selector.toolbar.sections
-    # may be the number or sections or one less than the number of sections if
-    # an introductory section is included
-    assert(len(selected_sections) == sections - 1 or
-           len(selected_sections) == sections), (
-        'Section selections '
-        '({0}) do not match the expected number of sections ({1} or {2})'
-        .format([section.number for section in selected_sections],
-                sections - 1,
-                sections))
-
-    # WHEN:  they select 1-3 assessments from each available section
     options_selected = 0
     for section in problem_selector.sections:
         for exercise in Utility.sample(section.assessments,
@@ -1533,40 +1519,79 @@ def test_student_viewing_student_scores(tutor_base_url, selenium, store):
     assert(not weights.is_displayed()), 'Weights are still visible'
 
 
-'''@test_case('C485044')
+@test_case('C485044')
 @nondestructive
 @tutor
 def test_teacher_viewing_the_course_performance_forecast(
-        tutor_base_url, selenium, teacher):
+        tutor_base_url, selenium, store):
     """Test an instructor viewing the course performance forecast."""
+    # SETUP:
+    test_data = store.get('C485044')
+    user = test_data.get('username')
+    if '-dev.' in tutor_base_url:
+        password = test_data.get('password_dev')
+    elif '-qa.' in tutor_base_url:
+        password = test_data.get('password_qa')
+    elif '-staging.' in tutor_base_url:
+        password = test_data.get('password_staging')
+    elif 'tutor.' in tutor_base_url:
+        password = test_data.get('password_prod')
+    else:
+        password = test_data.get('password_unique')
+    course_name = test_data.get('course_name')
+
     # GIVEN: a Tutor instructor with a course containing readings, homeworks,
     #        and/or external assignments with at least one student
+    home = TutorHome(selenium, tutor_base_url).open()
+    courses = home.log_in(user, password)
+    calendar = courses.go_to_course(course_name)
 
     # WHEN:  they click on the 'Performance Forecast' button
+    performance = calendar.banner.performance_forecast()
 
     # THEN:  the performance forecast is displayed
     # AND:   each course section tab is available
     # AND:   weaker areas and each chapter are displayed
     # AND:   each chapter and section displayed show a progress bar or 'Not
     #        enough exercises completed' message
+    assert(performance.is_displayed())
 
     import time
     time.sleep(5)
-    assert(False), '*** Reached Test End ***'''
+    # assert(False), '*** Reached Test End ***'''
 
 
-'''@test_case('C485045')
+@test_case('C485045')
 @tutor
 def test_student_viewing_their_performance_forecast(
-        tutor_base_url, selenium, student):
+        tutor_base_url, selenium, store):
     """Test a student using their performance forecast.
 
     View the performance forecast;
     practice a chapter.
 
     """
+    # SETUP:
+    test_data = store.get('C485045')
+    user = test_data.get('username')
+    if '-dev.' in tutor_base_url:
+        password = test_data.get('password_dev')
+    elif '-qa.' in tutor_base_url:
+        password = test_data.get('password_qa')
+    elif '-staging.' in tutor_base_url:
+        password = test_data.get('password_staging')
+    elif 'tutor.' in tutor_base_url:
+        password = test_data.get('password_prod')
+    else:
+        password = test_data.get('password_unique')
+
     # GIVEN: a Tutor student enrolled in a course with at least one completed
     #        reading or homework
+    home = TutorHome(selenium, tutor_base_url).open()
+    home.log_in(user, password)
+    # only one course means the student bypasses the course picker
+    this_week = go_to_(StudentCourse(selenium, tutor_base_url))
+    this_week.clear_training_wheels()
 
     # WHEN:  they click the 'Performance Forecast' link in the 'Menu'
 
@@ -1579,4 +1604,4 @@ def test_student_viewing_their_performance_forecast(
 
     import time
     time.sleep(5)
-    assert(False), '*** Reached Test End ***'''
+    # assert(False), '*** Reached Test End ***'''

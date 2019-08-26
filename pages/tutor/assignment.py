@@ -328,25 +328,40 @@ class OpenToClose(Region):
         :return: None
 
         """
-        # from selenium.common.exceptions import StaleElementReferenceException
         if not value:
             # No value was given so skip over the field (generally time values)
             return
         if 'time' in send_field:
-            self.driver.execute_script(f'arguments[0].value= "";',
+            self.driver.execute_script('arguments[0].value= "";',
                                        self.find_element(*selector))
+            hour, minute, ampm = value.split(':')
+            sleep(0.25)
+            # set hour
+            time_set = [Keys.ARROW_LEFT] * 2
+            for _ in range(int(hour)):
+                time_set = time_set + [Keys.ARROW_UP]
+            # set minute
+            time_set = time_set + [Keys.ARROW_RIGHT]
+            for _ in range(int(minute)):
+                time_set = time_set + [Keys.ARROW_UP]
+            time_set = time_set + [Keys.ARROW_UP]
+            # set am/pm
+            time_set = time_set + [Keys.ARROW_RIGHT]
+            time_set = time_set + ([Keys.ARROW_UP] if 'am' in ampm.lower() else
+                                   [Keys.ARROW_DOWN])
         else:
             old_value = self.find_element(*selector).get_attribute('value')
             clear = ([Keys.BACKSPACE] * len(old_value) +
                      [Keys.DELETE] * len(old_value))
         Utility.click_option(self.driver, element=self.find_element(*selector))
-
+        sleep(0.25)
         if 'time' not in send_field:
             self.find_element(*selector).send_keys(clear)
             sleep(0.25)
-
-        for ch in value:
-            self.find_element(*selector).send_keys(ch)
+            for ch in value:
+                self.find_element(*selector).send_keys(ch)
+        else:
+            self.find_element(*selector).send_keys(time_set)
         sleep(0.25)
 
 

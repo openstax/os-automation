@@ -536,8 +536,8 @@ class Calendar(TutorBase):
             """
             button = self.find_element(*self._performance_forecast_locator)
             Utility.click_option(self.driver, element=button)
-            from pages.tutor.performance import Performance
-            return go_to_(Performance(self.driver, self.page.base_url))
+            from pages.tutor.performance import PerformanceForecast
+            return go_to_(PerformanceForecast(self.driver, self.page.base_url))
 
         def student_scores(self):
             """Click on the 'Student Scores' button.
