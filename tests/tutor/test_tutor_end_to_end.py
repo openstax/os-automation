@@ -341,7 +341,7 @@ def test_course_registration_and_initial_assignment_creation_timing(
         production_payments = True
     _, first_name, last_name, suffix = Utility.random_name()
     email = RestMail(
-        f"{first_name}.{last_name}.{Utility.random_hex(3)}".lower())
+        f"{first_name}.{last_name}.{Utility.random_hex(4)}".lower())
     email.empty()
     password = Utility.random_hex(8)
     school = 'Automation'
@@ -1041,7 +1041,7 @@ def test_student_task_homework_assignment(tutor_base_url, selenium, store):
         assignment_url = test_data.get('assignment_url_unique')
     _, first_name, last_name, suffix = Utility.random_name()
     email = RestMail(
-        f"{first_name}.{last_name}.{Utility.random_hex(3)}".lower())
+        f"{first_name}.{last_name}.{Utility.random_hex(5)}".lower())
     email.empty()
     password = Utility.random_hex(8)
     school = 'Automation'
@@ -1539,6 +1539,7 @@ def test_teacher_viewing_the_course_performance_forecast(
     else:
         password = test_data.get('password_unique')
     course_name = test_data.get('course_name')
+    sections = test_data.get('sections')
 
     # GIVEN: a Tutor instructor with a course containing readings, homeworks,
     #        and/or external assignments with at least one student
@@ -1555,10 +1556,28 @@ def test_teacher_viewing_the_course_performance_forecast(
     # AND:   each chapter and section displayed show a progress bar or 'Not
     #        enough exercises completed' message
     assert(performance.is_displayed())
+    assert('guide' in performance.location)
 
-    import time
-    time.sleep(5)
-    # assert(False), '*** Reached Test End ***'''
+    assert(len(performance.section_tabs) == sections), \
+        'Expected {course_sections} sections, found {sections}'.format(
+            course_sections=sections,
+            sections=[section.name for section in performance.section_tabs])
+
+    assert(not performance.no_data), 'No course performance found'
+    assert(performance.forecast.weakest.lack_data or
+           performance.forecast.weakest.sections), \
+        'Weaker Areas pane not found'
+
+    for chapter in performance.forecast.chapters:
+        assert(chapter.chapter.number)
+        assert(chapter.chapter.title)
+        assert(chapter.chapter.progress)
+        assert(chapter.chapter.count)
+        for section in chapter.sections:
+            assert(section.number)
+            assert(section.title)
+            assert(section.progress)
+            assert(section.count)
 
 
 @test_case('C485045')
@@ -1584,6 +1603,7 @@ def test_student_viewing_their_performance_forecast(
         password = test_data.get('password_prod')
     else:
         password = test_data.get('password_unique')
+    book = bookterm.Biology2e()
 
     # GIVEN: a Tutor student enrolled in a course with at least one completed
     #        reading or homework
@@ -1594,14 +1614,66 @@ def test_student_viewing_their_performance_forecast(
     this_week.clear_training_wheels()
 
     # WHEN:  they click the 'Performance Forecast' link in the 'Menu'
+    performance = this_week.nav.menu.view_the_performance_forecast()
 
     # THEN:  the performance forecast is displayed
+    # AND:   each chapter and section displayed show a progress bar or 'Not
+    #        enough exercises completed' message
+    assert(performance.is_displayed()), \
+        'Not viewing the student performance forecast'
+    assert('guide' in performance.location)
+
+    for chapter in performance.forecast.chapters:
+        assert(chapter.chapter.number)
+        assert(chapter.chapter.title)
+        assert(chapter.chapter.progress)
+        assert(chapter.chapter.count)
+        for section in chapter.sections:
+            assert(section.number)
+            assert(section.title)
+            assert(section.progress)
+            assert(section.count)
 
     # WHEN:  they click a chapter progress bar or chapter 'Pracitce more to
     #        get forecast' button
+    options = performance.forecast.chapters
+    practice = options[Utility.random(0, len(options) - 1)].chapter.practice()
 
     # THEN:  a practice session is loaded for the selected chapter
+    url = practice.location
+    assert('task' in url or 'practice' in url), \
+        f'Practice session not started: {url}'
+    title = practice.footer.title
+    assert(title == 'Practice'), f'Wrong title found: {title}'
+    assessments = practice.exercises
+    assert(assessments >= 1 and assessments <= 5), \
+        f'Wrong number of assessment breadcrumbs: {assessments}'
 
-    import time
-    time.sleep(5)
-    # assert(False), '*** Reached Test End ***'''
+    # WHEN:  they answer all questions
+    while not practice.body.assignment_complete:
+        if practice.body.is_interstitial or practice.body.has_correct_answer:
+            practice.body._continue()
+        elif practice.body.is_multiple_choice:
+            practice.body.pane.random_answer()
+            practice.body.pane.answer()
+            practice.body.pane._continue()
+        elif practice.body.is_free_response:
+            practice.body.pane.free_response = (
+                book.get_term(practice.body.pane.chapter_section)[1])
+            practice.body.pane.answer()
+            practice.body.pane.random_answer()
+            practice.body.pane.answer()
+            practice.body.pane._continue()
+
+    # THEN:  the 'You are done.' card is displayed
+    assert('You are done.' in selenium.page_source)
+
+    # WHEN:  they click the 'Back to Performance Forecast' button
+    performance = practice.body.back_to_performance_forecast()
+    performance.reload()
+    performance.clear_training_wheels()
+
+    # THEN:  the student dashboard is displayed
+    assert(performance.is_displayed()), \
+        'Not viewing the student performance forecast'
+    assert('guide' in performance.location)

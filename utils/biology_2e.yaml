@@ -588,6 +588,10 @@
 14.2:
   electrophoresis: "technique used to separate DNA fragments according to size"
   gel electrophoresis: "a laboratory method used to separate mixtures of DNA, RNA, or proteins according to molecular size"
+14.3:
+  conservative model: "the parental DNA remains together and the newly formed daughter strands are together"
+  semi-conservative model: "each of the two parental DNA strands acts as a template for new DNA to be synthesized; after replication, each double-stranded DNA includes one parental or “old” strand and one “new” strand"
+  dispersive model: "both copies of DNA have double-stranded segments of parental DNA and newly synthesized DNA interspersed"
 14.4:
   helicase: "during replication, this enzyme helps to open up the DNA helix by breaking the hydrogen bonds"
   lagging strand: "during replication, the strand that is replicated in short fragments and away from the replication fork"
