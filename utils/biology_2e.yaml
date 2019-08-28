@@ -1049,6 +1049,9 @@
   plankton: "diverse group of mostly microscopic organisms that drift in marine and freshwater systems and serve as a food source for larger aquatic organisms"
   raphe: "slit in the silica shell of diatoms through which the protist secretes a stream of mucopolysaccharides for locomotion and attachment to substrates"
   test: "porous shell of a foram that is built from various organic materials and typically hardened with calcium carbonate"
+23.4:
+  pathogen: "a bacterium, virus, or other microorganism that can cause disease"
+  protist: "any eukaryotic organism that is not an animal, plant or fungus; they do not form a natural group, or clade, since they exclude certain eukaryotes, but are often grouped together for convenience"
 24.1:
   coenocytic hypha: "single hypha that lacks septa and contains many nuclei"
   conidiospore: "unicellular or multicellular spores that are released directly from the tip or side of the hypha"
@@ -1102,6 +1105,8 @@
   mycosis: "fungal infection"
   mycotoxicosis: "poisoning by a fungal toxin released in food"
   parasitism: "symbiotic relationship in which one member of the association benefits at the expense of the other"
+24.5:
+  importance in human life: "ecosystem decomposers, plant and human nutrition, fermentation, and as metabolites"
 25.1:
   antheridium: "male gametangium"
   archegonium: "female gametangium"
@@ -1123,6 +1128,9 @@
   non-vascular plant: "plant that lacks vascular tissue, which is formed of specialized cells for the transport of water and nutrients"
   sporocyte: "diploid cell that produces spores by meiosis"
   sporopollenin: "tough polymer surrounding the spore"
+  streptophytes: "group that includes green algae and land plants"
+25.2:
+  charophyte: "other term for green algae; considered the closest relative of land plants"
   streptophytes: "group that includes green algae and land plants"
 25.3:
   bryophytes: "the closest extant relatives of early terrestrial plants"
