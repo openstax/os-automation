@@ -57,9 +57,7 @@ class Assignment(Region):
         """Return the assignment plan element.
 
         :return: the assignment plan
-        :rtype:
-            :py:class:
-            `selenium.webdriver.remote.webelement.WebElement`
+        :rtype: :py:class:`selenium.webdriver.remote.webelement.WebElement`
 
         """
         return self.find_element(*self._plan_locator)
