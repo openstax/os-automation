@@ -677,15 +677,16 @@ class Reading(Assignment):
             -> Union[Reading, Reading.Highlights, Reading.Milestones]:
         """Toggle the highlighting or milestone summary page.
 
-        Possible outcomes:
-        |--------------------+-----------------------------------|
-        |                    |              Toggle:              |
-        | Currently Showing: | Highlights      | Milestones      |
-        |--------------------+-----------------+-----------------|
-        | Reading            | show highlights | show milestones |
-        | Highlight Summary  | show reading    | show milestones |
-        | Milestones         | show highlights | show reading    |
-        |--------------------+-----------------+-----------------|
+        .. Possible outcomes:
+
+           |--------------------+-----------------------------------|
+           |                    |              Toggle:              |
+           | Currently Showing: | Highlights      | Milestones      |
+           |--------------------+-----------------+-----------------|
+           | Reading            | show highlights | show milestones |
+           | Highlight Summary  | show reading    | show milestones |
+           | Milestones         | show highlights | show reading    |
+           |--------------------+-----------------+-----------------|
 
         :param bool milestones: (optional) use the milestone selector instead
             of the highlighting selector, returning the milestone chart
@@ -1383,8 +1384,8 @@ class Reading(Assignment):
 
             :return: the list of milestones reached within the reading
                 assignment
-            :rtype: list(:py:class:`~pages.tutor.task.Reading \
-                                    .Milestones.Milestone`)
+            :rtype: \
+                list(:py:class:`~pages.tutor.task.Reading.Milestones.Milestone`)
 
             """
             return [self.Milestone(self, card)
@@ -1406,7 +1407,7 @@ class Reading(Assignment):
 
                 :return: the milestone card's index within the assignment
                     starting from zero (0)
-                rtype: int
+                :rtype: int
 
                 """
                 return int(self.root.get_attribute('data-step-index'))

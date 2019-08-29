@@ -123,3 +123,70 @@ If you need to run all the tests in the framework you can simply leave off the
 
    pytest -n 4 --driver Chrome --headless     # All tests w/ Chrome, 4 processes, hidden, on qa
    pytest --driver Firefox --instance prod    # All tests w/ Firefox sequentially on production
+
+How to run tests using Docker
+-----------------------------
+
+Install Docker and Docker Compose
+=================================
+
+1. Follow the instructions to install `Docker <https://docs.docker.com/install/>`_
+2. Follow the instructions to install `Docker Compose <https://docs.docker.com/compose/install/>`_
+
+First run
+=========
+
+If you have a freshly cloned repository ignore this step.
+
+If you have run this repo without docker you need to clean up prebuild ``.pyc`` files:
+
+.. code-block:: bash
+
+   make clean
+
+Run Docker Compose
+==================
+
+.. code-block:: bash
+
+   docker-compose up -d selenium-chrome
+
+Execute the tests
+=================
+
+.. code-block:: bash
+
+   docker-compose exec selenium-chrome pytest
+
+.. seealso::
+
+   The above sections in :ref:`run_tests` show the various ways to run the
+   tests. Adapt the commands after the ``pytest`` command to target tests
+   to a specific system and instance.
+
+View the browser
+================
+
+List the docker containers to find the one for selenium-chrome
+
+.. code-block:: bash
+
+   docker container ls
+
+A table will be displayed with column names. Find the one labeled ``PORTS``
+
+.. code-block:: bash
+
+   PORTS
+   4444/tcp, 0.0.0.0:32778->5900/tcp
+
+Use a `VNC application <https://www.realvnc.com/en/connect/download/viewer/macos/>`_
+to connect to ``0.0.0.0:32778``. The port number ``32778`` may be different.
+
+Execute the tests as described above.
+
+Switch over to the VNC window and connect to the address.
+
+Enter ``test:test`` as the username and password.
+
+Watch as you see your tests running inside a container!

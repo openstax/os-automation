@@ -501,8 +501,8 @@ class NewCourse(CloneCourse):
             r"""Access the course book options.
 
             :return: the list of available books
-            :rtype: list(:py:class:`~pages.tutor.new_course \
-                                    .NewCourse.Course.Book)
+            :rtype: \
+                list(:py:class:`~pages.tutor.new_course.NewCourse.Course.Book`)
 
             """
             return [self.Book(self, option)
