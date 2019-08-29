@@ -459,8 +459,7 @@ def test_assignment_creation_readings(tutor_base_url, selenium, store):
     today = datetime.now()
     tomorrow = today + timedelta(days=1)
     dates_and_times = {Tutor.ALL: (today, (tomorrow, '1200p')), }
-    chapters = [1, None][Utility.random(0, 1)]
-    sections = Utility.random(2, 6)
+    chapters = 1
 
     # GIVEN: a Tutor teacher viewing their course calendar
     home = TutorHome(selenium, tutor_base_url).open()
@@ -487,14 +486,17 @@ def test_assignment_creation_readings(tutor_base_url, selenium, store):
     # Using the internal function to exercise both chapter and section options
     # either select 1 random chapter, or, when ``chapters == None``, select
     # between 2 and 6, inclusive, random, sequential book sections
-    group = assignment.add_readings_by(chapters=chapters, sections=sections)
+    # Patch: select one chapter because of the switch to baked books added
+    #        a slew of unnumbered sections at the end of each chapter making
+    #        section selection more difficult
+    group = assignment.add_readings_by(chapters=chapters)
 
     # THEN:  the selected readings should be displayed under the currently
     #        selected table
     sections_selected = [section.number
                          for section
                          in assignment.reading_list]
-    assert(len(group) == (chapters or sections))
+    assert(len(group) == chapters)
     if chapters:
         chapter = group[0].split('.')[0]
         for section in sections_selected:

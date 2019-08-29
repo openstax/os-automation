@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from time import sleep
+
 from pypom import Region
 from selenium.common.exceptions import NoSuchElementException
 from selenium.webdriver.common.by import By
@@ -162,6 +164,8 @@ class Dashboard(TutorBase):
             or current course exists or if a course does not match ``name``
 
         """
+        if self.is_safari:
+            sleep(2)
         # Look through current courses first
         try:
             for course in self.current_courses.courses:

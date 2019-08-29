@@ -83,6 +83,12 @@ class Utility(object):
                 .key_up(special) \
                 .send_keys(Keys.DELETE) \
                 .perform()
+        else:
+            clear = []
+            for _ in range(len(field.get_attribute('value'))):
+                clear.append(Keys.DELETE)
+                clear.append(Keys.BACKSPACE)
+            field.send_keys(clear)
 
     @classmethod
     def click_option(cls, driver, locator=None, element=None,
