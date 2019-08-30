@@ -26,7 +26,7 @@ from pages.tutor.reference import ReferenceBook
 from pages.tutor.settings import CourseSettings
 from regions.tutor.assessment import Assessment
 from utils.tutor import Tutor, TutorException, get_date_times
-from utils.utilities import Utility, go_to_
+from utils.utilities import Actions, Utility, go_to_
 
 Selector = Tuple[By, str]
 
@@ -232,6 +232,12 @@ class OpenToClose(Region):
     _calendar_day_selector = (
         '[aria-label="day-{day}"]:not([class*="--outside-month"])')
 
+    INCREASE = [Keys.ARROW_UP]
+    DECREASE = [Keys.ARROW_DOWN]
+    SHIFT_LEFT = [Keys.ARROW_LEFT]
+    SHIFT_RIGHT = [Keys.ARROW_RIGHT]
+    NEXT_FIELD = [Keys.TAB]
+
     @property
     def name(self) -> str:
         """Return the section name.
@@ -343,29 +349,53 @@ class OpenToClose(Region):
             return
 
         if 'time' in send_field:
-            self.driver.execute_script('arguments[0].value= "";',
-                                       self.find_element(*selector))
-            hour, minute, ampm = value.split(':')
+            initial_time = self.find_element(*selector).get_attribute('value')
+            try:  # Chrome and Firefox use 24H times
+                current_time = datetime.strptime(initial_time, '%H:%M')
+            except ValueError:  # Safari uses 12H times
+                current_time = datetime.strptime(initial_time, '%I:%M %p')
+            standardized_time = current_time.strftime('%I:%M:%p')
+
+            current_hour, current_minute, current_ampm = \
+                standardized_time.split(':')
+            target_hour, target_minute, target_ampm = value.split(':')
+            hour = int(target_hour) - int(current_hour)
+            minute = int(target_minute) - int(current_minute)
+            ampm = self.INCREASE \
+                if target_ampm.lower() != current_ampm.lower() else []
+
             sleep(0.25)
             # set hour
-            time_set = [Keys.ARROW_LEFT] * 2
-            for _ in range(int(hour)):
-                time_set = time_set + [Keys.ARROW_UP]
+            time_set = self.SHIFT_LEFT * 2
+            for _ in range(min(hour, 0), max(hour, 0), 1):
+                time_set += self.INCREASE if hour > 0 else self.DECREASE
             # set minute
-            time_set = time_set + [Keys.ARROW_RIGHT]
-            for _ in range(int(minute)):
-                time_set = time_set + [Keys.ARROW_UP]
-            time_set = time_set + [Keys.ARROW_UP]
+            time_set += self.SHIFT_RIGHT
+            for _ in range(min(minute, 0), max(minute, 0), 1):
+                time_set += self.INCREASE if minute > 0 else self.DECREASE
             # set am/pm
-            time_set = time_set + [Keys.ARROW_RIGHT]
-            time_set = time_set + ([Keys.ARROW_UP] if 'am' in ampm.lower() else
-                                   [Keys.ARROW_DOWN])
+            time_set += self.SHIFT_RIGHT + ampm
 
         Utility.click_option(self.driver, element=self.find_element(*selector))
         sleep(0.25)
 
         if 'time' in send_field:
-            self.find_element(*selector).send_keys(time_set)
+            if 'firefox' in self.driver.capabilities.get('browserName') \
+                    .lower():
+                Actions(self.driver) \
+                    .move_to_element(self.find_element(*selector)) \
+                    .click() \
+                    .send_keys(self.SHIFT_LEFT * 2) \
+                    .send_keys(f'{target_hour:0>2}') \
+                    .send_keys(f'{target_minute:0>2}') \
+                    .send_keys(target_ampm[0]) \
+                    .send_keys(self.NEXT_FIELD) \
+                    .perform()
+                sleep(0.5)
+            else:
+                time = self.find_element(*selector)
+                for ch in time_set:
+                    time.send_keys(ch)
         else:
             current_calendar = datetime.strptime(self.find_element(
                 *self._date_picker_current_month_locator).text, '%B %Y')
