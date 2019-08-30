@@ -9,6 +9,7 @@ Add/Edit/Delete Reading
 
 from __future__ import annotations
 
+from datetime import datetime
 from time import sleep
 from typing import Dict, List, Tuple, Union
 
@@ -221,6 +222,15 @@ class OpenToClose(Region):
         By.CSS_SELECTOR, '[id*="due-date"]')
     _due_time_locator = (
         By.CSS_SELECTOR, '[id*="due-time"]')
+    _previous_month_arrow_locator = (
+        By.CSS_SELECTOR, '.react-datepicker__navigation--previous')
+    _date_picker_current_month_locator = (
+        By.CSS_SELECTOR, '.react-datepicker__current-month')
+    _next_month_arrow_locator = (
+        By.CSS_SELECTOR, '.react-datepicker__navigation--next')
+
+    _calendar_day_selector = (
+        '[aria-label="day-{day}"]:not([class*="--outside-month"])')
 
     @property
     def name(self) -> str:
@@ -331,6 +341,7 @@ class OpenToClose(Region):
         if not value:
             # No value was given so skip over the field (generally time values)
             return
+
         if 'time' in send_field:
             self.driver.execute_script('arguments[0].value= "";',
                                        self.find_element(*selector))
@@ -349,19 +360,29 @@ class OpenToClose(Region):
             time_set = time_set + [Keys.ARROW_RIGHT]
             time_set = time_set + ([Keys.ARROW_UP] if 'am' in ampm.lower() else
                                    [Keys.ARROW_DOWN])
-        else:
-            old_value = self.find_element(*selector).get_attribute('value')
-            clear = ([Keys.BACKSPACE] * len(old_value) +
-                     [Keys.DELETE] * len(old_value))
+
         Utility.click_option(self.driver, element=self.find_element(*selector))
         sleep(0.25)
-        if 'time' not in send_field:
-            self.find_element(*selector).send_keys(clear)
-            sleep(0.25)
-            for ch in value:
-                self.find_element(*selector).send_keys(ch)
-        else:
+
+        if 'time' in send_field:
             self.find_element(*selector).send_keys(time_set)
+        else:
+            current_calendar = datetime.strptime(self.find_element(
+                *self._date_picker_current_month_locator).text, '%B %Y')
+            current_month = current_calendar.year * 12 + current_calendar.month
+            target = datetime.strptime(value, '%m/%d/%Y')
+            target_month = target.year * 12 + target.month
+            change = target_month - current_month
+            work = (min(change, 0), max(change, 0), 1)
+            for x in range(*work):
+                Utility.click_option(self.driver, element=self.find_element(*(
+                    self._previous_month_arrow_locator if x < 0 else
+                    self._next_month_arrow_locator)))
+                sleep(0.25)
+            Utility.click_option(self.driver, element=self.find_element(
+                By.CSS_SELECTOR,
+                self._calendar_day_selector.format(day=target.day)))
+
         sleep(0.25)
 
 
