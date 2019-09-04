@@ -1,0 +1,45 @@
+version: 2
+jobs:
+  test-web:
+    docker:
+      - image: openstax/selenium-chrome-debug:3.141.59
+    parallelism: 2
+    steps:
+      - checkout
+      - restore_cache:
+            key: deps1-{{ .Branch }}-{{ checksum "requirements.txt" }}
+      - run:
+          name: Install Python deps in a venv
+          command: make install
+      - save_cache:
+          key: deps1-{{ .Branch }}-{{ checksum "requirements.txt" }}
+          paths:
+            - ".venv"
+      - run:
+          name: start selenium server via entrypoint
+          command: /opt/bin/entry_point.sh
+          background: true
+      - run:
+          name: install pytest-circleci-parallelized
+          command: |
+            . .venv/bin/activate
+            pip install pytest-circleci-parallelized
+      - run:
+          name: run tests for webview
+          command: |
+            . .venv/bin/activate
+            pytest -n 2 --driver chrome --instance staging --systems web --strip-flake --skip-social --circleci-parallelize --junitxml=/tmp/test-reports/junit.xml
+      - store_artifacts:
+          path: /tmp/test-reports/junit.xml
+          destination: test-reports
+      - store_artifacts:
+          path: report.html
+          destination: test-reports
+      - store_test_results:
+          path: /tmp/test-reports
+          test-webview:
+workflows:
+  version: 2
+  os-automation-tests:
+    jobs:
+      - test-web
