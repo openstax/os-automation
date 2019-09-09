@@ -94,7 +94,7 @@ class TutorShared(Page):
             self.wait_for_page_to_load()
         except StaleElementReferenceException:
             pass
-        sleep(1.0)
+        sleep(3.0)
         return self
 
     def back(self) -> TutorShared:

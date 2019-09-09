@@ -824,7 +824,7 @@ class CourseSettings(TutorBase):
             :rtype: str
 
             """
-            return self.find_element(*self._timezone_locator).text
+            return self.find_element(*self._timezone_locator).text.strip()
 
         def edit_timezone(self):
             """Click on the edit icon nex to the course timezone.

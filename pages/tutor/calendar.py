@@ -23,9 +23,9 @@ class Assignment(Region):
     """An individual student assignment or event."""
 
     _plan_locator = (By.CSS_SELECTOR, '.plan')
-    _title_locator = (By.CSS_SELECTOR, '[data-opens-at]')
+    _title_locator = (By.CSS_SELECTOR, 'label')
     _edit_draft_locator = (By.CSS_SELECTOR, 'a')
-    _flagged_assignment_locator = (By.CSS_SELECTOR, '[data-opens-at] svg')
+    _flagged_assignment_locator = (By.CSS_SELECTOR, 'label svg')
 
     @property
     def style(self):

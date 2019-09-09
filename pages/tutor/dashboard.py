@@ -84,6 +84,8 @@ class Dashboard(TutorBase):
         :rtype: :py:class:`~pages.tutor.new_course.NewCourse`
 
         """
+        if self.is_safari:
+            sleep(2.5)
         tile = self.find_elements(*self._create_tile_locator)
         assert(tile), (
             "Create a course tile not found - "

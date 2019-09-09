@@ -1321,7 +1321,7 @@ class Scores(TutorBase):
                 return self.find_element(*self._student_id_locator).text
 
             def performance_forecast(self) -> PerformanceForecast:
-                """View the performance forecast for the student.
+                r"""View the performance forecast for the student.
 
                 :return: the performance forecast for the individual student
                 :rtype: :py:class:`~pages.tutor \

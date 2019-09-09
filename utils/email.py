@@ -209,6 +209,7 @@ class GmailReader(object):
                        an error occurred or None
         Raises:
             googleapiclient.errors.HttpError
+
         """
         if exception:
             print('{id} blew up! {ex}'.format(request_id, exception))

@@ -407,6 +407,22 @@ class QuestionBase(Region):
         """
         return self.find_element(*self._question_answer_button_locator)
 
+    @property
+    def nudge(self) -> str:
+        """Return the nudge or an empty string if no nudge message exists.
+
+        :return: the nudge text or an empty string if no nudge exists
+        :rtype: str
+
+        """
+        try:
+            return ' '.join([message.get_attribute('textContent')
+                            for message
+                            in self.find_elements(
+                                *self._nudge_message_locator)])
+        except NoSuchElementException:
+            return ''
+
     def answer(self, multipart: bool = False) -> None:
         """Click the 'Answer' button.
 
@@ -416,17 +432,22 @@ class QuestionBase(Region):
 
         """
         sleep(0.33)
-        answer_button = self.answer_button
-        Utility.click_option(self.driver, element=answer_button)
+        # answer_button = self.answer_button
+        Utility.click_option(self.driver, element=self.answer_button)
         if not multipart:
             sleep(1)
-            try:
-                self.wait.until(lambda _: (
-                    'Re-' not in answer_button.get_attribute('textContent') or
-                    'Continue' not
-                    in answer_button.get_attribute('textContent')))
-            except StaleElementReferenceException:
-                pass
+            browser = self.driver.capabilities.get('browserName').lower()
+            if browser == 'safari':
+                sleep(3)
+            else:
+                try:
+                    self.wait.until(lambda _: (
+                        'Re-' not
+                        in self.answer_button.get_attribute('textContent') or
+                        'Continue' not
+                        in self.answer_button.get_attribute('textContent')))
+                except StaleElementReferenceException:
+                    pass
         else:
             sleep(1.5)
         sleep(1)
@@ -570,18 +591,6 @@ class FreeResponse(QuestionBase):
             box = self.find_element(*self._free_response_box_locator)
             box.send_keys(answer)
         sleep(0.33)
-
-    @property
-    def nudge(self) -> str:
-        """Return the answer validation nudge message.
-
-        :return: the answer validation nudge message or an empty string
-        :rtype: str
-
-        """
-        return ' '.join([message.get_attribute('textContent')
-                        for message
-                        in self.find_elements(*self._nudge_message_locator)])
 
     def reanswer(self) -> None:
         """Click the 'Reanswer' button.

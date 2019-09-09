@@ -10,7 +10,7 @@ from typing import Union
 from autochomsky import chomsky
 
 from pages.tutor.course import StudentCourse
-from pages.tutor.enrollment import Enrollment, StudentID
+from pages.tutor.enrollment import Enrollment
 from pages.tutor.home import TutorHome
 from pages.tutor.task import Homework
 from tests.markers import nondestructive, test_case, tutor
@@ -371,7 +371,7 @@ def test_course_registration_and_initial_assignment_creation_timing(
 
     signup = enrollment.get_started()
 
-    signup.account_signup(
+    privacy = signup.account_signup(
         destination=tutor_base_url,
         email=email.address,
         name=['', first_name, last_name, suffix],
@@ -379,11 +379,9 @@ def test_course_registration_and_initial_assignment_creation_timing(
         school=school,
         tutor=True)
 
-    identification = StudentID(selenium, tutor_base_url)
+    identification = privacy.i_agree()
     identification.student_id = student_id
-    privacy = identification._continue()
-
-    buy_access = privacy.i_agree()
+    buy_access = identification._continue()
 
     if production_payments:
         free_trial = buy_access.try_free()
@@ -853,23 +851,29 @@ def test_student_task_reading_assignment(tutor_base_url, selenium, store):
     assignment_name = test_data.get('assignment_name')
     annotation_text = chomsky()
     free_response_giberish = Utility.random_hex(30)
+    # muck up the valid math number by adding spaces to force verification
+    random_string = 'abcdefghijklmnopqrstuvwxyz      '
+    options = len(random_string)
+    free_response_giberish = ''
+    for _ in range(30):
+        free_response_giberish += random_string[Utility.random(0, options - 1)]
+    # end muck up
     book = bookterm.CollegePhysics()
 
     # GIVEN: a Tutor student enrolled in a course with a reading assignment
     selenium.get(enrollment_url)
     enrollment = Enrollment(selenium, tutor_base_url)
     signup = enrollment.get_started()
-    signup.account_signup(
+    privacy = signup.account_signup(
         destination=tutor_base_url,
         email=email.address,
         name=['', first_name, last_name, suffix],
         password=password,
         school=school,
         tutor=True)
-    identification = StudentID(selenium, tutor_base_url)
+    identification = privacy.i_agree()
     identification.student_id = student_id
-    privacy = identification._continue()
-    course_page = privacy.i_agree()
+    course_page = identification._continue()
     course_page.clear_training_wheels()
     course_page.wait_for_assignments()
     course_page.clear_training_wheels()
@@ -889,10 +893,11 @@ def test_student_task_reading_assignment(tutor_base_url, selenium, store):
 
     # WHEN:  they select a section of text
     # AND:   click the highlighter icon
+    Utility.scroll_to(selenium, element=reading.body.paragraphs[0], shift=-250)
     Actions(selenium) \
         .move_to_element(reading.body.paragraphs[0]) \
         .click_and_hold() \
-        .move_by_offset(Utility.random(-20, 20) * 10 + 5, 0) \
+        .move_by_offset(Utility.random(-20, 20) * 5 + 5, 0) \
         .release() \
         .perform()
 
@@ -905,6 +910,7 @@ def test_student_task_reading_assignment(tutor_base_url, selenium, store):
     # WHEN:  they select a different section of text
     # AND:   click the speech bubble icon
     # AND:   enter text in the annotation box and click the check mark button
+    Utility.scroll_to(selenium, element=reading.body.paragraphs[1], shift=-250)
     Actions(selenium) \
         .move_to_element(reading.body.paragraphs[1]) \
         .click_and_hold() \
@@ -1055,17 +1061,16 @@ def test_student_task_homework_assignment(tutor_base_url, selenium, store):
     selenium.get(enrollment_url)
     enrollment = Enrollment(selenium, tutor_base_url)
     signup = enrollment.get_started()
-    signup.account_signup(
+    privacy = signup.account_signup(
         destination=tutor_base_url,
         email=email.address,
         name=['', first_name, last_name, suffix],
         password=password,
         school=school,
         tutor=True)
-    identification = StudentID(selenium, tutor_base_url)
+    identification = privacy.i_agree()
     identification.student_id = student_id
-    privacy = identification._continue()
-    course_page = privacy.i_agree()
+    course_page = identification._continue()
     course_page.clear_training_wheels()
     course_page.wait_for_assignments()
     course_page.clear_training_wheels()

@@ -1052,6 +1052,10 @@
 23.4:
   pathogen: "a bacterium, virus, or other microorganism that can cause disease"
   protist: "any eukaryotic organism that is not an animal, plant or fungus; they do not form a natural group, or clade, since they exclude certain eukaryotes, but are often grouped together for convenience"
+24:
+  fungus: any member of the group of eukaryotic organisms that includes microorganisms such as yeasts and molds, as well as the more familiar mushrooms
+  mycorrhizae: a symbiotic association between a fungus and a plant
+  spore: a reproductive structure that is adapted for dispersion and surviving for extended periods of time in unfavorable conditions
 24.1:
   coenocytic hypha: "single hypha that lacks septa and contains many nuclei"
   conidiospore: "unicellular or multicellular spores that are released directly from the tip or side of the hypha"

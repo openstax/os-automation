@@ -149,6 +149,7 @@ class Signup(AccountsBase):
 
         Return:
             page.accounts.Profile: new user profile page
+
         """
         # prep the signup help
         if 'kwargs' in kwargs:
@@ -302,10 +303,10 @@ class Signup(AccountsBase):
             self.next()
 
         if tutor:
-            from pages.tutor.enrollment import StudentID
+            from pages.tutor.enrollment import Terms
             return go_to_(
-                StudentID(self.driver,
-                          base_url=destination if destination else None))
+                Terms(self.driver,
+                      base_url=destination if destination else None))
         from pages.accounts.profile import Profile
         return go_to_(Profile(self.driver, base_url=self.base_url))
 
