@@ -25,10 +25,10 @@ jobs:
             . .venv/bin/activate
             pip install pytest-circleci-parallelized
       - run:
-          name: run tests for webview
+          name: run tests for os-web
           command: |
             . .venv/bin/activate
-            pytest -n 2 --driver chrome --instance staging --systems web --strip-flake --skip-social --circleci-parallelize --junitxml=/tmp/test-reports/junit.xml
+            pytest -vvv -n 2 --driver chrome --instance staging --systems web --strip-flake --skip-social --circleci-parallelize --junitxml=/tmp/test-reports/junit.xml
       - store_artifacts:
           path: /tmp/test-reports/junit.xml
           destination: test-reports
