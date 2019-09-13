@@ -375,6 +375,10 @@ class QuestionBase(Region):
     _book_section_title_locator = (By.CSS_SELECTOR, '.title')
     _correct_answer_shown_locator = (
         By.CSS_SELECTOR, '.has-correct-answer , .answer-correct')
+    _nudge_message_locator = (
+        By.CSS_SELECTOR,
+        '[class*=Nudge] > [class*=Title], [class*=Nudge] > [class*=Message]')
+    _two_step_intro_locator = (By.CSS_SELECTOR, '.openstax-two-step-intro')
 
     @property
     def step_id(self) -> str:
@@ -432,7 +436,6 @@ class QuestionBase(Region):
 
         """
         sleep(0.33)
-        # answer_button = self.answer_button
         Utility.click_option(self.driver, element=self.answer_button)
         if not multipart:
             sleep(1)
@@ -445,7 +448,10 @@ class QuestionBase(Region):
                         'Re-' not
                         in self.answer_button.get_attribute('textContent') or
                         'Continue' not
-                        in self.answer_button.get_attribute('textContent')))
+                        in self.answer_button.get_attribute('textContent') or (
+                            'Continue' in self.answer_button.get_attribute(
+                                'textContent') and
+                            self.find_element(*self._two_step_intro_locator))))
                 except StaleElementReferenceException:
                     pass
         else:
@@ -557,9 +563,6 @@ class FreeResponse(QuestionBase):
     """A free response step for an assessment."""
 
     _free_response_box_locator = (By.CSS_SELECTOR, 'textarea')
-    _nudge_message_locator = (
-        By.CSS_SELECTOR,
-        '[class*=Nudge] > [class*=Title], [class*=Nudge] > [class*=Message]')
 
     @property
     def free_response(self) -> str:
@@ -605,6 +608,9 @@ class MultipleChoice(QuestionBase):
     """A mutiple choice response step for an assessment."""
 
     _question_answer_locator = (By.CSS_SELECTOR, '.openstax-answer')
+    _nudge_message_locator = (
+        By.CSS_SELECTOR,
+        '[class*=Nudge] > [class*=Title], [class*=Nudge] > [class*=Message]')
 
     @property
     def answers(self) -> List[MultipleChoice.Answer]:

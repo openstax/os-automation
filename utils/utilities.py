@@ -717,8 +717,12 @@ def go_to_external_(destination, url=None):
         destination.wait_for_page_to_load()
         return destination
     except TimeoutException:
-        raise TimeoutException('{0} did not load ({1})'
-                               .format(type(destination).__name__, url))
+        try:
+            destination.wait_for_page_to_load()
+            return destination
+        except TimeoutException:
+            raise TimeoutException('{0} did not load ({1})'
+                                   .format(type(destination).__name__, url))
 
 
 class Actions(ActionChains):

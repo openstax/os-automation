@@ -1002,9 +1002,13 @@ def test_student_task_reading_assignment(tutor_base_url, selenium, store):
         'No milestone cards found'
 
     # WHEN:  they click the milestones icon
-    # AND:   click the 'Back to Dashboard' button
-    reading = reading.milestones()
+    reading = milestones.close()
 
+    # THEN:  the milestones overlay is closed
+    assert(not milestones.is_displayed()), \
+        'Milestone overlay is still displayed'
+
+    # WHEN:  they click the 'Back to Dashboard' button
     this_week = reading.body.back_to_dashboard()
     this_week.reload()  # force a fresh to get any new dashboard data
     if assignment_name not in this_week.assignment_names:
@@ -1439,7 +1443,11 @@ def test_teacher_viewing_student_scores(tutor_base_url, selenium, store):
     late_work.accept_late_score()
 
     # THEN:  the assignment on time score is replaced by the late work score
-    assert(assignment_score != random_assignment.score), "Score not updated"
+    # note - there is one assignment for one student where the original and
+    #        the late work are equal (38%)
+    assert(assignment_score != random_assignment.score or (
+           assignment_score == 38 and random_assignment.score == 38)), \
+        "Score not updated"
 
     # WHEN:  they click the late work arrow
     # AND:   click the 'Use this score' button

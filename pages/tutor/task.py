@@ -10,7 +10,8 @@ from time import sleep
 from typing import Dict, List, Union
 
 from pypom import Region
-from selenium.common.exceptions import NoSuchElementException
+from selenium.common.exceptions import (NoSuchElementException,
+                                        StaleElementReferenceException)
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.remote.webelement import WebElement
@@ -77,6 +78,8 @@ class Assignment(TutorBase):
             return 'Loading' not in loading_text
         except NoSuchElementException:
             return True
+        '''except StaleElementReferenceException:
+            return False'''
 
     @property
     def assignment_type(self) -> str:
@@ -473,6 +476,8 @@ class Homework(Assignment):
                     raise TutorException(
                         f'Could not continue ({self.page.location})')
             sleep(1)
+            if self.is_two_step_intro:
+                raise TutorException('Still on two-step intro')
             return Homework(self.driver, base_url=self.page.base_url)
 
         @property
@@ -1379,9 +1384,9 @@ class Reading(Assignment):
             overlay = self.driver.execute_script(
                 'return document.querySelector' +
                 f'("{self._overlay_page_selector}");')
-            return overlay and self.driver.execute_script(
-                'return window.getComputedStyle(arguments[0]) != "none";',
-                overlay)
+            script = ('return window.getComputedStyle(arguments[0])'
+                      '.display != "none";')
+            return overlay and self.driver.execute_script(script, overlay)
 
         def close(self) -> Reading:
             """Click on the toggle to close the milestones pane.
