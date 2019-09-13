@@ -1,9 +1,10 @@
 """The OpenStax blog."""
 
+from datetime import datetime
 from time import sleep
 
 from pypom import Region
-from selenium.common.exceptions import TimeoutException, WebDriverException
+from selenium.common.exceptions import WebDriverException
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as expect
 
@@ -16,13 +17,12 @@ class Blog(WebBase):
 
     URL_TEMPLATE = '/blog'
 
-    _article_locator = (
-                    By.CSS_SELECTOR, '.articles > div > .article:not(.hidden)')
-    _initial_image_locators = (By.CSS_SELECTOR, '#main .img')
-    _pinned_article_locator = (By.CSS_SELECTOR, '.pinned')
+    _article_locator = (By.CSS_SELECTOR, '.card')
+    _initial_image_locators = (By.CSS_SELECTOR, '.link-image')
+    _pinned_article_locator = (By.CSS_SELECTOR, '.pinned-article')
     _newsletter_locator = (By.CSS_SELECTOR, '.cta')
     _rss_locator = (By.CSS_SELECTOR, '.rss-link')
-    _other_posts_locator = (By.CSS_SELECTOR, '[role=complementary] > .article')
+    _other_posts_locator = (By.CSS_SELECTOR, '.card')
 
     @property
     def loaded(self):
@@ -104,10 +104,10 @@ class Blog(WebBase):
     class Tile(Region):
         """A blog entry overview tile."""
 
-        _image_locator = (By.CSS_SELECTOR, 'a.img')
+        _image_locator = (By.CSS_SELECTOR, 'a.link-image')
         _title_locator = (By.CSS_SELECTOR, 'h2 a')
         _subheading_locator = (By.CSS_SELECTOR, 'h3')
-        _excerpt_locator = (By.CSS_SELECTOR, '.body div')
+        _excerpt_locator = (By.CSS_SELECTOR, '.article-blurb')
         _read_more_locator = (By.CSS_SELECTOR, '.go-to')
         _author_locator = (By.CSS_SELECTOR, '.author')
         _date_locator = (By.CSS_SELECTOR, '.date')
@@ -120,61 +120,45 @@ class Blog(WebBase):
         @property
         def image(self):
             """Return the tile picture element."""
-            return self._field_helper(self._image_locator, True)
+            return self.find_element(*self._image_locator)
 
         @property
         def title(self):
             """Return the article title."""
-            return self._field_helper(self._title_locator)
+            return (self.find_element(*self._title_locator)
+                    .get_attribute('textContent'))
 
         @property
         def excerpt(self):
             """Return the article excerpt or subheading."""
-            text = self._field_helper(self._subheading_locator)
-            return text if text else self.body
-
-        @property
-        def body(self):
-            """Return the article text."""
-            text = (self._field_helper(self._excerpt_locator, True)
-                    .get_attribute('innerHTML'))
-            import re
-            text = re.sub(r'\<p[^<>]*\>', '\n', text)
-            text = re.sub(r'(\<\/?[^<>]{1,}\>)', '', text)
-            return text.strip()
+            subheading = self.find_elements(*self._subheading_locator)
+            content = subheading[0].get_attribute('textContent').strip() \
+                if subheading else ''
+            excerpt = (self.find_element(*self._excerpt_locator)
+                       .get_attribute('textContent'))
+            return f"{content} {excerpt}".strip()
 
         def view(self):
             """Open the article."""
-            link = self._field_helper(self._read_more_locator, True)
+            link = self.find_element(*self._read_more_locator)
             article = link.get_attribute('href').split('/')[-1]
-            Utility.safari_exception_click(self.driver, element=link)
+            Utility.click_option(self.driver, element=link)
             return go_to_(
                 Article(self.driver, self.page.base_url, article=article))
 
         @property
         def authors(self):
             """Return the article authors and editors."""
-            return self._field_helper(self._author_locator)
+            return self.find_element(*self._author_locator).text
 
         @property
         def date(self):
             """Return the article publish date string."""
-            return self._field_helper(self._date_locator)
+            return self.find_element(*self._date_locator).text
 
         def get_date(self):
             """Return a timezone-aware datetime of the publish date."""
-            from datetime import datetime
             return datetime.strptime(self.date + ' +0000', '%b %d, %Y %z')
-
-        def _field_helper(self, locator, return_field=False):
-            try:
-                field = self.wait.until(
-                    expect.presence_of_element_located(locator))
-                if return_field:
-                    return field
-                return field.text.strip()
-            except TimeoutException:
-                return None
 
 
 class Article(Blog):
@@ -183,7 +167,7 @@ class Article(Blog):
     URL_TEMPLATE = '/blog/{article}'
 
     _hero_banner_locator = (By.CSS_SELECTOR, '.hero')
-    _article_title_locator = (By.CSS_SELECTOR, 'article > h1')
+    _article_title_locator = (By.CSS_SELECTOR, '.article h1')
     _disqus_locator = (By.CSS_SELECTOR, '#disqus_thread')
 
     def wait_for_page_to_load(self):
