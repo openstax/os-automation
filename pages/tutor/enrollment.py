@@ -156,9 +156,10 @@ class PrivacyPolicy(Modal):
 
         After clicking on the I agree button, one of two destinations are
         possible:
-            1) the student course page with the product purchase modal open for
+
+            1. the student course page with the product purchase modal open for
                paid courses
-            2) the student course page without a modal open for existing
+            #. the student course page without a modal open for existing
                students in a free course
 
         :return: the course page with the product purchase modal displayed
@@ -891,8 +892,9 @@ class StudentID(Page):
 
         After clicking on the add it later button, one of two destinations are
         possible:
-            1) the student course page with the privacy policy modal open
-            2) the student course page with the product purchse modal open
+
+            1. the student course page with the privacy policy modal open
+            #. the student course page with the product purchse modal open
 
         :return: the course page with the privacy policy or product purchse
             modal displayed

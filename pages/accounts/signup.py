@@ -93,62 +93,94 @@ class Signup(AccountsBase):
                        password=None, _type='Student', provider='restmail',
                        tutor=False, destination=None,
                        **kwargs):
-        """Single signup entry point.
+        r"""Single signup entry point.
 
         Sign up a new user. Social, Random, and Name are mutually exclusive.
 
-        Args:
-            email (str): An accessible e-mail address
-            password (str): A user password
-                default: None
-            _type (:obj:`str`, optional): New user account type -
-                Signup.STUDENT, Signup.INSTRUCTOR, Signup.ADMINISTRATOR,
-                Signup.LIBRARIAN, Signup.DESIGNER, Signup.OTHER
-                default: Signup.STUDENT
-            provider (str): The e-mail host -
-                'google': Google Gmail
-                'guerrilla': Guerrilla Mail
-                'restmail': RestMail API mail
-            tutor (bool): A Tutor signup
-            destination (str): a URL destination if not Accounts
-            **kwargs: Arbitrary keyword arguments
-                'email_password': (str) Webmail login password
-                'name': user name fields
-                    [title (str), first_name (str),
-                     last_name (str), suffix(str)]
-                'news': (bool) checked or unchecked
-                    default: True
-                'phone': (str) instructor phone number
-                'school': (str) school name
-                'social': (str) Use a social login -
-                    facebook, google
-                'social_login': (str) Social account login
-                'social_password': (str) Social account password
-                'students': (int) number of course students
-                'subjects': ([str]) list of subject interest -
-                    accounting, algebra_and_trigonometry, american_government,
-                    anatomy_physiology, astronomy, biology, calculus,
-                    chemistry, chem_atoms_first, college_algebra,
-                    college_physics_algebra, concepts_of_bio_non_majors,
-                    introduction_to_business, introduction_to_sociology,
-                    introductory_statistics, microbiology, pre_algebra,
-                    precalc, economics, macro_econ, ap_macro_econ, micro_econ,
-                    ap_micro_econ, psychology, ap_physics, us_history,
-                    university_physics_calc, not_listed
-                'use': (string) using OpenStax -
-                    Signup.ADOPTED
-                        'Fully adopted and using it as the primary textbook'
-                    Signup.RECOMMENDED
-                        'Recommending the book – my students buy a different
-                            book'
-                    Signup.INTEREST
-                        'Interested in using OpenStax in the future'
-                    Signup.NOT_USING
-                        'Not using OpenStax'
-                'webpage': (str) web URL for an individual
+        :param str email: an accessible e-mail address
+        :param str password: the user password
+        :param str _type: (optional) the new user account type using
+            * :py:data:`Signup.STUDENT` (default)
+            * :py:data:`Signup.INSTRUCTOR`
+            * :py:data:`Signup.ADMINISTRATOR`
+            * :py:data:`Signup.LIBRARIAN`
+            * :py:data:`Signup.DESIGNER`
+            * :py:data:`Signup.OTHER`
+        :param str provider: (optional) the e-mail host, default: ``restmail``
+            ``google``: Google Gmail
+            ``guerrilla``: GuerrillaMail
+            ``restmail``: RestMail API Email
+        :param bool tutor: (optional) ``True`` if the signup is for OpenStax
+            Tutor, default: ``False``
+        :param str destination: a URL destination if not Accounts
+            default: ``None``
+        :param \**kwarys: arbitrary keyword arguments, see below
+        :return: the new user's profile page
+        :rtype: :py:class:`pages.accounts.profile.Profile`
 
-        Return:
-            page.accounts.Profile: new user profile page
+        :Keyword Arguments:
+            * *email_password* (``str``) --
+              Webmail login password
+            * *name* (``list``(``str``)) --
+              the user's name as [title, first_name, last_name, suffix]
+            * *news* (``bool``) --
+              ``True`` if the newsletter checkbox should be checked, ``False``
+              if the checkbox should be cleared
+            * *phone* (``str``) --
+              the instructor's telephone number
+            * *school* (``str``) --
+              the school name
+            * *social* (``str``) --
+              use a social login, either ``facebook`` or ``google``
+            * *social_login* (``str``) --
+              the social account login
+            * *social_password* (``str``) --
+              the social account password
+            * *students* (``int``) --
+              the number of students in the course
+            * *subjects* (``list``(``str``)) --
+              a list of interested book subjects
+              * ``accounting``
+              * ``algebra_and_trigonometry``
+              * ``american_government``
+              * ``anatomy_physiology``
+              * ``astronomy``
+              * ``biology``
+              * ``calculus``
+              * ``chemistry``
+              * ``chem_atoms_first``
+              * ``college_algebra``
+              * ``college_physics_algebra``
+              * ``concepts_of_bio_non_majors``
+              * ``introduction_to_business``
+              * ``introduction_to_sociology``
+              * ``introductory_statistics``
+              * ``microbiology``
+              * ``pre_algebra``
+              * ``precalc``
+              * ``economics``
+              * ``macro_econ``
+              * ``ap_macro_econ``
+              * ``micro_econ``
+              * ``ap_micro_econ``
+              * ``psychology``
+              * ``ap_physics``
+              * ``us_history``
+              * ``university_physics_calc``
+              * ``not_listed``
+            * *use* (``str``) --
+              How is the instructor using OpenStax?
+
+              * :py:data:`Signup.ADOPTED` --
+                  'Fully adopted and using it as the primary textbook'
+              * :py:data:`Signup.RECOMMENDED` --
+                  'Recommending the book - my students buy a different book'
+              * :py:data:`Signup.INTEREST` --
+                  'Interested in using OpenStax in the future'
+              * :py:data:`Signup.NOT_USING` --
+                  'Not using OpenStax'
+            * *webpage* (``str``) --
+              the web URL showing the user as a known instructor
 
         """
         # prep the signup help
