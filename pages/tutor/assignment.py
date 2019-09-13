@@ -9,6 +9,7 @@ Add/Edit/Delete Reading
 
 from __future__ import annotations
 
+from datetime import datetime
 from time import sleep
 from typing import Dict, List, Tuple, Union
 
@@ -25,7 +26,7 @@ from pages.tutor.reference import ReferenceBook
 from pages.tutor.settings import CourseSettings
 from regions.tutor.assessment import Assessment
 from utils.tutor import Tutor, TutorException, get_date_times
-from utils.utilities import Utility, go_to_
+from utils.utilities import Actions, Utility, go_to_
 
 Selector = Tuple[By, str]
 
@@ -221,6 +222,21 @@ class OpenToClose(Region):
         By.CSS_SELECTOR, '[id*="due-date"]')
     _due_time_locator = (
         By.CSS_SELECTOR, '[id*="due-time"]')
+    _previous_month_arrow_locator = (
+        By.CSS_SELECTOR, '.react-datepicker__navigation--previous')
+    _date_picker_current_month_locator = (
+        By.CSS_SELECTOR, '.react-datepicker__current-month')
+    _next_month_arrow_locator = (
+        By.CSS_SELECTOR, '.react-datepicker__navigation--next')
+
+    _calendar_day_selector = (
+        '[aria-label="day-{day}"]:not([class*="--outside-month"])')
+
+    INCREASE = [Keys.ARROW_UP]
+    DECREASE = [Keys.ARROW_DOWN]
+    SHIFT_LEFT = [Keys.ARROW_LEFT]
+    SHIFT_RIGHT = [Keys.ARROW_RIGHT]
+    NEXT_FIELD = [Keys.TAB]
 
     @property
     def name(self) -> str:
@@ -328,25 +344,75 @@ class OpenToClose(Region):
         :return: None
 
         """
-        # from selenium.common.exceptions import StaleElementReferenceException
         if not value:
             # No value was given so skip over the field (generally time values)
             return
+
         if 'time' in send_field:
-            self.driver.execute_script(f'arguments[0].value= "";',
-                                       self.find_element(*selector))
-        else:
-            old_value = self.find_element(*selector).get_attribute('value')
-            clear = ([Keys.BACKSPACE] * len(old_value) +
-                     [Keys.DELETE] * len(old_value))
-        Utility.click_option(self.driver, element=self.find_element(*selector))
+            initial_time = self.find_element(*selector).get_attribute('value')
+            try:  # Chrome and Firefox use 24H times
+                current_time = datetime.strptime(initial_time, '%H:%M')
+            except ValueError:  # Safari uses 12H times
+                current_time = datetime.strptime(initial_time, '%I:%M %p')
+            standardized_time = current_time.strftime('%I:%M:%p')
 
-        if 'time' not in send_field:
-            self.find_element(*selector).send_keys(clear)
+            current_hour, current_minute, current_ampm = \
+                standardized_time.split(':')
+            target_hour, target_minute, target_ampm = value.split(':')
+            hour = int(target_hour) - int(current_hour)
+            minute = int(target_minute) - int(current_minute)
+            ampm = self.INCREASE \
+                if target_ampm.lower() != current_ampm.lower() else []
+
             sleep(0.25)
+            # set hour
+            time_set = self.SHIFT_LEFT * 2
+            for _ in range(min(hour, 0), max(hour, 0), 1):
+                time_set += self.INCREASE if hour > 0 else self.DECREASE
+            # set minute
+            time_set += self.SHIFT_RIGHT
+            for _ in range(min(minute, 0), max(minute, 0), 1):
+                time_set += self.INCREASE if minute > 0 else self.DECREASE
+            # set am/pm
+            time_set += self.SHIFT_RIGHT + ampm
 
-        for ch in value:
-            self.find_element(*selector).send_keys(ch)
+        Utility.click_option(self.driver, element=self.find_element(*selector))
+        sleep(0.25)
+
+        if 'time' in send_field:
+            if 'firefox' in self.driver.capabilities.get('browserName') \
+                    .lower():
+                Actions(self.driver) \
+                    .move_to_element(self.find_element(*selector)) \
+                    .click() \
+                    .send_keys(self.SHIFT_LEFT * 2) \
+                    .send_keys(f'{target_hour:0>2}') \
+                    .send_keys(f'{target_minute:0>2}') \
+                    .send_keys(target_ampm[0]) \
+                    .send_keys(self.NEXT_FIELD) \
+                    .perform()
+                sleep(0.5)
+            else:
+                time = self.find_element(*selector)
+                for ch in time_set:
+                    time.send_keys(ch)
+        else:
+            current_calendar = datetime.strptime(self.find_element(
+                *self._date_picker_current_month_locator).text, '%B %Y')
+            current_month = current_calendar.year * 12 + current_calendar.month
+            target = datetime.strptime(value, '%m/%d/%Y')
+            target_month = target.year * 12 + target.month
+            change = target_month - current_month
+            work = (min(change, 0), max(change, 0), 1)
+            for x in range(*work):
+                Utility.click_option(self.driver, element=self.find_element(*(
+                    self._previous_month_arrow_locator if x < 0 else
+                    self._next_month_arrow_locator)))
+                sleep(0.25)
+            Utility.click_option(self.driver, element=self.find_element(
+                By.CSS_SELECTOR,
+                self._calendar_day_selector.format(day=target.day)))
+
         sleep(0.25)
 
 

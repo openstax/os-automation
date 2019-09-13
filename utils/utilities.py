@@ -83,6 +83,12 @@ class Utility(object):
                 .key_up(special) \
                 .send_keys(Keys.DELETE) \
                 .perform()
+        else:
+            clear = []
+            for _ in range(len(field.get_attribute('value'))):
+                clear.append(Keys.DELETE)
+                clear.append(Keys.BACKSPACE)
+            field.send_keys(clear)
 
     @classmethod
     def click_option(cls, driver, locator=None, element=None,
@@ -711,8 +717,12 @@ def go_to_external_(destination, url=None):
         destination.wait_for_page_to_load()
         return destination
     except TimeoutException:
-        raise TimeoutException('{0} did not load ({1})'
-                               .format(type(destination).__name__, url))
+        try:
+            destination.wait_for_page_to_load()
+            return destination
+        except TimeoutException:
+            raise TimeoutException('{0} did not load ({1})'
+                                   .format(type(destination).__name__, url))
 
 
 class Actions(ActionChains):

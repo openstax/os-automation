@@ -1415,6 +1415,7 @@ class Library():
 
         Return:
             (book record, book short name, book full name, book details append)
+
         """
         using = (self.get(book) if book else
                  self.random_book(short_name=False))

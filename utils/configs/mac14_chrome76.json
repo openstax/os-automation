@@ -1,0 +1,8 @@
+{
+  "capabilities": {
+    "browserName": "chrome",
+    "platform": "macOS 10.14",
+    "version": "76.0",
+    "screenResolution": "1024x768"
+  }
+}

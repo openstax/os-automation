@@ -1,0 +1,8 @@
+{
+  "capabilities": {
+    "browserName": "chrome",
+    "platform": "Windows 10",
+    "version": "76.0",
+    "screenResolution": "1024x768"
+  }
+}

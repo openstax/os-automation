@@ -297,30 +297,27 @@ def to_date_time_string(to_format: Union[str, DateFormat]) -> Tuple[str, str]:
     if isinstance(to_format, str):
         try:
             date, time = to_format.split()
+            combined = datetime.strptime(f'{date} {time}m', '%m/%d/%Y %I:%M%p')
         except ValueError:
             date = to_format
-            time = ''
+            time = '00:01'
+            combined = datetime.strptime(f'{date} {time}', '%m/%d/%Y %H:%M')
     # Split date/time string tuples
     elif isinstance(to_format, tuple):
         date, time = to_format
+        if isinstance(date, datetime):
+            date = date.strftime('%m/%d/%Y')
+        try:
+            combined = datetime.strptime(f'{date} {time}m', '%m/%d/%Y %I:%M%p')
+        except ValueError:
+            combined = datetime.strptime(f'{date} {time}m', '%m/%d/%Y %I%M%p')
     # Format datetime entries
     elif isinstance(to_format, datetime):
-        date, time = (
-            to_format.strftime('%m/%d/%Y %I:%M%p')
-            .lower()
-            [:-1]
-            .split())
+        combined = to_format
     else:
         raise TutorException(f'Unknown date time format: "{to_format}"')
 
-    if isinstance(date, datetime):
-        date = date.strftime('%m/%d/%Y')
-
-    # Fix some time prefixes that the form widget can't handle well
-    if not time.startswith('01') and time.startswith('0'):
-        time = time[1:]
-
-    return (date, time)
+    return combined.strftime('%m/%d/%Y %I:%M:%p').split()
 
 
 def get_date_times(driver: Webdriver,
@@ -349,7 +346,7 @@ def get_date_times(driver: Webdriver,
         _open = datetime.strptime(
             '{date} {time}'.format(
                 date=base_date.get_attribute('value'),
-                time='12:01 am'),
+                time='12:01 AM'),
             '%m/%d/%Y %I:%M %p')
         _open = _open + timedelta(days=Utility.random(0, 7),
                                   minutes=Utility.random(0, 60 * 24 - 2))

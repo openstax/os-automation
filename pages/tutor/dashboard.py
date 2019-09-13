@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from time import sleep
+
 from pypom import Region
 from selenium.common.exceptions import NoSuchElementException
 from selenium.webdriver.common.by import By
@@ -82,6 +84,8 @@ class Dashboard(TutorBase):
         :rtype: :py:class:`~pages.tutor.new_course.NewCourse`
 
         """
+        if self.is_safari:
+            sleep(2.5)
         tile = self.find_elements(*self._create_tile_locator)
         assert(tile), (
             "Create a course tile not found - "
@@ -162,6 +166,8 @@ class Dashboard(TutorBase):
             or current course exists or if a course does not match ``name``
 
         """
+        if self.is_safari:
+            sleep(2)
         # Look through current courses first
         try:
             for course in self.current_courses.courses:

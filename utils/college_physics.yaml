@@ -279,6 +279,8 @@
 10.5:
   angular momentum: "the product of moment of inertia and angular velocity"
   law of conservation of angular momentum: "angular momentum is conserved, i.e., the initial angular momentum is equal to the final angular momentum when no external torque is applied to the system"
+10.6:
+  rotational kinetic energy: "energy is always scalar whether motion is involved or not; rotational kinetic energy does not depend on the direction of motion"
 10.7:
   right-hand rule: "direction of angular velocity ω and angular momentum L in which the thumb of your right hand points when you curl your fingers in the direction of the disk’s rotation"
 11.1:
@@ -320,6 +322,8 @@
 12.2:
   Bernoulli’s equation: "the equation resulting from applying conservation of energy to an incompressible frictionless fluid: P + ½pv² + pgh = constant , through the fluid"
   Bernoulli’s principle: "Bernoulli’s equation applied at constant depth: P_1 + ½pv_1² = P_2 + ½pv_2²"
+12.3:
+  Torricelli’s theorem: "a theorem in fluid dynamics relating the speed of fluid flowing from an orifice to the height of fluid above the opening"
 12.4:
   laminar: "a type of fluid flow in which layers do not mix"
   Poiseuille’s law: "the rate of laminar flow of an incompressible fluid in a tube: Q = (P_2 − P_1)πr⁴/8ηl"
@@ -400,6 +404,8 @@
   R factor: "the ratio of thickness to the conductivity of a material"
   rate of conductive heat transfer: "rate of heat transfer from one material to another"
   thermal conductivity: "the property of a material’s ability to conduct heat"
+14.6:
+  convection: "heat transfer by the macroscopic movement of fluid"
 14.7:
   emissivity: "measure of how well an object radiates"
   greenhouse effect: "warming of the Earth that is due to gases such as carbon dioxide and methane that absorb infrared radiation from the Earth’s surface and reradiate it in all directions, thus sending a fraction of it back toward the surface of the Earth"
@@ -455,6 +461,10 @@
   simple harmonic oscillator: "a device that implements Hooke’s law, such as a mass that is attached to a spring, with the other end of the spring being connected to a rigid support such as a wall"
 16.4:
   simple pendulum: "an object with a small mass suspended from a light wire or string"
+16.5:
+  simple harmonic motion: "the oscillatory motion in a system where the net force can be described by Hooke’s law"
+16.6:
+  uniform circular motion: "the motion of an object in a circle at a constant speed"
 16.7:
   critical damping: "the condition in which the damping of an oscillator causes it to return as quickly as possible to its equilibrium position without oscillating back and forth about this position"
   over damping: "the condition in which damping of an oscillator causes it to return to equilibrium without oscillating; oscillator moves more slowly toward equilibrium than in the critically damped system"
@@ -572,6 +582,8 @@
 19.2:
   scalar: "physical quantity with magnitude but no direction"
   vector: "physical quantity with both magnitude and direction"
+19.3:
+  electric potential: "how much potential energy a single point charge at a given location will have"
 19.4:
   equipotential line: "a line along which the electric potential is constant"
   grounding: "fixing a conductor at zero volts by connecting it to the earth or ground"
@@ -582,6 +594,9 @@
   dielectric strength: "the maximum electric field above which an insulating material begins to break down and conduct"
   parallel plate capacitor: "two identical conducting plates separated by a distance"
   polar molecule: "a molecule with inherent separation of charge"
+19.6:
+  capacitance in parallel: "the total or equivalent capacitance in the circuit is equal to the sum of all the individual capacitors added together"
+  capacitance in series: "the total capacitance is less than any one of the series capacitors' individual capacitances"
 19.7:
   defibrillator: "a machine used to provide an electrical shock to a heart attack victim's heart in order to restore the heart's normal rhythmic pattern"
 20.1:
@@ -677,9 +692,15 @@
   magnetic force: "the force on a charge produced by its motion through a magnetic field; the Lorentz force"
   right hand rule (RHR-1): "the rule to determine the direction of the magnetic force on a positive moving charge: when the thumb of the right hand points in the direction of the charge’s velocity v and the fingers point in the direction of the magnetic field B, then the force on the charge is perpendicular and away from the palm; the force on a negative charge is perpendicular and into the palm"
   tesla: "T, the SI unit of the magnetic field strength; 1 T = 1 N/A⋅m"
+22.5:
+  mass spectrometry: "an analytical technique that measures the mass-to-charge ratio of ions; ions of the same mass-to-charge ratio will undergo the same amount of deflection"
+  Van Allen radiation belt: "a zone of energetic charged particles, most of which originate from the solar wind, that are captured by and held around a planet by that planet's magnetic field"
 22.6:
   Hall effect: "the creation of voltage across a current-carrying conductor by a magnetic field"
   Hall emf: "the electromotive force created by a current-carrying conductor by a magnetic field, ε=Blv"
+22.7:
+  magnetic force on a current-carrying wire: "the magnetic field exerts a force on a current-carrying wire in a direction given by the right hand rule 1 - the same direction as that on the individual moving charges"
+  magnetohydrodynamics: "the study of the magnetic properties and behaviour of electrically conducting fluids"
 22.8:
   meter: "common application of magnetic torque on a current-carrying loop that is very similar in construction to a motor; by design, the torque is proportional to I and not θ, so the needle deflection is proportional to the current"
   motor: "loop of wire in a magnetic field; when current is passed through the loops, the magnetic field exerts torque on the loops, which rotates a shaft; electrical energy is converted to mechanical work in the process"
@@ -705,6 +726,9 @@
 23.2:
   Faraday’s law of induction: "the means of calculating the emf in a coil due to changing magnetic flux, given by emf = −N ΔΦ/Δt"
   Lenz’s law: "the minus sign in Faraday’s law, signifying that the emf induced in a coil opposes the change in magnetic flux"
+23.3:
+  electromagnetic force: "one of the four fundamental forces: the electric force acts between all charged particles, whether or not they're moving; the magnetic force acts between moving charged particles; this means that every charged particle gives off an electric field, whether or not it's moving"
+  motional emf: "an emf induced by motion relative to a magnetic field"
 23.4:
   eddy current: "a current loop in a conductor caused by motional emf"
   magnetic damping: "the drag produced by eddy currents"
@@ -951,6 +975,8 @@
   uncertainty in momentum: "lack of precision or lack of knowledge of precise results in measurements of momentum"
   uncertainty in position: "lack of precision or lack of knowledge of precise results in measurements of position"
   uncertainty in time: "lack of precision or lack of knowledge of precise results in measurements of time"
+29.8:
+  particle-wave duality: "all particles have wave properties"
 30.1:
   atom: "basic unit of matter, which consists of a central, positively charged nucleus surrounded by negatively charged electrons"
   Brownian motion: "the continuous random movement of particles of matter suspended in a liquid or gas"
@@ -979,6 +1005,8 @@
   phosphorescence: "the de-excitation of a metastable state"
   population inversion: "the condition in which the majority of atoms in a sample are in a metastable state"
   Stimulated emission: "emission by atom or molecule in which an excited state is stimulated to decay, most readily caused by a photon of the same energy that is necessary to excite the state"
+30.6:
+  quantization: "the process of transition from a classical understanding of physical phenomena to a newer understanding known as quantum mechanics"
 30.7:
   fine structure: "the splitting of spectral lines of the hydrogen spectrum when the spectral lines are examined at very high resolution"
   intrinsic magnetic field : "the magnetic field generated due to the intrinsic spin of electrons"
@@ -1107,6 +1135,8 @@
   neutron-induced fission: "fission that is initiated after the absorption of neutron"
   nuclear fission: "reaction in which a nucleus splits"
   supercriticality: "an exponential increase in fissions"
+32.7:
+  Trinity: "the code name of the first detonation of a nuclear device; it was conducted on July 16, 1945, as part of the Manhattan Project"
 33:
   particle physics: "the study of and the quest for those truly fundamental particles having no substructure"
 33.1:

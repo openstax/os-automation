@@ -49,6 +49,7 @@ class Interest(Adoption):
                 [Web.TechProviders.<provider>]
             other_providers (str): a string of unlisted providers to be used
                 when Web.TechProviders.OTHER is in tech_providers
+
         """
         self.form.select(user_type)
         self.form.first_name = first
