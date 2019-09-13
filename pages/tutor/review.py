@@ -102,7 +102,7 @@ class Metrics(TutorBase):
 
             :return: the list of available assessment answers
             :rtype: \
-                list(:py:class:`~pages.tutor.review.Metrics.Assessment.Answer)
+                list(:py:class:`~pages.tutor.review.Metrics.Assessment.Answer`)
 
             """
             return [self.Answer(self, option)
@@ -205,7 +205,7 @@ class Metrics(TutorBase):
             """Access the course section tab options.
 
             :return: the list of available course sections for this assignment
-            :rtype: list(:py:class:`~pages.tutor.review.Metrics.Sidebar.Tab)
+            :rtype: list(:py:class:`~pages.tutor.review.Metrics.Sidebar.Tab`)
 
             """
             return [self.Tab(self, section)
@@ -454,7 +454,7 @@ class Metrics(TutorBase):
             """Access the assignment book section jump links.
 
             :return: the list of book section links in the assignment
-            :rtype: list(:py:class:`~pages.tutor.review.Metrics.Toolbar.Step)
+            :rtype: list(:py:class:`~pages.tutor.review.Metrics.Toolbar.Step`)
 
             """
             return [self.Step(self, breadcrumb)

@@ -16,6 +16,8 @@ def web_base_url(request):
                 config.getini('instance')).lower()
     if instance == 'unique':
         return base_url
+    if instance == 'staging':
+        return 'https://staging.openstax.org'
     if instance and base_url:
         segments = base_url.split(SPLIT)
         insert = ('' if instance.startswith('prod') else
