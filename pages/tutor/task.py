@@ -10,8 +10,7 @@ from time import sleep
 from typing import Dict, List, Union
 
 from pypom import Region
-from selenium.common.exceptions import (NoSuchElementException,
-                                        StaleElementReferenceException)
+from selenium.common.exceptions import NoSuchElementException
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.remote.webelement import WebElement
@@ -78,8 +77,6 @@ class Assignment(TutorBase):
             return 'Loading' not in loading_text
         except NoSuchElementException:
             return True
-        '''except StaleElementReferenceException:
-            return False'''
 
     @property
     def assignment_type(self) -> str:
