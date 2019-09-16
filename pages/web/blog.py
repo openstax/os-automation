@@ -255,7 +255,9 @@ class Blog(WebBase):
             """Return a timezone-aware datetime of the publish date.
 
             :return: the article's publish date as a timezone-aware datetime
-            :rtype: :py:class:`~datetime.datetime"""
+            :rtype: :py:class:`~datetime.datetime`
+
+            """
             return datetime.strptime(self.date + ' +0000', '%b %d, %Y %z')
 
 
