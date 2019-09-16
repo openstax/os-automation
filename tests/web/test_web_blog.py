@@ -61,26 +61,27 @@ def test_able_to_retrieve_the_rss_feed(web_base_url, selenium):
 @smoke_test
 @nondestructive
 @web
-def test_each_blog_entry_has_an_image_title_excerpt_author_and_date(
+def test_each_blog_entry_has_an_image_title_author_and_date(
         web_base_url, selenium):
-    """Test for the attributes of each blog entry tile."""
+    """Test for the attributes of each blog entry tile.
+
+    Excerpts are not always present.
+
+    """
     # GIVEN: a user viewing the blog page
     home = WebHome(selenium, web_base_url).open()
     blog = home.openstax_nav.view_the_blog()
 
     # WHEN:
 
-    # THEN: each tile has an image, a title, a text
-    #       excerpt, one or more authors, and a date when
-    #       the post was published
+    # THEN: each tile has an image, a title, one or more
+    #       authors, and a date when the post was published
     for entry in blog.articles:
         message = '%s - {0}' % entry.title
         assert(entry.image.is_displayed()), \
             message.format('image not displayed')
         assert(entry.title), \
             message.format('title not found')
-        assert(entry.excerpt), \
-            message.format('excerpt not found')
         assert(entry.authors), \
             message.format('author(s) not found')
         assert(entry.date), \
