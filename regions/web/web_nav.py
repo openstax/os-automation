@@ -3,7 +3,8 @@
 from time import sleep
 
 from pypom import Region
-from selenium.common.exceptions import WebDriverException
+from selenium.common.exceptions import (NoSuchElementException,
+                                        WebDriverException)
 from selenium.webdriver.common.by import By
 
 from utils.utilities import Actions, Utility, go_to_
@@ -97,10 +98,10 @@ class WebNav(Region):
     _root_locator = (By.CSS_SELECTOR, '.nav')
     _openstax_logo_locator = (By.CSS_SELECTOR, '.os-logo > a')
     _slogan_locator = (By.CSS_SELECTOR, '.logo-quote')
-    _subjects_dropdown_locator = (By.CLASS_NAME, 'subjects-dropdown')
-    _technology_dropdown_locator = (By.CLASS_NAME, 'technology-dropdown')
-    _what_we_do_dropdown_locator = (By.CLASS_NAME, 'what-we-do-dropdown')
-    _user_menu_locator = (By.CLASS_NAME, 'login')
+    _subjects_dropdown_locator = (By.CSS_SELECTOR, '.subjects-dropdown')
+    _technology_dropdown_locator = (By.CSS_SELECTOR, '.technology-dropdown')
+    _what_we_do_dropdown_locator = (By.CSS_SELECTOR, '.what-we-do-dropdown')
+    _user_menu_locator = (By.CSS_SELECTOR, '.login , .login-dropdown')
     _back_link_locator = (By.CSS_SELECTOR, 'a.close')
     _meta_menu_locator = (By.CLASS_NAME, 'expand')
 
@@ -535,8 +536,12 @@ class WebNav(Region):
         @property
         def training_wheel(self):
             """Return the training wheel modal."""
-            training_root = self.find_element(*self._training_wheel_locator)
-            return self.TrainingWheel(self, training_root)
+            try:
+                training_root = self.find_element(
+                    *self._training_wheel_locator)
+                return self.TrainingWheel(self, training_root)
+            except NoSuchElementException:
+                return
 
         @property
         def instructor_access(self):
