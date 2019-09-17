@@ -262,7 +262,7 @@ class WebHome(WebBase):
                     from pages.web.newsletter \
                         import NewsletterSignup as Destination
                 elif Support.BOOKSTORE in destination:
-                    self.button.click()
+                    Utility.switch_to(self.driver, action=self.button.click)
                     from pages.web.bookstore_suppliers \
                         import Bookstore as Destination
                 else:
