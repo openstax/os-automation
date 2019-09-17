@@ -124,7 +124,6 @@ class WebNav(Region):
 
     def go_home(self):
         """Return to the home page by clicking on the OpenStax logo."""
-        print(self.root.get_attribute('outerHTML'))
         logo = self.find_element(*self._openstax_logo_locator)
         Utility.safari_exception_click(self.driver, element=logo)
         from pages.web.home import WebHome
@@ -447,10 +446,11 @@ class WebNav(Region):
 
         _menu_expand_locator = (By.CSS_SELECTOR, 'nav.dropdown-menu')
         _log_in_link_locator = (By.CSS_SELECTOR, '.pardotTrackClick')
-        _logged_in_locator = (By.CLASS_NAME, 'login-dropdown')
+        _logged_in_locator = (By.CSS_SELECTOR, '.login-dropdown')
         _open_menu_locator = (By.CSS_SELECTOR, '[href="."]')
         _profile_link_locator = (By.CSS_SELECTOR, '[href$=profile]')
-        _openstax_tutor_link_locator = (By.LINK_TEXT, 'OpenStax Tutor')
+        _openstax_tutor_link_locator = (
+            By.CSS_SELECTOR, f'{_logged_in_locator[1]} [href*=tutor]')
         _training_wheel_locator = (By.CSS_SELECTOR, '.training-wheel')
         _faculty_access_locator = (By.CSS_SELECTOR, '[href*=faculty]')
         _log_out_link_locator = (By.CSS_SELECTOR, '[href*=logout]')
