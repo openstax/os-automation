@@ -98,12 +98,12 @@ class WebNav(Region):
     _root_locator = (By.CSS_SELECTOR, '.nav')
     _openstax_logo_locator = (By.CSS_SELECTOR, '.logo > a , a.logo')
     _slogan_locator = (By.CSS_SELECTOR, '.logo-quote')
-    _subjects_dropdown_locator = (By.CLASS_NAME, 'subjects-dropdown')
-    _technology_dropdown_locator = (By.CLASS_NAME, 'technology-dropdown')
-    _what_we_do_dropdown_locator = (By.CLASS_NAME, 'what-we-do-dropdown')
-    _user_menu_locator = (By.CLASS_NAME, 'login')
+    _subjects_dropdown_locator = (By.CSS_SELECTOR, '.subjects-dropdown')
+    _technology_dropdown_locator = (By.CSS_SELECTOR, '.technology-dropdown')
+    _what_we_do_dropdown_locator = (By.CSS_SELECTOR, '.what-we-do-dropdown')
+    _user_menu_locator = (By.CSS_SELECTOR, '.login , .login-dropdown')
     _back_link_locator = (By.CSS_SELECTOR, 'a.close')
-    _meta_menu_locator = (By.CLASS_NAME, 'expand')
+    _meta_menu_locator = (By.CSS_SELECTOR, '.expand')
 
     def is_displayed(self):
         """Return True if the nav bar is displayed."""
