@@ -8,7 +8,7 @@ from selenium.webdriver.common.by import By
 
 from pages.web.base import WebBase
 from utils.utilities import Utility, go_to_
-from utils.web import Web as Support
+from utils.web import Web, WebException
 
 
 class Link(Region):
@@ -45,15 +45,15 @@ class Link(Region):
         """
         destination = self.link.get_attribute('href')
         Utility.wait_for_overlay_then(self.link.click)
-        if destination.endswith(Support.IMPACT):
+        if destination.endswith(Web.IMPACT):
             from pages.web.impact import OurImpact as Destination
-        elif destination.endswith(Support.ANNUAL_REPORT):
+        elif destination.endswith(Web.ANNUAL_REPORT):
             from pages.web.annual import AnnualReport as Destination
-        elif destination.endswith(Support.PARTNERS):
+        elif destination.endswith(Web.PARTNERS):
             from pages.web.partners import Partners as Destination
-        elif destination.endswith(Support.SUBJECTS):
+        elif destination.endswith(Web.SUBJECTS):
             from pages.web.subjects import Subjects as Destination
-        elif destination.endswith(Support.TECHNOLOGY):
+        elif destination.endswith(Web.TECHNOLOGY):
             from pages.web.technology import Technology as Destination
         return go_to_(Destination(self.driver))
 
@@ -153,7 +153,7 @@ class WebHome(WebBase):
                 Split the URL and return the filename.
                 """
                 style = self.root.get_attribute('style')
-                attribute = Support.FILENAME_MATCHER.search(style)
+                attribute = Web.FILENAME_MATCHER.search(style)
                 file_url = attribute[4:-2]
                 filename = file_url.split('/')[-1]
                 return filename
@@ -164,10 +164,16 @@ class WebHome(WebBase):
                 Return a 'Destination' so the function will fail if
                 a new banner link is added.
                 """
-                if self.destination.endswith(Support.SUBJECTS):
+                if self.destination.endswith(Web.SUBJECTS):
                     from pages.web.subjects import Subjects as Destination
-                elif self.destination.endswith(Support.ABOUT):
+                elif self.destination.endswith(Web.ABOUT):
                     from pages.web.about import AboutUs as Destination
+                elif self.destination.endswith(Web.SE_APP):
+                    from pages.web.se_app import StudyEdge as Destination
+                else:
+                    raise WebException(
+                        'Unknown destination: {0}'
+                        .format(self.destination.split('/')[-1]))
                 Utility.wait_for_overlay_then(self.root.click)
                 return go_to_(Destination(self.driver))
 
@@ -257,11 +263,11 @@ class WebHome(WebBase):
                 a new quote is added.
                 """
                 destination = self.button.get_attribute('href')
-                if Support.NEWSLETTER in destination:
+                if Web.NEWSLETTER in destination:
                     Utility.switch_to(self.driver, action=self.button.click)
                     from pages.web.newsletter \
                         import NewsletterSignup as Destination
-                elif Support.BOOKSTORE in destination:
+                elif Web.BOOKSTORE in destination:
                     Utility.switch_to(self.driver, action=self.button.click)
                     from pages.web.bookstore_suppliers \
                         import Bookstore as Destination

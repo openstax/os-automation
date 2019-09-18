@@ -2,6 +2,8 @@
 
 import re
 
+from selenium.common.exceptions import WebDriverException
+
 from utils.utilities import Utility
 
 
@@ -212,6 +214,7 @@ class Web(object):
     NO_FILTER = 'View All'
     PARTNERS = 'partners'
     RESEARCH = 'research'
+    SE_APP = 'download-openstax-se-app'
     SUBJECTS = 'subjects'
     TECHNOLOGY = 'technology'
     TUTOR = 'openstax-tutor'
@@ -1541,3 +1544,9 @@ class Library():
                 names.append(book[0])
             return names[0] if len(names) == 1 else names
         return Utility.random_set(self.openstax, number)
+
+
+class WebException(WebDriverException):
+    """A generic exception for the OpenStax website."""
+
+    pass

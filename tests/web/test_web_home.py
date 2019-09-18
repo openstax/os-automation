@@ -1031,56 +1031,45 @@ def test_switch_panels_in_banner_carousel(web_base_url, selenium):
         assert(banner.is_displayed())
 
 
+# FAILING - Chrome Firefox Safari
+
 @test_case('C210326')
 @nondestructive
 @web
 def test_carousel_banners_link_to_other_pages(web_base_url, selenium):
     """Test clicking on each banner in the carousel."""
     # GIVEN: a user viewing the Web home page
-    carousel = ['subjects', 'about', 'subjects', 'subjects']
+    carousel = ['download-openstax-se-app', 'subjects', 'about']
     home = Home(selenium, web_base_url).open()
 
     # WHEN: they click on the banner
-    free_books = home.carousel.banners[Web.FREE_BOOKS_NO_CATCH].click()
+    new_app = home.carousel.banners[Web.NEW_APP].click()
 
     # THEN: the subjects page is displayed
-    assert(free_books.is_displayed())
-    assert(free_books.url == carousel[Web.FREE_BOOKS_NO_CATCH])
+    assert(new_app.is_displayed())
+    assert(new_app.url == carousel[Web.NEW_APP])
 
     # WHEN: they return to the home page
     # AND:  select the second banner
     # AND:  click on the banner
     home.open()
-    home.carousel.dots[Web.EDUCATION_OVER_PROFIT].click()
-    nonprofit = home.carousel.banners[Web.EDUCATION_OVER_PROFIT].click()
+    home.carousel.dots[Web.FREE_BOOKS_NO_CATCH].click()
+    nonprofit = home.carousel.banners[Web.FREE_BOOKS_NO_CATCH].click()
 
     # THEN: the about OpenStax page is displayed
     assert(nonprofit.is_displayed())
-    assert(nonprofit.url == carousel[Web.EDUCATION_OVER_PROFIT])
+    assert(nonprofit.url == carousel[Web.FREE_BOOKS_NO_CATCH])
 
     # WHEN: they return to the home page
     # AND:  select the third banner
     # AND:  click on the banner
     home.open()
-    home.carousel.dots[Web.ACADEMIC_FREEDOM].click()
-    freedom = home.carousel.banners[Web.ACADEMIC_FREEDOM].click()
+    home.carousel.dots[Web.EDUCATION_OVER_PROFIT].click()
+    nonprofit = home.carousel.banners[Web.EDUCATION_OVER_PROFIT].click()
 
     # THEN: the subjects page is displayed
-    assert(freedom.is_displayed())
-    assert(freedom.url == carousel[Web.ACADEMIC_FREEDOM])
-
-    ''' 29 Books removed
-    # WHEN: they return to the home page
-    # AND:  select the fourth banner
-    # AND:  click on the banner
-    home.open()
-    home.carousel.dots[Web._29_BOOKS].click()
-    books = home.carousel.banners[Web._29_BOOKS].click()
-
-    # THEN: the subjects page is displayed
-    assert(books.is_displayed())
-    assert(books.url == carousel[Web._29_BOOKS])
-    '''
+    assert(nonprofit.is_displayed())
+    assert(nonprofit.url == carousel[Web.EDUCATION_OVER_PROFIT])
 
 
 @test_case('C210327')
