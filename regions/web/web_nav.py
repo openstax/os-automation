@@ -3,7 +3,8 @@
 from time import sleep
 
 from pypom import Region
-from selenium.common.exceptions import WebDriverException
+from selenium.common.exceptions import (NoSuchElementException,
+                                        WebDriverException)
 from selenium.webdriver.common.by import By
 
 from utils.utilities import Actions, Utility, go_to_
@@ -537,8 +538,12 @@ class WebNav(Region):
         @property
         def training_wheel(self):
             """Return the training wheel modal."""
-            training_root = self.find_element(*self._training_wheel_locator)
-            return self.TrainingWheel(self, training_root)
+            try:
+                training_root = self.find_element(
+                    *self._training_wheel_locator)
+                return self.TrainingWheel(self, training_root)
+            except NoSuchElementException:
+                return
 
         @property
         def instructor_access(self):

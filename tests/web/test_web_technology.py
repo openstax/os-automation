@@ -70,12 +70,12 @@ def test_able_to_view_technology_options_for_a_book(web_base_url, selenium):
     # THEN: the partner tools on the instructor resources
     #       section of the book details page is displayed
     #       in a new tab
-    assert(details.is_displayed())
-    assert(book in selenium.page_source)
-    assert(details.tabs[Web.INSTRUCTOR_RESOURCES].is_displayed())
-    assert(Utility.in_viewport(selenium,
-                               element=details.instructor.tech_options)), \
-        'Tech options not in the browser window'
+    assert(details.is_displayed()), \
+        f'the book details for {book} are not displayed'
+    assert(book in selenium.page_source), \
+        f'{book} not in the source HTML'
+    assert(details.tabs[Web.INSTRUCTOR_RESOURCES].is_displayed()), \
+        'Instructor resources not displayed'
 
 
 @test_case('C210463')
