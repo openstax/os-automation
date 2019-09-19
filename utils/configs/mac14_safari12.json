@@ -1,0 +1,8 @@
+{
+  "capabilities": {
+    "browserName": "safari",
+    "platform": "macOS 10.14",
+    "version": "12.0",
+    "screenResolution": "1024x768"
+  }
+}

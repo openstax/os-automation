@@ -17,6 +17,7 @@ from selenium.webdriver.remote.webelement import WebElement
 
 from pages.tutor.base import TutorBase
 from pages.tutor.course import StudentCourse
+from pages.tutor.performance import PerformanceForecast
 from pages.tutor.reference import ReferenceBook
 from regions.tutor.assessment import FreeResponse, MultipleChoice
 from regions.tutor.print_preview import PrintPreview
@@ -472,6 +473,8 @@ class Homework(Assignment):
                     raise TutorException(
                         f'Could not continue ({self.page.location})')
             sleep(1)
+            if self.is_two_step_intro:
+                raise TutorException('Still on two-step intro')
             return Homework(self.driver, base_url=self.page.base_url)
 
         @property
@@ -485,13 +488,16 @@ class Homework(Assignment):
             """
             return bool(self.find_elements(*self._is_two_step_intro_locator))
 
-        def back_to_dashboard(self) -> StudentCourse:
+        def back_to_dashboard(self, other_destination: bool = False) \
+                -> StudentCourse:
             """Click on the 'Back to Dashboard' button.
 
+            :param bool other_destination: if ``True``, skip the return to the
+                student course
             :return: the student course page
             :rtype: :py:class:`~pages.tutor.course.StudentCourse`
 
-            :raises :py:class:`~utils.tutor.TutorException`: if the reading
+            :raises: :py:class:`~utils.tutor.TutorException`: if the reading
                 assignment is not at the completion card (final) step
 
             """
@@ -500,10 +506,26 @@ class Homework(Assignment):
                     *self._back_to_dashboard_button_locator)
                 Utility.click_option(self.driver, element=button)
                 sleep(1)
+                if other_destination:
+                    return
                 return go_to_(
                     StudentCourse(self.driver, base_url=self.page.base_url))
             except NoSuchElementException:
                 raise TutorException("Assignment not complete")
+
+        def back_to_performance_forecast(self) -> PerformanceForecast:
+            """Click on the 'Back to Performance Forecast' button.
+
+            :return: the student performance forecast
+            :rtype: :py:class:`~pages.tutor.performance.PerformanceForecast`
+
+            :raises: :py:class:`~utils.tutor.TutorException`: if the practice
+                session is not at the completion card (final) step
+
+            """
+            self.back_to_dashboard(other_destination=True)
+            return go_to_(
+                PerformanceForecast(self.driver, base_url=self.page.base_url))
 
     class Nav(Region):
         """The homework step navigation."""
@@ -1360,9 +1382,9 @@ class Reading(Assignment):
             overlay = self.driver.execute_script(
                 'return document.querySelector' +
                 f'("{self._overlay_page_selector}");')
-            return overlay and self.driver.execute_script(
-                'return window.getComputedStyle(arguments[0]) != "none";',
-                overlay)
+            script = ('return window.getComputedStyle(arguments[0])'
+                      '.display != "none";')
+            return overlay and self.driver.execute_script(script, overlay)
 
         def close(self) -> Reading:
             """Click on the toggle to close the milestones pane.

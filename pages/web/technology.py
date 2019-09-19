@@ -70,6 +70,12 @@ class Technology(WebBase):
         _instructor_link_locator = (By.CSS_SELECTOR, INSTRUCTOR + 'a')
         _technology_link_locator = (By.CSS_SELECTOR, TECHNOLOGY + 'a')
         _partner_resource_locator = (By.CSS_SELECTOR, '#technology-options h2')
+        _details_tab_locator = (By.CSS_SELECTOR, '.details-tab')
+        _instructor_resources_tab_locator = (
+            By.CSS_SELECTOR, '.instructor-resources')
+        _student_resources_tab_locator = (
+            By.CSS_SELECTOR, '.student-resources')
+        _partner_resources_tab_locator = (By.CSS_SELECTOR, '.partners-tab')
 
         @property
         def title(self):
@@ -116,7 +122,7 @@ class Technology(WebBase):
             link_border = self.find_element(*self._instructor_border_locator)
             return ('dimmed' not in link_border.get_attribute('class'))
 
-        def _selection_helper(self, link):
+        def _selection_helper(self, link, tab='book-details'):
             """Select the book reference link."""
             assert(self.book_selected), 'No book selected'
             book = self.find_element(*link)
@@ -128,8 +134,11 @@ class Technology(WebBase):
             Utility.switch_to(self.driver, element=book)
             self.wait.until(
                 lambda _: sleep(2) or
-                self.find_element(*self._partner_resource_locator)
-                .is_displayed())
+                self.find_elements(*self._details_tab_locator) or
+                self.find_elements(*self._instructor_resources_tab_locator) or
+                self.find_elements(*self._student_resources_tab_locator) or
+                self.find_elements(*self._partner_resources_tab_locator)
+            )
             return go_to_(Book(self.driver, self.page.base_url,
                                book_name=book_title))
 

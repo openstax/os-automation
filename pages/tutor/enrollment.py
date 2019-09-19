@@ -10,6 +10,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.remote.webelement import WebElement
 
 from pages.accounts.signup import Signup as AccountSignup
+from pages.tutor.base import TutorBase
 from pages.tutor.course import StudentCourse
 from utils.tutor import Tutor, TutorException
 from utils.utilities import Utility, go_to_
@@ -259,19 +260,7 @@ class PurchaseConfirmation(IframeModal):
         :rtype: bool
 
         """
-        # Intermittant load failures due to timing; check vals below until the
-        # root cause is found.
-        try:
-            number = self.order_number
-        except Exception:
-            number = None
-        try:
-            total = self.total
-        except Exception:
-            total = None
-        print(f'Order number: {number}\nTotal: {total}')
-        # return bool(self.order_number) and bool(self.total)
-        return bool(number) and bool(total)
+        return bool(self.order_number) and bool(self.total)
 
     @property
     def content(self) -> str:
@@ -913,3 +902,38 @@ class StudentID(Page):
 
         """
         return self._continue(add_it_later=True)
+
+
+class Terms(TutorBase):
+    """The terms of use and privacy policy acceptance page."""
+
+    @property
+    def loaded(self) -> bool:
+        """Return True when the policies are displayed.
+
+        :return: ``True`` when the terms of use and privacy policy are shown.
+        :rtype: bool
+
+        """
+        content = self.modal.heading.lower()
+        return 'terms' in content and 'privacy' in content
+
+    @property
+    def modal(self) -> PrivacyPolicy:
+        """Access the Terms modal.
+
+        :return: the combined policy modal
+        :rtype: :py:class:`~pages.tutor.enrollment.PrivacyPolicy`
+
+        """
+        return PrivacyPolicy(self)
+
+    def i_agree(self) -> StudentID:
+        """Agree to the terms of use and the privacy policy.
+
+        :return: the student identification number entry
+        :rtype: :py:class:`pages.tutor.enrollment.StudentID`
+
+        """
+        self.modal.i_agree()
+        return go_to_(StudentID(self.driver, base_url=self.base_url))

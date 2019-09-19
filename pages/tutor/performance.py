@@ -7,6 +7,7 @@ from selenium.common.exceptions import NoSuchElementException
 from selenium.webdriver.common.by import By
 
 from pages.tutor.base import TutorBase
+from regions.tutor.tooltip import Tooltip
 from utils.tutor import TutorException
 from utils.utilities import Utility, go_to_
 
@@ -55,8 +56,11 @@ class BookSection(Region):
             Utility.click_option(self.driver, element=button)
             sleep(1)
             from pages.tutor.practice import Practice
-            return go_to_(
-                Practice(self.driver, base_url=self.page.page.base_url))
+            try:
+                url = self.page.page.base_url
+            except AttributeError:
+                url = self.page.page.page.base_url
+            return go_to_(Practice(self.driver, base_url=url))
         except NoSuchElementException:
             # teachers don't have practice button on their forecast
             return self.page.page
@@ -71,7 +75,7 @@ class BookSection(Region):
 
         """
         progress = self.find_element(*self._progress_bar_locator)
-        clue = progress.get_attribute('aria-valuename')
+        clue = progress.get_attribute('aria-valuenow')
         if not clue:
             # not enough data to return a CLUe
             return progress.text
@@ -111,55 +115,12 @@ class PerformanceForecast(TutorBase):
     _go_back_button_locator = (By.CSS_SELECTOR, '.info a')
     _group_forecast_locator = (By.CSS_SELECTOR, '.guide-group')
     _guide_locator = (By.CSS_SELECTOR, '.guide-group-key')
+    _joyride_root_selector = (By.CSS_SELECTOR, '.joyride')
     _loading_message_locator = (
         By.CSS_SELECTOR, '.is-loading , .loading-animation')
     _no_data_locator = (By.CSS_SELECTOR, '.no-data-message')
     _page_title_locator = (By.CSS_SELECTOR, '.guide-group-title')
     _section_tab_locator = (By.CSS_SELECTOR, '[role=tab]')
-
-    @property
-    def loaded(self) -> bool:
-        """Return True when the performance forecast is loaded.
-
-        :return: ``True`` if no loading messages or elements are found
-        :rtype: bool
-
-        """
-        return not self.find_elements(*self._loading_message_locator)
-
-    @property
-    def title(self):
-        """Return the page title.
-
-        :return: the page title
-        :rtype: str
-
-        """
-        return self.find_element(*self._page_title_locator).text
-
-    @property
-    def guide(self):
-        """Access the colored bar guide.
-
-        :return: the list of possible bar colors and their associated keys
-        :rtype: list(:py:class:`~PerformanceForecast.Bar`)
-
-        """
-        return [self.Bar(self, bar)
-                for bar in self.find_elements(*self._guide_locator)]
-
-    def go_back(self):
-        """Return to the previous page.
-
-        Clicking on the 'Back to ...' button returns the user to the previously
-        visited Tutor page, which is often the student's course page or the
-        teacher's calendar.
-
-        :return: None
-
-        """
-        button = self.find_element(*self._go_back_button_locator)
-        Utility.click_option(self.driver, element=button)
 
     def back_to_scores(self):
         """Click the 'Back to Scores' button.
@@ -172,44 +133,21 @@ class PerformanceForecast(TutorBase):
         from pages.tutor.scores import Scores
         return go_to_(Scores(self.driver, base_url=self.base_url))
 
-    @property
-    def section_tabs(self):
-        """Access the section or period tabs.
+    def clear_training_wheels(self) -> None:
+        """Clear any joyride modals.
 
-        :return: the list of available sections or periods
-        :rtype: list(:py:class:`PerformanceForecast.Section`)
+        :return: None
 
         """
-        return [self.Section(self, tab)
-                for tab in self.find_elements(*self._section_tab_locator)]
-
-    def view_section(self, name):
-        """View a course section by its name.
-
-        :return: the performance forecast for the requested section or period
-        :rtype: :py:class:`PerformanceForecast`
-
-        :raises :py:class:`utils.tutor.TutorException`: if the name doesn't
-            match an available course section
-
-        """
-        for tab in self.section_tabs:
-            if tab.name == name:
-                tab.select()
-                return self.page
-        raise TutorException('"{0}" does not match any active section')
-
-    @property
-    def no_data(self):
-        """Return the 'no questions worked' message, if found.
-
-        :return: the 'no questions worked' message if found, otherwise an empty
-            string
-        :rtype: str
-
-        """
-        message = self.find_elements(*self._no_data_locator).text
-        return message[0].text if message else ''
+        try:
+            while Utility.has_children(
+                    self.find_element(*self._joyride_root_selector)):
+                tooltip = Tooltip(self, self.find_element(
+                    *self._joyride_root_selector))
+                tooltip.next()
+                sleep(1)
+        except NoSuchElementException:
+            sleep(0.5)
 
     @property
     def forecast(self):
@@ -227,6 +165,89 @@ class PerformanceForecast(TutorBase):
             return self.Guide(self, forecast)
         except NoSuchElementException:
             raise TutorException('Performance guide not found; is there data?')
+
+    def go_back(self):
+        """Return to the previous page.
+
+        Clicking on the 'Back to ...' button returns the user to the previously
+        visited Tutor page, which is often the student's course page or the
+        teacher's calendar.
+
+        :return: None
+
+        """
+        button = self.find_element(*self._go_back_button_locator)
+        Utility.click_option(self.driver, element=button)
+
+    @property
+    def guide(self):
+        """Access the colored bar guide.
+
+        :return: the list of possible bar colors and their associated keys
+        :rtype: list(:py:class:`~PerformanceForecast.Bar`)
+
+        """
+        return [self.Bar(self, bar)
+                for bar in self.find_elements(*self._guide_locator)]
+
+    @property
+    def loaded(self) -> bool:
+        """Return True when the performance forecast is loaded.
+
+        :return: ``True`` if no loading messages or elements are found
+        :rtype: bool
+
+        """
+        return not self.find_elements(*self._loading_message_locator)
+
+    @property
+    def no_data(self):
+        """Return the 'no questions worked' message, if found.
+
+        :return: the 'no questions worked' message if found, otherwise an empty
+            string
+        :rtype: str
+
+        """
+        message = self.find_elements(*self._no_data_locator)
+        return message[0].text if message else ''
+
+    @property
+    def section_tabs(self):
+        """Access the section or period tabs.
+
+        :return: the list of available sections or periods
+        :rtype: list(:py:class:`PerformanceForecast.Section`)
+
+        """
+        return [self.Section(self, tab)
+                for tab in self.find_elements(*self._section_tab_locator)]
+
+    @property
+    def title(self):
+        """Return the page title.
+
+        :return: the page title
+        :rtype: str
+
+        """
+        return self.find_element(*self._page_title_locator).text
+
+    def view_section(self, name):
+        """View a course section by its name.
+
+        :return: the performance forecast for the requested section or period
+        :rtype: :py:class:`PerformanceForecast`
+
+        :raises :py:class:`utils.tutor.TutorException`: if the name doesn't
+            match an available course section
+
+        """
+        for tab in self.section_tabs:
+            if tab.name == name:
+                tab.select()
+                return self.page
+        raise TutorException('"{0}" does not match any active section')
 
     class Bar(Region):
         """A progress bar."""

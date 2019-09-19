@@ -3,7 +3,8 @@
 from time import sleep
 
 from pypom import Region
-from selenium.common.exceptions import WebDriverException
+from selenium.common.exceptions import (NoSuchElementException,
+                                        WebDriverException)
 from selenium.webdriver.common.by import By
 
 from utils.utilities import Actions, Utility, go_to_
@@ -28,7 +29,8 @@ class WebNavMenu(Region):
                   .format(self._menu_item_selector))
         menus = ' '.join(list(
             menu.get_attribute('textContent')
-            for menu in self.driver.execute_script(script)))
+            for menu
+            in self.driver.execute_script(script)))
         return 'Subjects' in menus
 
     def is_displayed(self):
@@ -69,9 +71,9 @@ class WebNavMenu(Region):
                 '.{parent} {menu_locator}'.format(
                     parent='.'.join(self.root.get_attribute('class').split()),
                     menu_locator=self._open_menu_locator[1]))
-            Utility.safari_exception_click(driver=self.driver,
-                                           locator=target,
-                                           force_js_click=True)
+            Utility.click_option(driver=self.driver,
+                                 locator=target,
+                                 force_js_click=True)
         sleep(0.25)
         return self
 
@@ -84,9 +86,9 @@ class WebNavMenu(Region):
                               link_locator=locator,
                               force_js_click=True)
         else:
-            Utility.safari_exception_click(driver=self.driver,
-                                           locator=locator,
-                                           force_js_click=True)
+            Utility.click_option(driver=self.driver,
+                                 locator=locator,
+                                 force_js_click=True)
         sleep(1.0)
         return go_to_(destination(self.driver))
 
@@ -95,14 +97,14 @@ class WebNav(Region):
     """Website navbar region."""
 
     _root_locator = (By.CSS_SELECTOR, '.nav')
-    _openstax_logo_locator = (By.CSS_SELECTOR, '.os-logo > a')
+    _openstax_logo_locator = (By.CSS_SELECTOR, '.logo > a , a.logo')
     _slogan_locator = (By.CSS_SELECTOR, '.logo-quote')
-    _subjects_dropdown_locator = (By.CLASS_NAME, 'subjects-dropdown')
-    _technology_dropdown_locator = (By.CLASS_NAME, 'technology-dropdown')
-    _what_we_do_dropdown_locator = (By.CLASS_NAME, 'what-we-do-dropdown')
-    _user_menu_locator = (By.CLASS_NAME, 'login')
+    _subjects_dropdown_locator = (By.CSS_SELECTOR, '.subjects-dropdown')
+    _technology_dropdown_locator = (By.CSS_SELECTOR, '.technology-dropdown')
+    _what_we_do_dropdown_locator = (By.CSS_SELECTOR, '.what-we-do-dropdown')
+    _user_menu_locator = (By.CSS_SELECTOR, '.login , .login-dropdown')
     _back_link_locator = (By.CSS_SELECTOR, 'a.close')
-    _meta_menu_locator = (By.CLASS_NAME, 'expand')
+    _meta_menu_locator = (By.CSS_SELECTOR, '.expand')
 
     def is_displayed(self):
         """Return True if the nav bar is displayed."""
@@ -123,8 +125,8 @@ class WebNav(Region):
 
     def go_home(self):
         """Return to the home page by clicking on the OpenStax logo."""
-        Utility.safari_exception_click(self.driver,
-                                       locator=self._openstax_logo_locator)
+        logo = self.find_element(*self._openstax_logo_locator)
+        Utility.safari_exception_click(self.driver, element=logo)
         from pages.web.home import WebHome
         return go_to_(WebHome(self.driver, self.page.base_url))
 
@@ -445,10 +447,11 @@ class WebNav(Region):
 
         _menu_expand_locator = (By.CSS_SELECTOR, 'nav.dropdown-menu')
         _log_in_link_locator = (By.CSS_SELECTOR, '.pardotTrackClick')
-        _logged_in_locator = (By.CLASS_NAME, 'login-dropdown')
+        _logged_in_locator = (By.CSS_SELECTOR, '.login-dropdown')
         _open_menu_locator = (By.CSS_SELECTOR, '[href="."]')
         _profile_link_locator = (By.CSS_SELECTOR, '[href$=profile]')
-        _openstax_tutor_link_locator = (By.LINK_TEXT, 'OpenStax Tutor')
+        _openstax_tutor_link_locator = (
+            By.CSS_SELECTOR, f'{_logged_in_locator[1]} [href*=tutor]')
         _training_wheel_locator = (By.CSS_SELECTOR, '.training-wheel')
         _faculty_access_locator = (By.CSS_SELECTOR, '[href*=faculty]')
         _log_out_link_locator = (By.CSS_SELECTOR, '[href*=logout]')
@@ -535,8 +538,12 @@ class WebNav(Region):
         @property
         def training_wheel(self):
             """Return the training wheel modal."""
-            training_root = self.find_element(*self._training_wheel_locator)
-            return self.TrainingWheel(self, training_root)
+            try:
+                training_root = self.find_element(
+                    *self._training_wheel_locator)
+                return self.TrainingWheel(self, training_root)
+            except NoSuchElementException:
+                return
 
         @property
         def instructor_access(self):

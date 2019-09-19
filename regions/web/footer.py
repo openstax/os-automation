@@ -38,7 +38,7 @@ class Footer(Region):
         """Access the directory.
 
         :return: the upper footer box directory
-        :rtype: :py:class:`~Footer.Directory`
+        :rtype: :py:class:`~regions.web.footer.Footer.Directory`
 
         """
         region_root = self.find_element(*self._directory_locator)
@@ -49,7 +49,7 @@ class Footer(Region):
         """Access the supplemental information and social services.
 
         :return: the lower footer box information
-        :rtype: :py:class:`~Footer.Supplemental`
+        :rtype: :py:class:`~regions.web.footer.Footer.Supplemental`
 
         """
         region_root = self.find_element(*self._supplemental_locator)
@@ -59,7 +59,7 @@ class Footer(Region):
         """Scroll the section into view.
 
         :return: the parent Web page
-        :rtype: :py:class:`~pages.web.WebBase`
+        :rtype: :py:class:`~pages.web.base.WebBase`
 
         """
         Utility.scroll_to(self.driver, element=self.root)
@@ -68,7 +68,7 @@ class Footer(Region):
     class Directory(Region):
         """The site map directory links."""
 
-        _heading_locator = (By.CSS_SELECTOR, '[role=heading]')
+        _heading_locator = (By.CSS_SELECTOR, 'h2')
         _mission_statement_locator = (By.CSS_SELECTOR, '.mission')
         _give_locator = (By.CSS_SELECTOR, '[href$=give]')
 
@@ -280,7 +280,8 @@ class Footer(Region):
             :rtype: str
 
             """
-            return self.find_element(*self._copyright_statement_locator).text
+            return (self.find_element(*self._copyright_statement_locator)
+                    .text.replace('\n', ' '))
 
         @property
         def ap_statement(self):
@@ -290,7 +291,8 @@ class Footer(Region):
             :rtype: str
 
             """
-            return self.find_element(*self._ap_statement_locator).text
+            return (self.find_element(*self._ap_statement_locator)
+                    .text.replace('\n', ' '))
 
         # ------------------------------------------------ #
         # Social media

@@ -62,9 +62,19 @@ class OpenStaxBook(object):
             else:
                 section = int(section)
         terms = self._terms.get(section)
+        if not terms and isinstance(section, int):
+            terms = {}
+            for section_number in range(9, 0, -1):
+                section_terms = self._terms.get(float(
+                    f'{section}.{section_number}'))
+                if section_terms:
+                    terms.update(section_terms)
         if not terms:
-            raise BookIndexError('No terms found in section {0} of {1}'
-                                 .format(section, self.book_title))
+            raise BookIndexError(
+                'No terms found in {0} {1} of {2}'.format(
+                    'chapter' if isinstance(section, int) else 'section',
+                    section,
+                    self.book_title))
         keys = list(terms.keys())
         term = keys[randint(0, len(keys) - 1)]
         return (term, terms.get(term))

@@ -1,0 +1,8 @@
+{
+  "capabilities": {
+    "browserName": "internet explorer",
+    "platform": "Windows 10",
+    "version": "11.285",
+    "screenResolution": "1024x768"
+  }
+}
