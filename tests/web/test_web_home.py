@@ -736,8 +736,6 @@ def test_able_to_log_into_the_web_site(web_base_url, selenium, student):
     # Accounts directly instead of using the Web page
     # object log in routine (Safari issue)
     home.wait_for_page_to_load()
-    if home.web_nav.login.modal_displayed:
-        home.web_nav.login.training_wheel.close_modal()
 
     # THEN: the Web home page is displayed
     # AND:  the "Login" menu is replaced by the "Hi <first_name>" user menu
@@ -812,8 +810,6 @@ def test_user_menu_profile_link_loads_accounts_profile_for_the_student(
     # GIVEN: a user logged into the Web home page
     home = Home(selenium, web_base_url).open()
     home = home.web_nav.login.log_in(*student)
-    if home.web_nav.login.modal_displayed:
-        home.web_nav.login.training_wheel.close_modal()
 
     # WHEN: they open the user menu
     # AND:  click on the "Account Profile" menu option
@@ -848,8 +844,6 @@ def test_go_to_the_users_openstax_tutor_dashboard(
     # GIVEN: a user logged into the Web home page
     home = Home(selenium, web_base_url).open()
     home = home.web_nav.login.log_in(*student)
-    if home.web_nav.login.modal_displayed:
-        home.web_nav.login.training_wheel.close_modal()
 
     # WHEN: they open the user menu
     # AND:  click on the "OpenStax Tutor" menu option

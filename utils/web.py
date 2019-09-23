@@ -45,11 +45,10 @@ class Web(object):
     # *** BOOK DETAILS ***
 
     # Book page tabs
-    partner_resources_are_split = True
     BOOK_DETAILS = 0
     INSTRUCTOR_RESOURCES = 1
-    PARTNER_RESOURCES = 2 if partner_resources_are_split else None
-    STUDENT_RESOURCES = 2 if not PARTNER_RESOURCES else 3
+    PARTNER_RESOURCES = 3
+    STUDENT_RESOURCES = 2
 
     # Book page order modals
     INDIVIDUAL = 0

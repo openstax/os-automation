@@ -85,7 +85,7 @@ class Errata(WebBase):
 
     _loaded_locator = (By.CLASS_NAME, 'page-loaded')
     _table_locator = (By.CSS_SELECTOR, '.summary-table tbody')
-    _title_locator = (By.CSS_SELECTOR, '[data-html="title()"]')
+    _title_locator = (By.CSS_SELECTOR, '.hero h1')
     _tooltip_base_locator = (By.CSS_SELECTOR, '.with-tooltip')
     _schedule_locator = (By.CSS_SELECTOR, '.tooltip p')
     _filter_toggle_locator = (By.CSS_SELECTOR, '.filter-buttons')
@@ -335,16 +335,16 @@ class ErrataForm(WebBase):
     URL_TEMPLATE = '/errata/form?book={book}'
 
     _form_locator = (By.CSS_SELECTOR, '.body-block')
-    _subject_locator = (By.CSS_SELECTOR, '.select span')
+    _subject_locator = (By.CSS_SELECTOR, '.item')
 
     @property
     def loaded(self):
         """Return True when an errata form is found."""
-        return self.find_element(*self._form_locator)
+        return bool(self.find_elements(*self._form_locator))
 
     def is_displayed(self):
         """Return True if the form is displayed."""
-        return self.loaded.is_displayed()
+        return self.find_element(*self._form_locator).is_displayed()
 
     @property
     def subject(self):

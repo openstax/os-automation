@@ -12,8 +12,9 @@ from pages.accounts.signup import Signup
 from pages.web.book import Book
 from pages.web.errata import ErrataForm
 from pages.web.home import WebHome
-from tests.markers import accounts, nondestructive, skip_if_headless  # NOQA
-from tests.markers import skip_test, smoke_test, test_case, web  # NOQA
+from tests.markers import (accounts, expected_failure, nondestructive,
+                           skip_if_headless, skip_test, smoke_test, test_case,
+                           web)
 from utils.accounts import Accounts
 from utils.email import RestMail
 from utils.utilities import Actions, Utility
@@ -399,6 +400,7 @@ def test_current_book_editions_have_an_errata_section(web_base_url, selenium):
 
 @test_case('C210362')
 @nondestructive
+@expected_failure(reason='No old editions currently available')
 @web
 def test_an_old_version_does_not_have_errata(web_base_url, selenium):
     """Test that the current edition of a book has an errata section."""
@@ -463,7 +465,6 @@ def test_logged_in_users_may_view_the_errata_submission_form(
     # AND:   are logged into the website
     home = WebHome(selenium, web_base_url).open()
     home.web_nav.login.log_in(*teacher, destination=WebHome, url=web_base_url)
-    home.web_nav.login.training_wheel.close_modal()
     subjects = home.web_nav.subjects.view_all()
     book = subjects.select_random_book(_from=Library.OPENSTAX,
                                        filter_current=True)
@@ -649,22 +650,24 @@ def test_verified_instructors_may_access_locked_resources(
     # AND:  click on the "Click here to unlock" link
     book.select_tab(Web.INSTRUCTOR_RESOURCES)
     options = book.instructor.resources_by_option(Web.LOCKED)
-    assert(options)
+    assert(options), 'No locked instructor resources found'
     option = options[Utility.random(0, len(options) - 1)]
     option_title = option.title
     option.select()
     accounts = AccountsHome(selenium, accounts_base_url)
 
     # THEN: the Accounts login page is displayed
-    assert(accounts.is_displayed())
-    assert('login' in accounts.location)
+    assert(accounts.is_displayed()), 'Accounts login not displayed'
+    assert('login' in accounts.location), \
+        f'Not at the Accounts login page ({accounts.location})'
 
     # WHEN: they log into Accounts
     accounts.service_log_in(*teacher, destination=Book, url=web_base_url)
 
     # THEN: the instructor resources tab on the book details page is displayed
     # AND:  the resource is no longer locked
-    assert(book.instructor.is_displayed())
+    assert(book.instructor.is_displayed()), \
+        f'Instructor resources not displayed ({book.location})'
     option = book.instructor.resource_by_name(option_title)
     assert(not option.is_locked), \
         '{option} is still locked'.format(option=option.title)
@@ -683,8 +686,6 @@ def test_verified_instructors_may_request_a_comped_ibook(
     subjects = home.web_nav.subjects.view_all()
     book = subjects.select_random_book(_from=Library.COMP_COPY)
     book.web_nav.login.log_in(*teacher, destination=Book, url=web_base_url)
-    if book.web_nav.login.modal_displayed:
-        book.web_nav.login.training_wheel.close_modal()
 
     # WHEN: they click on the "Instructor resources" tab
     # AND:  click on the "iBooks Comp Copy" tile
@@ -693,7 +694,7 @@ def test_verified_instructors_may_request_a_comped_ibook(
                 'Apple iBooks Comp Copy').select()
 
     # THEN: the comp copy modal is displayed
-    assert(comp_copy.is_displayed())
+    assert(comp_copy.is_displayed()), 'Comp copy modal not displayed'
 
     # WHEN: they click "Request iBook"
     comp_copy.submit()
@@ -701,16 +702,20 @@ def test_verified_instructors_may_request_a_comped_ibook(
     # THEN: a "Please enter a number." pop up appears below
     #       the "How many students will be using <book>
     #       this semester?" input box
-    assert(comp_copy.get_error() in
-           ['Please enter a number.',
-            'Please fill out this field.',
-            'Fill out this field'])
+    error = comp_copy.get_error()
+    expected_error_messages = [
+        'Please enter a number.',
+        'Please fill out this field.',
+        'Fill out this field']
+    assert(error in expected_error_messages), \
+        f'Unexpected message displayed: {error}'
 
     # WHEN: they click on the "Cancel" button
     comp_copy.cancel()
 
     # THEN: the comp copy modal is closed
-    assert(not comp_copy.is_displayed())
+    assert(not comp_copy.is_displayed()), \
+        'The comp copy modal did not close'
 
     # WHEN: they click on the "iBooks Comp Copy" tile
     # AND:  click on the 'X' icon
@@ -719,7 +724,8 @@ def test_verified_instructors_may_request_a_comped_ibook(
     comp_copy.close()
 
     # THEN: the comp copy modal is closed
-    assert(not comp_copy.is_displayed())
+    assert(not comp_copy.is_displayed()), \
+        'The comp copy modal did not close'
 
     # WHEN: they click on the "iBooks Comp Copy" tile
     # AND:  enter a zero or greater number in the input box
@@ -730,13 +736,15 @@ def test_verified_instructors_may_request_a_comped_ibook(
     comp_copy_receipt = comp_copy.submit()
 
     # THEN: "Your request was submitted!" is displayed
-    assert('Your request was submitted!' in comp_copy_receipt.text)
+    assert('Your request was submitted!' in comp_copy_receipt.text), \
+        'The comp copy request confirmation was not shown'
 
     # WHEN: they click on the "Close" button
     comp_copy_receipt.close()
 
     # THEN: the comp copy modal is closed
-    assert(not comp_copy_receipt.is_displayed())
+    assert(not comp_copy_receipt.is_displayed()), \
+        'The comp copy modal did not close'
 
 
 @test_case('C210370')
@@ -752,8 +760,6 @@ def test_resources_have_a_title_description_and_access_type(
     # AND:  the book has student resources
     home = WebHome(selenium, web_base_url).open()
     home.web_nav.login.log_in(*teacher, destination=WebHome, url=web_base_url)
-    if home.web_nav.login.modal_displayed:
-        home.web_nav.login.training_wheel.close_modal()
     subjects = home.web_nav.subjects.view_all()
     book = subjects.select_random_book(_from=Library.HAS_S_UNLOCK)
 
@@ -900,10 +906,9 @@ def test_books_may_have_ally_tiles(web_base_url, selenium):
     home = WebHome(selenium, web_base_url).open()
     subjects = home.web_nav.subjects.view_all()
     book = subjects.select_random_book(_from=Library.OPENSTAX)
-    # book_title = book.title
 
-    # WHEN: they click on the "Instructor resources" tab
-    book.select_tab(Web.INSTRUCTOR_RESOURCES)
+    # WHEN: they click on the "Partner resources" tab
+    book.select_tab(Web.PARTNER_RESOURCES)
 
     # THEN: there may be an Allies section with one or more
     #       Ally tiles with the company name on the tile

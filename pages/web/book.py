@@ -11,7 +11,7 @@ from selenium.webdriver.support import expected_conditions as expect
 from pages.accounts.home import AccountsHome
 from pages.web.base import WebBase
 from utils.utilities import Utility, go_to_
-from utils.web import Web
+from utils.web import Web, WebException
 
 DISPLAY_TAB = (
     'return document.querySelectorAll(".tab")[{tab}]'
@@ -179,8 +179,9 @@ class Book(WebBase):
     @property
     def tabs(self):
         """Return the resource tabs."""
-        assert(self.driver.get_window_size().get('width') > Web.PHONE), \
-            'Tab viewing is not available in the phone display'
+        if self.driver.get_window_size().get('width') <= Web.PHONE:
+            raise WebException(
+                'Tab viewing is not available in the phone display')
         return [tab for tab in self.find_elements(*self._tab_locator)]
 
     def select_tab(self, tab):
@@ -201,8 +202,8 @@ class Book(WebBase):
     @property
     def sidebar(self):
         """Access the sidebar links."""
-        assert(self.driver.get_window_size().get('width') > Web.PHONE), \
-            'Sidebar not available in the phone display'
+        if self.driver.get_window_size().get('width') <= Web.PHONE:
+            raise WebException('Sidebar not available in the phone display')
         sidebar_root = self.find_element(*self._sidebar_locator)
         return self.Sidebar(self, sidebar_root)
 
@@ -248,12 +249,18 @@ class Book(WebBase):
         _ibook_download_locator = (By.CSS_SELECTOR, '[href*=itunes]')
         _kindle_download_locator = (
             By.CSS_SELECTOR, '[href*=amazon] , [href*="/a.co/"]')
+        _chegg_view_locator = (By.CSS_SELECTOR, '[href*=chegg]')
+        _view_more_options_locator = (By.CSS_SELECTOR, '.sidebar [href="."]')
         _interest_locator = (By.CSS_SELECTOR, '[href*=interest]')
         _adoption_locator = (By.CSS_SELECTOR, '[href*=adoption]')
 
         @property
         def options(self):
             """Return the available sideboar options."""
+            view_more = self.find_elements(*self._view_more_options_locator)
+            if view_more:
+                Utility.click_option(self.driver, element=view_more[0])
+                sleep(0.5)
             exists = self.find_elements
             return {
                 'toc': bool(exists(*self._toc_locator)),
@@ -263,6 +270,7 @@ class Book(WebBase):
                 'bookshare': bool(exists(*self._bookshare_locator)),
                 'ibook': bool(exists(*self._ibook_download_locator)),
                 'kindle': bool(exists(*self._kindle_download_locator)),
+                'chegg': bool(exists(*self._chegg_view_locator)),
                 'interest': bool(exists(*self._interest_locator)),
                 'adoption': bool(exists(*self._adoption_locator)), }
 
@@ -273,12 +281,14 @@ class Book(WebBase):
 
         def view_table_of_contents(self):
             """Open the Table of Contents modal."""
-            Utility.safari_exception_click(self.driver,
-                                           locator=self._toc_locator)
+            self.options
+            Utility.click_option(self.driver,
+                                 locator=self._toc_locator)
             return self.table_of_contents
 
         def view_online(self, get_url=False):
             """View the book on CNX.org."""
+            self.options
             link = self.find_element(*self._online_view_locator)
             if get_url:
                 return link.get_attribute('href')
@@ -294,6 +304,7 @@ class Book(WebBase):
 
         def download_pdf(self):
             """Click the download link."""
+            self.options
             link = self.find_element(*self._pdf_download_locator)
             return Utility.switch_to(self.driver, element=link)
 
@@ -304,12 +315,14 @@ class Book(WebBase):
 
         def view_book_order_options(self):
             """Open the Book Order modal."""
-            Utility.safari_exception_click(self.driver,
-                                           locator=self._print_copy_locator)
+            self.options
+            Utility.click_option(self.driver,
+                                 locator=self._print_copy_locator)
             return self.order_book
 
         def view_bookshare(self, url=False):
             """Open the Bookshare page for the textbook."""
+            self.options
             link = self.find_element(*self._bookshare_locator)
             if url:
                 return link.get_attribute('href')
@@ -324,8 +337,9 @@ class Book(WebBase):
 
         def view_ibook(self, book=1, url=False):
             """Open the iTunes store page for the iBook."""
-            assert(book <= len(self.ibooks)), \
-                'iBook {number} not available.'.format(number=book)
+            self.options
+            if book <= len(self.ibooks):
+                raise WebException(f'iBook {book} not available.')
             link = self.ibooks[book - 1]
             if url:
                 return link.get_attribute('href')
@@ -335,6 +349,7 @@ class Book(WebBase):
 
         def view_kindle(self, url=False):
             """Open the Amazon store page for the Kindle ebook."""
+            self.options
             link = self.find_element(*self._kindle_download_locator)
             if url:
                 return link.get_attribute('href')
@@ -344,14 +359,14 @@ class Book(WebBase):
 
         def submit_interest_form(self):
             """Go to the interest form."""
-            Utility.safari_exception_click(
+            Utility.click_option(
                 self.driver, locator=self._interest_locator)
             from pages.web.interest import Interest
             return go_to_(Interest(self.driver, base_url=self.page.base_url))
 
         def submit_adoption_form(self):
             """Go to the adoption form."""
-            Utility.safari_exception_click(
+            Utility.click_option(
                 self.driver, locator=self._adoption_locator)
             from pages.web.adoption import Adoption
             return go_to_(Adoption(self.driver, base_url=self.page.base_url))
@@ -455,7 +470,7 @@ class Book(WebBase):
             except WebDriverException:
                 button = self.find_element(*self._pl_correction_locator)
                 from pages.katalyst.errata import ErrataForm
-            Utility.safari_exception_click(self.driver, element=button)
+            Utility.click_option(self.driver, element=button)
             if not logged_in:
                 return go_to_(AccountsHome(self.driver))
             if book:
@@ -470,7 +485,7 @@ class Book(WebBase):
                 book = button.get_attribute('href').split('=')[1]
             except WebDriverException:
                 return
-            Utility.safari_exception_click(self.driver, element=button)
+            Utility.click_option(self.driver, element=button)
             return go_to_(Errata(self.driver, book=book))
 
         @property
@@ -534,10 +549,11 @@ class Book(WebBase):
             """Click on the 'Find a webinar' link."""
             webinar = self.find_element(*self._webinar_link_locator)
             article_href = webinar.get_attribute('href')
-            assert(article_href), '{0} is missing its webinar link'.format(
-                self.page.title)
+            if not bool(article_href):
+                raise WebException(
+                    f'{self.page.title} is missing its webinar link')
             article_url = article_href.split('/')[-1]
-            Utility.safari_exception_click(self.driver, element=webinar)
+            Utility.click_option(self.driver, element=webinar)
             from pages.web.blog import Article
             return go_to_(Article(self.driver, article=article_url))
 
@@ -591,6 +607,8 @@ class Book(WebBase):
         _bookshare_locator = (By.CSS_SELECTOR, '.option [href*=bookshare]')
         _ibook_download_locator = (By.CSS_SELECTOR, '[href*=itunes]')
         _kindle_download_locator = (By.CSS_SELECTOR, '[href*=amazon]')
+        _chegg_view_locator = (By.CSS_SELECTOR, '[href*=chegg]')
+        _view_more_options_locator = (By.CSS_SELECTOR, '[href="."]')
         _interest_locator = (By.CSS_SELECTOR, '[href*=interest]')
         _adoption_locator = (By.CSS_SELECTOR, '[href*=adoption]')
 
@@ -608,8 +626,29 @@ class Book(WebBase):
         _errata_locator = (
             By.CSS_SELECTOR, '.accordion-item:last-child')
 
+        @property
+        def options(self):
+            """Return the available sideboar options."""
+            view_more = self.find_elements(*self._view_more_options_locator)
+            if view_more:
+                Utility.click_option(self.driver, element=view_more[0])
+                sleep(0.5)
+            exists = self.find_elements
+            return {
+                'toc': bool(exists(*self._toc_locator)),
+                'cnx': bool(exists(*self._online_view_locator)),
+                'pdf': bool(exists(*self._pdf_download_locator)),
+                'print': bool(exists(*self._print_copy_locator)),
+                'bookshare': bool(exists(*self._bookshare_locator)),
+                'ibook': bool(exists(*self._ibook_download_locator)),
+                'kindle': bool(exists(*self._kindle_download_locator)),
+                'chegg': bool(exists(*self._chegg_view_locator)),
+                'interest': bool(exists(*self._interest_locator)),
+                'adoption': bool(exists(*self._adoption_locator)), }
+
         def view_online(self):
             """View the book on CNX.org."""
+            self.options
             link = self.find_element(*self._online_view_locator)
             Utility.switch_to(self.driver, element=link)
             from pages.cnx.contents import Webview
@@ -617,8 +656,9 @@ class Book(WebBase):
 
         def download_pdf(self):
             """Click the download link."""
+            self.options
             link = self.find_element(*self._pdf_download_locator)
-            Utility.safari_exception_click(self.driver, element=link)
+            Utility.click_option(self.driver, element=link)
             return self.page
 
         @property
@@ -628,12 +668,14 @@ class Book(WebBase):
 
         def view_book_order_options(self):
             """Open the Book Order modal."""
-            Utility.safari_exception_click(self.driver,
-                                           locator=self._print_copy_locator)
+            self.options
+            Utility.click_option(self.driver,
+                                 locator=self._print_copy_locator)
             return self.order_book
 
         def view_bookshare(self):
             """Open the Bookshare page for the textbook."""
+            self.options
             link = self.find_element(*self._bookshare_locator)
             Utility.switch_to(self.driver, element=link)
             from pages.bookshare.home import Bookshare
@@ -646,8 +688,9 @@ class Book(WebBase):
 
         def view_ibook(self, book=1):
             """Open the iTunes store page for the iBook."""
-            assert(book <= len(self.ibooks)), \
-                'iBook {number} not available.'.format(number=book)
+            self.options
+            if book <= len(self.ibooks):
+                raise WebException(f'iBook {book} not available.')
             link = self.ibooks[book - 1]
             Utility.switch_to(self.driver, element=link)
             from pages.itunes.home import ITunes
@@ -655,6 +698,7 @@ class Book(WebBase):
 
         def view_kindle(self):
             """Open the Amazon store page for the Kindle ebook."""
+            self.options
             link = self.find_element(*self._kindle_download_locator)
             Utility.switch_to(self.driver, element=link)
             from pages.amazon.home import Amazon
@@ -662,14 +706,14 @@ class Book(WebBase):
 
         def submit_interest_form(self):
             """Go to the interest form."""
-            Utility.safari_exception_click(
+            Utility.click_option(
                 self.driver, locator=self._interest_locator)
             from pages.web.interest import Interest
             return go_to_(Interest(self.driver))
 
         def submit_adoption_form(self):
             """Go to the adoption form."""
-            Utility.safari_exception_click(
+            Utility.click_option(
                 self.driver, locator=self._adoption_locator)
             from pages.web.adoption import Adoption
             return go_to_(Adoption(self.driver))
@@ -953,7 +997,7 @@ class Book(WebBase):
                 except WebDriverException:
                     button = self.find_element(*self._pl_correction_locator)
                     from pages.katalyst.errata import ErrataForm
-                Utility.safari_exception_click(self.driver, element=button)
+                Utility.click_option(self.driver, element=button)
                 if not logged_in:
                     return go_to_(AccountsHome(self.driver))
                 if book:
@@ -968,7 +1012,7 @@ class Book(WebBase):
                     book = button.get_attribute('href').split('=')[1]
                 except WebDriverException:
                     return
-                Utility.safari_exception_click(self.driver, element=button)
+                Utility.click_option(self.driver, element=button)
                 return go_to_(Errata(self.driver, book=book))
 
 
@@ -1135,9 +1179,10 @@ class Modal(Region):
 
     def close(self):
         """Close the order form."""
-        assert(self.is_displayed), 'Order options are not visible'
+        if self.is_displayed:
+            raise WebException('Order options are not visible')
         close = self.find_element(*self._close_locator)
-        Utility.safari_exception_click(self.driver, element=close)
+        Utility.click_option(self.driver, element=close)
         return self.page
 
 
@@ -1240,7 +1285,7 @@ class BookOrder(Modal):
                 from pages.amazon.home import Amazon
                 return go_to_(Amazon(self.driver))
             elif self.title == 'Bookstore':
-                Utility.safari_exception_click(self.driver, element=target)
+                Utility.switch_to(self.driver, element=target)
                 from pages.web.bookstore_suppliers import Bookstore
                 return go_to_(Bookstore(self.driver))
 
@@ -1300,7 +1345,7 @@ class CompCopyRequest(Modal):
         """Submit the request form."""
         button = self.find_element(*self._request_button_locator)
         valid = self.is_valid
-        Utility.safari_exception_click(self.driver, element=button)
+        Utility.click_option(self.driver, element=button)
         if valid:
             return CompCopyRequestReceipt(page=self.page)
         return self
@@ -1308,7 +1353,7 @@ class CompCopyRequest(Modal):
     def cancel(self):
         """Cancel out of the form."""
         button = self.find_element(*self._cancel_button_locator)
-        Utility.safari_exception_click(self.driver, element=button)
+        Utility.click_option(self.driver, element=button)
         return self.page
 
 
@@ -1337,7 +1382,7 @@ class CompCopyRequestReceipt(Modal):
     def close(self):
         """Click the dialog close button."""
         button = self.find_element(*self._close_button_locator)
-        Utility.safari_exception_click(self.driver, element=button)
+        Utility.click_option(self.driver, element=button)
         return self.page
 
 

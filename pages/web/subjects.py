@@ -10,7 +10,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 
 from pages.web.base import WebBase
 from utils.utilities import Utility, go_to_
-from utils.web import Library, Web
+from utils.web import Library, Web, WebException
 
 
 class Subjects(WebBase):
@@ -290,7 +290,8 @@ class Subjects(WebBase):
             using = list(filter(
                 lambda book: book.title not in Library.OLD_EDITIONS, using))
         total = len(using)
-        assert(total > 0), 'No books are available for selection'
+        if total <= 0:
+            raise WebException('No books are available for selection')
         book = Utility.random(0, total - 1)
         selected = using[book]
         print('Selected book: {0}'.format(selected.title))
