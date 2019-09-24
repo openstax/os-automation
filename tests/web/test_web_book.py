@@ -909,14 +909,16 @@ def test_books_may_have_ally_tiles(web_base_url, selenium):
 
     # WHEN: they click on the "Partner resources" tab
     book.select_tab(Web.PARTNER_RESOURCES)
+    from time import sleep
+    sleep(5)
 
     # THEN: there may be an Allies section with one or more
     #       Ally tiles with the company name on the tile
-    assert(book.instructor.partners)
+    assert(book.partners.partners), 'No partner resources found'
 
     # WHEN: the cursor hovers over a tile
-    random_tile = Utility.random(0, len(book.instructor.partners) - 1)
-    tile = book.instructor.partners[random_tile]
+    random_tile = Utility.random(0, len(book.partners.partners) - 1)
+    tile = book.partners.partners[random_tile]
     tile_name = tile.name
     Utility.scroll_to(selenium, element=tile.root)
     print(tile_name)

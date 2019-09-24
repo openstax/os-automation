@@ -222,6 +222,7 @@ class Web(object):
     VIEW_ALL = 'All'
     VIEW_AP = 'AP®'
     VIEW_BUSINESS = 'Business'
+    VIEW_ESSENTIALS = 'Essentials'
     VIEW_HUMANITIES = 'Humanities'
     VIEW_MATH = 'Math'
     VIEW_SCIENCE = 'Science'
@@ -335,6 +336,7 @@ class Web(object):
         'social-sciences',
         'humanities',
         'business',
+        'essentials',
         'ap'
     ]
     FILTERS = [
@@ -343,6 +345,7 @@ class Web(object):
         VIEW_SOCIAL_SCIENCES,
         VIEW_HUMANITIES,
         VIEW_BUSINESS,
+        VIEW_ESSENTIALS,
         VIEW_AP
     ]
     MENU_SUBJECTS = [
@@ -356,7 +359,8 @@ class Web(object):
         VIEW_SOCIAL_SCIENCES: 3,
         VIEW_HUMANITIES: 4,
         VIEW_BUSINESS: 5,
-        VIEW_AP: 6,
+        VIEW_ESSENTIALS: 6,
+        VIEW_AP: 7,
     }
     MENU_TECHNOLOGY = [
         VIEW_TECHNOLOGY,
@@ -567,6 +571,7 @@ class Library():
     ALL = 'View All'
     AP = 'AP®'
     BUSINESS = 'Business'
+    ESSENTIALS = 'Essentials'
     HUMANITIES = 'Humanities'
     MATH = 'Math'
     SCIENCE = 'Science'
@@ -635,7 +640,7 @@ class Library():
                 self.SHORT_NAME: 'Introductory Business Statistics', },
             self.ENTREPRENEUR: {  # Pre-release
                 self.BOOKSHARE: False,
-                self.CATEGORY: [self.ALL, self.BUSINESS],
+                self.CATEGORY: [self.ALL, self.BUSINESS, self.ESSENTIALS],
                 self.CHEGG: False,
                 self.COMP_COPY: False,
                 self.DETAILS: 'entrepreneurship',
@@ -723,6 +728,9 @@ class Library():
                 self.PRE_RELEASE: False,
                 self.PRINT_COPY: False,
                 self.SHORT_NAME: None, },
+
+            # Essentials
+            # currently, only Entrepreneurship is in Essentials
 
             # Humanities
             self.US_HISTORY: {
@@ -1408,6 +1416,11 @@ class Library():
         """Return the current edition of each book."""
         return [(book, self.get(book)) for book in self.books
                 if book not in self.OLD_EDITIONS]
+
+    @property
+    def essentials(self):
+        """Return the essentials books."""
+        return self.get_by_category(self.ESSENTIALS)
 
     @property
     def humanities(self):

@@ -489,6 +489,7 @@ def test_able_to_view_subjects_using_the_nav_menu(web_base_url, selenium):
                   all_subjects.social_sciences,
                   all_subjects.humanities,
                   all_subjects.business,
+                  all_subjects.essentials,
                   all_subjects.ap]
     assert(all_subjects.is_displayed())
     assert(all_subjects.is_filtered_by(Web.NO_FILTER))
@@ -522,6 +523,7 @@ def test_able_to_view_subjects_using_the_nav_menu(web_base_url, selenium):
                   all_subjects.social_sciences,
                   all_subjects.humanities,
                   all_subjects.business,
+                  all_subjects.essentials,
                   all_subjects.ap]
     assert(all_subjects.is_displayed())
     assert(all_subjects.is_filtered_by(Web.NO_FILTER))
@@ -557,6 +559,7 @@ def test_subject_menu_options_load_filtered_views(web_base_url, selenium):
                 home.web_nav.subjects.view_social_sciences,
                 home.web_nav.subjects.view_humanities,
                 home.web_nav.subjects.view_business,
+                home.web_nav.subjects.view_essentials,
                 home.web_nav.subjects.view_ap
             ]
             if device == 'mobile' and not home.web_nav.meta.is_open:
@@ -573,6 +576,7 @@ def test_subject_menu_options_load_filtered_views(web_base_url, selenium):
                 subject.social_sciences,
                 subject.humanities,
                 subject.business,
+                subject.essentials,
                 subject.ap
             ]
             assert(subject.location.endswith(Web.URL_APPENDS[index])), (

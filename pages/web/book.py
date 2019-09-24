@@ -34,13 +34,15 @@ class ResourceTab(Region):
     @property
     def slogan(self):
         """Return the instructor resource slogan."""
-        return self.find_element(*self._slogan_locator).text
+        return (self.find_element(*self._slogan_locator)
+                .get_attribute('textContent'))
 
     @property
     def resources(self):
         """Return a list of available resources."""
         return [Resource(self, box)
-                for box in self.find_elements(*self._resource_locator)]
+                for box
+                in self.find_elements(*self._resource_locator)]
 
     def resource_by_name(self, name):
         """Return a resource box by its name."""
@@ -115,6 +117,7 @@ class Book(WebBase):
     _book_content_locator = (By.CSS_SELECTOR, '.main')
     _instructor_locator = (By.CSS_SELECTOR, '.instructor-resources')
     _student_locator = (By.CSS_SELECTOR, '.student-resources')
+    _partner_locator = (By.CSS_SELECTOR, '.partners-tab')
 
     _sidebar_locator = (By.CSS_SELECTOR, '.sidebar')
     _phone_view_locator = (By.CSS_SELECTOR, '.phone-view')
@@ -219,7 +222,7 @@ class Book(WebBase):
     def partners(self):
         """Access the partner resources."""
         if self.driver.get_window_size().get('width') > Web.PHONE:
-            partner_root = self.find_element(*self._book_content_locator)
+            partner_root = self.find_element(*self._partner_locator)
             return self.PartnerResources(self, partner_root)
         return None
 
@@ -573,7 +576,7 @@ class Book(WebBase):
         """The partner resources tab."""
 
         _slogan_locator = (By.CSS_SELECTOR, '.ally-blurb h2')
-        _partner_info_locator = (By.CSS_SELECTOR, '.ally-blurb a')
+        _partner_info_locator = (By.CSS_SELECTOR, '.blurb-body')
         _resource_locator = (By.CSS_SELECTOR, '.ally-box')
 
         def is_displayed(self):
@@ -583,8 +586,10 @@ class Book(WebBase):
         @property
         def partners(self):
             """Return a list of available resources."""
+            print(self.root.get_attribute('outerHTML'))
             return [Partner(self, box)
-                    for box in self.find_elements(*self._resource_locator)]
+                    for box
+                    in self.find_elements(*self._resource_locator)]
 
         @property
         def resources(self):

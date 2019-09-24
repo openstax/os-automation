@@ -45,6 +45,8 @@ class Subjects(WebBase):
         By.XPATH, category_xpath.format(subject=Web.VIEW_HUMANITIES))
     _business_category_locator = (
         By.XPATH, category_xpath.format(subject=Web.VIEW_BUSINESS))
+    _essentials_category_locator = (
+        By.XPATH, category_xpath.format(subject=Web.VIEW_ESSENTIALS))
     _ap_category_locator = (
         By.XPATH, category_xpath.format(subject=Web.VIEW_AP.replace('®', '')))
     _book_locator = (By.CSS_SELECTOR, 'div.book-category:not(.hidden) .cover')
@@ -139,6 +141,12 @@ class Subjects(WebBase):
         return self.Category(self, business_root)
 
     @property
+    def essentials(self):
+        """Return the subjects filtered by the essentials titles."""
+        essentials_root = self.find_element(*self._essentials_category_locator)
+        return self.Category(self, essentials_root)
+
+    @property
     def ap(self):
         """Return the subjects filtered by the AP titles."""
         ap_root = self.find_element(*self._ap_category_locator)
@@ -174,6 +182,11 @@ class Subjects(WebBase):
     def current_books(self):
         """Select the current editions of each book."""
         return self._selection_helper(Library().current)
+
+    @property
+    def essentials_books(self):
+        """Select active essentials books."""
+        return self._selection_helper(Library().essentials)
 
     @property
     def humanities_books(self):

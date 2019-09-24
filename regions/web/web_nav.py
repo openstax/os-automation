@@ -220,6 +220,7 @@ class WebNav(Region):
                                            '[href$=social-sciences]')
         _humanities_option_locator = (By.CSS_SELECTOR, '[href$=humanities]')
         _business_option_locator = (By.CSS_SELECTOR, '[href$=business]')
+        _essentials_option_locator = (By.CSS_SELECTOR, '[href$=essentials]')
         _ap_option_locator = (By.CSS_SELECTOR, '[href$=ap]')
 
         def is_available(self, label):
@@ -233,6 +234,7 @@ class WebNav(Region):
                     self._social_sciences_option_locator[1]),
                 Web.VIEW_HUMANITIES: self._humanities_option_locator[1],
                 Web.VIEW_BUSINESS: self._business_option_locator[1],
+                Web.VIEW_ESSENTIALS: self._essentials_option_locator[1],
                 Web.VIEW_AP: self._ap_option_locator[1],
             }
             return self._is_available(label, 'subjects', subjects)
