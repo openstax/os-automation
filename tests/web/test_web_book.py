@@ -13,8 +13,7 @@ from pages.web.book import Book
 from pages.web.errata import ErrataForm
 from pages.web.home import WebHome
 from tests.markers import (accounts, expected_failure, nondestructive,
-                           skip_if_headless, skip_test, smoke_test, test_case,
-                           web)
+                           skip_if_headless, smoke_test, test_case, web)
 from utils.accounts import Accounts
 from utils.email import RestMail
 from utils.utilities import Actions, Utility
@@ -862,25 +861,61 @@ def test_unverified_users_sent_to_faculty_verification_for_locked_resources(
         'Instructor access text not found in the page source'
 
 
-@skip_test(reason='No locked student content')
 @test_case('C210372')
 @nondestructive
 @web
 def test_students_sign_up_to_access_locked_student_content(
-        web_base_url, selenium):
+        accounts_base_url, web_base_url, selenium):
     """Users are directed to sign up to access locked student content."""
+    # SETUP:
+    name = Utility.random_name()
+    email = RestMail('{first}.{last}.{tag}'.format(
+        first=name[1], last=name[2], tag=Utility.random_hex(4)).lower())
+    email.empty()
+    address = email.address
+    password = Utility.random_hex(20)
+
     # GIVEN: a user viewing the student resources on a book details page
     # AND:  is not logged into the site
     # AND:  there is a locked student resource
+    home = WebHome(selenium, web_base_url).open()
+    subjects = home.web_nav.subjects.view_all()
+    book = subjects.select_random_book(_from=Library.HAS_S_LOCK)
+    book_url = book.location.split('/')[-1]
+    book.select_tab(Web.STUDENT_RESOURCES)
 
     # WHEN: they click on "Click here to unlock" link
+    options = book.student.resources_by_option(Web.LOCKED)
+    assert(options), f'No locked student resources found for {book.title}'
+    option = options[Utility.random(0, len(options) - 1)]
+    option_title = option.title
+    option.select()
+    accounts = AccountsHome(selenium, accounts_base_url)
 
     # THEN: the Accounts sign up page is displayed
+    assert(accounts.is_displayed()), 'Accounts login page not displayed'
+    assert('accounts' in accounts.location), \
+        f'Not on an Accounts instance ({accounts.location})'
 
     # WHEN: they sign up
+    book = accounts.login.go_to_signup.account_signup(
+        email=address,
+        password=password,
+        _type=Accounts.STUDENT,
+        role=Accounts.STUDENT,
+        provider=Accounts.RESTMAIL,
+        name=name,
+        school='Automation',
+        news=False,
+        destination=Book(selenium, web_base_url, book_name=book_url))
 
     # THEN: the student resources on the book details page is displayed
     # AND:  the resource is available for download
+    assert(book.student.is_displayed()), \
+        f'Student resources not displayed ({book.location})'
+    option = book.student.resource_by_name(option_title)
+    assert(not option.is_locked), \
+        '{option} is still locked'.format(option=option.title)
 
 
 @test_case('C210373')
