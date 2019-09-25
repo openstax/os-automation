@@ -339,8 +339,9 @@ class ErrataForm(WebBase):
 
     @property
     def loaded(self):
-        """Return True when an errata form is found."""
-        return bool(self.find_elements(*self._form_locator))
+        """Return True when an errata form and book title are found."""
+        return (bool(self.find_elements(*self._form_locator)) and
+                bool(self.find_elements(*self._subject_locator)))
 
     def is_displayed(self):
         """Return True if the form is displayed."""

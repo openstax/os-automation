@@ -4,7 +4,7 @@ import re
 from time import sleep
 
 from pypom import Region
-from selenium.common.exceptions import WebDriverException
+from selenium.common.exceptions import WebDriverException, TimeoutException
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as expect
 
@@ -118,6 +118,8 @@ class Book(WebBase):
     _instructor_locator = (By.CSS_SELECTOR, '.instructor-resources')
     _student_locator = (By.CSS_SELECTOR, '.student-resources')
     _partner_locator = (By.CSS_SELECTOR, '.partners-tab')
+    _loading_overlay_locator = (By.CSS_SELECTOR, '.overlay')
+    _page_loaded_locator = (By.CSS_SELECTOR, 'body.page-loaded')
 
     _sidebar_locator = (By.CSS_SELECTOR, '.sidebar')
     _phone_view_locator = (By.CSS_SELECTOR, '.phone-view')
@@ -126,11 +128,11 @@ class Book(WebBase):
         """Output book information."""
         tabs = ''
         for tab in self.tabs:
-            tabs = tabs + ' "' + tab.text + '"'
-        return ('Book:    {title}\n'.format(title=self.title) +
-                'Tabs:    {tabs}\n'.format(tabs=tabs) +
-                'Sidebar: {sidebar}\n'.format(sidebar=self.sidebar.options) +
-                'Details: {details}\n'.format(details=self.details.options))
+            tabs = tabs + ' "' + tab.text + '"; '
+        return (f'Book:    {self.title}\n'
+                f'Tabs:    {tabs.strip()}\n'
+                f'Sidebar: {self.sidebar.options}\n'
+                f'Details: {self.details.options}\n')
 
     @property
     def loaded(self):
@@ -189,7 +191,16 @@ class Book(WebBase):
 
     def select_tab(self, tab):
         """Select a specific resource tab."""
-        Utility.scroll_to(self.driver, element=self.tabs[tab], shift=-80)
+        Utility.scroll_to(self.driver, element=self.tabs[tab], shift=-100)
+        from selenium.webdriver.support.ui import WebDriverWait
+        try:
+            WebDriverWait(self.driver, 3.0).until(
+                lambda _: (self.driver.execute_script(
+                    'return arguments[0].style.display == "";',
+                    self.find_element(*self._loading_overlay_locator)) or
+                    bool(self.find_elements(*self._page_loaded_locator))))
+        except TimeoutException:
+            pass
         self.tabs[tab].click()
         sleep(0.5)
         return self

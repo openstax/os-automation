@@ -514,8 +514,9 @@ def test_non_logged_in_users_are_directed_to_log_in_to_view_the_errata_form(
     accounts = book.details.submit_errata()
 
     # THEN: the Accounts login page is displayed
-    assert(accounts.is_displayed())
-    assert('accounts' in accounts.location)
+    assert(accounts.is_displayed()), 'Accounts login page not displayed'
+    assert('accounts' in accounts.location), \
+        f'Not on an Accounts instance ({accounts.location})'
 
     # WHEN: they log into Accounts
     errata_form = accounts.service_log_in(
@@ -524,8 +525,10 @@ def test_non_logged_in_users_are_directed_to_log_in_to_view_the_errata_form(
 
     # THEN: the errata form is displayed
     # AND:  the subject is prefilled in
-    assert(errata_form.is_displayed())
-    assert(errata_form.subject == book_title)
+    assert(errata_form.is_displayed()), 'Errata form not displayed'
+    assert(errata_form.subject == book_title), (
+        f'Errata form book ({errata_form.subject}) '
+        f'does not match used book ({book_title})')
 
 
 @test_case('C210366')
@@ -555,8 +558,9 @@ def test_non_logged_in_users_on_mobile_are_directed_to_log_in_for_errata_form(
     accounts = book.phone.errata.submit_errata()
 
     # THEN: the Accounts login page is displayed
-    assert(accounts.is_displayed())
-    assert('accounts' in accounts.location)
+    assert(accounts.is_displayed()), 'Accounts login page not displayed'
+    assert('accounts' in accounts.location), \
+        f'Not on an Accounts instance ({accounts.location})'
 
     # WHEN: they log into Accounts
     errata_form = accounts.service_log_in(
@@ -588,8 +592,9 @@ def test_teachers_are_asked_to_sign_up_to_access_locked_content(
     accounts = book.instructor.sign_up()
 
     # THEN: the Accounts sign up page is displayed
-    assert(accounts.is_displayed())
-    assert('accounts' in accounts.location)
+    assert(accounts.is_displayed()), 'Accounts login page not displayed'
+    assert('accounts' in accounts.location), \
+        f'Not on an Accounts instance ({accounts.location})'
 
 
 @test_case('C210368')
@@ -657,9 +662,9 @@ def test_verified_instructors_may_access_locked_resources(
     accounts = AccountsHome(selenium, accounts_base_url)
 
     # THEN: the Accounts login page is displayed
-    assert(accounts.is_displayed()), 'Accounts login not displayed'
-    assert('login' in accounts.location), \
-        f'Not at the Accounts login page ({accounts.location})'
+    assert(accounts.is_displayed()), 'Accounts login page not displayed'
+    assert('accounts' in accounts.location), \
+        f'Not on an Accounts instance ({accounts.location})'
 
     # WHEN: they log into Accounts
     accounts.service_log_in(*teacher, destination=Book, url=web_base_url)
@@ -774,10 +779,10 @@ def test_resources_have_a_title_description_and_access_type(
     #       Hub"
     for resource in book.instructor.resources_by_status(Web.ACCESS_OK):
         title = resource.title
-        assert(title)
-        assert(resource.description), '{0} missing a description'.format(title)
+        assert(title), 'Resource lacks a title'
+        assert(resource.description), f'{title} missing a description'
         assert(resource.status_message in Web.ACCESS_OK), \
-            '{0} does not show {1}'.format(title, Web.ACCESS_OK)
+            f'{title} does not show {Web.ACCESS_OK}'
 
     # WHEN: they click on the "Student resources" tab
     book.select_tab(Web.STUDENT_RESOURCES)
@@ -788,7 +793,7 @@ def test_resources_have_a_title_description_and_access_type(
     #       "Download"
     for resource in book.student.resources_by_status(Web.ACCESS_OK):
         title = resource.title
-        assert(title)
+        assert(title), 'Resource lacks a title'
         assert(resource.description), '{0} missing a description'.format(title)
         assert(resource.status_message in Web.ACCESS_OK), \
             '{0} does not show {1}'.format(title, Web.ACCESS_OK)
@@ -799,11 +804,10 @@ def test_resources_have_a_title_description_and_access_type(
     # THEN: the description is not displayed
     for resource in book.student.resources_by_status(Web.ACCESS_OK):
         title = resource.title
-        assert(title)
-        assert(not resource.description), \
-            '{0} shows a description'.format(title)
+        assert(title), 'Resource lacks a title'
+        assert(not resource.description), f'{title} missing a description'
         assert(resource.status_message in Web.ACCESS_OK), \
-            '{0} does not show {1}'.format(title, Web.ACCESS_OK)
+            f'{title} does not show {Web.ACCESS_OK}'
 
 
 @test_case('C210371')
@@ -812,15 +816,17 @@ def test_resources_have_a_title_description_and_access_type(
 def test_unverified_users_sent_to_faculty_verification_for_locked_resources(
         accounts_base_url, web_base_url, selenium, admin):
     """Test non-verified users must fill out faculty verification form."""
-    # GIVEN: a user viewing the instructor resources on a book details page
-    # AND:  have a non-verified, non-pending account
-    # AND:  are logged into the site
+    # SETUP:
     name = Utility.random_name()
     email = RestMail('{first}.{last}.{tag}'.format(
         first=name[1], last=name[2], tag=Utility.random_hex(4)).lower())
     email.empty()
     address = email.address
     password = Utility.random_hex(20)
+
+    # GIVEN: a user viewing the instructor resources on a book details page
+    # AND:  have a non-verified, non-pending account
+    # AND:  are logged into the site
     accounts = AccountsHome(selenium, accounts_base_url).open()
     profile = accounts.login.go_to_signup.account_signup(
         name=name, email=address, password=password, _type=Signup.INSTRUCTOR,
@@ -851,8 +857,9 @@ def test_unverified_users_sent_to_faculty_verification_for_locked_resources(
     verification = resource.select()
 
     # THEN: the Accounts faculty verification form is loaded in a new tab
-    assert(verification.is_displayed())
-    assert('Apply for instructor access' in selenium.page_source)
+    assert(verification.is_displayed()), 'Verification form not displayed'
+    assert('Apply for instructor access' in selenium.page_source), \
+        'Instructor access text not found in the page source'
 
 
 @skip_test(reason='No locked student content')
@@ -970,7 +977,9 @@ def test_available_student_resources_can_be_downloaded(web_base_url, selenium):
 
     # THEN: available resources are available for download
     for resource in book.student.resources:
-        assert(resource.can_be_downloaded or resource.is_external), \
+        assert(resource.can_be_downloaded or
+               resource.is_external or
+               resource.is_locked), \
             '{resource} is not available'.format(resource=resource.title)
 
 
