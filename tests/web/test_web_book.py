@@ -66,7 +66,7 @@ def test_the_availability_of_the_table_of_contents(web_base_url, selenium):
     # GIVEN: a user viewing the book details page
     home = WebHome(selenium, web_base_url).open()
     subjects = home.web_nav.subjects.view_all()
-    book = subjects.select_random_book()
+    book = subjects.select_random_book(_from=Library.AVAILABLE)
     book_title = book.title
 
     # WHEN: they click on the "Table of contents" link
@@ -118,7 +118,7 @@ def test_webview_for_a_book_is_avaialble(web_base_url, selenium):
     # GIVEN: a user viewing the book details page
     home = WebHome(selenium, web_base_url).open()
     subjects = home.web_nav.subjects.view_all()
-    book = subjects.select_random_book(_from=Library.ALL_BOOKS)
+    book = subjects.select_random_book(_from=Library.AVAILABLE)
     book_title = book.title
 
     # WHEN: they click on the "View online" link
@@ -141,7 +141,7 @@ def test_details_pdf_is_downloadable(web_base_url, selenium):
     # GIVEN: a user viewing the book details page
     home = WebHome(selenium, web_base_url).open()
     subjects = home.web_nav.subjects.view_all()
-    book = subjects.select_random_book(_from=Library.ALL_BOOKS)
+    book = subjects.select_random_book(_from=Library.AVAILABLE)
 
     # WHEN: they click on the "Download a PDF" link
     url = book.sidebar.pdf_url
@@ -980,7 +980,9 @@ def test_books_may_have_ally_tiles(web_base_url, selenium):
         # THEN: the company name is replaced by the company
         #       description
         if (not text_seen[0] and
-                not math.isclose(text_seen[1], text_seen[2], rel_tol=0.1)):
+                not math.isclose(float(text_seen[1]),
+                                 float(text_seen[2]),
+                                 rel_tol=0.1)):
             warnings.warn(UserWarning(
                 'On hover text for the tile "{0}"'.format(tile_name) +
                 ' failed to show: {0}, {1}, {2}'.format(*text_seen)))

@@ -603,7 +603,6 @@ class Book(WebBase):
         @property
         def partners(self):
             """Return a list of available resources."""
-            print(self.root.get_attribute('outerHTML'))
             return [Partner(self, box)
                     for box
                     in self.find_elements(*self._resource_locator)]
@@ -1224,6 +1223,7 @@ class TableOfContents(Region):
         """
         button = self.find_element(*self._close_slide_out_button_locator)
         Utility.click_option(self.driver, element=button)
+        sleep(0.33)
         return self.page
 
     def is_displayed(self) -> bool:

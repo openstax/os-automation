@@ -164,6 +164,11 @@ class Subjects(WebBase):
         return self._selection_helper(Library().ap)
 
     @property
+    def available_books(self):
+        """Select active books."""
+        return self._selection_helper(Library().available)
+
+    @property
     def bookshare_books(self):
         """Select active books available through Bookshare."""
         return self._selection_helper(Library().bookshare)
@@ -280,6 +285,7 @@ class Subjects(WebBase):
         using = {
             Library.ALL_BOOKS: self._active_books,
             Library.AP: self.ap_books,
+            Library.AVAILABLE: self.available_books,
             Library.BOOKSHARE: self.bookshare_books,
             Library.BUSINESS: self.business_books,
             Library.COMP_COPY: self.comp_copy,

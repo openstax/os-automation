@@ -544,6 +544,7 @@ class Library():
     # Fields and limiters
     ADOPTION = 'interest'
     ALL_BOOKS = 'all'
+    AVAILABLE = 'available'
     BOOKSHARE = 'bookshare'
     CATEGORY = 'subject'
     CHEGG = 'chegg'
@@ -1383,6 +1384,16 @@ class Library():
                 if self.get(book, self.IS_AP)]
 
     @property
+    def available(self):
+        """Return the available book.
+
+        Not pre-release
+
+        """
+        return [(book, self.get(book)) for book in self.books
+                if not self.get(book, self.PRE_RELEASE)]
+
+    @property
     def bookshare(self):
         """Return the books available through Bookshare."""
         return [(book, self.get(book)) for book in self.books
@@ -1514,6 +1525,8 @@ class Library():
 
     def get(self, book, field=None):
         """Return the field or fields for a specific book."""
+        if book == self.AP_PHYS_ALT:
+            book = self.AP_PHYS
         return_book = self.books.get(book)
         if field:
             return return_book.get(field)
