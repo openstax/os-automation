@@ -1,7 +1,10 @@
 """A marketing page for an OpenStax book."""
 
+from __future__ import annotations
+
 import re
 from time import sleep
+from typing import List
 
 from pypom import Region
 from selenium.common.exceptions import WebDriverException, TimeoutException
@@ -120,6 +123,7 @@ class Book(WebBase):
     _partner_locator = (By.CSS_SELECTOR, '.partners-tab')
     _loading_overlay_locator = (By.CSS_SELECTOR, '.overlay')
     _page_loaded_locator = (By.CSS_SELECTOR, 'body.page-loaded')
+    _toc_root_locator = (By.CSS_SELECTOR, '.toc-slideout')
 
     _sidebar_locator = (By.CSS_SELECTOR, '.sidebar')
     _phone_view_locator = (By.CSS_SELECTOR, '.phone-view')
@@ -249,7 +253,8 @@ class Book(WebBase):
     def table_of_contents(self):
         """Shortcut the table of contents."""
         if self.driver.get_window_size().get('width') > Web.PHONE:
-            return self.sidebar.table_of_contents
+            toc_root = self.find_element(*self._toc_root_locator)
+            return TableOfContents(self, toc_root)
         return self.phone.table_of_contents
 
     class Sidebar(Region):
@@ -291,13 +296,14 @@ class Book(WebBase):
         @property
         def table_of_contents(self):
             """Access the book table of contents."""
-            return TableOfContents(self)
+            return self.page.table_of_contents
 
         def view_table_of_contents(self):
-            """Open the Table of Contents modal."""
+            """Open the Table of Contents slideout."""
             self.options
-            Utility.click_option(self.driver,
-                                 locator=self._toc_locator)
+            toggle = self.find_element(*self._toc_locator)
+            Utility.click_option(self.driver, element=toggle)
+            sleep(0.33)
             return self.table_of_contents
 
         def view_online(self, get_url=False):
@@ -1202,11 +1208,165 @@ class Modal(Region):
         return self.page
 
 
-class TableOfContents(Modal):
-    """The book table of contents modal display."""
+class TableOfContents(Region):
+    """The book table of contents slide-out display."""
 
-    _chapter_list_locator = (By.CSS_SELECTOR, '.table-of-contents > li')
-    _online_view_locator = (By.CSS_SELECTOR, 'a')
+    _book_contents_list_locator = (By.CSS_SELECTOR, '.table-of-contents > li')
+    _close_slide_out_button_locator = (By.CSS_SELECTOR, '.close-toc')
+    _preface_link_locator = (By.CSS_SELECTOR, '.table-of-contents a')
+
+    def close(self) -> Book:
+        """Close the table of contents.
+
+        :return: the book page
+        :rtype: :py:class:`~pages.web.book.Book`
+
+        """
+        button = self.find_element(*self._close_slide_out_button_locator)
+        Utility.click_option(self.driver, element=button)
+        return self.page
+
+    def is_displayed(self) -> bool:
+        """Return True when the table of contents is open.
+
+        :return: ``True`` when the table of contents is open
+        :rtype: bool
+
+        """
+        return self.is_open
+
+    @property
+    def is_open(self) -> bool:
+        """Return True when the table of contents is open.
+
+        :return: ``True`` when the table of contents has height
+        :rtype: bool
+
+        """
+        return bool(self.driver.execute_script(
+            'return arguments[0].style.height;', self.root))
+
+    @property
+    def preface(self) -> str:
+        """Return the book's preface CNX URL.
+
+        :return: the CNX URL for the book's preface (the first link in the
+            table of contents)
+        :rtype: str
+
+        """
+        return (self.find_element(*self._preface_link_locator)
+                .get_attribute('href'))
+
+    @property
+    def sections(self) -> List[TableOfContents.Section]:
+        """Access the table of contents sections.
+
+        :return: the list of available chapters and other sections
+        :rtype: list(:py:class:`~pages.web.book.TableOfContents.Section`)
+
+        """
+        return [self.Section(self, option)
+                for option
+                in self.find_elements(*self._book_contents_list_locator)]
+
+    class Section(Region):
+        """A table of contents chapter or other primary content."""
+
+        _subsection_locator = (By.CSS_SELECTOR, '.subunit > li')
+
+        @property
+        def number(self) -> str:
+            """Return the chapter or content number.
+
+            :return: the chapter or content number, if found, otherwise an
+                empty string
+            :rtype: str
+
+            """
+            line = self.root.text.split(". ", 1)
+            return line[0] if len(line) > 1 else ""
+
+        @property
+        def subsections(self) -> List[TableOfContents.Section.Unit]:
+            """Access the chapter or content units.
+
+            :return: the list of available units or subsections
+            :rtype: list(
+                :py:class:`~pages.web.book.TableOfContents.Section.Unit`)
+
+            """
+            return [self.Unit(self, option)
+                    for option
+                    in self.find_elements(*self._subsection_locator)]
+
+        @property
+        def title(self) -> str:
+            """Return the chapter or content title.
+
+            :return: the chapter or content title
+            :rtype: str
+
+            """
+            return self.root.text.split(". ", 1)[-1]
+
+        @property
+        def unnumbered(self) -> bool:
+            """Return True if the chapter or content is unnumbered.
+
+            :return: ``True`` if the chapter or content is unnumbered
+            :rtype: bool
+
+            """
+            return self.number == ""
+
+        class Unit(Region):
+            """A chapter or content sub-unit."""
+
+            _section_link_locator = (By.CSS_SELECTOR, 'a')
+
+            @property
+            def number(self) -> str:
+                """Return the section or subsection number.
+
+                :return: the section or subsection number, if found, otherwise
+                    an empty string
+                :rtype: str
+
+                """
+                line = self.root.text.split(". ", 1)
+                return line[0] if bool(line) else ""
+
+            @property
+            def title(self) -> str:
+                """Return the section or subsection title.
+
+                :return: the section or subsection title
+                :rtype: str
+
+                """
+                return self.find_element(*self._section_link_locator).text
+
+            @property
+            def unnumbered(self) -> bool:
+                """Return True if the section or subsection is unnumbered.
+
+                :return: ``True`` if the section or subsection is unnumbered
+                :rtype: bool
+
+                """
+                return self.number == ""
+
+            @property
+            def url(self) -> str:
+                """Return the CNX URL for the section.
+
+                :return: the CNX URL for the linked section
+                :rtype: str
+
+                """
+                return (self.find_element(*self._section_link_locator)
+                        .get_attribute("href"))
 
     @property
     def chapters(self):

@@ -2,6 +2,7 @@
 
 import warnings
 
+import math
 import pytest
 import requests
 from selenium.common.exceptions import NoSuchElementException
@@ -72,12 +73,13 @@ def test_the_availability_of_the_table_of_contents(web_base_url, selenium):
     book.sidebar.view_table_of_contents()
 
     # THEN: the table of contents pane is displayed
-    assert(book.table_of_contents.is_displayed())
+    assert(book.table_of_contents.is_displayed()), \
+        'The table of contents is not visible'
 
-    # WHEN: they click on the "View online" button
-    webview = book.table_of_contents.view_online(get_url=True)
+    # WHEN: they click on the "Preface" link
+    webview = book.table_of_contents.preface
 
-    # THEN: the webview version of the book is loaded in a new tab
+    # THEN: the webview version of the book is available
     Utility.test_url_and_warn(
         url=webview,
         message='Webview not available for {0}'.format(book_title),
@@ -88,7 +90,7 @@ def test_the_availability_of_the_table_of_contents(web_base_url, selenium):
 
     # THEN: the table of contents pane is closed
     assert(not book.table_of_contents.is_displayed()), \
-        'The table of contents is still visible.'
+        'The table of contents is still visible'
 
     # WHEN: the screen width is reduced to 600 pixels
     # AND:  click on the "Table of contents" toggle
@@ -96,13 +98,15 @@ def test_the_availability_of_the_table_of_contents(web_base_url, selenium):
     book.table_of_contents.toggle()
 
     # THEN: the table of contents pane is displayed
-    assert(book.table_of_contents.is_displayed())
+    assert(book.table_of_contents.is_displayed()), \
+        'The table of contents is not visible'
 
     # WHEN: they click on the "Table of contents" link
     book.table_of_contents.toggle()
 
     # THEN: the table of contents pane is closed
-    assert(not book.table_of_contents.is_displayed())
+    assert(not book.table_of_contents.is_displayed()), \
+        'The table of contents is still visible'
 
 
 @test_case('C210351')
@@ -975,7 +979,8 @@ def test_books_may_have_ally_tiles(web_base_url, selenium):
 
         # THEN: the company name is replaced by the company
         #       description
-        if not text_seen[0]:
+        if (not text_seen[0] and
+                not math.isclose(text_seen[1], text_seen[2], rel_tol=0.1)):
             warnings.warn(UserWarning(
                 'On hover text for the tile "{0}"'.format(tile_name) +
                 ' failed to show: {0}, {1}, {2}'.format(*text_seen)))
