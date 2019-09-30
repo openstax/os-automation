@@ -996,7 +996,7 @@ def test_books_may_have_ally_tiles(web_base_url, selenium):
         if (not text_seen[0] and
                 not math.isclose(float(text_seen[1]),
                                  float(text_seen[2]),
-                                 rel_tol=0.1)):
+                                 rel_tol=0.125)):
             warnings.warn(UserWarning(
                 'On hover text for the tile "{0}"'.format(tile_name) +
                 ' failed to show: {0}, {1}, {2}'.format(*text_seen)))

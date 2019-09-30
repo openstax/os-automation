@@ -116,6 +116,7 @@ class Book(WebBase):
     _banner_locator = (By.CLASS_NAME, 'title-image')
     _tab_locator = (By.CSS_SELECTOR, '.tab')
 
+    _async_hide_locator = (By.CSS_SELECTOR, '.async-hide')
     _content_locator = (By.CSS_SELECTOR, '.details-tab')
     _book_content_locator = (By.CSS_SELECTOR, '.main')
     _instructor_locator = (By.CSS_SELECTOR, '.instructor-resources')
@@ -149,7 +150,8 @@ class Book(WebBase):
         except WebDriverException:
             return False
         return (
-            Utility.is_image_visible(
+            not self.find_elements(*self._async_hide_locator)
+            and Utility.is_image_visible(
                 self.driver, image=self.find_element(*self._banner_locator))
             and Utility.has_children(details)
             and (Utility.has_children(instructor)
@@ -1206,7 +1208,7 @@ class Modal(Region):
 
     def close(self):
         """Close the order form."""
-        if self.is_displayed:
+        if not self.is_displayed:
             raise WebException('Order options are not visible')
         close = self.find_element(*self._close_locator)
         Utility.click_option(self.driver, element=close)

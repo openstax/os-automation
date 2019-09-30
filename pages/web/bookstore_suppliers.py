@@ -24,7 +24,8 @@ class Bookstore(WebBase):
     @property
     def loaded(self):
         """Return True when the backgrounds and text are loaded."""
-        return ('order print copies' in self.driver.page_source and
+        return (super().loaded and
+                'order print copies' in self.driver.page_source and
                 Utility.is_image_visible(
                     self.driver, locator=self._background_image_locator))
 

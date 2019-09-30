@@ -101,7 +101,7 @@ class WebNav(Region):
     _subjects_dropdown_locator = (By.CSS_SELECTOR, '.subjects-dropdown')
     _technology_dropdown_locator = (By.CSS_SELECTOR, '.technology-dropdown')
     _what_we_do_dropdown_locator = (By.CSS_SELECTOR, '.what-we-do-dropdown')
-    _user_menu_locator = (By.CSS_SELECTOR, '.login , .login-dropdown')
+    _user_menu_locator = (By.CSS_SELECTOR, '.login , .login-menu')
     _back_link_locator = (By.CSS_SELECTOR, 'a.close')
     _meta_menu_locator = (By.CSS_SELECTOR, '.expand')
 
@@ -448,7 +448,7 @@ class WebNav(Region):
 
         _menu_expand_locator = (By.CSS_SELECTOR, 'nav.dropdown-menu')
         _log_in_link_locator = (By.CSS_SELECTOR, '.pardotTrackClick')
-        _logged_in_locator = (By.CSS_SELECTOR, '.login-dropdown')
+        _logged_in_locator = (By.CSS_SELECTOR, '.login-menu')
         _open_menu_locator = (By.CSS_SELECTOR, '[href="."]')
         _profile_link_locator = (By.CSS_SELECTOR, '[href$=profile]')
         _openstax_tutor_link_locator = (
