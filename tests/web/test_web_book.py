@@ -972,8 +972,6 @@ def test_books_may_have_ally_tiles(web_base_url, selenium):
 
     # WHEN: they click on the "Partner resources" tab
     book.select_tab(Web.PARTNER_RESOURCES)
-    from time import sleep
-    sleep(5)
 
     # THEN: there may be an Allies section with one or more
     #       Ally tiles with the company name on the tile
@@ -984,7 +982,6 @@ def test_books_may_have_ally_tiles(web_base_url, selenium):
     tile = book.partners.partners[random_tile]
     tile_name = tile.name
     Utility.scroll_to(selenium, element=tile.root)
-    print(tile_name)
     is_safari = selenium.capabilities.get('browserName').lower() == 'safari'
     if not is_safari:
         text_seen = (
