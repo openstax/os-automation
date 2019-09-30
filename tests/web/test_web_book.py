@@ -1,8 +1,8 @@
 """Test the books webpage."""
 
+import math
 import warnings
 
-import math
 import pytest
 import requests
 from selenium.common.exceptions import NoSuchElementException

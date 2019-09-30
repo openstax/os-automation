@@ -7,7 +7,7 @@ from time import sleep
 from typing import List
 
 from pypom import Region
-from selenium.common.exceptions import WebDriverException, TimeoutException
+from selenium.common.exceptions import TimeoutException, WebDriverException
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as expect
 
