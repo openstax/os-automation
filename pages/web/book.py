@@ -803,6 +803,12 @@ class Book(WebBase):
                     By.CSS_SELECTOR, '.loc-nonsenior-author')
 
                 @property
+                def has_senior_authors(self):
+                    """Return True if the senior authors section exists."""
+                    return '<h4>Senior Contributing Authors</h4>' \
+                        in self.driver.page_source
+
+                @property
                 def senior_authors(self):
                     """Return a list of senior authors."""
                     authors = self.find_elements(*self._senior_auth_locator)

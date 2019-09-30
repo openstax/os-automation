@@ -491,6 +491,7 @@ class Library():
     ACCOUNTING_1 = 'Principles of Accounting, Volume 1: Financial Accounting'
     ACCOUNTING_2 = 'Principles of Accounting, Volume 2: Managerial Accounting'
     BUSINESS_STATS = 'Introductory Business Statistics'
+    BUS_LAW_1 = 'Business Law I Essentials'
     ENTREPRENEUR = 'Entrepreneurship'
     ETHICS = 'Business Ethics'
     INTRO_BUSINESS = 'Introduction to Business'
@@ -639,6 +640,24 @@ class Library():
                 self.PRE_RELEASE: False,
                 self.PRINT_COPY: True,
                 self.SHORT_NAME: 'Introductory Business Statistics', },
+            self.BUS_LAW_1: {
+                self.BOOKSHARE: False,
+                self.CATEGORY: [self.ALL, self.BUSINESS, self.ESSENTIALS],
+                self.CHEGG: False,
+                self.COMP_COPY: False,
+                self.DETAILS: 'business-law-i-essentials',
+                self.HAS_I_LOCK: False,
+                self.HAS_I_UNLOCK: True,
+                self.HAS_S_LOCK: False,
+                self.HAS_S_UNLOCK: True,
+                self.INTEREST: r'Business%20Law%20I%20Essentials',
+                self.IS_AP: False,
+                self.ITUNES: False,
+                self.KINDLE: False,
+                self.LANGUAGE: self.ENGLISH,
+                self.PRE_RELEASE: False,
+                self.PRINT_COPY: False,
+                self.SHORT_NAME: 'Business Law I Essentials', },
             self.ENTREPRENEUR: {  # Pre-release
                 self.BOOKSHARE: False,
                 self.CATEGORY: [self.ALL, self.BUSINESS, self.ESSENTIALS],
@@ -728,10 +747,11 @@ class Library():
                 self.LANGUAGE: self.ENGLISH,
                 self.PRE_RELEASE: False,
                 self.PRINT_COPY: False,
-                self.SHORT_NAME: None, },
+                self.SHORT_NAME: 'Behavior', },
 
             # Essentials
-            # currently, only Entrepreneurship is in Essentials
+            #     currently, only Entrepreneurship and Busness Law I are in
+            #     Essentials
 
             # Humanities
             self.US_HISTORY: {
@@ -1390,8 +1410,11 @@ class Library():
         Not pre-release
 
         """
-        return [(book, self.get(book)) for book in self.books
-                if not self.get(book, self.PRE_RELEASE)]
+        return [(book, self.get(book))
+                for book
+                in self.books
+                if (not self.get(book, self.PRE_RELEASE) and
+                    self.get(book, self.LANGUAGE) == self.ENGLISH)]
 
     @property
     def bookshare(self):

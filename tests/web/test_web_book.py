@@ -332,7 +332,7 @@ def test_the_book_details_pane(web_base_url, selenium):
     # GIVEN: a user viewing the book details page
     home = WebHome(selenium, web_base_url).open()
     subjects = home.web_nav.subjects.view_all()
-    book = subjects.select_random_book(_from=Library.OPENSTAX)
+    book = subjects.select_random_book(_from=Library.AVAILABLE)
 
     # WHEN:
 
@@ -342,17 +342,26 @@ def test_the_book_details_pane(web_base_url, selenium):
     # AND:  a publish date is present
     # AND:  one or more ISBN numbers is present
     # AND:  a license is present
-    assert(book.details.is_displayed())
-    assert(len(book.details.summary) > 10)
+    assert(book.details.is_displayed()), \
+        'Book details not displayed in full screen view'
+    assert(len(book.details.summary) > 10), \
+        'Summary not found in full screen view'
     if book.details.has_senior_authors:
-        assert(book.details.senior_authors)
+        assert(book.details.senior_authors), \
+            'Senior authors expected but none found in full screen view'
     if book.details.has_nonsenior_authors:
-        assert(book.details.nonsenior_authors)
-    assert(book.details.published_on)
-    assert(book.details.print_isbns and book.details.digital_isbns)
+        assert(book.details.nonsenior_authors), \
+            'Non-senior authors expected but none found in full screen view'
+    assert(book.details.published_on), \
+        'No publish date found in full screen view'
+    assert(book.details.print_isbns), \
+        'Print ISBN(s) not found in full screen view'
+    assert(book.details.digital_isbns), \
+        'Digital ISBN(s) not found in full screen view'
     if book.sidebar.ibooks:
-        assert(book.details.ibook_isbns)
-    assert(book.details.license)
+        assert(book.details.ibook_isbns), \
+            'iBook ISBN expected but not found in full screen view'
+    assert(book.details.license), 'No book license found in full screen view'
 
     # WHEN: the screen is reduced to 600 pixels
     # AND:  they click on the "Book details" bar
@@ -360,27 +369,35 @@ def test_the_book_details_pane(web_base_url, selenium):
     book.details.toggle()
 
     # THEN: the summary is displayed
-    assert(len(book.details.summary) > 10)
+    assert(len(book.details.summary) > 10), \
+        'Phone view book summary not displayed in mobile view'
 
     # WHEN: they click on the "Authors" bar
     book.details.authors.toggle()
 
     # THEN: one or more "Senior Contributing Authors" may be present
     # AND:  one or more "Contributing Authors" may be present
-    assert(book.details.authors.senior_authors)
+    if book.details.authors.has_senior_authors:
+        assert(book.details.authors.senior_authors), \
+            'Senior authors expected but none found in mobile view'
     if book.details.authors.has_nonsenior_authors:
-        assert(book.details.authors.nonsenior_authors)
+        assert(book.details.authors.nonsenior_authors), \
+            'Non-senior authors expected but none found in mobile view'
 
     # WHEN: they click on the "Product details" bar
     book.details.product_details.toggle()
 
     # THEN: one or more ISBN numbers is present
     # AND:  a license is present
-    assert(book.details.product_details.print_isbns and
-           book.details.product_details.digital_isbns)
+    assert(book.details.product_details.print_isbns), \
+        'Print ISBN(s) not found in mobile view'
+    assert(book.details.product_details.digital_isbns), \
+        'Digital ISBN(s) not found in mobile view'
     if book.phone.ibooks:
-        assert(book.details.product_details.ibook_isbns)
-    assert(book.details.product_details.license)
+        assert(book.details.product_details.ibook_isbns), \
+            'iBook ISBN expected but not found in mobile view'
+    assert(book.details.product_details.license), \
+        'No book license found in mobile view'
 
 
 @test_case('C210361')
