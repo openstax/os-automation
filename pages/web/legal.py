@@ -118,7 +118,7 @@ class PrivacyPolicy(LegalBase):
 
     URL_TEMPLATE = '/privacy-policy'
 
-    _section_title_locator = (By.CSS_SELECTOR, 'h3')
+    _section_title_locator = (By.CSS_SELECTOR, '#main h3')
     _privacy_content_locator = (By.CSS_SELECTOR, '[data-html=content] p')
     _gdpr_locator = (By.CSS_SELECTOR, '[href$=gdpr]')
 

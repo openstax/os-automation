@@ -10,12 +10,12 @@ class Accessibility(WebBase):
 
     URL_TEMPLATE = '/accessibility-statement'
 
-    _section_locator = (By.TAG_NAME, 'h2')
+    _section_locator = (By.CSS_SELECTOR, '#main h2')
 
     @property
     def loaded(self):
         """Wait until the statement is found."""
-        return self.find_element(*self._section_locator)
+        return (super().loaded and self.find_element(*self._section_locator))
 
     def is_displayed(self):
         """Return True if the first statement header is displayed."""

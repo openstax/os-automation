@@ -96,7 +96,7 @@ def test_what_we_do_information_cards(web_base_url, selenium):
     Utility.scroll_to(selenium, element=about.what_we_do.root)
 
     # THEN: four information cards are displayed
-    assert(len(about.what_we_do.cards) == 4)
+    assert(len(about.what_we_do.cards) == 6)
 
     # WHEN: they click on the first card
     subjects = about.what_we_do.cards[FIRST].click()

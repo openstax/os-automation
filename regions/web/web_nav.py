@@ -316,6 +316,18 @@ class WebNav(Region):
                 Subjects)
 
         @property
+        def essentials(self):
+            """Return the essentials subjects link."""
+            return self.find_element(*self._essentials_option_locator)
+
+        def view_essentials(self):
+            """View all essentials books."""
+            from pages.web.subjects import Subjects
+            return self.open()._selection_helper(
+                self._essentials_option_locator,
+                Subjects)
+
+        @property
         def ap(self):
             """Return the AP subjects link."""
             return self.find_element(*self._ap_option_locator)

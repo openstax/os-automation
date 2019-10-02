@@ -168,8 +168,7 @@ class Web(object):
 
     TEAM_GROUPS = [
         'OpenStax Team',
-        'Strategic Advisors',
-        'Faculty Advisory Board'
+        'Strategic Advisors'
     ]
 
     # *** TUTOR MARKETING ***

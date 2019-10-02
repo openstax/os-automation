@@ -17,6 +17,7 @@ class Release(Region):
     """An OpenStax press release snippet."""
 
     _byline_locator = (By.CSS_SELECTOR, '.byline')
+    _date_locator = (By.CSS_SELECTOR, '.date')
     _headline_locator = (By.CSS_SELECTOR, '.headline a')
     _excerpt_locator = (By.CSS_SELECTOR, '.excerpt')
     _continue_reading_locator = (By.CSS_SELECTOR, _excerpt_locator[1] + ' a')
@@ -35,7 +36,8 @@ class Release(Region):
     def date(self):
         """Return a timezone-aware date of release."""
         return datetime.strptime(
-            self.byline.split('|')[1].strip() + ' +0000', '%b %d, %Y %z')
+            self.find_element(*self._date_locator).text + " +0000",
+            "%b %d, %Y %z")
 
     @property
     def headline(self):
@@ -150,7 +152,8 @@ class Press(WebBase):
             contact_found = (self.contact.name
                              if not isinstance(self.contact, list)
                              else self.contact[0].name)
-            return (sections_found and
+            return (super().loaded and
+                    sections_found and
                     images_visible and
                     (contact_found or self.is_phone))
         except Exception:
@@ -326,7 +329,7 @@ class Press(WebBase):
 
         _logo_locator = (By.CSS_SELECTOR, 'img')
         _source_locator = (By.CSS_SELECTOR, '.source')
-        _byline_locator = (By.CSS_SELECTOR, '.byline')
+        _byline_locator = (By.CSS_SELECTOR, '.byline .date')
         _headline_locator = (By.CSS_SELECTOR, '.headline a')
 
         @property
@@ -476,7 +479,7 @@ class PressRelease(WebBase):
 
     URL_TEMPLATE = '/press/{article}'
 
-    _article_locator = (By.CSS_SELECTOR, '.article.page')
+    _article_locator = (By.CSS_SELECTOR, '.page > .article')
     _headline_locator = (By.CSS_SELECTOR, 'article h1')
     _author_locator = (By.CSS_SELECTOR, '.author')
     _date_locator = (By.CSS_SELECTOR, '.date')
@@ -494,7 +497,7 @@ class PressRelease(WebBase):
     @property
     def loaded(self):
         """Return True when the press release text is displayed."""
-        return bool(self.content)
+        return super().loaded and bool(self.content)
 
     def is_displayed(self):
         """Return True if the press release sections are available."""
@@ -503,10 +506,7 @@ class PressRelease(WebBase):
     @property
     def is_an_article(self):
         """Return True if the page is a press release article."""
-        try:
-            return self.find_element(*self._article_locator)
-        except WebDriverException:
-            return False
+        return bool(self.find_elements(*self._article_locator))
 
     @property
     def headline(self):

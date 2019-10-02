@@ -23,8 +23,9 @@ def test_the_interest_form_loads(web_base_url, selenium):
     interest.open()
 
     # THEN: the form is displayed
-    assert(interest.is_displayed())
-    assert('interest' in interest.location)
+    assert(interest.is_displayed()), 'Interest page not displayed'
+    assert('interest' in interest.location), \
+        f'"interest" not in the current URL ({interest.location})'
 
 
 @test_case('C210509')
@@ -39,8 +40,9 @@ def test_the_interest_form_links_to_the_adoption_form(web_base_url, selenium):
     adoption = interest.go_to_adoption()
 
     # THEN: the adoption page is displayed
-    assert(adoption.is_displayed())
-    assert('adoption' in adoption.location)
+    assert(adoption.is_displayed()), 'Adoption page not displayed'
+    assert('adoption' in adoption.location), \
+        f'"adoption" not in the current URL ({adoption.location})'
 
 
 @test_case('C210510')
@@ -76,7 +78,9 @@ def test_students_do_not_need_to_fill_out_the_form(web_base_url, selenium):
     interest.form.go_back(destination=Book)
 
     # THEN: the book page is displayed
-    assert(book.is_displayed() and book.title == book_title)
+    assert(book.is_displayed()), f'{book_title} page not displayed'
+    assert(book.title == book_title), \
+        f'Book ({book.title}) is not the expected destination ({book_title})'
 
 
 @test_case('C210511')
@@ -86,7 +90,7 @@ def test_non_students_may_fill_out_the_form(web_base_url, selenium):
 
     Salesforce verification of the form is not tested.
     """
-    # GIVEN: a user viewing the interest page
+    # SETUP:
     user_type = Web.USERS[Utility.random(1, len(Web.USERS) - 1)]
     _, first_name, last_name, _ = Utility.random_name()
     email = RestMail(
@@ -103,6 +107,8 @@ def test_non_students_may_fill_out_the_form(web_base_url, selenium):
         other = 'Another product provider'
     else:
         other = None
+
+    # GIVEN: a user viewing the interest page
     interest = Interest(selenium, web_base_url).open()
 
     # WHEN: they select a non-Student role from the drop down menu
@@ -130,8 +136,10 @@ def test_non_students_may_fill_out_the_form(web_base_url, selenium):
         other_provider=other)
 
     # THEN: the interest confirmation page is displayed
-    assert(confirmation.is_displayed())
-    assert('confirmation' in confirmation.location)
+    assert(confirmation.is_displayed()), \
+        'Book interest confirmation page not displayed'
+    assert('confirmation' in confirmation.location), \
+        f'Not at the interest confirmation page ({confirmation.location})'
 
 
 @test_case('C210512')
@@ -140,7 +148,7 @@ def test_non_students_may_fill_out_the_form(web_base_url, selenium):
 def test_a_book_is_preselected_when_a_book_details_interest_link_is_used(
         web_base_url, selenium):
     """Test the book is already selected when passed in the URL."""
-    # GIVEN: a user viewing a book page
+    # SETUP:
     user_type = Web.USERS[Utility.random(1, len(Web.USERS) - 1)]
     _, first_name, last_name, _ = Utility.random_name()
     email = RestMail(
@@ -152,6 +160,8 @@ def test_a_book_is_preselected_when_a_book_details_interest_link_is_used(
     book, short, full, detail_append = Library().get_name_set()
     books = [short]
     students = ''
+
+    # GIVEN: a user viewing a book page
     book_details = Book(selenium, web_base_url, book_name=detail_append).open()
     interest = book_details.is_interested()
 
@@ -172,11 +182,10 @@ def test_a_book_is_preselected_when_a_book_details_interest_link_is_used(
             additional_resources=Web.resources(),
             heard_on=Web.heard_by())
 
-    selection = interest.form.selection
     # THEN: the book is selected
-    assert(short in selection), (
-        '{book} not in the current selection ({selection})'
-        .format(book=short, selection=selection))
+    selection = interest.form.selection
+    assert(short in selection), \
+        f'{short} not in the current selection ({selection})'
     assert('Using error' in Utility.get_error_information(error)), \
         'No book is preselected'
 
@@ -220,9 +229,12 @@ def test_interest_form_identity_fields_are_required(web_base_url, selenium):
     phone = ('phone' + expected_error) in data_issues
     school = ('school' + expected_error) in data_issues
     assert(first and last and email and phone and school), (
-        'Errors not all shown:\n{errors}\n'.format(errors=data_issues)
-        ('{first} {last} {email} {phone} {school}'
-         .format(first=first, last=last, email=email, school=school)))
+        'Errors not all shown: '
+        f'{"First name  " if first else ""}'
+        f'{"Last name  " if last else ""}'
+        f'{"Email  " if email else ""}'
+        f'{"Phone  " if phone else ""}'
+        f'{"School" if school else ""}').strip()
 
 
 @skip_test(reason='Not written')
@@ -243,6 +255,7 @@ def test_interest_form_school_name_auto_complete(web_base_url, selenium):
     # THEN: the suggestion list is filtered further
 
 
+@skip_test(reason='Not written')
 @test_case('C210515')
 @nondestructive
 @web
@@ -264,7 +277,7 @@ def test_able_to_submit_a_new_institution_name(web_base_url, selenium):
 def test_interest_form_requires_at_least_one_book_selection(
         web_base_url, selenium):
     """Test at least one book must be selected before submitting the form."""
-    # GIVEN: a user viewing the interest page
+    # SETUP:
     user_type = Web.USERS[Utility.random(1, len(Web.USERS) - 1)]
     _, first_name, last_name, _ = Utility.random_name()
     email = RestMail(
@@ -273,6 +286,8 @@ def test_interest_form_requires_at_least_one_book_selection(
         .lower())
     phone = Utility.random_phone(713, False)
     school = 'Automation'
+
+    # GIVEN: a user viewing the interest page
     interest = Interest(selenium, web_base_url).open()
 
     # WHEN: they select a non-Student role from the drop down menu
@@ -338,5 +353,6 @@ def test_post_form_submission_text_and_link(web_base_url, selenium):
     subjects = confirmation.back_to_books()
 
     # THEN: the subjects page is displayed
-    assert(subjects.is_displayed())
-    assert('subjects' in subjects.location)
+    assert(subjects.is_displayed()), 'Subjects page not displayed'
+    assert('subjects' in subjects.location), \
+        f'Not at the subjects page ({subjects.location})'
