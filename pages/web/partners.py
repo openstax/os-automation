@@ -10,6 +10,37 @@ from utils.utilities import Utility
 from utils.web import TechProviders, Web
 
 
+class Institutional(WebBase):
+    """The OpenStax Institutional Partners page."""
+
+    URL_TEMPLATE = '/institutional-partnership'
+
+    _title_locator = (By.CSS_SELECTOR, '.banner h1')
+
+    @property
+    def loaded(self) -> bool:
+        """Return True when the page is loaded.
+
+        :return: ``True`` when the async hide class is not found and the
+            template URL is in use
+        :rtype: bool
+
+        """
+        return (super().loaded and self.URL_TEMPLATE in self.location)
+
+    def is_displayed(self) -> bool:
+        """Return True when the page is displayed.
+
+        :return: ``True`` when the page is loaded and the title is found
+        :rtype: bool
+
+        """
+        title = self.find_elements(*self._title_locator)
+        if not title:
+            return False
+        return self.loaded and 'Institutional' in title[0].text
+
+
 class Partners(WebBase):
     """The OpenStax Partners page."""
 

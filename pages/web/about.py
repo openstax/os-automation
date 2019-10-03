@@ -132,6 +132,7 @@ class AboutUs(WebBase):
             def click(self):
                 """Click the card."""
                 href = self.root.get_attribute('href')
+                append = href.split('openstax.org')[-1]
                 Utility.safari_exception_click(self.driver, element=self.root)
                 if Web.SUBJECTS in href:
                     from pages.web.subjects import Subjects as Destination
@@ -139,11 +140,14 @@ class AboutUs(WebBase):
                     from pages.web.tutor import TutorMarketing as Destination
                 elif Web.RESEARCH in href:
                     from pages.web.research import Research as Destination
+                elif Web.INSTITUTION in href:
+                    from pages.web.partners import Institutional as Destination
                 elif Web.PARTNERS in href:
                     from pages.web.partners import Partners as Destination
+                elif Web.ROVER in href:
+                    from pages.web.rover import Rover as Destination
                 else:
-                    raise PageNotFound('{dest} is not a known destination'
-                                       .format(dest=href.split('/')[-1]))
+                    raise PageNotFound(f'{append} is not a known destination')
                 sleep(1.0)
                 return go_to_(Destination(self.driver))
 
