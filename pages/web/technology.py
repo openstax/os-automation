@@ -8,7 +8,7 @@ from selenium.webdriver.common.by import By
 from pages.web.base import WebBase
 from pages.web.book import Book
 from utils.utilities import Utility, go_to_
-from utils.web import Library
+from utils.web import Library, WebException
 
 
 class Technology(WebBase):
@@ -93,19 +93,19 @@ class Technology(WebBase):
             options = self.find_element(*self._option_list_locator)
             details = Library().get(book, Library.DETAILS)
             option = self.find_element(
-                By.CSS_SELECTOR, '[data-value={book}]'.format(book=details))
+                By.CSS_SELECTOR, f'[data-value={details}]')
             offset = self.driver.execute_script(
                 'return arguments[0].offsetTop;',
                 option)
             if 'open' not in menu.get_attribute('class'):
-                Utility.safari_exception_click(self.driver, element=menu)
+                Utility.click_option(self.driver, element=menu)
             self.driver.execute_script(
                 'arguments[0].scrollTop = {offset};'.format(offset=offset),
                 options)
             sleep(0.2)
-            Utility.safari_exception_click(self.driver,
-                                           element=option,
-                                           force_js_click=True)
+            Utility.click_option(self.driver,
+                                 element=option,
+                                 force_js_click=True)
             return self.page
 
         def view_instructor_resources(self):
@@ -124,21 +124,23 @@ class Technology(WebBase):
 
         def _selection_helper(self, link, tab='book-details'):
             """Select the book reference link."""
-            assert(self.book_selected), 'No book selected'
+            if not self.book_selected:
+                raise WebException('No book selected')
             book = self.find_element(*link)
-            book_title = (
-                book
-                .get_attribute('href')
-                .split('/')[-1]
-                .split('?')[0])
+            book_title = (book.get_attribute('href')
+                          .split('/')[-1].split('?')[0])
             Utility.switch_to(self.driver, element=book)
             self.wait.until(
-                lambda _: sleep(2) or
-                self.find_elements(*self._details_tab_locator) or
-                self.find_elements(*self._instructor_resources_tab_locator) or
-                self.find_elements(*self._student_resources_tab_locator) or
-                self.find_elements(*self._partner_resources_tab_locator)
-            )
+                lambda _: (
+                    sleep(4) or (
+                        self.find_elements(
+                            *self._details_tab_locator) or
+                        self.find_elements(
+                            *self._instructor_resources_tab_locator) or
+                        self.find_elements(
+                            *self._student_resources_tab_locator) or
+                        self.find_elements(
+                            *self._partner_resources_tab_locator))))
             return go_to_(Book(self.driver, self.page.base_url,
                                book_name=book_title))
 

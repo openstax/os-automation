@@ -112,7 +112,6 @@ def test_the_go_to_tutor_button_loads_the_users_tutor_dashboard(
     #       account
     home = WebHome(selenium, web_base_url).open()
     home.web_nav.login.log_in(*teacher, destination=WebHome, url=web_base_url)
-    home.web_nav.login.training_wheel.close_modal()
     technology = home.web_nav.technology.view_technology()
 
     # WHEN: they click on the "Go to OpenStax Tutor" button

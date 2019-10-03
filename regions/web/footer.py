@@ -261,7 +261,7 @@ class Footer(Region):
         """Trademarks and OpenStax social program Links."""
 
         _copyright_statement_locator = (
-                                 By.CSS_SELECTOR, '[data-html=copyright]')
+            By.CSS_SELECTOR, '[data-html=copyright]')
         _ap_statement_locator = (By.CSS_SELECTOR, '[data-html=apStatement]')
         _facebook_locator = (By.CSS_SELECTOR, '.facebook')
         _twitter_locator = (By.CSS_SELECTOR, '.twitter')
@@ -281,7 +281,7 @@ class Footer(Region):
 
             """
             return (self.find_element(*self._copyright_statement_locator)
-                    .text.replace('\n', ' '))
+                    .get_attribute('textContent').replace('\n', ' '))
 
         @property
         def ap_statement(self):
@@ -292,7 +292,7 @@ class Footer(Region):
 
             """
             return (self.find_element(*self._ap_statement_locator)
-                    .text.replace('\n', ' '))
+                    .get_attribute('textContent').replace('\n', ' '))
 
         # ------------------------------------------------ #
         # Social media

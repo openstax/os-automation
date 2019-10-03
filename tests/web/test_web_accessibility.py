@@ -19,4 +19,6 @@ def test_accessibility_statement_loads(web_base_url, selenium):
     #       "Interactive Simulations", and "User-Contributed Content" are
     #       displayed
     for section in accessibility.sections:
-        assert(section.text in Web.ACCESSIBILITY)
+        assert(section.text in Web.ACCESSIBILITY), (
+            f'Section "{section.text}" '
+            'not found in the accessibility statement')

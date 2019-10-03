@@ -206,7 +206,7 @@ class Adoption(WebBase):
                 sleep(0.5)
                 for option in self.options:
                     if option.get_attribute('textContent') == user_type:
-                        option.click()
+                        Utility.click_option(self.driver, element=option)
             sleep(0.5)
             return self
 

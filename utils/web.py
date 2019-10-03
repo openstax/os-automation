@@ -45,11 +45,10 @@ class Web(object):
     # *** BOOK DETAILS ***
 
     # Book page tabs
-    partner_resources_are_split = True
     BOOK_DETAILS = 0
     INSTRUCTOR_RESOURCES = 1
-    PARTNER_RESOURCES = 2 if partner_resources_are_split else None
-    STUDENT_RESOURCES = 2 if not PARTNER_RESOURCES else 3
+    PARTNER_RESOURCES = 3
+    STUDENT_RESOURCES = 2
 
     # Book page order modals
     INDIVIDUAL = 0
@@ -169,8 +168,7 @@ class Web(object):
 
     TEAM_GROUPS = [
         'OpenStax Team',
-        'Strategic Advisors',
-        'Faculty Advisory Board'
+        'Strategic Advisors'
     ]
 
     # *** TUTOR MARKETING ***
@@ -210,10 +208,12 @@ class Web(object):
     BOOKSTORE = 'bookstore-suppliers'
     GIVE = 'give'
     IMPACT = 'impact'
+    INSTITUTION = 'institutional-partnership'
     NEWSLETTER = 'www2.openstax.org'
     NO_FILTER = 'View All'
     PARTNERS = 'partners'
     RESEARCH = 'research'
+    ROVER = 'rover-by-openstax'
     SE_APP = 'download-openstax-se-app'
     SUBJECTS = 'subjects'
     TECHNOLOGY = 'technology'
@@ -223,6 +223,7 @@ class Web(object):
     VIEW_ALL = 'All'
     VIEW_AP = 'AP®'
     VIEW_BUSINESS = 'Business'
+    VIEW_ESSENTIALS = 'Essentials'
     VIEW_HUMANITIES = 'Humanities'
     VIEW_MATH = 'Math'
     VIEW_SCIENCE = 'Science'
@@ -336,6 +337,7 @@ class Web(object):
         'social-sciences',
         'humanities',
         'business',
+        'essentials',
         'ap'
     ]
     FILTERS = [
@@ -344,6 +346,7 @@ class Web(object):
         VIEW_SOCIAL_SCIENCES,
         VIEW_HUMANITIES,
         VIEW_BUSINESS,
+        VIEW_ESSENTIALS,
         VIEW_AP
     ]
     MENU_SUBJECTS = [
@@ -357,7 +360,8 @@ class Web(object):
         VIEW_SOCIAL_SCIENCES: 3,
         VIEW_HUMANITIES: 4,
         VIEW_BUSINESS: 5,
-        VIEW_AP: 6,
+        VIEW_ESSENTIALS: 6,
+        VIEW_AP: 7,
     }
     MENU_TECHNOLOGY = [
         VIEW_TECHNOLOGY,
@@ -488,6 +492,7 @@ class Library():
     ACCOUNTING_1 = 'Principles of Accounting, Volume 1: Financial Accounting'
     ACCOUNTING_2 = 'Principles of Accounting, Volume 2: Managerial Accounting'
     BUSINESS_STATS = 'Introductory Business Statistics'
+    BUS_LAW_1 = 'Business Law I Essentials'
     ENTREPRENEUR = 'Entrepreneurship'
     ETHICS = 'Business Ethics'
     INTRO_BUSINESS = 'Introduction to Business'
@@ -541,6 +546,7 @@ class Library():
     # Fields and limiters
     ADOPTION = 'interest'
     ALL_BOOKS = 'all'
+    AVAILABLE = 'available'
     BOOKSHARE = 'bookshare'
     CATEGORY = 'subject'
     CHEGG = 'chegg'
@@ -568,6 +574,7 @@ class Library():
     ALL = 'View All'
     AP = 'AP®'
     BUSINESS = 'Business'
+    ESSENTIALS = 'Essentials'
     HUMANITIES = 'Humanities'
     MATH = 'Math'
     SCIENCE = 'Science'
@@ -634,9 +641,27 @@ class Library():
                 self.PRE_RELEASE: False,
                 self.PRINT_COPY: True,
                 self.SHORT_NAME: 'Introductory Business Statistics', },
+            self.BUS_LAW_1: {
+                self.BOOKSHARE: False,
+                self.CATEGORY: [self.ALL, self.BUSINESS, self.ESSENTIALS],
+                self.CHEGG: False,
+                self.COMP_COPY: False,
+                self.DETAILS: 'business-law-i-essentials',
+                self.HAS_I_LOCK: False,
+                self.HAS_I_UNLOCK: True,
+                self.HAS_S_LOCK: False,
+                self.HAS_S_UNLOCK: True,
+                self.INTEREST: r'Business%20Law%20I%20Essentials',
+                self.IS_AP: False,
+                self.ITUNES: False,
+                self.KINDLE: False,
+                self.LANGUAGE: self.ENGLISH,
+                self.PRE_RELEASE: False,
+                self.PRINT_COPY: False,
+                self.SHORT_NAME: 'Business Law I Essentials', },
             self.ENTREPRENEUR: {  # Pre-release
                 self.BOOKSHARE: False,
-                self.CATEGORY: [self.ALL, self.BUSINESS],
+                self.CATEGORY: [self.ALL, self.BUSINESS, self.ESSENTIALS],
                 self.CHEGG: False,
                 self.COMP_COPY: False,
                 self.DETAILS: 'entrepreneurship',
@@ -723,7 +748,11 @@ class Library():
                 self.LANGUAGE: self.ENGLISH,
                 self.PRE_RELEASE: False,
                 self.PRINT_COPY: False,
-                self.SHORT_NAME: None, },
+                self.SHORT_NAME: 'Behavior', },
+
+            # Essentials
+            #     currently, only Entrepreneurship and Busness Law I are in
+            #     Essentials
 
             # Humanities
             self.US_HISTORY: {
@@ -1376,6 +1405,19 @@ class Library():
                 if self.get(book, self.IS_AP)]
 
     @property
+    def available(self):
+        """Return the available book.
+
+        Not pre-release
+
+        """
+        return [(book, self.get(book))
+                for book
+                in self.books
+                if (not self.get(book, self.PRE_RELEASE) and
+                    self.get(book, self.LANGUAGE) == self.ENGLISH)]
+
+    @property
     def bookshare(self):
         """Return the books available through Bookshare."""
         return [(book, self.get(book)) for book in self.books
@@ -1409,6 +1451,11 @@ class Library():
         """Return the current edition of each book."""
         return [(book, self.get(book)) for book in self.books
                 if book not in self.OLD_EDITIONS]
+
+    @property
+    def essentials(self):
+        """Return the essentials books."""
+        return self.get_by_category(self.ESSENTIALS)
 
     @property
     def humanities(self):
@@ -1502,6 +1549,8 @@ class Library():
 
     def get(self, book, field=None):
         """Return the field or fields for a specific book."""
+        if book == self.AP_PHYS_ALT:
+            book = self.AP_PHYS
         return_book = self.books.get(book)
         if field:
             return return_book.get(field)

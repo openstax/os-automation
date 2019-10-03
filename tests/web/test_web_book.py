@@ -1,5 +1,6 @@
 """Test the books webpage."""
 
+import math
 import warnings
 
 import pytest
@@ -12,8 +13,8 @@ from pages.accounts.signup import Signup
 from pages.web.book import Book
 from pages.web.errata import ErrataForm
 from pages.web.home import WebHome
-from tests.markers import accounts, nondestructive, skip_if_headless  # NOQA
-from tests.markers import skip_test, smoke_test, test_case, web  # NOQA
+from tests.markers import (accounts, expected_failure, nondestructive,
+                           skip_if_headless, smoke_test, test_case, web)
 from utils.accounts import Accounts
 from utils.email import RestMail
 from utils.utilities import Actions, Utility
@@ -65,19 +66,20 @@ def test_the_availability_of_the_table_of_contents(web_base_url, selenium):
     # GIVEN: a user viewing the book details page
     home = WebHome(selenium, web_base_url).open()
     subjects = home.web_nav.subjects.view_all()
-    book = subjects.select_random_book()
+    book = subjects.select_random_book(_from=Library.AVAILABLE)
     book_title = book.title
 
     # WHEN: they click on the "Table of contents" link
     book.sidebar.view_table_of_contents()
 
     # THEN: the table of contents pane is displayed
-    assert(book.table_of_contents.is_displayed())
+    assert(book.table_of_contents.is_displayed()), \
+        'The table of contents is not visible'
 
-    # WHEN: they click on the "View online" button
-    webview = book.table_of_contents.view_online(get_url=True)
+    # WHEN: they click on the "Preface" link
+    webview = book.table_of_contents.preface
 
-    # THEN: the webview version of the book is loaded in a new tab
+    # THEN: the webview version of the book is available
     Utility.test_url_and_warn(
         url=webview,
         message='Webview not available for {0}'.format(book_title),
@@ -88,7 +90,7 @@ def test_the_availability_of_the_table_of_contents(web_base_url, selenium):
 
     # THEN: the table of contents pane is closed
     assert(not book.table_of_contents.is_displayed()), \
-        'The table of contents is still visible.'
+        'The table of contents is still visible'
 
     # WHEN: the screen width is reduced to 600 pixels
     # AND:  click on the "Table of contents" toggle
@@ -96,13 +98,15 @@ def test_the_availability_of_the_table_of_contents(web_base_url, selenium):
     book.table_of_contents.toggle()
 
     # THEN: the table of contents pane is displayed
-    assert(book.table_of_contents.is_displayed())
+    assert(book.table_of_contents.is_displayed()), \
+        'The table of contents is not visible'
 
     # WHEN: they click on the "Table of contents" link
     book.table_of_contents.toggle()
 
     # THEN: the table of contents pane is closed
-    assert(not book.table_of_contents.is_displayed())
+    assert(not book.table_of_contents.is_displayed()), \
+        'The table of contents is still visible'
 
 
 @test_case('C210351')
@@ -114,7 +118,7 @@ def test_webview_for_a_book_is_avaialble(web_base_url, selenium):
     # GIVEN: a user viewing the book details page
     home = WebHome(selenium, web_base_url).open()
     subjects = home.web_nav.subjects.view_all()
-    book = subjects.select_random_book(_from=Library.ALL_BOOKS)
+    book = subjects.select_random_book(_from=Library.AVAILABLE)
     book_title = book.title
 
     # WHEN: they click on the "View online" link
@@ -137,7 +141,7 @@ def test_details_pdf_is_downloadable(web_base_url, selenium):
     # GIVEN: a user viewing the book details page
     home = WebHome(selenium, web_base_url).open()
     subjects = home.web_nav.subjects.view_all()
-    book = subjects.select_random_book(_from=Library.ALL_BOOKS)
+    book = subjects.select_random_book(_from=Library.AVAILABLE)
 
     # WHEN: they click on the "Download a PDF" link
     url = book.sidebar.pdf_url
@@ -328,7 +332,7 @@ def test_the_book_details_pane(web_base_url, selenium):
     # GIVEN: a user viewing the book details page
     home = WebHome(selenium, web_base_url).open()
     subjects = home.web_nav.subjects.view_all()
-    book = subjects.select_random_book(_from=Library.OPENSTAX)
+    book = subjects.select_random_book(_from=Library.AVAILABLE)
 
     # WHEN:
 
@@ -338,17 +342,26 @@ def test_the_book_details_pane(web_base_url, selenium):
     # AND:  a publish date is present
     # AND:  one or more ISBN numbers is present
     # AND:  a license is present
-    assert(book.details.is_displayed())
-    assert(len(book.details.summary) > 10)
+    assert(book.details.is_displayed()), \
+        'Book details not displayed in full screen view'
+    assert(len(book.details.summary) > 10), \
+        'Summary not found in full screen view'
     if book.details.has_senior_authors:
-        assert(book.details.senior_authors)
+        assert(book.details.senior_authors), \
+            'Senior authors expected but none found in full screen view'
     if book.details.has_nonsenior_authors:
-        assert(book.details.nonsenior_authors)
-    assert(book.details.published_on)
-    assert(book.details.print_isbns and book.details.digital_isbns)
+        assert(book.details.nonsenior_authors), \
+            'Non-senior authors expected but none found in full screen view'
+    assert(book.details.published_on), \
+        'No publish date found in full screen view'
+    assert(book.details.print_isbns), \
+        'Print ISBN(s) not found in full screen view'
+    assert(book.details.digital_isbns), \
+        'Digital ISBN(s) not found in full screen view'
     if book.sidebar.ibooks:
-        assert(book.details.ibook_isbns)
-    assert(book.details.license)
+        assert(book.details.ibook_isbns), \
+            'iBook ISBN expected but not found in full screen view'
+    assert(book.details.license), 'No book license found in full screen view'
 
     # WHEN: the screen is reduced to 600 pixels
     # AND:  they click on the "Book details" bar
@@ -356,27 +369,35 @@ def test_the_book_details_pane(web_base_url, selenium):
     book.details.toggle()
 
     # THEN: the summary is displayed
-    assert(len(book.details.summary) > 10)
+    assert(len(book.details.summary) > 10), \
+        'Phone view book summary not displayed in mobile view'
 
     # WHEN: they click on the "Authors" bar
     book.details.authors.toggle()
 
     # THEN: one or more "Senior Contributing Authors" may be present
     # AND:  one or more "Contributing Authors" may be present
-    assert(book.details.authors.senior_authors)
+    if book.details.authors.has_senior_authors:
+        assert(book.details.authors.senior_authors), \
+            'Senior authors expected but none found in mobile view'
     if book.details.authors.has_nonsenior_authors:
-        assert(book.details.authors.nonsenior_authors)
+        assert(book.details.authors.nonsenior_authors), \
+            'Non-senior authors expected but none found in mobile view'
 
     # WHEN: they click on the "Product details" bar
     book.details.product_details.toggle()
 
     # THEN: one or more ISBN numbers is present
     # AND:  a license is present
-    assert(book.details.product_details.print_isbns and
-           book.details.product_details.digital_isbns)
+    assert(book.details.product_details.print_isbns), \
+        'Print ISBN(s) not found in mobile view'
+    assert(book.details.product_details.digital_isbns), \
+        'Digital ISBN(s) not found in mobile view'
     if book.phone.ibooks:
-        assert(book.details.product_details.ibook_isbns)
-    assert(book.details.product_details.license)
+        assert(book.details.product_details.ibook_isbns), \
+            'iBook ISBN expected but not found in mobile view'
+    assert(book.details.product_details.license), \
+        'No book license found in mobile view'
 
 
 @test_case('C210361')
@@ -399,6 +420,7 @@ def test_current_book_editions_have_an_errata_section(web_base_url, selenium):
 
 @test_case('C210362')
 @nondestructive
+@expected_failure(reason='No old editions currently available')
 @web
 def test_an_old_version_does_not_have_errata(web_base_url, selenium):
     """Test that the current edition of a book has an errata section."""
@@ -463,7 +485,6 @@ def test_logged_in_users_may_view_the_errata_submission_form(
     # AND:   are logged into the website
     home = WebHome(selenium, web_base_url).open()
     home.web_nav.login.log_in(*teacher, destination=WebHome, url=web_base_url)
-    home.web_nav.login.training_wheel.close_modal()
     subjects = home.web_nav.subjects.view_all()
     book = subjects.select_random_book(_from=Library.OPENSTAX,
                                        filter_current=True)
@@ -513,8 +534,9 @@ def test_non_logged_in_users_are_directed_to_log_in_to_view_the_errata_form(
     accounts = book.details.submit_errata()
 
     # THEN: the Accounts login page is displayed
-    assert(accounts.is_displayed())
-    assert('accounts' in accounts.location)
+    assert(accounts.is_displayed()), 'Accounts login page not displayed'
+    assert('accounts' in accounts.location), \
+        f'Not on an Accounts instance ({accounts.location})'
 
     # WHEN: they log into Accounts
     errata_form = accounts.service_log_in(
@@ -523,8 +545,10 @@ def test_non_logged_in_users_are_directed_to_log_in_to_view_the_errata_form(
 
     # THEN: the errata form is displayed
     # AND:  the subject is prefilled in
-    assert(errata_form.is_displayed())
-    assert(errata_form.subject == book_title)
+    assert(errata_form.is_displayed()), 'Errata form not displayed'
+    assert(errata_form.subject == book_title), (
+        f'Errata form book ({errata_form.subject}) '
+        f'does not match used book ({book_title})')
 
 
 @test_case('C210366')
@@ -554,8 +578,9 @@ def test_non_logged_in_users_on_mobile_are_directed_to_log_in_for_errata_form(
     accounts = book.phone.errata.submit_errata()
 
     # THEN: the Accounts login page is displayed
-    assert(accounts.is_displayed())
-    assert('accounts' in accounts.location)
+    assert(accounts.is_displayed()), 'Accounts login page not displayed'
+    assert('accounts' in accounts.location), \
+        f'Not on an Accounts instance ({accounts.location})'
 
     # WHEN: they log into Accounts
     errata_form = accounts.service_log_in(
@@ -587,8 +612,9 @@ def test_teachers_are_asked_to_sign_up_to_access_locked_content(
     accounts = book.instructor.sign_up()
 
     # THEN: the Accounts sign up page is displayed
-    assert(accounts.is_displayed())
-    assert('accounts' in accounts.location)
+    assert(accounts.is_displayed()), 'Accounts login page not displayed'
+    assert('accounts' in accounts.location), \
+        f'Not on an Accounts instance ({accounts.location})'
 
 
 @test_case('C210368')
@@ -649,22 +675,24 @@ def test_verified_instructors_may_access_locked_resources(
     # AND:  click on the "Click here to unlock" link
     book.select_tab(Web.INSTRUCTOR_RESOURCES)
     options = book.instructor.resources_by_option(Web.LOCKED)
-    assert(options)
+    assert(options), 'No locked instructor resources found'
     option = options[Utility.random(0, len(options) - 1)]
     option_title = option.title
     option.select()
     accounts = AccountsHome(selenium, accounts_base_url)
 
     # THEN: the Accounts login page is displayed
-    assert(accounts.is_displayed())
-    assert('login' in accounts.location)
+    assert(accounts.is_displayed()), 'Accounts login page not displayed'
+    assert('accounts' in accounts.location), \
+        f'Not on an Accounts instance ({accounts.location})'
 
     # WHEN: they log into Accounts
     accounts.service_log_in(*teacher, destination=Book, url=web_base_url)
 
     # THEN: the instructor resources tab on the book details page is displayed
     # AND:  the resource is no longer locked
-    assert(book.instructor.is_displayed())
+    assert(book.instructor.is_displayed()), \
+        f'Instructor resources not displayed ({book.location})'
     option = book.instructor.resource_by_name(option_title)
     assert(not option.is_locked), \
         '{option} is still locked'.format(option=option.title)
@@ -683,8 +711,6 @@ def test_verified_instructors_may_request_a_comped_ibook(
     subjects = home.web_nav.subjects.view_all()
     book = subjects.select_random_book(_from=Library.COMP_COPY)
     book.web_nav.login.log_in(*teacher, destination=Book, url=web_base_url)
-    if book.web_nav.login.modal_displayed:
-        book.web_nav.login.training_wheel.close_modal()
 
     # WHEN: they click on the "Instructor resources" tab
     # AND:  click on the "iBooks Comp Copy" tile
@@ -693,7 +719,7 @@ def test_verified_instructors_may_request_a_comped_ibook(
                 'Apple iBooks Comp Copy').select()
 
     # THEN: the comp copy modal is displayed
-    assert(comp_copy.is_displayed())
+    assert(comp_copy.is_displayed()), 'Comp copy modal not displayed'
 
     # WHEN: they click "Request iBook"
     comp_copy.submit()
@@ -701,16 +727,20 @@ def test_verified_instructors_may_request_a_comped_ibook(
     # THEN: a "Please enter a number." pop up appears below
     #       the "How many students will be using <book>
     #       this semester?" input box
-    assert(comp_copy.get_error() in
-           ['Please enter a number.',
-            'Please fill out this field.',
-            'Fill out this field'])
+    error = comp_copy.get_error()
+    expected_error_messages = [
+        'Please enter a number.',
+        'Please fill out this field.',
+        'Fill out this field']
+    assert(error in expected_error_messages), \
+        f'Unexpected message displayed: {error}'
 
     # WHEN: they click on the "Cancel" button
     comp_copy.cancel()
 
     # THEN: the comp copy modal is closed
-    assert(not comp_copy.is_displayed())
+    assert(not comp_copy.is_displayed()), \
+        'The comp copy modal did not close'
 
     # WHEN: they click on the "iBooks Comp Copy" tile
     # AND:  click on the 'X' icon
@@ -719,7 +749,8 @@ def test_verified_instructors_may_request_a_comped_ibook(
     comp_copy.close()
 
     # THEN: the comp copy modal is closed
-    assert(not comp_copy.is_displayed())
+    assert(not comp_copy.is_displayed()), \
+        'The comp copy modal did not close'
 
     # WHEN: they click on the "iBooks Comp Copy" tile
     # AND:  enter a zero or greater number in the input box
@@ -730,13 +761,15 @@ def test_verified_instructors_may_request_a_comped_ibook(
     comp_copy_receipt = comp_copy.submit()
 
     # THEN: "Your request was submitted!" is displayed
-    assert('Your request was submitted!' in comp_copy_receipt.text)
+    assert('Your request was submitted!' in comp_copy_receipt.text), \
+        'The comp copy request confirmation was not shown'
 
     # WHEN: they click on the "Close" button
     comp_copy_receipt.close()
 
     # THEN: the comp copy modal is closed
-    assert(not comp_copy_receipt.is_displayed())
+    assert(not comp_copy_receipt.is_displayed()), \
+        'The comp copy modal did not close'
 
 
 @test_case('C210370')
@@ -752,8 +785,6 @@ def test_resources_have_a_title_description_and_access_type(
     # AND:  the book has student resources
     home = WebHome(selenium, web_base_url).open()
     home.web_nav.login.log_in(*teacher, destination=WebHome, url=web_base_url)
-    if home.web_nav.login.modal_displayed:
-        home.web_nav.login.training_wheel.close_modal()
     subjects = home.web_nav.subjects.view_all()
     book = subjects.select_random_book(_from=Library.HAS_S_UNLOCK)
 
@@ -768,10 +799,10 @@ def test_resources_have_a_title_description_and_access_type(
     #       Hub"
     for resource in book.instructor.resources_by_status(Web.ACCESS_OK):
         title = resource.title
-        assert(title)
-        assert(resource.description), '{0} missing a description'.format(title)
+        assert(title), 'Resource lacks a title'
+        assert(resource.description), f'{title} missing a description'
         assert(resource.status_message in Web.ACCESS_OK), \
-            '{0} does not show {1}'.format(title, Web.ACCESS_OK)
+            f'{title} does not show {Web.ACCESS_OK}'
 
     # WHEN: they click on the "Student resources" tab
     book.select_tab(Web.STUDENT_RESOURCES)
@@ -782,7 +813,7 @@ def test_resources_have_a_title_description_and_access_type(
     #       "Download"
     for resource in book.student.resources_by_status(Web.ACCESS_OK):
         title = resource.title
-        assert(title)
+        assert(title), 'Resource lacks a title'
         assert(resource.description), '{0} missing a description'.format(title)
         assert(resource.status_message in Web.ACCESS_OK), \
             '{0} does not show {1}'.format(title, Web.ACCESS_OK)
@@ -793,11 +824,10 @@ def test_resources_have_a_title_description_and_access_type(
     # THEN: the description is not displayed
     for resource in book.student.resources_by_status(Web.ACCESS_OK):
         title = resource.title
-        assert(title)
-        assert(not resource.description), \
-            '{0} shows a description'.format(title)
+        assert(title), 'Resource lacks a title'
+        assert(not resource.description), f'{title} missing a description'
         assert(resource.status_message in Web.ACCESS_OK), \
-            '{0} does not show {1}'.format(title, Web.ACCESS_OK)
+            f'{title} does not show {Web.ACCESS_OK}'
 
 
 @test_case('C210371')
@@ -806,15 +836,17 @@ def test_resources_have_a_title_description_and_access_type(
 def test_unverified_users_sent_to_faculty_verification_for_locked_resources(
         accounts_base_url, web_base_url, selenium, admin):
     """Test non-verified users must fill out faculty verification form."""
-    # GIVEN: a user viewing the instructor resources on a book details page
-    # AND:  have a non-verified, non-pending account
-    # AND:  are logged into the site
+    # SETUP:
     name = Utility.random_name()
     email = RestMail('{first}.{last}.{tag}'.format(
         first=name[1], last=name[2], tag=Utility.random_hex(4)).lower())
     email.empty()
     address = email.address
     password = Utility.random_hex(20)
+
+    # GIVEN: a user viewing the instructor resources on a book details page
+    # AND:  have a non-verified, non-pending account
+    # AND:  are logged into the site
     accounts = AccountsHome(selenium, accounts_base_url).open()
     profile = accounts.login.go_to_signup.account_signup(
         name=name, email=address, password=password, _type=Signup.INSTRUCTOR,
@@ -845,29 +877,66 @@ def test_unverified_users_sent_to_faculty_verification_for_locked_resources(
     verification = resource.select()
 
     # THEN: the Accounts faculty verification form is loaded in a new tab
-    assert(verification.is_displayed())
-    assert('Apply for instructor access' in selenium.page_source)
+    assert(verification.is_displayed()), 'Verification form not displayed'
+    assert('Apply for instructor access' in selenium.page_source), \
+        'Instructor access text not found in the page source'
 
 
-@skip_test(reason='No locked student content')
 @test_case('C210372')
 @nondestructive
 @web
 def test_students_sign_up_to_access_locked_student_content(
-        web_base_url, selenium):
+        accounts_base_url, web_base_url, selenium):
     """Users are directed to sign up to access locked student content."""
+    # SETUP:
+    name = Utility.random_name()
+    email = RestMail('{first}.{last}.{tag}'.format(
+        first=name[1], last=name[2], tag=Utility.random_hex(4)).lower())
+    email.empty()
+    address = email.address
+    password = Utility.random_hex(20)
+
     # GIVEN: a user viewing the student resources on a book details page
     # AND:  is not logged into the site
     # AND:  there is a locked student resource
+    home = WebHome(selenium, web_base_url).open()
+    subjects = home.web_nav.subjects.view_all()
+    book = subjects.select_random_book(_from=Library.HAS_S_LOCK)
+    book_url = book.location.split('/')[-1]
+    book.select_tab(Web.STUDENT_RESOURCES)
 
     # WHEN: they click on "Click here to unlock" link
+    options = book.student.resources_by_option(Web.LOCKED)
+    assert(options), f'No locked student resources found for {book.title}'
+    option = options[Utility.random(0, len(options) - 1)]
+    option_title = option.title
+    option.select()
+    accounts = AccountsHome(selenium, accounts_base_url)
 
     # THEN: the Accounts sign up page is displayed
+    assert(accounts.is_displayed()), 'Accounts login page not displayed'
+    assert('accounts' in accounts.location), \
+        f'Not on an Accounts instance ({accounts.location})'
 
     # WHEN: they sign up
+    book = accounts.login.go_to_signup.account_signup(
+        email=address,
+        password=password,
+        _type=Accounts.STUDENT,
+        role=Accounts.STUDENT,
+        provider=Accounts.RESTMAIL,
+        name=name,
+        school='Automation',
+        news=False,
+        destination=Book(selenium, web_base_url, book_name=book_url))
 
     # THEN: the student resources on the book details page is displayed
     # AND:  the resource is available for download
+    assert(book.student.is_displayed()), \
+        f'Student resources not displayed ({book.location})'
+    option = book.student.resource_by_name(option_title)
+    assert(not option.is_locked), \
+        '{option} is still locked'.format(option=option.title)
 
 
 @test_case('C210373')
@@ -900,21 +969,19 @@ def test_books_may_have_ally_tiles(web_base_url, selenium):
     home = WebHome(selenium, web_base_url).open()
     subjects = home.web_nav.subjects.view_all()
     book = subjects.select_random_book(_from=Library.OPENSTAX)
-    # book_title = book.title
 
-    # WHEN: they click on the "Instructor resources" tab
-    book.select_tab(Web.INSTRUCTOR_RESOURCES)
+    # WHEN: they click on the "Partner resources" tab
+    book.select_tab(Web.PARTNER_RESOURCES)
 
     # THEN: there may be an Allies section with one or more
     #       Ally tiles with the company name on the tile
-    assert(book.instructor.partners)
+    assert(book.partners.partners), 'No partner resources found'
 
     # WHEN: the cursor hovers over a tile
-    random_tile = Utility.random(0, len(book.instructor.partners) - 1)
-    tile = book.instructor.partners[random_tile]
+    random_tile = Utility.random(0, len(book.partners.partners) - 1)
+    tile = book.partners.partners[random_tile]
     tile_name = tile.name
     Utility.scroll_to(selenium, element=tile.root)
-    print(tile_name)
     is_safari = selenium.capabilities.get('browserName').lower() == 'safari'
     if not is_safari:
         text_seen = (
@@ -926,7 +993,10 @@ def test_books_may_have_ally_tiles(web_base_url, selenium):
 
         # THEN: the company name is replaced by the company
         #       description
-        if not text_seen[0]:
+        if (not text_seen[0] and
+                not math.isclose(float(text_seen[1]),
+                                 float(text_seen[2]),
+                                 rel_tol=0.125)):
             warnings.warn(UserWarning(
                 'On hover text for the tile "{0}"'.format(tile_name) +
                 ' failed to show: {0}, {1}, {2}'.format(*text_seen)))
@@ -963,7 +1033,9 @@ def test_available_student_resources_can_be_downloaded(web_base_url, selenium):
 
     # THEN: available resources are available for download
     for resource in book.student.resources:
-        assert(resource.can_be_downloaded or resource.is_external), \
+        assert(resource.can_be_downloaded or
+               resource.is_external or
+               resource.is_locked), \
             '{resource} is not available'.format(resource=resource.title)
 
 

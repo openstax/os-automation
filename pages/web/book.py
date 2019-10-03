@@ -1,17 +1,20 @@
 """A marketing page for an OpenStax book."""
 
+from __future__ import annotations
+
 import re
 from time import sleep
+from typing import List
 
 from pypom import Region
-from selenium.common.exceptions import WebDriverException
+from selenium.common.exceptions import TimeoutException, WebDriverException
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as expect
 
 from pages.accounts.home import AccountsHome
 from pages.web.base import WebBase
 from utils.utilities import Utility, go_to_
-from utils.web import Web
+from utils.web import Web, WebException
 
 DISPLAY_TAB = (
     'return document.querySelectorAll(".tab")[{tab}]'
@@ -34,13 +37,15 @@ class ResourceTab(Region):
     @property
     def slogan(self):
         """Return the instructor resource slogan."""
-        return self.find_element(*self._slogan_locator).text
+        return (self.find_element(*self._slogan_locator)
+                .get_attribute('textContent'))
 
     @property
     def resources(self):
         """Return a list of available resources."""
         return [Resource(self, box)
-                for box in self.find_elements(*self._resource_locator)]
+                for box
+                in self.find_elements(*self._resource_locator)]
 
     def resource_by_name(self, name):
         """Return a resource box by its name."""
@@ -111,10 +116,15 @@ class Book(WebBase):
     _banner_locator = (By.CLASS_NAME, 'title-image')
     _tab_locator = (By.CSS_SELECTOR, '.tab')
 
+    _async_hide_locator = (By.CSS_SELECTOR, '.async-hide')
     _content_locator = (By.CSS_SELECTOR, '.details-tab')
     _book_content_locator = (By.CSS_SELECTOR, '.main')
     _instructor_locator = (By.CSS_SELECTOR, '.instructor-resources')
     _student_locator = (By.CSS_SELECTOR, '.student-resources')
+    _partner_locator = (By.CSS_SELECTOR, '.partners-tab')
+    _loading_overlay_locator = (By.CSS_SELECTOR, '.overlay')
+    _page_loaded_locator = (By.CSS_SELECTOR, 'body.page-loaded')
+    _toc_root_locator = (By.CSS_SELECTOR, '.toc-slideout')
 
     _sidebar_locator = (By.CSS_SELECTOR, '.sidebar')
     _phone_view_locator = (By.CSS_SELECTOR, '.phone-view')
@@ -123,11 +133,11 @@ class Book(WebBase):
         """Output book information."""
         tabs = ''
         for tab in self.tabs:
-            tabs = tabs + ' "' + tab.text + '"'
-        return ('Book:    {title}\n'.format(title=self.title) +
-                'Tabs:    {tabs}\n'.format(tabs=tabs) +
-                'Sidebar: {sidebar}\n'.format(sidebar=self.sidebar.options) +
-                'Details: {details}\n'.format(details=self.details.options))
+            tabs = tabs + ' "' + tab.text + '"; '
+        return (f'Book:    {self.title}\n'
+                f'Tabs:    {tabs.strip()}\n'
+                f'Sidebar: {self.sidebar.options}\n'
+                f'Details: {self.details.options}\n')
 
     @property
     def loaded(self):
@@ -140,7 +150,8 @@ class Book(WebBase):
         except WebDriverException:
             return False
         return (
-            Utility.is_image_visible(
+            not self.find_elements(*self._async_hide_locator)
+            and Utility.is_image_visible(
                 self.driver, image=self.find_element(*self._banner_locator))
             and Utility.has_children(details)
             and (Utility.has_children(instructor)
@@ -179,13 +190,23 @@ class Book(WebBase):
     @property
     def tabs(self):
         """Return the resource tabs."""
-        assert(self.driver.get_window_size().get('width') > Web.PHONE), \
-            'Tab viewing is not available in the phone display'
+        if self.driver.get_window_size().get('width') <= Web.PHONE:
+            raise WebException(
+                'Tab viewing is not available in the phone display')
         return [tab for tab in self.find_elements(*self._tab_locator)]
 
     def select_tab(self, tab):
         """Select a specific resource tab."""
-        Utility.scroll_to(self.driver, element=self.tabs[tab], shift=-80)
+        Utility.scroll_to(self.driver, element=self.tabs[tab], shift=-100)
+        from selenium.webdriver.support.ui import WebDriverWait
+        try:
+            WebDriverWait(self.driver, 3.0).until(
+                lambda _: (self.driver.execute_script(
+                    'return arguments[0].style.display == "";',
+                    self.find_element(*self._loading_overlay_locator)) or
+                    bool(self.find_elements(*self._page_loaded_locator))))
+        except TimeoutException:
+            pass
         self.tabs[tab].click()
         sleep(0.5)
         return self
@@ -201,8 +222,8 @@ class Book(WebBase):
     @property
     def sidebar(self):
         """Access the sidebar links."""
-        assert(self.driver.get_window_size().get('width') > Web.PHONE), \
-            'Sidebar not available in the phone display'
+        if self.driver.get_window_size().get('width') <= Web.PHONE:
+            raise WebException('Sidebar not available in the phone display')
         sidebar_root = self.find_element(*self._sidebar_locator)
         return self.Sidebar(self, sidebar_root)
 
@@ -218,7 +239,7 @@ class Book(WebBase):
     def partners(self):
         """Access the partner resources."""
         if self.driver.get_window_size().get('width') > Web.PHONE:
-            partner_root = self.find_element(*self._book_content_locator)
+            partner_root = self.find_element(*self._partner_locator)
             return self.PartnerResources(self, partner_root)
         return None
 
@@ -234,7 +255,8 @@ class Book(WebBase):
     def table_of_contents(self):
         """Shortcut the table of contents."""
         if self.driver.get_window_size().get('width') > Web.PHONE:
-            return self.sidebar.table_of_contents
+            toc_root = self.find_element(*self._toc_root_locator)
+            return TableOfContents(self, toc_root)
         return self.phone.table_of_contents
 
     class Sidebar(Region):
@@ -248,12 +270,18 @@ class Book(WebBase):
         _ibook_download_locator = (By.CSS_SELECTOR, '[href*=itunes]')
         _kindle_download_locator = (
             By.CSS_SELECTOR, '[href*=amazon] , [href*="/a.co/"]')
+        _chegg_view_locator = (By.CSS_SELECTOR, '[href*=chegg]')
+        _view_more_options_locator = (By.CSS_SELECTOR, '.sidebar [href="."]')
         _interest_locator = (By.CSS_SELECTOR, '[href*=interest]')
         _adoption_locator = (By.CSS_SELECTOR, '[href*=adoption]')
 
         @property
         def options(self):
             """Return the available sideboar options."""
+            view_more = self.find_elements(*self._view_more_options_locator)
+            if view_more:
+                Utility.click_option(self.driver, element=view_more[0])
+                sleep(0.5)
             exists = self.find_elements
             return {
                 'toc': bool(exists(*self._toc_locator)),
@@ -263,22 +291,26 @@ class Book(WebBase):
                 'bookshare': bool(exists(*self._bookshare_locator)),
                 'ibook': bool(exists(*self._ibook_download_locator)),
                 'kindle': bool(exists(*self._kindle_download_locator)),
+                'chegg': bool(exists(*self._chegg_view_locator)),
                 'interest': bool(exists(*self._interest_locator)),
                 'adoption': bool(exists(*self._adoption_locator)), }
 
         @property
         def table_of_contents(self):
             """Access the book table of contents."""
-            return TableOfContents(self)
+            return self.page.table_of_contents
 
         def view_table_of_contents(self):
-            """Open the Table of Contents modal."""
-            Utility.safari_exception_click(self.driver,
-                                           locator=self._toc_locator)
+            """Open the Table of Contents slideout."""
+            self.options
+            toggle = self.find_element(*self._toc_locator)
+            Utility.click_option(self.driver, element=toggle)
+            sleep(0.33)
             return self.table_of_contents
 
         def view_online(self, get_url=False):
             """View the book on CNX.org."""
+            self.options
             link = self.find_element(*self._online_view_locator)
             if get_url:
                 return link.get_attribute('href')
@@ -294,6 +326,7 @@ class Book(WebBase):
 
         def download_pdf(self):
             """Click the download link."""
+            self.options
             link = self.find_element(*self._pdf_download_locator)
             return Utility.switch_to(self.driver, element=link)
 
@@ -304,12 +337,14 @@ class Book(WebBase):
 
         def view_book_order_options(self):
             """Open the Book Order modal."""
-            Utility.safari_exception_click(self.driver,
-                                           locator=self._print_copy_locator)
+            self.options
+            Utility.click_option(self.driver,
+                                 locator=self._print_copy_locator)
             return self.order_book
 
         def view_bookshare(self, url=False):
             """Open the Bookshare page for the textbook."""
+            self.options
             link = self.find_element(*self._bookshare_locator)
             if url:
                 return link.get_attribute('href')
@@ -324,8 +359,9 @@ class Book(WebBase):
 
         def view_ibook(self, book=1, url=False):
             """Open the iTunes store page for the iBook."""
-            assert(book <= len(self.ibooks)), \
-                'iBook {number} not available.'.format(number=book)
+            self.options
+            if book <= len(self.ibooks):
+                raise WebException(f'iBook {book} not available.')
             link = self.ibooks[book - 1]
             if url:
                 return link.get_attribute('href')
@@ -335,6 +371,7 @@ class Book(WebBase):
 
         def view_kindle(self, url=False):
             """Open the Amazon store page for the Kindle ebook."""
+            self.options
             link = self.find_element(*self._kindle_download_locator)
             if url:
                 return link.get_attribute('href')
@@ -344,14 +381,14 @@ class Book(WebBase):
 
         def submit_interest_form(self):
             """Go to the interest form."""
-            Utility.safari_exception_click(
+            Utility.click_option(
                 self.driver, locator=self._interest_locator)
             from pages.web.interest import Interest
             return go_to_(Interest(self.driver, base_url=self.page.base_url))
 
         def submit_adoption_form(self):
             """Go to the adoption form."""
-            Utility.safari_exception_click(
+            Utility.click_option(
                 self.driver, locator=self._adoption_locator)
             from pages.web.adoption import Adoption
             return go_to_(Adoption(self.driver, base_url=self.page.base_url))
@@ -455,7 +492,7 @@ class Book(WebBase):
             except WebDriverException:
                 button = self.find_element(*self._pl_correction_locator)
                 from pages.katalyst.errata import ErrataForm
-            Utility.safari_exception_click(self.driver, element=button)
+            Utility.click_option(self.driver, element=button)
             if not logged_in:
                 return go_to_(AccountsHome(self.driver))
             if book:
@@ -470,7 +507,7 @@ class Book(WebBase):
                 book = button.get_attribute('href').split('=')[1]
             except WebDriverException:
                 return
-            Utility.safari_exception_click(self.driver, element=button)
+            Utility.click_option(self.driver, element=button)
             return go_to_(Errata(self.driver, book=book))
 
         @property
@@ -534,10 +571,11 @@ class Book(WebBase):
             """Click on the 'Find a webinar' link."""
             webinar = self.find_element(*self._webinar_link_locator)
             article_href = webinar.get_attribute('href')
-            assert(article_href), '{0} is missing its webinar link'.format(
-                self.page.title)
+            if not bool(article_href):
+                raise WebException(
+                    f'{self.page.title} is missing its webinar link')
             article_url = article_href.split('/')[-1]
-            Utility.safari_exception_click(self.driver, element=webinar)
+            Utility.click_option(self.driver, element=webinar)
             from pages.web.blog import Article
             return go_to_(Article(self.driver, article=article_url))
 
@@ -557,7 +595,7 @@ class Book(WebBase):
         """The partner resources tab."""
 
         _slogan_locator = (By.CSS_SELECTOR, '.ally-blurb h2')
-        _partner_info_locator = (By.CSS_SELECTOR, '.ally-blurb a')
+        _partner_info_locator = (By.CSS_SELECTOR, '.blurb-body')
         _resource_locator = (By.CSS_SELECTOR, '.ally-box')
 
         def is_displayed(self):
@@ -568,7 +606,8 @@ class Book(WebBase):
         def partners(self):
             """Return a list of available resources."""
             return [Partner(self, box)
-                    for box in self.find_elements(*self._resource_locator)]
+                    for box
+                    in self.find_elements(*self._resource_locator)]
 
         @property
         def resources(self):
@@ -591,6 +630,8 @@ class Book(WebBase):
         _bookshare_locator = (By.CSS_SELECTOR, '.option [href*=bookshare]')
         _ibook_download_locator = (By.CSS_SELECTOR, '[href*=itunes]')
         _kindle_download_locator = (By.CSS_SELECTOR, '[href*=amazon]')
+        _chegg_view_locator = (By.CSS_SELECTOR, '[href*=chegg]')
+        _view_more_options_locator = (By.CSS_SELECTOR, '[href="."]')
         _interest_locator = (By.CSS_SELECTOR, '[href*=interest]')
         _adoption_locator = (By.CSS_SELECTOR, '[href*=adoption]')
 
@@ -608,8 +649,29 @@ class Book(WebBase):
         _errata_locator = (
             By.CSS_SELECTOR, '.accordion-item:last-child')
 
+        @property
+        def options(self):
+            """Return the available sideboar options."""
+            view_more = self.find_elements(*self._view_more_options_locator)
+            if view_more:
+                Utility.click_option(self.driver, element=view_more[0])
+                sleep(0.5)
+            exists = self.find_elements
+            return {
+                'toc': bool(exists(*self._toc_locator)),
+                'cnx': bool(exists(*self._online_view_locator)),
+                'pdf': bool(exists(*self._pdf_download_locator)),
+                'print': bool(exists(*self._print_copy_locator)),
+                'bookshare': bool(exists(*self._bookshare_locator)),
+                'ibook': bool(exists(*self._ibook_download_locator)),
+                'kindle': bool(exists(*self._kindle_download_locator)),
+                'chegg': bool(exists(*self._chegg_view_locator)),
+                'interest': bool(exists(*self._interest_locator)),
+                'adoption': bool(exists(*self._adoption_locator)), }
+
         def view_online(self):
             """View the book on CNX.org."""
+            self.options
             link = self.find_element(*self._online_view_locator)
             Utility.switch_to(self.driver, element=link)
             from pages.cnx.contents import Webview
@@ -617,8 +679,9 @@ class Book(WebBase):
 
         def download_pdf(self):
             """Click the download link."""
+            self.options
             link = self.find_element(*self._pdf_download_locator)
-            Utility.safari_exception_click(self.driver, element=link)
+            Utility.click_option(self.driver, element=link)
             return self.page
 
         @property
@@ -628,12 +691,14 @@ class Book(WebBase):
 
         def view_book_order_options(self):
             """Open the Book Order modal."""
-            Utility.safari_exception_click(self.driver,
-                                           locator=self._print_copy_locator)
+            self.options
+            Utility.click_option(self.driver,
+                                 locator=self._print_copy_locator)
             return self.order_book
 
         def view_bookshare(self):
             """Open the Bookshare page for the textbook."""
+            self.options
             link = self.find_element(*self._bookshare_locator)
             Utility.switch_to(self.driver, element=link)
             from pages.bookshare.home import Bookshare
@@ -646,8 +711,9 @@ class Book(WebBase):
 
         def view_ibook(self, book=1):
             """Open the iTunes store page for the iBook."""
-            assert(book <= len(self.ibooks)), \
-                'iBook {number} not available.'.format(number=book)
+            self.options
+            if book <= len(self.ibooks):
+                raise WebException(f'iBook {book} not available.')
             link = self.ibooks[book - 1]
             Utility.switch_to(self.driver, element=link)
             from pages.itunes.home import ITunes
@@ -655,6 +721,7 @@ class Book(WebBase):
 
         def view_kindle(self):
             """Open the Amazon store page for the Kindle ebook."""
+            self.options
             link = self.find_element(*self._kindle_download_locator)
             Utility.switch_to(self.driver, element=link)
             from pages.amazon.home import Amazon
@@ -662,14 +729,14 @@ class Book(WebBase):
 
         def submit_interest_form(self):
             """Go to the interest form."""
-            Utility.safari_exception_click(
+            Utility.click_option(
                 self.driver, locator=self._interest_locator)
             from pages.web.interest import Interest
             return go_to_(Interest(self.driver))
 
         def submit_adoption_form(self):
             """Go to the adoption form."""
-            Utility.safari_exception_click(
+            Utility.click_option(
                 self.driver, locator=self._adoption_locator)
             from pages.web.adoption import Adoption
             return go_to_(Adoption(self.driver))
@@ -736,6 +803,12 @@ class Book(WebBase):
                     By.CSS_SELECTOR, '.loc-senior-author')
                 _other_auth_locator = (
                     By.CSS_SELECTOR, '.loc-nonsenior-author')
+
+                @property
+                def has_senior_authors(self):
+                    """Return True if the senior authors section exists."""
+                    return '<h4>Senior Contributing Authors</h4>' \
+                        in self.driver.page_source
 
                 @property
                 def senior_authors(self):
@@ -953,7 +1026,7 @@ class Book(WebBase):
                 except WebDriverException:
                     button = self.find_element(*self._pl_correction_locator)
                     from pages.katalyst.errata import ErrataForm
-                Utility.safari_exception_click(self.driver, element=button)
+                Utility.click_option(self.driver, element=button)
                 if not logged_in:
                     return go_to_(AccountsHome(self.driver))
                 if book:
@@ -968,7 +1041,7 @@ class Book(WebBase):
                     book = button.get_attribute('href').split('=')[1]
                 except WebDriverException:
                     return
-                Utility.safari_exception_click(self.driver, element=button)
+                Utility.click_option(self.driver, element=button)
                 return go_to_(Errata(self.driver, book=book))
 
 
@@ -1135,17 +1208,173 @@ class Modal(Region):
 
     def close(self):
         """Close the order form."""
-        assert(self.is_displayed), 'Order options are not visible'
+        if not self.is_displayed:
+            raise WebException('Order options are not visible')
         close = self.find_element(*self._close_locator)
-        Utility.safari_exception_click(self.driver, element=close)
+        Utility.click_option(self.driver, element=close)
         return self.page
 
 
-class TableOfContents(Modal):
-    """The book table of contents modal display."""
+class TableOfContents(Region):
+    """The book table of contents slide-out display."""
 
-    _chapter_list_locator = (By.CSS_SELECTOR, '.table-of-contents > li')
-    _online_view_locator = (By.CSS_SELECTOR, 'a')
+    _book_contents_list_locator = (By.CSS_SELECTOR, '.table-of-contents > li')
+    _close_slide_out_button_locator = (By.CSS_SELECTOR, '.close-toc')
+    _preface_link_locator = (By.CSS_SELECTOR, '.table-of-contents a')
+
+    def close(self) -> Book:
+        """Close the table of contents.
+
+        :return: the book page
+        :rtype: :py:class:`~pages.web.book.Book`
+
+        """
+        button = self.find_element(*self._close_slide_out_button_locator)
+        Utility.click_option(self.driver, element=button)
+        sleep(0.33)
+        return self.page
+
+    def is_displayed(self) -> bool:
+        """Return True when the table of contents is open.
+
+        :return: ``True`` when the table of contents is open
+        :rtype: bool
+
+        """
+        return self.is_open
+
+    @property
+    def is_open(self) -> bool:
+        """Return True when the table of contents is open.
+
+        :return: ``True`` when the table of contents has height
+        :rtype: bool
+
+        """
+        return bool(self.driver.execute_script(
+            'return arguments[0].style.height;', self.root))
+
+    @property
+    def preface(self) -> str:
+        """Return the book's preface CNX URL.
+
+        :return: the CNX URL for the book's preface (the first link in the
+            table of contents)
+        :rtype: str
+
+        """
+        return (self.find_element(*self._preface_link_locator)
+                .get_attribute('href'))
+
+    @property
+    def sections(self) -> List[TableOfContents.Section]:
+        """Access the table of contents sections.
+
+        :return: the list of available chapters and other sections
+        :rtype: list(:py:class:`~pages.web.book.TableOfContents.Section`)
+
+        """
+        return [self.Section(self, option)
+                for option
+                in self.find_elements(*self._book_contents_list_locator)]
+
+    class Section(Region):
+        """A table of contents chapter or other primary content."""
+
+        _subsection_locator = (By.CSS_SELECTOR, '.subunit > li')
+
+        @property
+        def number(self) -> str:
+            """Return the chapter or content number.
+
+            :return: the chapter or content number, if found, otherwise an
+                empty string
+            :rtype: str
+
+            """
+            line = self.root.text.split(". ", 1)
+            return line[0] if len(line) > 1 else ""
+
+        @property
+        def subsections(self) -> List[TableOfContents.Section.Unit]:
+            """Access the chapter or content units.
+
+            :return: the list of available units or subsections
+            :rtype: list(
+                :py:class:`~pages.web.book.TableOfContents.Section.Unit`)
+
+            """
+            return [self.Unit(self, option)
+                    for option
+                    in self.find_elements(*self._subsection_locator)]
+
+        @property
+        def title(self) -> str:
+            """Return the chapter or content title.
+
+            :return: the chapter or content title
+            :rtype: str
+
+            """
+            return self.root.text.split(". ", 1)[-1]
+
+        @property
+        def unnumbered(self) -> bool:
+            """Return True if the chapter or content is unnumbered.
+
+            :return: ``True`` if the chapter or content is unnumbered
+            :rtype: bool
+
+            """
+            return self.number == ""
+
+        class Unit(Region):
+            """A chapter or content sub-unit."""
+
+            _section_link_locator = (By.CSS_SELECTOR, 'a')
+
+            @property
+            def number(self) -> str:
+                """Return the section or subsection number.
+
+                :return: the section or subsection number, if found, otherwise
+                    an empty string
+                :rtype: str
+
+                """
+                line = self.root.text.split(". ", 1)
+                return line[0] if bool(line) else ""
+
+            @property
+            def title(self) -> str:
+                """Return the section or subsection title.
+
+                :return: the section or subsection title
+                :rtype: str
+
+                """
+                return self.find_element(*self._section_link_locator).text
+
+            @property
+            def unnumbered(self) -> bool:
+                """Return True if the section or subsection is unnumbered.
+
+                :return: ``True`` if the section or subsection is unnumbered
+                :rtype: bool
+
+                """
+                return self.number == ""
+
+            @property
+            def url(self) -> str:
+                """Return the CNX URL for the section.
+
+                :return: the CNX URL for the linked section
+                :rtype: str
+
+                """
+                return (self.find_element(*self._section_link_locator)
+                        .get_attribute("href"))
 
     @property
     def chapters(self):
@@ -1240,7 +1469,7 @@ class BookOrder(Modal):
                 from pages.amazon.home import Amazon
                 return go_to_(Amazon(self.driver))
             elif self.title == 'Bookstore':
-                Utility.safari_exception_click(self.driver, element=target)
+                Utility.switch_to(self.driver, element=target)
                 from pages.web.bookstore_suppliers import Bookstore
                 return go_to_(Bookstore(self.driver))
 
@@ -1300,7 +1529,7 @@ class CompCopyRequest(Modal):
         """Submit the request form."""
         button = self.find_element(*self._request_button_locator)
         valid = self.is_valid
-        Utility.safari_exception_click(self.driver, element=button)
+        Utility.click_option(self.driver, element=button)
         if valid:
             return CompCopyRequestReceipt(page=self.page)
         return self
@@ -1308,7 +1537,7 @@ class CompCopyRequest(Modal):
     def cancel(self):
         """Cancel out of the form."""
         button = self.find_element(*self._cancel_button_locator)
-        Utility.safari_exception_click(self.driver, element=button)
+        Utility.click_option(self.driver, element=button)
         return self.page
 
 
@@ -1337,7 +1566,7 @@ class CompCopyRequestReceipt(Modal):
     def close(self):
         """Click the dialog close button."""
         button = self.find_element(*self._close_button_locator)
-        Utility.safari_exception_click(self.driver, element=button)
+        Utility.click_option(self.driver, element=button)
         return self.page
 
 

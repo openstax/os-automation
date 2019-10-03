@@ -3,8 +3,7 @@
 from time import sleep
 
 from pypom import Region
-from selenium.common.exceptions import (NoSuchElementException,
-                                        WebDriverException)
+from selenium.common.exceptions import WebDriverException
 from selenium.webdriver.common.by import By
 
 from utils.utilities import Actions, Utility, go_to_
@@ -102,7 +101,7 @@ class WebNav(Region):
     _subjects_dropdown_locator = (By.CSS_SELECTOR, '.subjects-dropdown')
     _technology_dropdown_locator = (By.CSS_SELECTOR, '.technology-dropdown')
     _what_we_do_dropdown_locator = (By.CSS_SELECTOR, '.what-we-do-dropdown')
-    _user_menu_locator = (By.CSS_SELECTOR, '.login , .login-dropdown')
+    _user_menu_locator = (By.CSS_SELECTOR, '.login , .login-menu')
     _back_link_locator = (By.CSS_SELECTOR, 'a.close')
     _meta_menu_locator = (By.CSS_SELECTOR, '.expand')
 
@@ -221,6 +220,7 @@ class WebNav(Region):
                                            '[href$=social-sciences]')
         _humanities_option_locator = (By.CSS_SELECTOR, '[href$=humanities]')
         _business_option_locator = (By.CSS_SELECTOR, '[href$=business]')
+        _essentials_option_locator = (By.CSS_SELECTOR, '[href$=essentials]')
         _ap_option_locator = (By.CSS_SELECTOR, '[href$=ap]')
 
         def is_available(self, label):
@@ -234,6 +234,7 @@ class WebNav(Region):
                     self._social_sciences_option_locator[1]),
                 Web.VIEW_HUMANITIES: self._humanities_option_locator[1],
                 Web.VIEW_BUSINESS: self._business_option_locator[1],
+                Web.VIEW_ESSENTIALS: self._essentials_option_locator[1],
                 Web.VIEW_AP: self._ap_option_locator[1],
             }
             return self._is_available(label, 'subjects', subjects)
@@ -312,6 +313,18 @@ class WebNav(Region):
             from pages.web.subjects import Subjects
             return self.open()._selection_helper(
                 self._business_option_locator,
+                Subjects)
+
+        @property
+        def essentials(self):
+            """Return the essentials subjects link."""
+            return self.find_element(*self._essentials_option_locator)
+
+        def view_essentials(self):
+            """View all essentials books."""
+            from pages.web.subjects import Subjects
+            return self.open()._selection_helper(
+                self._essentials_option_locator,
                 Subjects)
 
         @property
@@ -447,12 +460,11 @@ class WebNav(Region):
 
         _menu_expand_locator = (By.CSS_SELECTOR, 'nav.dropdown-menu')
         _log_in_link_locator = (By.CSS_SELECTOR, '.pardotTrackClick')
-        _logged_in_locator = (By.CSS_SELECTOR, '.login-dropdown')
+        _logged_in_locator = (By.CSS_SELECTOR, '.login-menu')
         _open_menu_locator = (By.CSS_SELECTOR, '[href="."]')
         _profile_link_locator = (By.CSS_SELECTOR, '[href$=profile]')
         _openstax_tutor_link_locator = (
             By.CSS_SELECTOR, f'{_logged_in_locator[1]} [href*=tutor]')
-        _training_wheel_locator = (By.CSS_SELECTOR, '.training-wheel')
         _faculty_access_locator = (By.CSS_SELECTOR, '[href*=faculty]')
         _log_out_link_locator = (By.CSS_SELECTOR, '[href*=logout]')
 
@@ -527,25 +539,6 @@ class WebNav(Region):
             return tutor.service_pass_through()
 
         @property
-        def modal_displayed(self):
-            """Return True if the Tutor modal is displayed."""
-            try:
-                self.find_element(*self._training_wheel_locator)
-                return True
-            except WebDriverException:
-                return False
-
-        @property
-        def training_wheel(self):
-            """Return the training wheel modal."""
-            try:
-                training_root = self.find_element(
-                    *self._training_wheel_locator)
-                return self.TrainingWheel(self, training_root)
-            except NoSuchElementException:
-                return
-
-        @property
         def instructor_access(self):
             """Return the link to apply for faculty access."""
             return self.find_element(*self._faculty_access_locator)
@@ -569,38 +562,3 @@ class WebNav(Region):
             return self.open()._selection_helper(
                 self._log_out_link_locator,
                 Home)
-
-        class TrainingWheel(Region):
-            """The Tutor beta training wheel."""
-
-            _image_locator = (By.CSS_SELECTOR, 'img')
-            _message_locator = (By.CSS_SELECTOR, '.message')
-            _x_close_locator = (By.CSS_SELECTOR, '.put-away')
-            _got_it_button_locator = (By.CSS_SELECTOR, '.button-row button')
-
-            @property
-            def image(self):
-                """Return the modal image."""
-                return self.find_element(*self._image_locator)
-
-            @property
-            def message(self):
-                """Return the text of the modal message."""
-                return self.find_element(*self._message_locator).text
-
-            def close_modal(self, option=''):
-                """Close the training wheel modal.
-
-                If option is set and equals 'x', use the x close button.
-                If option is set and isn't 'x', use the Got It button.
-                If option isn't set, randomize which button gets used.
-                """
-                if option:
-                    button = (self._x_close_locator
-                              if option == 'x'
-                              else self._got_it_button_locator)
-                else:
-                    button = (self._x_close_locator
-                              if bool(Utility.random(0, 1))
-                              else self._got_it_button_locator)
-                Utility.wait_for_overlay_then(self.find_element(*button).click)

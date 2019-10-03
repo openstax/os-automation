@@ -3,7 +3,7 @@
 from time import sleep
 from urllib.parse import urlparse
 
-from pypom import Region
+from pypom import Page, Region
 from selenium.common.exceptions import TimeoutException, WebDriverException
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
@@ -339,6 +339,12 @@ class Signup(AccountsBase):
             return go_to_(
                 Terms(self.driver,
                       base_url=destination if destination else None))
+
+        # if an alternative destination Page is provided (like from Web), wait
+        # for it to be loaded
+        if isinstance(destination, Page):
+            return go_to_(destination)
+
         from pages.accounts.profile import Profile
         return go_to_(Profile(self.driver, base_url=self.base_url))
 

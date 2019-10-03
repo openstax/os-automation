@@ -10,7 +10,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 
 from pages.web.base import WebBase
 from utils.utilities import Utility, go_to_
-from utils.web import Library, Web
+from utils.web import Library, Web, WebException
 
 
 class Subjects(WebBase):
@@ -45,6 +45,8 @@ class Subjects(WebBase):
         By.XPATH, category_xpath.format(subject=Web.VIEW_HUMANITIES))
     _business_category_locator = (
         By.XPATH, category_xpath.format(subject=Web.VIEW_BUSINESS))
+    _essentials_category_locator = (
+        By.XPATH, category_xpath.format(subject=Web.VIEW_ESSENTIALS))
     _ap_category_locator = (
         By.XPATH, category_xpath.format(subject=Web.VIEW_AP.replace('®', '')))
     _book_locator = (By.CSS_SELECTOR, 'div.book-category:not(.hidden) .cover')
@@ -139,6 +141,12 @@ class Subjects(WebBase):
         return self.Category(self, business_root)
 
     @property
+    def essentials(self):
+        """Return the subjects filtered by the essentials titles."""
+        essentials_root = self.find_element(*self._essentials_category_locator)
+        return self.Category(self, essentials_root)
+
+    @property
     def ap(self):
         """Return the subjects filtered by the AP titles."""
         ap_root = self.find_element(*self._ap_category_locator)
@@ -154,6 +162,11 @@ class Subjects(WebBase):
     def ap_books(self):
         """Select active AP books."""
         return self._selection_helper(Library().ap)
+
+    @property
+    def available_books(self):
+        """Select active books."""
+        return self._selection_helper(Library().available)
 
     @property
     def bookshare_books(self):
@@ -174,6 +187,11 @@ class Subjects(WebBase):
     def current_books(self):
         """Select the current editions of each book."""
         return self._selection_helper(Library().current)
+
+    @property
+    def essentials_books(self):
+        """Select active essentials books."""
+        return self._selection_helper(Library().essentials)
 
     @property
     def humanities_books(self):
@@ -267,6 +285,7 @@ class Subjects(WebBase):
         using = {
             Library.ALL_BOOKS: self._active_books,
             Library.AP: self.ap_books,
+            Library.AVAILABLE: self.available_books,
             Library.BOOKSHARE: self.bookshare_books,
             Library.BUSINESS: self.business_books,
             Library.COMP_COPY: self.comp_copy,
@@ -290,7 +309,8 @@ class Subjects(WebBase):
             using = list(filter(
                 lambda book: book.title not in Library.OLD_EDITIONS, using))
         total = len(using)
-        assert(total > 0), 'No books are available for selection'
+        if total <= 0:
+            raise WebException('No books are available for selection')
         book = Utility.random(0, total - 1)
         selected = using[book]
         print('Selected book: {0}'.format(selected.title))

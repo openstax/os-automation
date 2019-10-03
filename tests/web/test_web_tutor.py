@@ -18,7 +18,6 @@ def test_tutor_users_may_access_their_course_from_the_marketing_page(
     # AND:  logged into the site with a current Tutor user
     home = WebHome(selenium, web_base_url).open()
     home.web_nav.login.log_in(*teacher)
-    home.web_nav.login.training_wheel.close_modal()
     tutor_marketing = home.web_nav.technology.view_tutor()
 
     # WHEN: they click on the "Access Your Course" button
@@ -264,7 +263,6 @@ def test_clicking_the_get_started_button_takes_instructors_to_their_dashboard(
     #        instructor account
     home = WebHome(selenium, web_base_url).open()
     home.web_nav.login.log_in(*teacher)
-    home.web_nav.login.training_wheel.close_modal()
     tutor_marketing = home.web_nav.technology.view_tutor()
 
     # WHEN: they click the "Get started" button in the

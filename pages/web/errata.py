@@ -85,7 +85,7 @@ class Errata(WebBase):
 
     _loaded_locator = (By.CLASS_NAME, 'page-loaded')
     _table_locator = (By.CSS_SELECTOR, '.summary-table tbody')
-    _title_locator = (By.CSS_SELECTOR, '[data-html="title()"]')
+    _title_locator = (By.CSS_SELECTOR, '.hero h1')
     _tooltip_base_locator = (By.CSS_SELECTOR, '.with-tooltip')
     _schedule_locator = (By.CSS_SELECTOR, '.tooltip p')
     _filter_toggle_locator = (By.CSS_SELECTOR, '.filter-buttons')
@@ -101,6 +101,7 @@ class Errata(WebBase):
         If there isn't data (eg a new book), sleep 3 seconds then return.
         """
         return (
+            super().loaded and
             bool(self.find_element(*self._loaded_locator)) and
             (Utility.has_children(self.find_element(*self._table_locator)) or
              (sleep(3) or True)))
@@ -335,16 +336,27 @@ class ErrataForm(WebBase):
     URL_TEMPLATE = '/errata/form?book={book}'
 
     _form_locator = (By.CSS_SELECTOR, '.body-block')
-    _subject_locator = (By.CSS_SELECTOR, '.select span')
+    _subject_locator = (By.CSS_SELECTOR, '.item')
 
     @property
     def loaded(self):
-        """Return True when an errata form is found."""
-        return self.find_element(*self._form_locator)
+        """Return True when an errata form and book title are found."""
+        sup = super().loaded
+        form = self.find_elements(*self._form_locator)
+        sub = self.find_elements(*self._subject_locator)
+        loc = 'errata/form' in self.location
+        print(f'Super: {sup} '
+              f'Form: {bool(form)} '
+              f'Subject: {bool(sub)} '
+              f'Location: {loc}')
+        return (super().loaded and
+                bool(self.find_elements(*self._form_locator)) and
+                bool(self.find_elements(*self._subject_locator)) and
+                'errata/form' in self.location)
 
     def is_displayed(self):
         """Return True if the form is displayed."""
-        return self.loaded.is_displayed()
+        return self.find_element(*self._form_locator).is_displayed()
 
     @property
     def subject(self):

@@ -66,7 +66,8 @@ class Team(WebBase):
     @property
     def loaded(self):
         """Return True when banner is visible."""
-        return Utility.is_image_visible(self.driver, image=self.banner)
+        return (super().loaded and
+                Utility.is_image_visible(self.driver, image=self.banner))
 
     def is_displayed(self):
         """Return True if the team page is displayed."""

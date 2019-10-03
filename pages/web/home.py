@@ -1,5 +1,7 @@
 """OpenStax's Web home page."""
 
+from __future__ import annotations
+
 from time import sleep
 
 from pypom import Region
@@ -7,6 +9,7 @@ from selenium.common.exceptions import NoSuchElementException
 from selenium.webdriver.common.by import By
 
 from pages.web.base import WebBase
+from pages.web.legal import PrivacyPolicy
 from utils.utilities import Utility, go_to_
 from utils.web import Web, WebException
 
@@ -68,6 +71,8 @@ class WebHome(WebBase):
     _education_locator = (By.CSS_SELECTOR, '.education-banner')
     _information_locator = (By.CSS_SELECTOR, '.buckets-section')
 
+    _cookie_notice_selector = '#dialog'
+
     @property
     def loaded(self):
         """Return True when the banner carousel and navs are displayed."""
@@ -108,6 +113,19 @@ class WebHome(WebBase):
         """Access the informational links."""
         region_root = self.find_element(*self._information_locator)
         return self.Information(self, region_root)
+
+    @property
+    def privacy(self):
+        """Access the privacy and cookies notice.
+
+        :return: the privacy and cookies dialog notice
+        :rtype: :py:class:`~pages.web.home.WebHome.Dialog`
+
+        """
+        dialog = self.execute_script(
+            f'return document.querySelector("{self._cookie_notice_selector}");'
+        )
+        return self.Dialog(self, dialog)
 
     class BookBanners(Region):
         """The banner carousel."""
@@ -189,6 +207,70 @@ class WebHome(WebBase):
                 """Select a dot to display the corresponding banner."""
                 Utility.wait_for_overlay_then(self.root.click)
                 return go_to_(WebHome(self.driver))
+
+    class Dialog(Region):
+        """The Privacy and Cookies dialog box pop up."""
+
+        _dialog_title_locator = (By.CSS_SELECTOR, '#dialog-title')
+        _got_it_button_locator = (By.CSS_SELECTOR, '.cookie-notice button')
+        _message_content_locator = (By.CSS_SELECTOR, '.message')
+        _privacy_policy_link_locator = (By.CSS_SELECTOR, '.message a')
+
+        @property
+        def content(self) -> str:
+            """Return the dialog box text content.
+
+            :return: the Privacy and Cookies dialog box text content
+            :rtype: str
+
+            """
+            return (self.find_element(*self._message_content_locator)
+                    .get_attribute('textContent'))
+
+        def displayed(self) -> bool:
+            """Return True if the dialog box is displayed.
+
+            :return: ``True`` if the dialog box is displayed
+            :rtype: bool
+
+            """
+            return self.driver.execute_script(
+                'return arguments[0].hidden == false;',
+                self.root)
+
+        def got_it(self) -> WebHome:
+            """Click the 'Got it!' button.
+
+            :return: the home page
+            :rtype: :py:class:`~pages.web.home.WebHome`
+
+            """
+            button = self.find_element(*self._got_it_button_locator)
+            Utility.click_option(self.driver, element=button)
+            self.wait.until(lambda _: not self.displayed())
+            return self.page
+
+        def privacy_policy(self) -> PrivacyPolicy:
+            """Click on the privacy policy link.
+
+            :return: the privacy policy page
+            :rtype: :py:class:`~pages.web.legal.PrivacyPolicy`
+
+            """
+            link = self.find_element(*self._privacy_policy_link_locator)
+            Utility.click_option(self.driver, element=link)
+            return go_to_(
+                PrivacyPolicy(self.driver, base_url=self.page.base_url))
+
+        @property
+        def title(self) -> str:
+            """Return the dialog box title.
+
+            :return: the Privacy and Cookies dialog box title
+            :rtype: str
+
+            """
+            return self.find_element(*self._dialog_title_locator).text
 
     class Quotes(Region):
         """Quotes and page links."""

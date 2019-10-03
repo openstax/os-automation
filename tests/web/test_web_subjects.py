@@ -17,8 +17,7 @@ def test_the_subjects_page_loads(web_base_url, selenium):
     subjects = home.web_nav.subjects.view_all()
 
     # THEN: the page loads
-    assert(subjects.loaded), \
-        '{page} did not load successfully'.format(page=web_base_url)
+    assert(subjects.loaded), f'{web_base_url} did not load successfully'
 
 
 @test_case('C210344')
@@ -31,13 +30,13 @@ def test_able_to_filter_books_by_category(web_base_url, selenium):
     subjects = home.web_nav.subjects.view_all()
     filter_list = [*(subjects.filters[1:])]
     subject_list = [
-        subjects.math,
-        subjects.science,
-        subjects.social_sciences,
-        subjects.humanities,
-        subjects.business,
-        subjects.ap
-    ]
+        subjects.math, subjects.science, subjects.social_sciences,
+        subjects.humanities, subjects.business, subjects.essentials,
+        subjects.ap]
+    subject_list_text = [
+        'Math', 'Science', 'Social sciences',
+        'Humanities', 'Business', 'Essentials',
+        'AP']
 
     for index in range(len(subject_list)):
         # WHEN: they click on a subject filter button
@@ -45,7 +44,8 @@ def test_able_to_filter_books_by_category(web_base_url, selenium):
 
         # THEN: that subject is displayed
         # AND:  the other subjects are not displayed
-        assert(subject_list[index].is_visible)
+        assert(subject_list[index].is_visible), \
+            f'{subject_list_text[index]} is not visible'
         for other_index in range(len(subject_list)):
             if index != other_index:
                 assert(not subject_list[other_index].is_visible), (
@@ -76,13 +76,13 @@ def test_able_to_filter_books_by_category_using_the_drop_down_menu(
     subjects.open()
     filter_list = [*(subjects.filters[1:])]
     subject_list = [
-        subjects.math,
-        subjects.science,
-        subjects.social_sciences,
-        subjects.humanities,
-        subjects.business,
-        subjects.ap
-    ]
+        subjects.math, subjects.science, subjects.social_sciences,
+        subjects.humanities, subjects.business, subjects.essentials,
+        subjects.ap]
+    subject_list_text = [
+        'Math', 'Science', 'Social sciences',
+        'Humanities', 'Business', 'Essentials',
+        'AP']
 
     for index in range(len(subject_list)):
         # WHEN: they click on the "Filter by:" drop down menu
@@ -92,7 +92,8 @@ def test_able_to_filter_books_by_category_using_the_drop_down_menu(
 
         # THEN: that subject is displayed
         # AND:  the other subjects are not displayed
-        assert(subject_list[index].is_visible)
+        assert(subject_list[index].is_visible), \
+            f'{subject_list_text[index]} is not visible'
         for other_index in range(len(subject_list)):
             if index != other_index:
                 assert(not subject_list[other_index].is_visible), (
@@ -124,7 +125,8 @@ def test_selecting_a_book_cover_opens_the_book_details_page(
     book = subjects.select_random_book()
 
     # THEN: the book details page is displayed
-    assert('details' in book.location)
+    assert('details' in book.location), \
+        f'Not viewing the book details ({book.location})'
 
 
 @test_case('C210347')
@@ -142,9 +144,12 @@ def test_for_the_presence_of_the_book_production_overview_blurb(
 
     # THEN: text blurbs describing the book production process are displayed
     assert('Expert Authors' in subjects.about[Subjects.AUTHORS].title and
-           len(subjects.about[Subjects.AUTHORS].blurb) > 0)
+           len(subjects.about[Subjects.AUTHORS].blurb) > 0), \
+        'Expert Authors message not found'
     assert('Standard Scope and Sequence'
            in subjects.about[Subjects.SEQUENCE].title and
-           len(subjects.about[Subjects.SEQUENCE].blurb) > 0)
+           len(subjects.about[Subjects.SEQUENCE].blurb) > 0), \
+        'Standard Scope and Sequence message not found'
     assert('Peer Reviewed' in subjects.about[Subjects.PEER_REVIEWED].title and
-           len(subjects.about[Subjects.PEER_REVIEWED].blurb) > 0)
+           len(subjects.about[Subjects.PEER_REVIEWED].blurb) > 0), \
+        'Peer Reviewed message not found'
