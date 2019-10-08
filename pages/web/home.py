@@ -346,11 +346,11 @@ class WebHome(WebBase):
                 """
                 destination = self.button.get_attribute('href')
                 if Web.NEWSLETTER in destination:
-                    Utility.switch_to(self.driver, action=self.button.click)
+                    Utility.switch_to(self.driver, element=self.button)
                     from pages.web.newsletter \
                         import NewsletterSignup as Destination
                 elif Web.BOOKSTORE in destination:
-                    Utility.switch_to(self.driver, action=self.button.click)
+                    Utility.switch_to(self.driver, element=self.button)
                     from pages.web.bookstore_suppliers \
                         import Bookstore as Destination
                 else:

@@ -418,7 +418,8 @@ class Utility(object):
         Utility.scroll_to(driver=driver, element=element, shift=-80)
         sleep(0.5)
         try:
-            if force_js_click:
+            if force_js_click or \
+                    driver.capabilities.get('browserName').lower() == 'safari':
                 raise WebDriverException('Bypassing the driver-defined click')
             element.click()
         except WebDriverException:
@@ -552,18 +553,18 @@ class Utility(object):
         agent = {
             'chrome': {
                 'User-Agent': (
-                    'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_1)'
-                    ' AppleWebKit/537.36 (KHTML, like Gecko) '
-                    'Chrome/70.0.3538.110 Safari/537.36'), },
+                    'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6)'
+                    ' AppleWebKit/537.36 (KHTML, like Gecko)'
+                    ' Chrome/77.0.3865.90 Safari/537.36'), },
             'firefox': {
                 'User-Agent': (
                     'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14;'
-                    ' rv:64.0) Gecko/20100101 Firefox/64.0'), },
+                    ' rv:69.0) Gecko/20100101 Firefox/69.0'), },
             'safari': {
                 'User-Agent': (
-                    'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_1)'
+                    'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6)'
                     ' AppleWebKit/605.1.15 (KHTML, like Gecko)'
-                    ' Version/12.0.1 Safari/605.1.15'), },
+                    ' Version/13.0.1 Safari/605.1.15'), },
             '': {},
         }
         if link:

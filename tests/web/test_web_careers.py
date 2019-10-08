@@ -17,16 +17,15 @@ def test_open_positions_are_available(web_base_url, selenium):
     # WHEN:
 
     # THEN: the position title is displayed
-    # AND:  a brief description of the position is displayed
     # AND:  a link to the job post is available
     # AND:  the job posting on Rice Jobs is verified
-    assert(careers.is_displayed())
-    assert('careers' in careers.location)
+    assert(careers.is_displayed()), 'Careers page not displayed'
+    assert('careers' in careers.location), \
+        f'"{selenium.current_url}" is not the Careers page'
     for position in careers.jobs:
-        assert(position.title)
-        assert(position.description)
-        assert(position.url)
+        assert(position.title), 'Job title not found'
+        assert(position.url), 'Job page URL not found'
         assert(Utility.test_url_and_warn(
             url=position.url,
             message=position.title,
-            driver=selenium))
+            driver=selenium)), 'Rice Jobs page for the position in unavailable'
