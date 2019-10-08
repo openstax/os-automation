@@ -309,7 +309,7 @@ def test_page_links_to_the_adoption_form(web_base_url, selenium):
     # GIVEN: a user viewing the book details page
     home = WebHome(selenium, web_base_url).open()
     subjects = home.web_nav.subjects.view_all()
-    book = subjects.select_random_book(_from=Library.OPENSTAX)
+    book = subjects.select_random_book(_from=Library.AVAILABLE)
 
     # WHEN: they click on the "Using this book? Let us know." link
     library = Library()

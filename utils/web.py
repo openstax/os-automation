@@ -490,13 +490,16 @@ class Library():
 
     # Business
     ACCOUNTING_1 = 'Principles of Accounting, Volume 1: Financial Accounting'
+    ACCOUNTING_1_ALT = 'Financial Accounting'
     ACCOUNTING_2 = 'Principles of Accounting, Volume 2: Managerial Accounting'
+    ACCOUNTING_2_ALT = 'Managerial Accounting'
     BUSINESS_STATS = 'Introductory Business Statistics'
     BUS_LAW_1 = 'Business Law I Essentials'
     ENTREPRENEUR = 'Entrepreneurship'
     ETHICS = 'Business Ethics'
     INTRO_BUSINESS = 'Introduction to Business'
     MANAGEMENT = 'Principles of Management'
+    MANAGEMENT_ALT = 'Management'
     ORG_BEHAVIOR = 'Organizational Behavior'
 
     # Humanities
@@ -516,9 +519,11 @@ class Library():
 
     # Science
     ANATOMY_PHYS = 'Anatomy and Physiology'
-    AP_BIO = 'Biology for AP® Courses'
+    AP_BIO = 'Biology for AP® Courses'  # book title
+    AP_BIO_ALT = 'AP Biology'  # shortened list title
     AP_PHYS = 'College Physics for AP® Courses'  # book title
     AP_PHYS_ALT = 'The AP Physics Collection'  # alternate title
+    AP_PHYS_ALT_2 = 'AP Physics'  # shortened list title
     ASTRONOMY = 'Astronomy'
     BIOLOGY_2E = 'Biology 2e'
     BIO_CONCEPTS = 'Concepts of Biology'
@@ -1549,12 +1554,26 @@ class Library():
 
     def get(self, book, field=None):
         """Return the field or fields for a specific book."""
-        if book == self.AP_PHYS_ALT:
-            book = self.AP_PHYS
-        return_book = self.books.get(book)
-        if field:
+        alts = {self.AP_PHYS_ALT: self.AP_PHYS,
+                self.AP_PHYS_ALT_2: self.AP_PHYS,
+                self.AP_BIO_ALT: self.AP_BIO,
+                self.ACCOUNTING_1_ALT: self.ACCOUNTING_1,
+                self.ACCOUNTING_2_ALT: self.ACCOUNTING_2,
+                self.MANAGEMENT_ALT: self.MANAGEMENT, }
+
+        if book in alts:  # Is the book using an altered title?
+            return_book = self.books.get(alts[book])
+        else:  # Try to get the book information
+            return_book = self.books.get(book)
+        if return_book is None:  # Retrieval failed; is it a second edition?
+            return_book = self.books.get(book + ' 2e')
+        if return_book is None:  # Retrieval failed; not a second edition...
+            raise WebException(f'{book} not found in the library')
+
+        # Book found...
+        if field:  # return the requested field value.
             return return_book.get(field)
-        return return_book
+        return return_book  # return all of the book's field values.
 
     def get_by_category(self, category):
         """Return the books within a specific category."""

@@ -21,7 +21,7 @@ def test_adoption_form_loads(web_base_url, selenium):
     # GIVEN: a user viewing the adoption page
     home = WebHome(selenium, web_base_url).open()
     subjects = home.web_nav.subjects.view_all()
-    book = subjects.select_random_book(_from=Library.OPENSTAX)
+    book = subjects.select_random_book(_from=Library.AVAILABLE)
     adoption = book.is_using()
 
     # WHEN:
@@ -38,7 +38,7 @@ def test_adoption_form_links_to_the_interest_form(web_base_url, selenium):
     # GIVEN: a user viewing the adoption page
     home = WebHome(selenium, web_base_url).open()
     subjects = home.web_nav.subjects.view_all()
-    book = subjects.select_random_book(_from=Library.OPENSTAX)
+    book = subjects.select_random_book(_from=Library.AVAILABLE)
     adoption = book.is_using()
 
     # WHEN: they click on the "interest form" link
@@ -57,7 +57,7 @@ def test_students_do_not_need_to_fill_out_the_adoption_form(
     # GIVEN: a user viewing the adoption page
     home = WebHome(selenium, web_base_url).open()
     subjects = home.web_nav.subjects.view_all()
-    book = subjects.select_random_book(_from=Library.OPENSTAX)
+    book = subjects.select_random_book(_from=Library.AVAILABLE)
     adoption = book.is_using()
 
     # WHEN: they access the adoption form
@@ -96,7 +96,7 @@ def test_non_student_users_submit_the_adoption_form(web_base_url, selenium):
 
     Salesforce verification of the form is not tested.
     """
-    # GIVEN: a user viewing the adoption page
+    # SETUP:
     user_type = Web.USERS[Utility.random(1, len(Web.USERS) - 1)]
     _, first_name, last_name, _ = Utility.random_name()
     email = RestMail(
@@ -118,6 +118,8 @@ def test_non_student_users_submit_the_adoption_form(web_base_url, selenium):
         other = 'Another product provider'
     else:
         other = None
+
+    # GIVEN: a user viewing the adoption page
     home = WebHome(selenium, web_base_url).open()
     subjects = home.web_nav.subjects.view_all()
     initial_book = choice(list(books.keys()))
@@ -155,7 +157,7 @@ def test_non_student_users_submit_the_adoption_form(web_base_url, selenium):
 def test_a_book_is_preselected_when_a_book_details_adoption_link_is_used(
         web_base_url, selenium):
     """Test using a book details page adoption link prefills the book."""
-    # GIVEN: a user viewing a book page
+    # SETUP:
     user_type = Web.USERS[Utility.random(1, len(Web.USERS) - 1)]
     _, first_name, last_name, _ = Utility.random_name()
     email = RestMail(
@@ -166,9 +168,11 @@ def test_a_book_is_preselected_when_a_book_details_adoption_link_is_used(
     school = 'Automation'
     book, short, full, detail_append = Library().get_name_set()
     books = {short: {'status': '', 'students': '', }}
+
+    # GIVEN: a user viewing a book page
     home = WebHome(selenium, web_base_url).open()
     subjects = home.web_nav.subjects.view_all()
-    book = subjects.select_random_book(_from=Library.OPENSTAX)
+    book = subjects.select_random_book(_from=Library.AVAILABLE)
     adoption = book.is_using()
 
     # WHEN: they click on the "Using this book? Let us know." link
@@ -196,11 +200,13 @@ def test_a_book_is_preselected_when_a_book_details_adoption_link_is_used(
 @web
 def test_adoption_form_identity_fields_are_required(web_base_url, selenium):
     """Test for error messages for all identification fields."""
-    # GIVEN: a user viewing the adoption page
+    # SETUP:
     user_type = Web.USERS[Utility.random(1, len(Web.USERS) - 1)]
+
+    # GIVEN: a user viewing the adoption page
     home = WebHome(selenium, web_base_url).open()
     subjects = home.web_nav.subjects.view_all()
-    book = subjects.select_random_book(_from=Library.OPENSTAX)
+    book = subjects.select_random_book(_from=Library.AVAILABLE)
     adoption = book.is_using()
 
     # WHEN: they select a non-Student role from the drop down menu
@@ -274,7 +280,7 @@ def test_adoption_form_school_name_can_use_a_new_name(web_base_url, selenium):
 def test_adoption_form_requires_at_least_one_book_selection(
         web_base_url, selenium):
     """Test that the adoption form requires at least one book selection."""
-    # GIVEN: a user viewing the adoption page
+    # SETUP:
     user_type = Web.USERS[Utility.random(1, len(Web.USERS) - 1)]
     _, first_name, last_name, _ = Utility.random_name()
     email = RestMail(
@@ -283,6 +289,8 @@ def test_adoption_form_requires_at_least_one_book_selection(
         .lower())
     phone = Utility.random_phone(713, False)
     school = 'Automation'
+
+    # GIVEN: a user viewing the adoption page
     adoption = Adoption(selenium, web_base_url).open()
 
     # WHEN: they select a non-Student role from the drop down menu
