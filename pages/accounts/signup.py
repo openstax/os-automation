@@ -389,12 +389,11 @@ class Signup(AccountsBase):
         for book in books:
             if book.find_element(*_subject_label_locator).text in interests:
                 _book = book.find_element(*_subject_checkbox_locator)
-                Utility.scroll_to(self.driver, element=_book)
-                _book.click()
+                Utility.click_option(self.driver, element=_book)
         _news = self.find_element(*_apply_newsletter_locator)
         Utility.scroll_to(self.driver, element=_news)
         if not get_newsletter:
-            _news.click()
+            Utility.click_option(self.driver, element=_news)
         self.next()
         sleep(1.0)
         self.notice.get_confirmation_email()
@@ -510,8 +509,8 @@ class Signup(AccountsBase):
 
         def log_in(self):
             """Return to the login screen."""
-            return self.find_element(*self._sign_in_locator).click()
-            sleep(1)
+            sign_in = self.find_element(*self._sign_in_locator)
+            Utility.click_option(self.driver, element=sign_in)
             from pages.accounts.home import AccountsHome
             return go_to_(
                 AccountsHome(self.driver, base_url=self.page.base_url))
@@ -536,8 +535,8 @@ class Signup(AccountsBase):
 
         def edit_email(self):
             """Return to the user type selection."""
-            self.find_element(*self._email_edit_locator).click()
-            sleep(1)
+            edit_email = self.find_element(*self._email_edit_locator)
+            Utility.click_option(self.driver, element=edit_email)
             return self.UserType(self)
 
         @property
@@ -604,8 +603,8 @@ class Signup(AccountsBase):
 
         def use_social_login(self):
             """Go to the social login setup."""
-            self.find_element(*self._go_to_social_locator).click()
-            sleep(1)
+            use_social = self.find_element(*self._go_to_social_locator)
+            Utility.click_option(self.driver, element=use_social)
             return Signup.SocialLogin(self)
 
     class UserFields(Region):
@@ -653,15 +652,13 @@ class Signup(AccountsBase):
         def toggle_news(self):
             """Toggle between receiving and not receiving news."""
             news = self.find_element(*self._news_locator)
-            Utility.scroll_to(self.driver, element=news, shift=-80)
-            news.click()
-            sleep(1)
+            Utility.click_option(self.driver, element=news)
             return self
 
         def agree_to_terms(self):
             """Accept the Accounts terms of use and the privacy policy."""
-            self.find_element(*self._policy_agreement_locator).click()
-            sleep(1)
+            accept_terms = self.find_element(*self._policy_agreement_locator)
+            Utility.click_option(self.driver, element=accept_terms)
             return self
 
     class SocialLogin(Region):
@@ -676,24 +673,24 @@ class Signup(AccountsBase):
         @property
         def use_facebook(self):
             """Use Facebook to log in."""
-            self.find_element(*self._facebook_button_locator).click()
-            sleep(0.5)
+            fb_login = self.find_element(*self._facebook_button_locator)
+            Utility.click_option(self.driver, element=fb_login)
             from pages.facebook.home import Facebook
             return Facebook(self.driver)
 
         @property
         def use_google(self):
             """Use Google to log in."""
-            self.find_element(*self._google_button_locator).click()
-            sleep(0.5)
+            g_login = self.find_element(*self._google_button_locator)
+            Utility.click_option(self.driver, element=g_login)
             from pages.google.home import Google
             return Google(self.driver)
 
         @property
         def use_a_password(self):
             """Use a non-social log in."""
-            self.find_element(*self._go_to_password_setup_locator).click()
-            sleep(0.5)
+            non_social = self.find_element(*self._go_to_password_setup_locator)
+            Utility.click_option(self.driver, element=non_social)
             return Signup.SetPassword(self)
 
     class InstructorVerification(Region):
@@ -805,6 +802,6 @@ class Signup(AccountsBase):
         def get_confirmation_email(self):
             """Get an e-mail confirmation when instructor access approved."""
             sleep(0.5)
-            self.find_element(*self._get_email_confirmation_locator).click()
-            sleep(0.5)
+            confirm = self.find_element(*self._get_email_confirmation_locator)
+            Utility.click_option(self.driver, element=confirm)
             return self

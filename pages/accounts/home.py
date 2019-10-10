@@ -144,8 +144,8 @@ class AccountsHome(AccountsBase):
                 sleep(1)
             assert(not self.get_login_error()), 'Password failed'
             while 'terms/pose' in self.page.location:
-                Utility.scroll_to(self.driver, element=self.agreement_checkbox)
-                self.agreement_checkbox.click()
+                Utility.click_option(self.driver,
+                                     element=self.agreement_checkbox)
                 self.next()
             if destination:
                 return go_to_(destination(self.driver, url, **kwargs))
@@ -178,18 +178,21 @@ class AccountsHome(AccountsBase):
             """Log into the site with google."""
             self.user = user
             self.next()
-            self.find_element(*self._google_locator).click()
+            g_login = self.find_element(*self._google_locator)
+            Utility.click_option(self.driver, element=g_login)
             self.wait.until(
                 expect.visibility_of_element_located(
                     self._google_user_locator))
-            self.find_element(*self._google_user_next_locator).click()
+            g_next = self.find_element(*self._google_user_next_locator)
+            Utility.click_option(self.driver, element=g_next)
             self.wait.until(
                 expect.visibility_of_element_located(
                     self._google_password_locator))
             self.find_element(*self._google_password_locator) \
                 .send_keys(password)
-            self.find_element(*self._google_pass_next_locator).click()
-            sleep(2.0)
+            g_pass = self.find_element(*self._google_pass_next_locator)
+            Utility.click_option(self.driver, element=g_pass)
+            sleep(1.0)
             from pages.accounts.profile import Profile
             return go_to_(Profile(self.driver, self.page.base_url))
 
@@ -205,13 +208,15 @@ class AccountsHome(AccountsBase):
             fields = self.find_elements(*self._password_reset_fields_locator)
             for field in fields:
                 field.send_keys(password)
-            self.find_element(*self._password_reset_submit).click()
-            sleep(1.0)
+            reset = self.find_element(*self._password_reset_submit)
+            Utility.click_option(self.driver, element=reset)
             try:
-                self.find_element(*self._password_reset_submit).click()
+                submit = self.find_element(*self._password_reset_submit)
+                Utility.click_option(self.driver, element=submit)
             except ElementNotInteractableException:
-                sleep(2)
-                self.find_element(*self._password_reset_submit).click()
+                sleep(1.0)
+                submit = self.find_element(*self._password_reset_submit)
+                Utility.click_option(self.driver, element=submit)
             sleep(1.0)
             from pages.accounts.profile import Profile
             return go_to_(Profile(self.driver, self.page.base_url))
@@ -224,7 +229,8 @@ class AccountsHome(AccountsBase):
         @property
         def toggle_help(self):
             """Show or hide Account help info."""
-            self.find_element(*self._trouble_locator).click()
+            toggle = self.find_element(*self._trouble_locator)
+            Utility.click_option(self.driver, element=toggle)
             sleep(0.25)
             return self
 
@@ -234,8 +240,8 @@ class AccountsHome(AccountsBase):
             if not self.is_help_shown:
                 self.toggle_help
             current = self.driver.current_window_handle
-            self.find_element(*self._salesforce_link_locator).click()
-            sleep(1)
+            salesforce = self.find_element(*self._salesforce_link_locator)
+            Utility.click_option(self.driver, element=salesforce)
             new_handle = 1 if current == self.driver.window_handles[0] else 0
             if len(self.driver.window_handles) > 1:
                 self.driver.switch_to.window(
@@ -269,8 +275,8 @@ class AccountsHome(AccountsBase):
         @property
         def go_to_signup(self):
             """Go to user signup."""
-            self.find_element(*self._signup_locator).click()
-            sleep(1)
+            signup = self.find_element(*self._signup_locator)
+            Utility.click_option(self.driver, element=signup)
             from utils.accounts import Accounts
             if Accounts.accounts_old:
                 from pages.accounts.signup import Signup

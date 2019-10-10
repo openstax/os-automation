@@ -99,8 +99,8 @@ class AccountsBase(Page):
 
         def go_to_accounts_home(self):
             """Follow the OpenStax icon link back to the site root."""
-            self.find_element(*self._logo_locator).click()
-            sleep(1)
+            go_home = self.find_element(*self._logo_locator)
+            Utility.click_option(self.driver, element=go_home)
             return self
 
     class Footer(Region):
@@ -119,19 +119,20 @@ class AccountsBase(Page):
         @property
         def show_copyright(self):
             """Display the copyright."""
-            self.find_element(*self._copyright_locator).click()
-            sleep(1)
+            copyright = self.find_element(*self._copyright_locator)
+            Utility.click_option(self.driver, element=copyright)
             return self
 
         @property
         def show_terms_of_use(self):
             """Display the terms of use."""
-            self.find_element(*self._terms_locator).click()
-            sleep(1)
+            terms = self.find_element(*self._terms_locator)
+            Utility.click_option(self.driver, element=terms)
+            sleep(1.0)
             return self
 
         def go_to_rice(self):
             """Load the Rice webpage."""
-            self.find_element(*self._rice_link_locator).click()
-            sleep(1)
+            rice = self.find_element(*self._rice_link_locator)
+            Utility.click_option(self.driver, element=rice)
             return Rice(self.driver)
