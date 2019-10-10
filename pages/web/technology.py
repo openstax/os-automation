@@ -179,6 +179,8 @@ class Technology(WebBase):
         def go_to_openstax_tutor(self, base_url=None):
             """Click the 'Go to OpenStax Tutor' button."""
             Utility.switch_to(self.driver, self._tutor_dashboard_locator)
+            if self.page.is_safari:
+                sleep(2.0)
             self.wait.until(lambda _:
                             'accounts' in self.driver.current_url or
                             'tutor' in self.driver.current_url)

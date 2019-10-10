@@ -484,7 +484,7 @@ class WebNav(Region):
         def log_in(self, user=None, password=None,
                    do_not_log_in=False, destination=None, url=None):
             """Log a user into the website."""
-            Utility.wait_for_overlay_then(self.login.click)
+            Utility.click_option(self.driver, element=self.login)
             from pages.accounts.home import AccountsHome
             if do_not_log_in:
                 return go_to_(AccountsHome(self.driver, url))

@@ -94,14 +94,14 @@ class AccountsHome(AccountsBase):
 
         def next(self):
             """Click the NEXT button."""
-            self.find_element(*self._login_submit_button_locator).click()
-            sleep(1.0)
+            next_button = self.find_element(*self._login_submit_button_locator)
+            Utility.click_option(self.driver, element=next_button)
             return self
 
         def reset(self):
             """Click the reset password link."""
-            self.find_element(*self._password_reset_locator).click()
-            sleep(1.0)
+            reset_button = self.find_element(*self._password_reset_locator)
+            Utility.click_option(self.driver, element=reset_button)
             return self
 
         @property
@@ -154,7 +154,8 @@ class AccountsHome(AccountsBase):
             """Log into the site with facebook."""
             self.user = user
             self.next()
-            self.find_element(*self._fb_locator).click()
+            fb_button = self.find_element(*self._fb_locator)
+            Utility.click_option(self.driver, element=fb_button)
             self.wait.until(
                 expect.visibility_of_element_located(
                     self._fb_email_field_locator))
@@ -162,12 +163,13 @@ class AccountsHome(AccountsBase):
                 .send_keys(facebook_user)
             self.find_element(*self._fb_password_field_locator) \
                 .send_keys(password)
-            self.find_element(*self._fb_submit_locator).click()
+            fb_submit = self.find_element(*self._fb_submit_locator)
+            Utility.click_option(self.driver, element=fb_submit)
             if self.driver.capabilities['browserName'] == 'safari':
-                self.wait.until(
+                fb_safari = self.wait.until(
                     expect.visibility_of_element_located(
                         self._fb_safari_specific_locator))
-                self.find_element(*self._fb_safari_specific_locator).click()
+                Utility.click_option(self.driver, element=fb_safari)
             sleep(2.0)
             from pages.accounts.profile import Profile
             return go_to_(Profile(self.driver, self.page.base_url))
