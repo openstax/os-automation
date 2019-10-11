@@ -96,7 +96,8 @@ class Subjects(WebBase):
 
     def filter_toggle(self):
         """Click on the filter menu to show the filter options."""
-        self.find_element(*self._filter_toggle_locator).click()
+        toggle = self.find_element(*self._filter_toggle_locator)
+        Utility.click_option(self.driver, element=toggle)
         return self
 
     @property
@@ -355,7 +356,7 @@ class Subjects(WebBase):
 
         def view_books(self):
             """Select the filter category to view the topic textbooks."""
-            self.root.click()
+            Utility.click_option(self.driver, element=self.root)
             return self.page
 
         @property
