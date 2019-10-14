@@ -646,7 +646,7 @@ class RestMail(object):
         self._inbox = [self.Email(message) for message in messages.json()]
         return self._inbox
 
-    def wait_for_mail(self, max_time=30.0, pause_time=0.25):
+    def wait_for_mail(self, max_time=60.0, pause_time=0.25):
         """Poll until mail is received but doesn't exceed max_time seconds.
 
         Args:

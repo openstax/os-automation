@@ -34,9 +34,9 @@ class Adoption(WebBase):
     def loaded(self):
         """Wait until the form is displayed."""
         return (
+            super().loaded and
             self.find_element(*self._loaded_locator).is_displayed() and
-            self.find_element(*self._drop_down_menu_locator).is_displayed()
-        )
+            self.find_element(*self._drop_down_menu_locator).is_displayed())
 
     def is_displayed(self):
         """Return True if the adoption form is displayed."""

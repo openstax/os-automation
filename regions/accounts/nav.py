@@ -3,7 +3,6 @@
 from time import sleep
 
 from pypom import Region
-from selenium.common.exceptions import WebDriverException
 from selenium.webdriver.common.by import By
 
 from utils.utilities import go_to_
@@ -61,10 +60,7 @@ class AccountsAdminNav(Region):
 
     def is_displayed(self):
         """Return True when the console nav is displayed."""
-        try:
-            return self.loaded
-        except WebDriverException:
-            return False
+        return self.root.is_displayed()
 
     @property
     def menu_toggle(self):

@@ -100,14 +100,14 @@ class Search(AccountsAdmin):
 
     def view_search_help(self):
         """Display the search API help page."""
-        self.find_element(*self._search_help_locator).click()
-        sleep(1.0)
+        search_help = self.find_element(*self._search_help_locator)
+        Utility.click_option(self.driver, element=search_help)
         return go_to_(SearchHelp(self.driver))
 
     def submit_search(self):
         """Click the search button."""
-        self.find_element(*self._search_button_locator).click()
-        sleep(1.0)
+        search = self.find_element(*self._search_button_locator)
+        Utility.click_option(self.driver, element=search)
         return self
 
     def find(self, terms, ordering=None):
@@ -138,7 +138,7 @@ class Search(AccountsAdmin):
 
         # odd/even fields
         _expand_locator = (By.CSS_SELECTOR, 'td:first-child a')
-        _user_id_locator = (By.CSS_SELECTOR, 'td:nth-child(2)')
+        _user_id_locator = (By.CSS_SELECTOR, '[href$=edit]')
         _first_name_locator = (By.CSS_SELECTOR, 'td:nth-child(3)')
         _last_name_locator = (By.CSS_SELECTOR, 'td:nth-child(4)')
         _username_locator = (By.CSS_SELECTOR, 'td:nth-child(5)')
@@ -175,11 +175,13 @@ class Search(AccountsAdmin):
 
         def edit(self):
             """Edit the user account data."""
-            self.find_element(*self._user_id_locator).click()
-            sleep(1.0)
+            user = self.find_element(*self._user_id_locator)
+            user_id = self.id
+            Utility.switch_to(self.driver, element=user)
+            sleep(1.5)
             return go_to_(Details(driver=self.driver,
                                   base_url=self.page.base_url,
-                                  user_id=self.id))
+                                  user_id=user_id))
 
         @property
         def id(self):
@@ -218,7 +220,8 @@ class Search(AccountsAdmin):
 
         def impersonate(self):
             """Log in as the user."""
-            self.find_element(*self._impersonate_locator).click()
+            impersonate = self.find_element(*self._impersonate_locator)
+            Utility.click_option(self.driver, element=impersonate)
             self.driver.switch_to_alert().accept()
             sleep(1.0)
             from pages.accounts.profile import Profile
@@ -248,8 +251,8 @@ class Search(AccountsAdmin):
 
         def view_security_log(self):
             """View the security log for the user."""
-            self._get_from_details(self._security_log_link_locator).click()
-            sleep(1.0)
+            log = self._get_from_details(self._security_log_link_locator)
+            Utility.click_option(self.driver, element=log)
             from pages.accounts.admin.security import Security
             return go_to_(Security(self.driver))
 
@@ -373,7 +376,8 @@ class Details(AccountsAdmin):
 
     def become_user(self):
         """Impersonate the user."""
-        self.find_element(*self._become_user_locator).click()
+        become = self.find_element(*self._become_user_locator)
+        Utility.click_option(self.driver, element=become)
         self.driver.switch_to_alert.accept()
         sleep(1.0)
         from pages.accounts.profile import Profile
@@ -397,8 +401,8 @@ class Details(AccountsAdmin):
 
     def view_salesforce_contact(self):
         """View the contact information on Salesforce."""
-        self.find_element(*self._view_on_salesforce_locator).click()
-        sleep(1.0)
+        contact = self.find_element(*self._view_on_salesforce_locator)
+        Utility.click_option(self.driver, element=contact)
         from pages.salesforce.home import Salesforce
         return go_to_(Salesforce(self.driver))
 
@@ -513,8 +517,8 @@ class Details(AccountsAdmin):
 
     def view_security_log(self):
         """View the security log for the account."""
-        self.find_element(*self._security_log_locator).click()
-        sleep(1.0)
+        log = self.find_element(*self._security_log_locator)
+        Utility.click_option(self.driver, element=log)
         from pages.accounts.admin.security import Security
         return go_to_(Security(self.driver))
 
@@ -542,7 +546,7 @@ class Details(AccountsAdmin):
     def _toggle_helper(self, locator, test):
         """Click on a checkbox and set the checked attribute."""
         checkbox = self.find_element(*locator)
-        checkbox.click()
+        Utility.click_option(self.driver, element=checkbox)
         sleep(1.0)
         self.driver.execute_script(
             'arguments[0].setAttribute("checked", "{value}");'
@@ -552,8 +556,8 @@ class Details(AccountsAdmin):
 
     def save(self):
         """Click the save button to preserve the current account settings."""
-        self.find_element(*self._save_button_locator).click()
-        sleep(1.0)
+        button = self.find_element(*self._save_button_locator)
+        Utility.click_option(self.driver, element=button)
         return self
 
     class Email(Region):
@@ -573,7 +577,8 @@ class Details(AccountsAdmin):
 
         def confirm_address(self):
             """Force the confirmation of an email."""
-            self.find_element(*self._confirmation_link_locator).click()
+            link = self.find_element(*self._confirmation_link_locator)
+            Utility.click_option(self.driver, element=link)
             self.driver.switch_to_alert().accept()
             return Details(self.driver, user_id=self.url_kwargs.get('user_id'))
 
@@ -590,8 +595,8 @@ class Details(AccountsAdmin):
         def view_tutor_data(self):
             """View user information on Tutor."""
             if 'Tutor' in self.app:
-                self.find_element(*self._view_app_user_info_locator).click()
-                sleep(1.0)
+                user = self.find_element(*self._view_app_user_info_locator)
+                Utility.click_option(self.driver, element=user)
                 from pages.tutor.admin.users import Details as TutorDetails
                 return go_to_(TutorDetails(self.driver))
 
@@ -605,8 +610,8 @@ class Actions(AccountsAdmin):
 
     def mark_as_updated(self):
         """Mark all accounts as recently updated."""
-        self.find_element(*self._mark_updated_button_locator).click()
-        sleep(1.0)
+        updated = self.find_element(*self._mark_updated_button_locator)
+        Utility.click_option(self.driver, element=updated)
         return self
 
 
@@ -623,26 +628,26 @@ class PreAuth(AccountsAdmin):
 
     def view_one_day(self):
         """View pre-auth for the past day."""
-        self.find_element(*self._one_day_filter_locator).click()
-        sleep(1.0)
+        one_day = self.find_element(*self._one_day_filter_locator)
+        Utility.click_option(self.driver, element=one_day)
         return self
 
     def view_one_week(self):
         """View pre-auth for the past week."""
-        self.find_element(*self._one_week_filter_locator).click()
-        sleep(1.0)
+        one_week = self.find_element(*self._one_week_filter_locator)
+        Utility.click_option(self.driver, element=one_week)
         return self
 
     def view_two_weeks(self):
         """View pre-auth for the past two weeks."""
-        self.find_element(*self._two_weeks_filter_locator).click()
-        sleep(1.0)
+        two_weeks = self.find_element(*self._two_weeks_filter_locator)
+        Utility.click_option(self.driver, element=two_weeks)
         return self
 
     def view_all(self):
         """View all accounts in pre-auth."""
-        self.find_element(*self._all_pending_filter_locator).click()
-        sleep(1.0)
+        view_all = self.find_element(*self._all_pending_filter_locator)
+        Utility.click_option(self.driver, element=view_all)
         return self
 
     @property

@@ -7,7 +7,7 @@ from selenium.webdriver.common.by import By
 
 from pages.web.base import WebBase
 from utils.utilities import Actions, Utility, go_to_
-from utils.web import Web
+from utils.web import Web, WebException
 
 
 class ErrataBase(Region):
@@ -109,10 +109,12 @@ class Errata(WebBase):
     def is_displayed(self):
         """Return True if the errata table is displayed."""
         if self.driver.get_window_size().get('width') > Web.PHONE:
-            table = self.find_element(*self._table_locator)
+            table = self.find_elements(*self._table_locator)
         else:
-            table = self.find_element(*self._mobile_errata_locator)
-        return self.loaded and table.is_displayed()
+            table = self.find_elements(*self._mobile_errata_locator)
+        if self.loaded and not table:
+            raise WebException('Errata table is empty')
+        return self.loaded and table[0].is_displayed()
 
     @property
     def title(self):

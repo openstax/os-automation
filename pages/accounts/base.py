@@ -21,7 +21,8 @@ class AccountsBase(Page):
         return (self.find_element(*self._root_locator) and
                 Utility.load_background_images(self.driver,
                                                self._root_locator) and
-                'accounts' in self.driver.current_url)
+                'accounts' in self.driver.current_url and
+                ((sleep(2.0) or True) if self.is_safari else True))
 
     def is_displayed(self):
         """Return True when Accounts is loaded."""
