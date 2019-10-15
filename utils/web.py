@@ -26,9 +26,9 @@ class Web(object):
     # *** HOME PAGE, NAV BARS, and FOOTER ***
 
     # Web banner carousel options
-    NEW_APP = 0
-    FREE_BOOKS_NO_CATCH = 1
-    EDUCATION_OVER_PROFIT = 2
+    INTERACTIVE_MAP = 0
+    NEW_APP = 1
+    FREE_BOOKS_NO_CATCH = 2
 
     # Quotes
     SUBSCRIBE = 0
@@ -212,6 +212,7 @@ class Web(object):
     NEWSLETTER = 'www2.openstax.org'
     NO_FILTER = 'View All'
     PARTNERS = 'partners'
+    GLOBAL_REACH = 'global-reach'
     RESEARCH = 'research'
     ROVER = 'rover-by-openstax'
     SE_APP = 'download-openstax-se-app'

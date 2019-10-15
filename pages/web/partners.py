@@ -21,12 +21,14 @@ class Institutional(WebBase):
     def loaded(self) -> bool:
         """Return True when the page is loaded.
 
-        :return: ``True`` when the async hide class is not found and the
-            template URL is in use
+        :return: ``True`` when the async hide class is not found, the template
+            URL is in use, and the title banner is found
         :rtype: bool
 
         """
-        return (super().loaded and self.URL_TEMPLATE in self.location)
+        return (super().loaded and
+                self.URL_TEMPLATE in self.location and
+                bool(self.find_elements(*self._title_locator)))
 
     def is_displayed(self) -> bool:
         """Return True when the page is displayed.

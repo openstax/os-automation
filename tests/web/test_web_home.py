@@ -1037,37 +1037,37 @@ def test_switch_panels_in_banner_carousel(web_base_url, selenium):
 def test_carousel_banners_link_to_other_pages(web_base_url, selenium):
     """Test clicking on each banner in the carousel."""
     # GIVEN: a user viewing the Web home page
-    carousel = ['download-openstax-se-app', 'subjects', 'about']
+    carousel = ['global-reach', 'download-openstax-se-app', 'subjects']
     home = Home(selenium, web_base_url).open()
 
     # WHEN: they click on the banner
-    new_app = home.carousel.banners[Web.NEW_APP].click()
+    global_reach = home.carousel.banners[Web.INTERACTIVE_MAP].click()
 
-    # THEN: the subjects page is displayed
-    assert(new_app.is_displayed())
-    assert(new_app.url == carousel[Web.NEW_APP])
+    # THEN: the interactive map page is displayed
+    assert(global_reach.is_displayed())
+    assert(global_reach.url == carousel[Web.INTERACTIVE_MAP])
 
     # WHEN: they return to the home page
     # AND:  select the second banner
     # AND:  click on the banner
     home.open()
-    home.carousel.dots[Web.FREE_BOOKS_NO_CATCH].click()
-    nonprofit = home.carousel.banners[Web.FREE_BOOKS_NO_CATCH].click()
+    home.carousel.dots[Web.NEW_APP].click()
+    new_app = home.carousel.banners[Web.NEW_APP].click()
 
-    # THEN: the about OpenStax page is displayed
-    assert(nonprofit.is_displayed())
-    assert(nonprofit.url == carousel[Web.FREE_BOOKS_NO_CATCH])
+    # THEN: the OpenStax + SE app page is displayed
+    assert(new_app.is_displayed())
+    assert(new_app.url == carousel[Web.NEW_APP])
 
     # WHEN: they return to the home page
     # AND:  select the third banner
     # AND:  click on the banner
     home.open()
-    home.carousel.dots[Web.EDUCATION_OVER_PROFIT].click()
-    nonprofit = home.carousel.banners[Web.EDUCATION_OVER_PROFIT].click()
+    home.carousel.dots[Web.FREE_BOOKS_NO_CATCH].click()
+    nonprofit = home.carousel.banners[Web.FREE_BOOKS_NO_CATCH].click()
 
     # THEN: the subjects page is displayed
     assert(nonprofit.is_displayed())
-    assert(nonprofit.url == carousel[Web.EDUCATION_OVER_PROFIT])
+    assert(nonprofit.url == carousel[Web.FREE_BOOKS_NO_CATCH])
 
 
 @test_case('C210327')
@@ -1224,14 +1224,24 @@ def test_footer_static_text(web_base_url, selenium):
     # AND:  the company mission statement is stated
     # AND:  the copyright and trademark information is
     #       stated
-    assert('501(c)(3) nonprofit' in home.footer.directory.non_profit)
+    non_profit = home.footer.directory.non_profit
+    mission = home.footer.directory.our_mission
+    copyright = home.footer.supplemental.copyright
+    ap_statement = home.footer.supplemental.ap_statement
+    assert(non_profit), 'Footer non-profit status missing'
+    assert(mission), 'Footer OpenStax mission statement missing'
+    assert(copyright), 'Footer copyright missing'
+    assert(ap_statement), 'Footer AP® statement missing'
+    assert('501(c)(3) nonprofit' in non_profit), \
+        'Footer non-profit organization type not listed'
     assert("It's our mission to give every student the tools they need to be" +
-           " successful in the classroom."
-           in home.footer.directory.our_mission)
-    assert('licensed under a Creative Commons'
-           in home.footer.supplemental.copyright)
+           " successful in the classroom." in mission), \
+        'Footer mission statement text is incorrect'
+    assert('licensed under a Creative Commons' in copyright), \
+        'Footer licensing text is incorrect'
     assert('trademarks registered and/or owned by the College Board'
-           in home.footer.supplemental.ap_statement)
+           in ap_statement), \
+        'Footer AP text is incorrect'
 
 
 @test_case('C210337')

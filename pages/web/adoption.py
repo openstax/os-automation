@@ -193,15 +193,15 @@ class Adoption(WebBase):
         def select(self, user_type):
             """Select a user type from the user drop down menu."""
             sleep(0.25)
-            Utility.click_option(self.driver,
-                                 locator=self._user_select_locator)
+            user = self.find_element(*self._user_select_locator)
+            Utility.click_option(self.driver, element=user)
             for _ in range(60):
                 try:
                     select = self.find_element(*self._user_select_locator)
                     if 'open' not in select.get_attribute('class'):
                         break
                 except StaleElementReferenceException:
-                    sleep(1)
+                    sleep(1.0)
                     select = self.find_element(*self._user_select_locator)
                 sleep(0.5)
                 for option in self.options:

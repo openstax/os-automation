@@ -182,12 +182,15 @@ class WebHome(WebBase):
                 Return a 'Destination' so the function will fail if
                 a new banner link is added.
                 """
-                if self.destination.endswith(Web.SUBJECTS):
+                destination = self.destination
+                if destination.endswith(Web.SUBJECTS):
                     from pages.web.subjects import Subjects as Destination
-                elif self.destination.endswith(Web.ABOUT):
+                elif destination.endswith(Web.ABOUT):
                     from pages.web.about import AboutUs as Destination
-                elif self.destination.endswith(Web.SE_APP):
+                elif destination.endswith(Web.SE_APP):
                     from pages.web.se_app import StudyEdge as Destination
+                elif destination.endswith(Web.GLOBAL_REACH):
+                    from pages.web.reach import GlobalReach as Destination
                 else:
                     raise WebException(
                         'Unknown destination: {0}'

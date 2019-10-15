@@ -723,8 +723,11 @@ def go_to_external_(destination, url=None):
             destination.wait_for_page_to_load()
             return destination
         except TimeoutException:
-            raise TimeoutException('{0} did not load ({1})'
-                                   .format(type(destination).__name__, url))
+            raise TimeoutException(
+                'Expected <{0}> failed to load{1}; ended at: {2}'
+                .format(type(destination).__name__,
+                        f' (URL: {url})' if url else '',
+                        destination.driver.current_url))
 
 
 class Actions(ActionChains):
