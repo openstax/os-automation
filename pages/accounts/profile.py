@@ -67,8 +67,10 @@ class Profile(AccountsHome):
         """Open the small admin console."""
         if not self.is_admin:
             raise AccountException('User is not an administrator')
+        sleep(0.5)
         console = self.find_element(*self._popup_console_locator)
         Utility.click_option(self.driver, element=console)
+        sleep(1.0)
         return self.PopupConsole(self)
 
     def open_full_console(self):
@@ -147,6 +149,7 @@ class Profile(AccountsHome):
             """Accept the current values."""
             accept = self.find_element(*self._edit_submit_locator)
             Utility.click_option(self.driver, element=accept)
+            sleep(0.75)
             return self
 
         def cancel(self):
@@ -159,7 +162,7 @@ class Profile(AccountsHome):
             """Setter helper."""
             el = self.find_elements(*locator)[position]
             Utility.click_option(self.driver, element=el)
-            el.clear()
+            Utility.clear_field(self.driver, field=el)
             el.send_keys(new_value)
 
         @property
@@ -223,7 +226,7 @@ class Profile(AccountsHome):
             return self.find_element(*self._username_locator).text
 
         @username.setter
-        def username(self, username):
+        def username(self, user_name):
             """Set a new username."""
             try:
                 username = self.find_element(*self._username_locator)
@@ -232,11 +235,14 @@ class Profile(AccountsHome):
                 sleep(1)
                 username = self.find_element(*self._username_locator)
                 Utility.click_option(self.driver, element=username)
+            sleep(0.5)
             clear = self.find_element(*Profile._edit_clear_locator)
             Utility.click_option(self.driver, element=clear)
-            self.find_element(*self._input_locator).send_keys(username)
+            sleep(0.5)
+            self.find_element(*self._input_locator).send_keys(user_name)
             submit = self.find_element(*Profile._edit_submit_locator)
             Utility.click_option(self.driver, element=submit)
+            sleep(0.5)
             return Profile(self.driver, base_url=self.page.base_url)
 
     class Emails(Region):
@@ -301,10 +307,13 @@ class Profile(AccountsHome):
                 """Delete an individual email section."""
                 select = self.find_element(*self._specific_locator)
                 Utility.click_option(self.driver, element=select)
+                sleep(0.5)
                 delete = self.find_element(*self._delete_locator)
                 Utility.click_option(self.driver, element=delete)
+                sleep(0.5)
                 ok = self.find_element(*self._ok_locator)
                 Utility.click_option(self.driver, element=ok)
+                sleep(0.5)
                 return go_to_(
                     Profile(self.driver, base_url=self.page.page.base_url))
 
@@ -312,8 +321,10 @@ class Profile(AccountsHome):
                 """Resend confirmation email for a certain email."""
                 resend = self.find_element(*self._unverified_btn_locator)
                 Utility.click_option(self.driver, element=resend)
+                sleep(0.5)
                 confirm = self.find_element(*self._confirmation_btn_locator)
                 Utility.click_option(self.driver, element=confirm)
+                sleep(0.5)
                 return go_to_(
                     Profile(self.driver, base_url=self.page.page.base_url))
 

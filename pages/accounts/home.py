@@ -3,8 +3,9 @@
 from time import sleep
 
 from pypom import Region
-from selenium.common.exceptions import ElementNotInteractableException  # NOQA
-from selenium.common.exceptions import TimeoutException, WebDriverException
+from selenium.common.exceptions import (ElementNotInteractableException,
+                                        TimeoutException,
+                                        WebDriverException)
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as expect
 
@@ -96,12 +97,14 @@ class AccountsHome(AccountsBase):
             """Click the NEXT button."""
             next_button = self.find_element(*self._login_submit_button_locator)
             Utility.click_option(self.driver, element=next_button)
+            sleep(0.5)
             return self
 
         def reset(self):
             """Click the reset password link."""
             reset_button = self.find_element(*self._password_reset_locator)
             Utility.click_option(self.driver, element=reset_button)
+            sleep(0.5)
             return self
 
         @property
@@ -210,14 +213,23 @@ class AccountsHome(AccountsBase):
                 field.send_keys(password)
             reset = self.find_element(*self._password_reset_submit)
             Utility.click_option(self.driver, element=reset)
+            sleep(0.25)
             try:
                 submit = self.find_element(*self._password_reset_submit)
                 Utility.click_option(self.driver, element=submit)
+                sleep(0.5)
             except ElementNotInteractableException:
                 sleep(1.0)
                 submit = self.find_element(*self._password_reset_submit)
                 Utility.click_option(self.driver, element=submit)
+                sleep(0.5)
             sleep(1.0)
+            try:
+                submit = self.find_element(*self._password_reset_submit)
+                Utility.click_option(self.driver, element=submit)
+                sleep(0.5)
+            except WebDriverException:
+                pass
             from pages.accounts.profile import Profile
             return go_to_(Profile(self.driver, self.page.base_url))
 

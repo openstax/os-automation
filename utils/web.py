@@ -524,6 +524,7 @@ class Library():
 
     # Science
     ANATOMY_PHYS = 'Anatomy and Physiology'
+    ANATOMY_PHYS_ALT = 'Anatomy & Physiology'
     AP_BIO = 'Biology for AP® Courses'  # book title
     AP_BIO_ALT = 'AP Biology'  # shortened list title
     AP_PHYS = 'College Physics for AP® Courses'  # book title
@@ -542,6 +543,7 @@ class Library():
     U_PHYS_1 = 'University Physics Volume 1'
     U_PHYS_2 = 'University Physics Volume 2'
     U_PHYS_3 = 'University Physics Volume 3'
+    U_PHYS_ALT = 'University Physics'
 
     # Social Sciences
     AP_MACRO = 'Principles of Macroeconomics for AP® Courses 2e'
@@ -1559,12 +1561,14 @@ class Library():
 
     def get(self, book, field=None):
         """Return the field or fields for a specific book."""
-        alts = {self.AP_PHYS_ALT: self.AP_PHYS,
+        alts = {self.ANATOMY_PHYS_ALT: self.ANATOMY_PHYS,
+                self.AP_PHYS_ALT: self.AP_PHYS,
                 self.AP_PHYS_ALT_2: self.AP_PHYS,
                 self.AP_BIO_ALT: self.AP_BIO,
                 self.ACCOUNTING_1_ALT: self.ACCOUNTING_1,
                 self.ACCOUNTING_2_ALT: self.ACCOUNTING_2,
-                self.MANAGEMENT_ALT: self.MANAGEMENT, }
+                self.MANAGEMENT_ALT: self.MANAGEMENT,
+                self.U_PHYS_ALT: self.U_PHYS_1, }
 
         if book in alts:  # Is the book using an altered title?
             return_book = self.books.get(alts[book])

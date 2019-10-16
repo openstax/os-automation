@@ -90,13 +90,14 @@ class Adoption(WebBase):
 
         """
         self.form.select(user_type)
+        sleep(1.0)
         self.form.first_name = first
         self.form.last_name = last
         self.form.email = email
         self.form.phone = phone
         self.form.school = school
         self.form.next()
-        sleep(1)
+        sleep(1.0)
         user_errors = self.form.get_user_errors
         assert(not user_errors), \
             'User errors: {issues}'.format(issues=user_errors)

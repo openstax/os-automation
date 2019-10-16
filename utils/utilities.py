@@ -707,26 +707,21 @@ def go_to_(destination):
 def go_to_external_(destination, url=None):
     """Follow an external destination link repeatedly waiting for page load."""
     if url:
-        for _ in range(2):
-            try:
-                destination.wait_for_page_to_load()
-                return destination
-            except TimeoutException:
-                destination.driver.get(url)
-                sleep(1)
-    try:
-        destination.wait_for_page_to_load()
-        return destination
-    except TimeoutException:
         try:
             destination.wait_for_page_to_load()
             return destination
         except TimeoutException:
-            raise TimeoutException(
-                'Expected <{0}> failed to load{1}; ended at: {2}'
-                .format(type(destination).__name__,
-                        f' (URL: {url})' if url else '',
-                        destination.driver.current_url))
+            destination.driver.get(url)
+            sleep(1)
+    try:
+        destination.wait_for_page_to_load()
+        return destination
+    except TimeoutException:
+        raise TimeoutException(
+            'Expected <{_class}> failed to load{url}; ended at: {finish}'
+            .format(_class=type(destination).__name__,
+                    url=f' (URL: {url})' if url else '',
+                    finish=destination.driver.current_url))
 
 
 class Actions(ActionChains):

@@ -6,7 +6,7 @@ from pypom import Page, Region
 from selenium.webdriver.common.by import By
 
 from pages.rice.home import Rice
-from utils.utilities import Utility
+from utils.utilities import Utility, go_to_
 
 
 class AccountsBase(Page):
@@ -122,6 +122,7 @@ class AccountsBase(Page):
             """Display the copyright."""
             copyright = self.find_element(*self._copyright_locator)
             Utility.click_option(self.driver, element=copyright)
+            sleep(1.0)
             return self
 
         @property
@@ -136,4 +137,5 @@ class AccountsBase(Page):
             """Load the Rice webpage."""
             rice = self.find_element(*self._rice_link_locator)
             Utility.click_option(self.driver, element=rice)
-            return Rice(self.driver)
+            sleep(1.0)
+            return go_to_(Rice(self.driver))
