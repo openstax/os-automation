@@ -199,7 +199,9 @@ class WebNav(Region):
 
             If the page overlay is still in place, wait and retry.
             """
-            Utility.wait_for_overlay_then(self.root.click)
+            sleep(0.5)
+            Utility.click_option(self.driver, element=self.root)
+            sleep(0.5)
             return self
 
     class Subjects(WebNavMenu):

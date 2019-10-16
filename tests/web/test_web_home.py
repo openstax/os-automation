@@ -735,6 +735,15 @@ def test_technology_menu_options_load_the_corresponding_pages(
         assert(tutor.is_displayed()), \
             f'Tutor marketing page not displayed; ended at: {tutor.location}'
 
+        # WHEN: the "Rover by OpenStax" menu option is clicked
+        if device == 'mobile' and not tutor.web_nav.meta.is_open:
+            tutor.web_nav.meta.toggle_menu()
+        rover = tutor.web_nav.technology.view_rover()
+
+        # THEN: the Rover by OpenStax marketing webpage is displayed
+        assert(rover.is_displayed()), \
+            f'Rover page not displayed; ended at: {rover.location}'
+
         # WHEN: the "OpenStax Partners" menu option is clicked
         if device == 'mobile' and not tutor.web_nav.meta.is_open:
             tutor.web_nav.meta.toggle_menu()

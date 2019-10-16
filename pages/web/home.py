@@ -51,8 +51,7 @@ class Link(Region):
         while not isinstance(parent, Page):
             parent = parent.page
         base_url = parent.base_url
-        Utility.wait_for_overlay_then(
-            Utility.click_option(self.driver, element=self.link))
+        Utility.click_option(self.driver, element=self.link)
         if destination.endswith(Web.IMPACT):
             from pages.web.impact import OurImpact as Destination
         elif destination.endswith(Web.ANNUAL_REPORT):
@@ -188,6 +187,10 @@ class WebHome(WebBase):
                 a new banner link is added.
                 """
                 destination = self.destination
+                parent = self.page
+                while not isinstance(parent, Page):
+                    parent = parent.page
+                base_url = parent.base_url
                 if destination.endswith(Web.SUBJECTS):
                     from pages.web.subjects import Subjects as Destination
                 elif destination.endswith(Web.ABOUT):
@@ -200,8 +203,8 @@ class WebHome(WebBase):
                     raise WebException(
                         'Unknown destination: {0}'
                         .format(self.destination.split('/')[-1]))
-                Utility.wait_for_overlay_then(self.root.click)
-                return go_to_(Destination(self.driver))
+                Utility.click_option(self.driver, element=self.root)
+                return go_to_(Destination(self.driver, base_url=base_url))
 
         class Dot(Region):
             """An individual sellection button."""
@@ -213,7 +216,7 @@ class WebHome(WebBase):
 
             def click(self):
                 """Select a dot to display the corresponding banner."""
-                Utility.wait_for_overlay_then(self.root.click)
+                Utility.click_option(self.driver, element=self.root)
                 return go_to_(WebHome(self.driver))
 
     class Dialog(Region):
