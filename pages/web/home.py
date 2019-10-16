@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from time import sleep
 
-from pypom import Region
+from pypom import Page, Region
 from selenium.common.exceptions import NoSuchElementException
 from selenium.webdriver.common.by import By
 
@@ -47,7 +47,12 @@ class Link(Region):
         a new link is added.
         """
         destination = self.link.get_attribute('href')
-        Utility.wait_for_overlay_then(self.link.click)
+        parent = self.page
+        while not isinstance(parent, Page):
+            parent = parent.page
+        base_url = parent.base_url
+        Utility.wait_for_overlay_then(
+            Utility.click_option(self.driver, element=self.link))
         if destination.endswith(Web.IMPACT):
             from pages.web.impact import OurImpact as Destination
         elif destination.endswith(Web.ANNUAL_REPORT):
@@ -58,7 +63,7 @@ class Link(Region):
             from pages.web.subjects import Subjects as Destination
         elif destination.endswith(Web.TECHNOLOGY):
             from pages.web.technology import Technology as Destination
-        return go_to_(Destination(self.driver))
+        return go_to_(Destination(self.driver, base_url=base_url))
 
 
 class WebHome(WebBase):

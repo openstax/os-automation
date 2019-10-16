@@ -236,6 +236,7 @@ class Web(object):
     VIEW_TUTOR = 'OpenStax Tutor'
 
     VIEW_ABOUT_US = 'About Us'
+    VIEW_CREATOR_FEST = 'Creator Fest'
     VIEW_PARTNERSHIPS = 'Institutional Partnerships'
     VIEW_RESEARCH = 'Research'
     VIEW_TEAM = 'Team'
@@ -367,12 +368,15 @@ class Web(object):
     MENU_TECHNOLOGY = [
         VIEW_TECHNOLOGY,
         VIEW_TUTOR,
+        VIEW_ROVER,
         VIEW_PARTNERS
     ]
     MENU_WHAT_WE_DO = [
         VIEW_ABOUT_US,
         VIEW_TEAM,
-        VIEW_RESEARCH
+        VIEW_RESEARCH,
+        VIEW_PARTNERSHIPS,
+        VIEW_CREATOR_FEST
     ]
 
 

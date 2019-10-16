@@ -24,12 +24,11 @@ class WebNavMenu(Region):
         :rtype: bool
 
         """
-        script = ('return document.querySelectorAll("{0}");'
-                  .format(self._menu_item_selector))
-        menus = ' '.join(list(
-            menu.get_attribute('textContent')
-            for menu
-            in self.driver.execute_script(script)))
+        script = ('return document.querySelectorAll('
+                  f'"{self._menu_item_selector}");')
+        menus = ' '.join(list(menu.get_attribute('textContent')
+                              for menu
+                              in self.driver.execute_script(script)))
         return 'Subjects' in menus
 
     def is_displayed(self):
@@ -38,20 +37,17 @@ class WebNavMenu(Region):
 
     def _is_available(self, label, menu, options):
         """Return True if the menu option is available."""
-        locator = ('li.{menu}-dropdown {topic}'
-                   .format(menu=menu, topic=options.get(label)))
+        locator = f'li.{menu}-dropdown {options.get(label)}'
         return Utility.has_height(self.driver, locator)
 
     def _hover(self, locator):
         """Return the CSS style of a hovered element."""
         menu = self.root
         option = locator[1]
-        action = (
-            Actions(self.driver)
-            .move_to_element(menu)
-            .pause(1)
-            .get_js_data(option, 'height', 'auto')
-        )
+        action = (Actions(self.driver)
+                  .move_to_element(menu)
+                  .pause(1)
+                  .get_js_data(option, 'height', 'auto'))
         # if the result is 'auto', the menu option isn't displayed
         return not action
 
@@ -111,14 +107,14 @@ class WebNav(Region):
             return False
         current_width = self.driver.get_window_size().get('width')
         return (
-            (current_width > 960) or
-            (current_width <= 960 and self.meta.is_open)
+            (current_width > Web.TABLET) or
+            (current_width <= Web.TABLET and self.meta.is_open)
         )
 
     def is_hidden(self):
         """Return True if the nav bar is not visible due to the mobile menu."""
         if (not self.meta.is_open and
-                self.driver.get_window_size().get('width') <= 960):
+                self.driver.get_window_size().get('width') <= Web.TABLET):
             return True
         return False
 
@@ -138,8 +134,7 @@ class WebNav(Region):
         """Return True if the text is displayed."""
         element_height = (
             'return window.getComputedStyle(document.querySelector'
-            '("{selector}"))["height"]'
-        ).format(selector=self._slogan_locator[1])
+            f'("{self._slogan_locator[1]}"))["height"]')
         return self.driver.execute_script(element_height) != '0px'
 
     @property
@@ -175,8 +170,7 @@ class WebNav(Region):
         """
         sleep(0.5)
         self.driver.execute_script(
-            'document.querySelector("%s").click()' %
-            self._back_link_locator[1])
+            f'document.querySelector("{self._back_link_locator[1]}").click();')
         sleep(1.0)
         return self
 
@@ -342,11 +336,12 @@ class WebNav(Region):
     class Technology(WebNavMenu):
         """The Technology navigation menu dropdown."""
 
-        _open_menu_locator = (By.CSS_SELECTOR, '[href="."]')
         _menu_expand_locator = (By.CSS_SELECTOR, 'nav.dropdown-menu')
+        _open_menu_locator = (By.CSS_SELECTOR, '[href="."]')
+        _partners_option_locator = (By.CSS_SELECTOR, '[href$=partners]')
+        _rover_option_locator = (By.CSS_SELECTOR, '[href*=rover]')
         _technology_option_locator = (By.CSS_SELECTOR, '[href$=technology]')
         _tutor_option_locator = (By.CSS_SELECTOR, '[href$=openstax-tutor]')
-        _partners_option_locator = (By.CSS_SELECTOR, '[href$=partners]')
 
         def hover(self):
             """Return the CSS style of a hovered element."""
@@ -357,6 +352,7 @@ class WebNav(Region):
             topics = {
                 Web.VIEW_TECHNOLOGY: self._technology_option_locator[1],
                 Web.VIEW_TUTOR: self._tutor_option_locator[1],
+                Web.VIEW_ROVER: self._rover_option_locator[1],
                 Web.VIEW_PARTNERS: self._partners_option_locator[1],
             }
             return self._is_available(label, 'technology', topics)
@@ -386,6 +382,18 @@ class WebNav(Region):
                 TutorMarketing)
 
         @property
+        def rover(self):
+            """Return the Rover by OpenStax link."""
+            return self.find_element(*self._rover_option_locator)
+
+        def view_rover(self):
+            """View the Rover by OpenStax marketing page."""
+            from pages.web.rover import Rover
+            return self.open()._selection_helper(
+                self._rover_option_locator,
+                Rover)
+
+        @property
         def partners(self):
             """Return the OpenStax partners link."""
             return self.find_element(*self._partners_option_locator)
@@ -400,11 +408,13 @@ class WebNav(Region):
     class WhatWeDo(WebNavMenu):
         """The What we do navigation menu dropdown."""
 
-        _open_menu_locator = (By.CSS_SELECTOR, '[href="."]')
-        _menu_expand_locator = (By.CSS_SELECTOR, 'nav.dropdown-menu')
         _about_us_option_locator = (By.CSS_SELECTOR, '[href$=about]')
-        _team_option_locator = (By.CSS_SELECTOR, '[href$=team]')
+        _creator_fest_option_locator = (By.CSS_SELECTOR, '[href$=fest]')
+        _menu_expand_locator = (By.CSS_SELECTOR, 'nav.dropdown-menu')
+        _open_menu_locator = (By.CSS_SELECTOR, '[href="."]')
+        _partnerships_option_locator = (By.CSS_SELECTOR, '[href*=institution]')
         _research_option_locator = (By.CSS_SELECTOR, '[href$=research]')
+        _team_option_locator = (By.CSS_SELECTOR, '[href$=team]')
 
         def hover(self):
             """Return the CSS style of a hovered element."""
@@ -416,6 +426,8 @@ class WebNav(Region):
                 Web.VIEW_ABOUT_US: self._about_us_option_locator[1],
                 Web.VIEW_TEAM: self._team_option_locator[1],
                 Web.VIEW_RESEARCH: self._research_option_locator[1],
+                Web.VIEW_PARTNERSHIPS: self._partnerships_option_locator[1],
+                Web.VIEW_CREATOR_FEST: self._creator_fest_option_locator[1],
             }
             return self._is_available(label, 'what-we-do', groups)
 
@@ -454,6 +466,30 @@ class WebNav(Region):
             return self.open()._selection_helper(
                 self._research_option_locator,
                 Research)
+
+        @property
+        def partnerships(self):
+            """Return the institutional partnerships link."""
+            return self.find_element(*self._partnerships_option_locator)
+
+        def view_partnerships(self):
+            """View the institutional partnerships page."""
+            from pages.web.partners import Institutional
+            return self.open()._selection_helper(
+                self._partnerships_option_locator,
+                Institutional)
+
+        @property
+        def creator_fest(self):
+            """Return the OpenStax Creator Fest link."""
+            return self.find_element(*self._creator_fest_option_locator)
+
+        def view_creator_fest(self):
+            """View the OpenStax Creator Fest page."""
+            from pages.web.creator_fest import CreatorFest
+            return self.open()._selection_helper(
+                self._creator_fest_option_locator,
+                CreatorFest)
 
     class Login(WebNavMenu):
         """The login option and menu."""

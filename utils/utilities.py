@@ -203,8 +203,7 @@ class Utility(object):
         :returns: True if the element's height is not 'auto'
         """
         auto = ('return window.getComputedStyle('
-                'document.querySelector("{selector}")).height!="auto"'
-                ).format(selector=locator)
+                f'document.querySelector("{locator}")).height != "auto";')
         return driver.execute_script(auto)
 
     @classmethod
