@@ -1314,34 +1314,42 @@ def test_the_home_page_information_bars(web_base_url, selenium):
 
     # THEN: they are presented 2 boxes
     # AND:  the first discusses the OpenStax impact
-    assert(home.information.box[Web.OUR_IMPACT].is_displayed())
+    assert(home.information.box[Web.OUR_IMPACT].is_displayed()), \
+        'Our Impact info box not displayed'
     assert('Wolchonok has saved students' in
-           home.information.box[Web.OUR_IMPACT].text)
-    assert(home.information.box[Web.OUR_IMPACT].has_image)
+           home.information.box[Web.OUR_IMPACT].text), \
+        'Our Impact info box text changed'
+    assert(home.information.box[Web.OUR_IMPACT].has_image), \
+        'Our Impact info box image missing'
 
     # WHEN: the user clicks the "See our impact" button
     impact = home.information.box[Web.OUR_IMPACT].click()
 
     # THEN: the impact page is displayed
-    assert(impact.is_displayed())
-    assert('impact' in impact.location)
+    assert(impact.is_displayed()), 'Our Impact page not displayed'
+    assert('impact' in impact.location), \
+        f'Not viewing the Our Impact page; ended at: {impact.location}'
 
     # WHEN: the user opens the Web home page
     # AND:  scroll to the information bars
     home.open()
+
     home.information.show()
 
     # THEN: the second box discusses OpenStax partners
-    assert(home.information.box[Web.OPENSTAX_PARTNERS].is_displayed())
+    assert(home.information.box[Web.OPENSTAX_PARTNERS].is_displayed()), \
+        'Partners info box not displayed'
     assert('OpenStax partners have united with us' in
-           home.information.box[Web.OPENSTAX_PARTNERS].text)
+           home.information.box[Web.OPENSTAX_PARTNERS].text), \
+        'Partners info box text changed'
 
     # WHEN: the user clicks the "View Partners" button
     partners = home.information.box[Web.OPENSTAX_PARTNERS].click()
 
     # THEN: the partners page is displayed
-    assert(partners.is_displayed())
-    assert('partners' in partners.location)
+    assert(partners.is_displayed()), 'Partners page not displayed'
+    assert('partners' in partners.location), \
+        f'Not viewing the Partners page; ended at: {partners.location}'
 
 
 @test_case('C210330')
@@ -1356,7 +1364,7 @@ def test_page_footer_is_displayed(web_base_url, selenium):
     home.footer.show()
 
     # THEN: the footer is visible
-    assert(home.footer.is_displayed())
+    assert(home.footer.is_displayed()), 'Web footer not displayed'
 
 
 @test_case('C210339')
@@ -1369,26 +1377,29 @@ def test_footer_static_text(web_base_url, selenium):
     home.footer.show()
 
     # WHEN:
+    non_profit = home.footer.directory.non_profit
+    mission = home.footer.directory.our_mission
+    copyright = home.footer.supplemental.copyright
+    ap_statement = home.footer.supplemental.ap_statement
 
     # THEN: the company nonprofit status is stated
     # AND:  the company mission statement is stated
     # AND:  the copyright and trademark information is
     #       stated
-    non_profit = home.footer.directory.non_profit
-    mission = home.footer.directory.our_mission
-    copyright = home.footer.supplemental.copyright
-    ap_statement = home.footer.supplemental.ap_statement
     assert(non_profit), 'Footer non-profit status missing'
-    assert(mission), 'Footer OpenStax mission statement missing'
-    assert(copyright), 'Footer copyright missing'
-    assert(ap_statement), 'Footer AP® statement missing'
     assert('501(c)(3) nonprofit' in non_profit), \
         'Footer non-profit organization type not listed'
+
+    assert(mission), 'Footer OpenStax mission statement missing'
     assert("It's our mission to give every student the tools they need to be" +
            " successful in the classroom." in mission), \
         'Footer mission statement text is incorrect'
+
+    assert(copyright), 'Footer copyright missing'
     assert('licensed under a Creative Commons' in copyright), \
         'Footer licensing text is incorrect'
+
+    assert(ap_statement), 'Footer AP® statement missing'
     assert('trademarks registered and/or owned by the College Board'
            in ap_statement), \
         'Footer AP text is incorrect'
@@ -1409,8 +1420,9 @@ def test_the_contact_us_link_in_the_footer_opens_the_contact_form(
     contact = home.footer.directory.contact_us()
 
     # THEN: the contact form is displayed
-    assert(contact.is_displayed())
-    assert('contact' in contact.location)
+    assert(contact.is_displayed()), 'Contact page not displayed'
+    assert('contact' in contact.location), \
+        f'Not viewing the contact page; ended at: {contact.location}'
 
 
 @test_case('C476813')
@@ -1427,8 +1439,9 @@ def test_the_support_center_link_in_the_footer(web_base_url, selenium):
 
     # THEN: the Salesforce support page is loaded in a new
     #       tab
-    assert(salesforce.is_displayed())
-    assert('openstax.secure.force.com' in salesforce.location)
+    assert(salesforce.is_displayed()), 'Salesforce support page not displayed'
+    assert('openstax.secure.force.com' in salesforce.location), \
+        f'Not viewing the Salesforce site; ended at: {salesforce.location}'
 
 
 @test_case('C476814')
@@ -1444,8 +1457,9 @@ def test_the_faq_link_in_the_footer(web_base_url, selenium):
     faq = home.footer.directory.faq()
 
     # THEN: the frequently asked questions page is displayed
-    assert(faq.is_displayed())
-    assert('faq' in faq.location)
+    assert(faq.is_displayed()), 'FAQ page not displayed'
+    assert('faq' in faq.location), \
+        f'Not viewing the FAQ page; ended at: {faq.location}'
 
 
 @test_case('C210338')
@@ -1461,8 +1475,9 @@ def test_the_press_link_in_the_footer(web_base_url, selenium):
     press = home.footer.directory.press()
 
     # THEN: the press page is displayed
-    assert(press.is_displayed())
-    assert('press' in press.location)
+    assert(press.is_displayed()), 'Press page not displayed'
+    assert('press' in press.location), \
+        f'Not viewing the press page; ended at: {press.location}'
 
 
 @test_case('C476815')
@@ -1478,8 +1493,9 @@ def test_the_newsletter_sign_up_link_in_the_footer(web_base_url, selenium):
     sign_up = home.footer.directory.newsletter()
 
     # THEN: the newsletter sign up form is displayed in the new tab
-    assert(sign_up.is_displayed())
-    assert('www2' in sign_up.location)
+    assert(sign_up.is_displayed()), 'Newsletter signup site not displayed'
+    assert('www2' in sign_up.location), \
+        f'Not viewing the newsletter signup site; ended at: {sign_up.location}'
 
 
 @test_case('C210335')
@@ -1495,8 +1511,9 @@ def test_the_careers_link_in_the_footer(web_base_url, selenium):
     careers = home.footer.directory.careers()
 
     # THEN: the jobs page is displayed
-    assert(careers.is_displayed())
-    assert('careers' in careers.location)
+    assert(careers.is_displayed()), 'Careers page not displayed'
+    assert('careers' in careers.location), \
+        f'Not viewing the careers page; ended at: {careers.location}'
 
 
 @test_case('C210334')
@@ -1513,8 +1530,10 @@ def test_the_accessibility_statement_link_in_the_footer(
     accessibility = home.footer.directory.accessibility_statement()
 
     # THEN: the accessibility statement page is displayed
-    assert(accessibility.is_displayed())
-    assert('accessibility-statement' in accessibility.location)
+    assert(accessibility.is_displayed()), 'Accessibility page not displayed'
+    assert('accessibility-statement' in accessibility.location), (
+        'Not viewing the accessibility page; '
+        f'ended at: {accessibility.location}')
 
 
 @test_case('C210332')
@@ -1530,8 +1549,9 @@ def test_the_terms_of_use_link_in_the_footer(web_base_url, selenium):
     terms = home.footer.directory.terms_of_use()
 
     # THEN: the terms page is displayed
-    assert(terms.is_displayed())
-    assert('tos' in terms.location)
+    assert(terms.is_displayed()), 'Terms of use page not displayed'
+    assert('tos' in terms.location), \
+        f'Not viewing the terms of use page; ended at: {terms.location}'
 
 
 @test_case('C210331')
@@ -1547,8 +1567,9 @@ def test_the_licensing_link_in_the_footer(web_base_url, selenium):
     license = home.footer.directory.licensing()
 
     # THEN: the licensing page is displayed
-    assert(license.is_displayed())
-    assert('license' in license.location)
+    assert(license.is_displayed()), 'Licensing page not displayed'
+    assert('license' in license.location), \
+        f'Not viewing the licensing page; ended at: {license.location}'
 
 
 @test_case('C210333')
@@ -1564,8 +1585,9 @@ def test_the_privacy_policy_link_in_the_footer(web_base_url, selenium):
     privacy = home.footer.directory.privacy_policy()
 
     # THEN: the privacy policy page is displayed
-    assert(privacy.is_displayed())
-    assert('privacy-policy' in privacy.location)
+    assert(privacy.is_displayed()), 'Privacy policy page not displayed'
+    assert('privacy-policy' in privacy.location), \
+        f'Not viewing the privacy policy page; ended at: {privacy.location}'
 
 
 @test_case('C210340')
@@ -1581,8 +1603,10 @@ def test_the_footer_openstax_facebook_link(web_base_url, selenium):
     facebook = home.footer.supplemental.facebook()
 
     # THEN: the OpenStax Facebook page is displayed in a new tab
-    assert(facebook.is_displayed())
-    assert('facebook' in facebook.location)
+    assert(facebook.is_displayed()), 'Facebook site not displayed in a new tab'
+    assert('facebook' in facebook.location), (
+        'Not viewing the OpenStax Facebook page; '
+        f'ended at: {facebook.location}')
 
 
 @test_case('C210341')
@@ -1598,8 +1622,10 @@ def test_the_footer_openstax_twitter_link(web_base_url, selenium):
     twitter = home.footer.supplemental.twitter()
 
     # THEN: the OpenStax Twitter feed is displayed in a new tab
-    assert(twitter.is_displayed())
-    assert('twitter' in twitter.location)
+    assert(twitter.is_displayed()), 'Twitter site not displayed in a new tab'
+    assert('twitter' in twitter.location), (
+        'Not viewing the OpenStax Twitter page; '
+        f'ended at: {twitter.location}')
 
 
 @test_case('C210342')
@@ -1615,8 +1641,10 @@ def test_the_footer_openstax_linkedin_link(web_base_url, selenium):
     linkedin = home.footer.supplemental.linkedin()
 
     # THEN: the OpenStax LinkedIn company page is displayed in a new tab
-    assert(linkedin.is_displayed())
-    assert('linkedin' in linkedin.location)
+    assert(linkedin.is_displayed()), 'LinkedIn site not displayed in a new tab'
+    assert('linkedin' in linkedin.location), (
+        'Not viewing the OpenStax LinkedIn page; '
+        f'ended at: {linkedin.location}')
 
 
 @test_case('C214021')
@@ -1632,5 +1660,8 @@ def test_the_footer_openstax_instagram_link(web_base_url, selenium):
     instagram = home.footer.supplemental.instagram()
 
     # THEN: the OpenStax Instagram page is displayed in a new tab
-    assert(instagram.is_displayed())
-    assert('instagram' in instagram.location)
+    assert(instagram.is_displayed()), \
+        'Instagram site not displayed in a new tab'
+    assert('instagram' in instagram.location), (
+        'Not viewing the OpenStax Instagram page; '
+        f'ended at: {instagram.location}')
