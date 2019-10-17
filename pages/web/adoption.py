@@ -3,10 +3,9 @@
 from time import sleep
 
 from pypom import Region
-from selenium.common.exceptions import ElementNotInteractableException  # NOQA
-from selenium.common.exceptions import NoSuchElementException  # NOQA
-from selenium.common.exceptions import StaleElementReferenceException  # NOQA
-from selenium.common.exceptions import WebDriverException  # NOQA
+from selenium.common.exceptions import (ElementNotInteractableException,
+                                        NoSuchElementException,
+                                        WebDriverException)
 from selenium.webdriver.common.by import By
 
 from pages.web.base import WebBase
@@ -40,7 +39,13 @@ class Adoption(WebBase):
 
     def is_displayed(self):
         """Return True if the adoption form is displayed."""
-        return self.find_element(*self._drop_down_menu_locator).is_displayed()
+        form = self.find_elements(*self._drop_down_menu_locator)
+        if not form:
+            return False
+        visibility = self.driver.execute_script(
+            'return window.getComputedStyle(arguments[0]).visibility;',
+            form[0])
+        return visibility == 'visible'
 
     def go_to_interest(self, link=None):
         """Switch to the interest form."""
@@ -196,18 +201,10 @@ class Adoption(WebBase):
             sleep(0.25)
             user = self.find_element(*self._user_select_locator)
             Utility.click_option(self.driver, element=user)
-            for _ in range(60):
-                try:
-                    select = self.find_element(*self._user_select_locator)
-                    if 'open' not in select.get_attribute('class'):
-                        break
-                except StaleElementReferenceException:
-                    sleep(1.0)
-                    select = self.find_element(*self._user_select_locator)
-                sleep(0.5)
-                for option in self.options:
-                    if option.get_attribute('textContent') == user_type:
-                        Utility.click_option(self.driver, element=option)
+            sleep(0.33)
+            for option in self.options:
+                if option.get_attribute('textContent') == user_type:
+                    Utility.click_option(self.driver, element=option)
             sleep(0.5)
             return self
 
@@ -503,6 +500,7 @@ class Adoption(WebBase):
                 """Click the checkbox."""
                 checkbox = self.find_element(*self._checkbox_locator)
                 Utility.safari_exception_click(self.driver, element=checkbox)
+                sleep(0.25)
                 return self.page
 
             @property

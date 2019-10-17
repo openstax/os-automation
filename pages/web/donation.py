@@ -381,10 +381,12 @@ class Donate(WebBase):
         """Click the Continue button."""
         Utility.safari_exception_click(self.driver,
                                        element=self.continue_button)
+        sleep(1.5)
         if not self.get_errors:
             from pages.rice.ebank import EBank
             sleep(2)
             return go_to_(EBank(self.driver))
+        return self
 
     def get_errors(self):
         """Return a list of validation errors found."""

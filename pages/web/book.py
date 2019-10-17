@@ -1249,8 +1249,9 @@ class TableOfContents(Region):
         :rtype: bool
 
         """
-        return bool(self.driver.execute_script(
-            'return arguments[0].style.height;', self.root))
+        get_height = 'return window.getComputedStyle(arguments[0]).height;'
+        height = self.driver.execute_script(get_height, self.root)
+        return height and height != '0px'
 
     @property
     def preface(self) -> str:
