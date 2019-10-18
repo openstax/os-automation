@@ -1,12 +1,9 @@
 """The Accounts admin console nav."""
 
-from time import sleep
-
 from pypom import Region
-from selenium.common.exceptions import WebDriverException
 from selenium.webdriver.common.by import By
 
-from utils.utilities import go_to_
+from utils.utilities import Utility, go_to_
 
 
 class AccountsNavMenu(Region):
@@ -20,7 +17,8 @@ class AccountsNavMenu(Region):
 
     def open(self):
         """Click the toggle to open the menu."""
-        self.find_element(*self._mobile_menu_toggle_locator).click()
+        toggle = self.find_element(*self._mobile_menu_toggle_locator)
+        Utility.click_option(self.driver, element=toggle)
 
     @property
     def is_open(self):
@@ -31,8 +29,8 @@ class AccountsNavMenu(Region):
         """Menu option helper for duplicated actions."""
         if not self.is_open:
             self.open()
-        self.find_element(*locator).click()
-        sleep(1.0)
+        target = self.find_element(*locator)
+        Utility.click_option(self.driver, element=target)
         return go_to_(destination(self.driver))
 
 
@@ -61,10 +59,7 @@ class AccountsAdminNav(Region):
 
     def is_displayed(self):
         """Return True when the console nav is displayed."""
-        try:
-            return self.loaded
-        except WebDriverException:
-            return False
+        return self.root.is_displayed()
 
     @property
     def menu_toggle(self):
@@ -83,8 +78,8 @@ class AccountsAdminNav(Region):
 
     def view_console_home(self):
         """Click on the console brand link."""
-        self.find_element(*self._brand_locator).click()
-        sleep(1.0)
+        link = self.find_element(*self._brand_locator)
+        Utility.click_option(self.driver, element=link)
         from pages.accounts.admin.console import Console
         return go_to_(Console(self.driver))
 
@@ -96,8 +91,8 @@ class AccountsAdminNav(Region):
 
     def security(self):
         """View the security log."""
-        self.find_element(*self._security_log_link_locator).click()
-        sleep(1.0)
+        log = self.find_element(*self._security_log_link_locator)
+        Utility.click_option(self.driver, element=log)
         from pages.accounts.admin.security import Security
         return go_to_(Security(self.driver))
 
@@ -110,8 +105,8 @@ class AccountsAdminNav(Region):
 
     def settings(self):
         """View the settings for Accounts."""
-        self.find_element(*self._settings_link_locator).click()
-        sleep(1.0)
+        settings = self.find_element(*self._settings_link_locator)
+        Utility.click_option(self.driver, element=settings)
         from pages.accounts.admin.settings import Settings
         return go_to_(Settings(self.driver))
 
@@ -123,15 +118,15 @@ class AccountsAdminNav(Region):
 
     def terms(self):
         """View the contracts for Accounts."""
-        self.find_element(*self._terms_link_locator).click()
-        sleep(1.0)
+        terms = self.find_element(*self._terms_link_locator)
+        Utility.click_option(self.driver, element=terms)
         from pages.accounts.admin.contracts import Contracts
         return go_to_(Contracts(self.driver))
 
     def close_console(self):
         """Close the admin console and return to Accounts."""
-        self.find_element(*self._console_exit_link_locator).click()
-        sleep(1.0)
+        close = self.find_element(*self._console_exit_link_locator)
+        Utility.click_option(self.driver, element=close)
         from pages.accounts.profile import Profile
         return go_to_(Profile(self.driver))
 

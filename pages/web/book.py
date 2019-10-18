@@ -85,9 +85,7 @@ class Accordion(Region):
     def toggle(self):
         """Click on a toggle bar to open or close the menu."""
         toggle_bar = self.find_element(*self._toggle_locator)
-        Utility.scroll_to(self.driver, element=toggle_bar, shift=-80)
-        self.find_element(*self._toggle_locator).click()
-        sleep(0.5)
+        Utility.click_option(self.driver, element=toggle_bar)
         return self
 
     @property
@@ -207,8 +205,7 @@ class Book(WebBase):
                     bool(self.find_elements(*self._page_loaded_locator))))
         except TimeoutException:
             pass
-        self.tabs[tab].click()
-        sleep(0.5)
+        Utility.click_option(self.driver, element=self.tabs[tab])
         return self
 
     @property
@@ -263,7 +260,10 @@ class Book(WebBase):
         """The large view sidebar."""
 
         _toc_locator = (By.CSS_SELECTOR, '.show-toc')
-        _online_view_locator = (By.CSS_SELECTOR, '[href*="cnx.org"]')
+        # Use an XPATH because the online link may be CNX (cnx.org) or
+        # REx (openstax.org) and it doesn't have any other identifying flags
+        _online_view_locator = (
+            By.XPATH, '//a[span[contains(text(),"View online")]]')
         _pdf_download_locator = (By.CSS_SELECTOR, '.option [href*=cloudfront]')
         _print_copy_locator = (By.CSS_SELECTOR, '.show-print-submenu')
         _bookshare_locator = (By.CSS_SELECTOR, '[href*=bookshare]')
@@ -1077,11 +1077,9 @@ class Resource(Region):
         if self.status_message == Web.EXTERNAL:
             Utility.switch_to(self.driver, element=self.root)
             return self.driver
-        if self.status_message == Web.REQUEST:
-            self.root.click()
-            return CompCopyRequest(self.page)
-        self.root.click()
-        return self
+        comp_copy = True if self.status_message == Web.REQUEST else False
+        Utility.click_option(self.driver, element=self.root)
+        return CompCopyRequest(self.page) if comp_copy else self
 
     @property
     def status_message(self):
@@ -1251,8 +1249,9 @@ class TableOfContents(Region):
         :rtype: bool
 
         """
-        return bool(self.driver.execute_script(
-            'return arguments[0].style.height;', self.root))
+        get_height = 'return window.getComputedStyle(arguments[0]).height;'
+        height = self.driver.execute_script(get_height, self.root)
+        return height and height != '0px'
 
     @property
     def preface(self) -> str:

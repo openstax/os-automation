@@ -3,8 +3,9 @@
 from time import sleep
 
 from pypom import Region
-from selenium.common.exceptions import ElementNotInteractableException  # NOQA
-from selenium.common.exceptions import TimeoutException, WebDriverException
+from selenium.common.exceptions import (ElementNotInteractableException,
+                                        TimeoutException,
+                                        WebDriverException)
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as expect
 
@@ -94,14 +95,16 @@ class AccountsHome(AccountsBase):
 
         def next(self):
             """Click the NEXT button."""
-            self.find_element(*self._login_submit_button_locator).click()
-            sleep(1.0)
+            next_button = self.find_element(*self._login_submit_button_locator)
+            Utility.click_option(self.driver, element=next_button)
+            sleep(0.5)
             return self
 
         def reset(self):
             """Click the reset password link."""
-            self.find_element(*self._password_reset_locator).click()
-            sleep(1.0)
+            reset_button = self.find_element(*self._password_reset_locator)
+            Utility.click_option(self.driver, element=reset_button)
+            sleep(0.5)
             return self
 
         @property
@@ -144,8 +147,8 @@ class AccountsHome(AccountsBase):
                 sleep(1)
             assert(not self.get_login_error()), 'Password failed'
             while 'terms/pose' in self.page.location:
-                Utility.scroll_to(self.driver, element=self.agreement_checkbox)
-                self.agreement_checkbox.click()
+                Utility.click_option(self.driver,
+                                     element=self.agreement_checkbox)
                 self.next()
             if destination:
                 return go_to_(destination(self.driver, url, **kwargs))
@@ -154,7 +157,8 @@ class AccountsHome(AccountsBase):
             """Log into the site with facebook."""
             self.user = user
             self.next()
-            self.find_element(*self._fb_locator).click()
+            fb_button = self.find_element(*self._fb_locator)
+            Utility.click_option(self.driver, element=fb_button)
             self.wait.until(
                 expect.visibility_of_element_located(
                     self._fb_email_field_locator))
@@ -162,12 +166,13 @@ class AccountsHome(AccountsBase):
                 .send_keys(facebook_user)
             self.find_element(*self._fb_password_field_locator) \
                 .send_keys(password)
-            self.find_element(*self._fb_submit_locator).click()
+            fb_submit = self.find_element(*self._fb_submit_locator)
+            Utility.click_option(self.driver, element=fb_submit)
             if self.driver.capabilities['browserName'] == 'safari':
-                self.wait.until(
+                fb_safari = self.wait.until(
                     expect.visibility_of_element_located(
                         self._fb_safari_specific_locator))
-                self.find_element(*self._fb_safari_specific_locator).click()
+                Utility.click_option(self.driver, element=fb_safari)
             sleep(2.0)
             from pages.accounts.profile import Profile
             return go_to_(Profile(self.driver, self.page.base_url))
@@ -176,18 +181,21 @@ class AccountsHome(AccountsBase):
             """Log into the site with google."""
             self.user = user
             self.next()
-            self.find_element(*self._google_locator).click()
+            g_login = self.find_element(*self._google_locator)
+            Utility.click_option(self.driver, element=g_login)
             self.wait.until(
                 expect.visibility_of_element_located(
                     self._google_user_locator))
-            self.find_element(*self._google_user_next_locator).click()
+            g_next = self.find_element(*self._google_user_next_locator)
+            Utility.click_option(self.driver, element=g_next)
             self.wait.until(
                 expect.visibility_of_element_located(
                     self._google_password_locator))
             self.find_element(*self._google_password_locator) \
                 .send_keys(password)
-            self.find_element(*self._google_pass_next_locator).click()
-            sleep(2.0)
+            g_pass = self.find_element(*self._google_pass_next_locator)
+            Utility.click_option(self.driver, element=g_pass)
+            sleep(1.0)
             from pages.accounts.profile import Profile
             return go_to_(Profile(self.driver, self.page.base_url))
 
@@ -203,14 +211,25 @@ class AccountsHome(AccountsBase):
             fields = self.find_elements(*self._password_reset_fields_locator)
             for field in fields:
                 field.send_keys(password)
-            self.find_element(*self._password_reset_submit).click()
+            reset = self.find_element(*self._password_reset_submit)
+            Utility.click_option(self.driver, element=reset)
+            sleep(0.25)
+            try:
+                submit = self.find_element(*self._password_reset_submit)
+                Utility.click_option(self.driver, element=submit)
+                sleep(0.5)
+            except ElementNotInteractableException:
+                sleep(1.0)
+                submit = self.find_element(*self._password_reset_submit)
+                Utility.click_option(self.driver, element=submit)
+                sleep(0.5)
             sleep(1.0)
             try:
-                self.find_element(*self._password_reset_submit).click()
-            except ElementNotInteractableException:
-                sleep(2)
-                self.find_element(*self._password_reset_submit).click()
-            sleep(1.0)
+                submit = self.find_element(*self._password_reset_submit)
+                Utility.click_option(self.driver, element=submit)
+                sleep(0.5)
+            except WebDriverException:
+                pass
             from pages.accounts.profile import Profile
             return go_to_(Profile(self.driver, self.page.base_url))
 
@@ -222,7 +241,8 @@ class AccountsHome(AccountsBase):
         @property
         def toggle_help(self):
             """Show or hide Account help info."""
-            self.find_element(*self._trouble_locator).click()
+            toggle = self.find_element(*self._trouble_locator)
+            Utility.click_option(self.driver, element=toggle)
             sleep(0.25)
             return self
 
@@ -232,8 +252,8 @@ class AccountsHome(AccountsBase):
             if not self.is_help_shown:
                 self.toggle_help
             current = self.driver.current_window_handle
-            self.find_element(*self._salesforce_link_locator).click()
-            sleep(1)
+            salesforce = self.find_element(*self._salesforce_link_locator)
+            Utility.click_option(self.driver, element=salesforce)
             new_handle = 1 if current == self.driver.window_handles[0] else 0
             if len(self.driver.window_handles) > 1:
                 self.driver.switch_to.window(
@@ -267,8 +287,8 @@ class AccountsHome(AccountsBase):
         @property
         def go_to_signup(self):
             """Go to user signup."""
-            self.find_element(*self._signup_locator).click()
-            sleep(1)
+            signup = self.find_element(*self._signup_locator)
+            Utility.click_option(self.driver, element=signup)
             from utils.accounts import Accounts
             if Accounts.accounts_old:
                 from pages.accounts.signup import Signup

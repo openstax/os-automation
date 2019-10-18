@@ -1,7 +1,5 @@
 """The frequently asked questions page."""
 
-from time import sleep
-
 from pypom import Region
 from selenium.webdriver.common.by import By
 
@@ -23,7 +21,8 @@ class FAQ(WebBase):
     @property
     def loaded(self):
         """Return True if the hero banner is found."""
-        return bool(self.find_element(*self._main_content_locator))
+        content = self.find_element(*self._main_content_locator)
+        return super().loaded and bool(content)
 
     def is_displayed(self):
         """Return True if the main content is loaded."""
@@ -41,7 +40,8 @@ class FAQ(WebBase):
 
     def visit_support(self):
         """Click the 'support page' link."""
-        link = self.find_element(*self._support_locator)
+        link = self.wait.until(
+            lambda _: self.find_element(*self._support_locator))
         url = link.get_attribute('href')
         Utility.switch_to(self.driver, element=link)
         from pages.salesforce.home import Salesforce
@@ -62,8 +62,8 @@ class FAQ(WebBase):
 
         def toggle(self):
             """Open or close the question."""
-            self.find_element(*self._toggle_locator).click()
-            sleep(0.5)
+            toggle = self.find_element(*self._toggle_locator)
+            Utility.click_option(self.driver, element=toggle)
             return self.page
 
         @property

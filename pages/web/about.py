@@ -25,7 +25,8 @@ class AboutUs(WebBase):
     @property
     def loaded(self):
         """Wait until the three panels are displayed."""
-        status = (self.who_we_are.is_displayed() and
+        status = (super().loaded and
+                  self.who_we_are.is_displayed() and
                   self.what_we_do.is_displayed() and
                   self.where_were_going.is_displayed())
         return status
@@ -71,22 +72,22 @@ class AboutUs(WebBase):
 
         def go_to_foundations(self):
             """Follow the philanthropic foundations link."""
-            self.find_element(*self._foundation_link_locator).click()
-            sleep(1.0)
+            foundations = self.find_element(*self._foundation_link_locator)
+            Utility.click_option(self.driver, element=foundations)
             from pages.web.supporters import Supporters
             return go_to_(Supporters(self.driver))
 
         def go_to_resources(self):
             """Follow the educational resources link."""
-            self.find_element(*self._resources_link_locator).click()
-            sleep(1.0)
+            resources = self.find_element(*self._resources_link_locator)
+            Utility.click_option(self.driver, element=resources)
             from pages.web.partners import Partners
             return go_to_(Partners(self.driver))
 
         def go_to_faq(self):
             """Follow the FAQ link."""
-            self.find_element(*self._faq_link_locator).click()
-            sleep(1.0)
+            faq = self.find_element(*self._faq_link_locator)
+            Utility.click_option(self.driver, element=faq)
             from pages.web.faq import FAQ
             return go_to_(FAQ(self.driver))
 
@@ -103,15 +104,15 @@ class AboutUs(WebBase):
 
         def go_to_library(self):
             """Follow the current library link."""
-            self.find_element(*self._library_link_locator).click()
-            sleep(1.0)
+            library_link = self.find_element(*self._library_link_locator)
+            Utility.click_option(self.driver, element=library_link)
             from pages.web.subjects import Subjects
             return go_to_(Subjects(self.driver))
 
         def go_to_tutor_marketing(self):
             """Follow the OpenStax Tutor Beta link."""
-            self.find_element(*self._tutor_marketing_link_locator).click()
-            sleep(1.0)
+            tutor_link = self.find_element(*self._tutor_marketing_link_locator)
+            Utility.click_option(self.driver, element=tutor_link)
             from pages.web.tutor import TutorMarketing
             return go_to_(TutorMarketing(self.driver))
 
@@ -133,7 +134,7 @@ class AboutUs(WebBase):
                 """Click the card."""
                 href = self.root.get_attribute('href')
                 append = href.split('openstax.org')[-1]
-                Utility.safari_exception_click(self.driver, element=self.root)
+                Utility.click_option(self.driver, element=self.root)
                 if Web.SUBJECTS in href:
                     from pages.web.subjects import Subjects as Destination
                 elif Web.TUTOR in href:
@@ -149,7 +150,8 @@ class AboutUs(WebBase):
                 else:
                     raise PageNotFound(f'{append} is not a known destination')
                 sleep(1.0)
-                return go_to_(Destination(self.driver))
+                return go_to_(
+                    Destination(self.driver, base_url=self.page.page.base_url))
 
             @property
             def text(self):
@@ -169,18 +171,19 @@ class AboutUs(WebBase):
 
         def go_to_student_learning(self):
             """Follow the improving student learning link."""
-            Utility.safari_exception_click(
-                self.driver, self._tutor_marketing_link_locator)
-            sleep(1.0)
+            learning = self.find_element(*self._tutor_marketing_link_locator)
+            Utility.click_option(self.driver, element=learning)
             from pages.web.tutor import TutorMarketing
-            return go_to_(TutorMarketing(self.driver))
+            return go_to_(
+                TutorMarketing(self.driver, base_url=self.page.base_url))
 
         def go_to_research(self):
             """Follow the research in learning science link."""
-            self.find_element(*self._research_link_locator).click()
-            sleep(1.0)
+            research = self.find_element(*self._research_link_locator)
+            Utility.click_option(self.driver, element=research)
             from pages.web.research import Research
-            return go_to_(Research(self.driver))
+            return go_to_(
+                Research(self.driver, base_url=self.page.base_url))
 
 
 class PageNotFound(Exception):

@@ -88,6 +88,18 @@ class Give(WebBase):
             """Return the set amount boxes."""
             return [box for box in self.find_elements(*self._amount_locator)]
 
+        @boxes.setter
+        def boxes(self, amount):
+            """Set the donation amount."""
+            set_options = {10: 0, 25: 1, 50: 2, 100: 3, 500: 4, 1000: 5}
+            if amount in set_options:
+                Utility.click_option(
+                    self.driver,
+                    element=self.boxes[set_options.get(amount)])
+            else:
+                self.other = amount
+            return self
+
         @property
         def other(self):
             """Return the other amount box."""
@@ -97,18 +109,10 @@ class Give(WebBase):
         def other(self, amount):
             """Set a specific donation amount."""
             self.other.send_keys(amount)
-            return self
-
-        @boxes.setter
-        def boxes(self, amount):
-            """Set the donation amount."""
-            set_options = {10: 0, 25: 1, 50: 2, 100: 3, 500: 4, 1000: 5}
-            if amount in set_options:
-                Utility.safari_exception_click(
-                    driver=self.driver,
-                    element=self.boxes[set_options.get(amount)])
-            else:
-                self.other = amount
+            if self.page.is_safari:
+                sleep(0.5)
+                from selenium.webdriver.common.keys import Keys
+                self.other.send_keys(Keys.TAB)
             return self
 
         @property
@@ -377,10 +381,12 @@ class Donate(WebBase):
         """Click the Continue button."""
         Utility.safari_exception_click(self.driver,
                                        element=self.continue_button)
+        sleep(1.5)
         if not self.get_errors:
             from pages.rice.ebank import EBank
             sleep(2)
             return go_to_(EBank(self.driver))
+        return self
 
     def get_errors(self):
         """Return a list of validation errors found."""

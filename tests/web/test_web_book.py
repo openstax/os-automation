@@ -9,6 +9,7 @@ from selenium.common.exceptions import NoSuchElementException
 
 from pages.accounts.admin.users import Search
 from pages.accounts.home import AccountsHome
+from pages.accounts.profile import Profile
 from pages.accounts.signup import Signup
 from pages.web.book import Book
 from pages.web.errata import ErrataForm
@@ -309,7 +310,7 @@ def test_page_links_to_the_adoption_form(web_base_url, selenium):
     # GIVEN: a user viewing the book details page
     home = WebHome(selenium, web_base_url).open()
     subjects = home.web_nav.subjects.view_all()
-    book = subjects.select_random_book(_from=Library.OPENSTAX)
+    book = subjects.select_random_book(_from=Library.AVAILABLE)
 
     # WHEN: they click on the "Using this book? Let us know." link
     library = Library()
@@ -857,13 +858,13 @@ def test_unverified_users_sent_to_faculty_verification_for_locked_resources(
     profile.log_out()
     profile = accounts.log_in(*admin)
     search = Search(selenium, accounts_base_url).open()
-    details = Utility.switch_to(
-        driver=selenium,
-        action=search.find(terms={'email': address}).users[0].edit)
+    user = search.find(terms={'email': address}).users[0]
+    details = user.edit()
     details.faculty_status = Accounts.REJECTED
     details.save()
     details.close_tab()
-    search.nav.user_menu.sign_out()
+    profile = Profile(selenium, accounts_base_url).open()
+    profile.log_out()
     accounts.log_in(address, password)
     home = WebHome(selenium, web_base_url).open()
     subjects = home.web_nav.subjects.view_all()
@@ -987,7 +988,7 @@ def test_books_may_have_ally_tiles(web_base_url, selenium):
         text_seen = (
             Actions(selenium)
             .move_to_element(tile.to_hover)
-            .wait(1.0)
+            .wait(2.0)
             .get_js_data(
                 element=tile.hover, data_type='opacity', expected='1'))
 

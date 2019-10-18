@@ -12,7 +12,7 @@ from utils.utilities import Utility, go_to_, go_to_external_
 class OpenStaxNav(Region):
     """OpenStax's website shared navigational control."""
 
-    _root_locator = (By.CLASS_NAME, 'meta-nav')
+    _root_locator = (By.CSS_SELECTOR, 'nav.meta-nav')
     _our_impact_locator = (By.CSS_SELECTOR, '[href$=impact]')
     _supporters_locator = (By.CSS_SELECTOR, '[href$=foundation]')
     _blog_locator = (By.CSS_SELECTOR, '[href$=blog]')
@@ -76,7 +76,8 @@ class OpenStaxNav(Region):
         """Click on the navigation link."""
         for _ in range(30):
             try:
-                self.find_element(*locator).click()
+                link = self.find_element(*locator)
+                Utility.click_option(self.driver, element=link)
                 break
             except WebDriverException:
                 sleep(1.0)

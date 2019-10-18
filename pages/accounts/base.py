@@ -6,7 +6,7 @@ from pypom import Page, Region
 from selenium.webdriver.common.by import By
 
 from pages.rice.home import Rice
-from utils.utilities import Utility
+from utils.utilities import Utility, go_to_
 
 
 class AccountsBase(Page):
@@ -21,7 +21,8 @@ class AccountsBase(Page):
         return (self.find_element(*self._root_locator) and
                 Utility.load_background_images(self.driver,
                                                self._root_locator) and
-                'accounts' in self.driver.current_url)
+                'accounts' in self.driver.current_url and
+                ((sleep(2.0) or True) if self.is_safari else True))
 
     def is_displayed(self):
         """Return True when Accounts is loaded."""
@@ -99,8 +100,8 @@ class AccountsBase(Page):
 
         def go_to_accounts_home(self):
             """Follow the OpenStax icon link back to the site root."""
-            self.find_element(*self._logo_locator).click()
-            sleep(1)
+            go_home = self.find_element(*self._logo_locator)
+            Utility.click_option(self.driver, element=go_home)
             return self
 
     class Footer(Region):
@@ -119,19 +120,22 @@ class AccountsBase(Page):
         @property
         def show_copyright(self):
             """Display the copyright."""
-            self.find_element(*self._copyright_locator).click()
-            sleep(1)
+            copyright = self.find_element(*self._copyright_locator)
+            Utility.click_option(self.driver, element=copyright)
+            sleep(1.0)
             return self
 
         @property
         def show_terms_of_use(self):
             """Display the terms of use."""
-            self.find_element(*self._terms_locator).click()
-            sleep(1)
+            terms = self.find_element(*self._terms_locator)
+            Utility.click_option(self.driver, element=terms)
+            sleep(1.0)
             return self
 
         def go_to_rice(self):
             """Load the Rice webpage."""
-            self.find_element(*self._rice_link_locator).click()
-            sleep(1)
-            return Rice(self.driver)
+            rice = self.find_element(*self._rice_link_locator)
+            Utility.click_option(self.driver, element=rice)
+            sleep(1.0)
+            return go_to_(Rice(self.driver))

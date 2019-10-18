@@ -13,13 +13,13 @@ class AccountsAdmin(Page):
     URL_TEMPLATE = '/admin'
 
     _root_locator = (By.CSS_SELECTOR, '.admin')
-    _nav_locator = (By.CSS_SELECTOR, '.navbar.navbar-default')
+    _nav_locator = (By.CSS_SELECTOR, 'nav.navbar.navbar-default')
 
     @property
     def loaded(self):
         """Return True when the console is loaded and the nav is displayed."""
-        return (bool(self.find_element(*self._root_locator))
-                and self.nav.is_displayed())
+        return (bool(self.find_elements(*self._root_locator)) and
+                self.nav.is_displayed())
 
     def is_displayed(self):
         """Return True when the console is loaded."""

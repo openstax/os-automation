@@ -1,7 +1,10 @@
 """The OpenStax jobs board."""
 
-import re
+from __future__ import annotations
 
+from typing import List
+
+from pypom import Region
 from selenium.webdriver.common.by import By
 
 from pages.web.base import WebBase
@@ -14,78 +17,91 @@ class Careers(WebBase):
     URL_TEMPLATE = '/careers'
 
     _banner_locator = (By.CSS_SELECTOR, 'h1')
+    _careers_content_locator = (
+        By.CSS_SELECTOR, '#main [data-html=content] p:first-child')
+    _job_list_locator = (By.XPATH, '//div[@data-html="content"]/p[a]')
+    _job_title_locator = (By.CSS_SELECTOR, 'a')
     _subheading_locator = (
         By.CSS_SELECTOR, '[data-html=content] p:first-child')
-    _careers_content_locator = (
-                    By.CSS_SELECTOR, '#main [data-html=content] p:first-child')
-    _job_list_locator = (By.CSS_SELECTOR, '[data-html=content] p:nth-child(5)')
 
     @property
-    def loaded(self):
-        """Return True when text content is found."""
+    def loaded(self) -> bool:
+        """Return True when text content is found.
+
+        :return: ``True`` when the text content is found and the async overlay
+            is not
+        :rtype: bool
+
+        """
         content = (self.find_element(*self._careers_content_locator)
                    .text.strip())
         banner = self.find_element(*self._banner_locator)
-        return content and banner
+        return super().loaded and content and banner
 
-    def is_displayed(self):
-        """Return True if the heading is displayed."""
+    def is_displayed(self) -> bool:
+        """Return True if the heading is displayed.
+
+        :return: ``True`` if the job list is populated
+        :rtype: bool
+
+        """
         return self.job_list
 
     @property
-    def job_list(self):
-        """Return the content within the open positions element."""
+    def job_list(self) -> str:
+        """Return the content within the open positions element.
+
+        :return: the job list content inner HTML
+        :rtype: str
+
+        """
         listings = self.wait.until(
             lambda _: self.find_element(*self._job_list_locator))
         return listings.get_attribute('innerHTML')
 
     @property
-    def jobs(self):
-        """Access the available jobs."""
-        segments = (re.sub(r'(<br[\/ ]{0,2}>){2}', '|||', self.job_list)
-                    .split('|||'))
-        return [self.Job(self, text) for text in segments]
+    def jobs(self) -> List[Careers.Job]:
+        """Access the available jobs.
 
-    class Job():
+        :return: the list of available OpenStax jobs
+        :rtype: list(:py:class:`~pages.web.careers.Careers.Job`)
+
+        """
+        jobs = self.find_element(*self._job_list_locator)
+        return [self.Job(self, position)
+                for position
+                in jobs.find_elements(*self._job_title_locator)]
+
+    class Job(Region):
         """A job entry."""
 
-        def __init__(self, page, job_string):
-            """Initialize an open job position object."""
-            self.page = page
-            try:
-                href = re.search(r'href=\"[\w\d\/\:\*\.]*\"', job_string)
-                self._url = href.group().split('"')[1] if href else ''
-            except AttributeError:
-                self._url = ''
-            try:
-                title = (re.search(r'<b>[^(<\/)]*<\/b>', job_string)
-                         .group().split('>', 1)[-1])
-                self._title = re.sub(r'<b>|<\/b>', '', title)
-            except AttributeError:
-                self._title = ''
-            try:
-                self._description = re.split(r'<\/b>|<br>', job_string)[-1]
-            except AttributeError:
-                self._description = ''
+        @property
+        def title(self) -> str:
+            """Return the job title.
+
+            :return: the job title
+            :rtype: str
+
+            """
+            return self.root.get_attribute('textContent').strip()
 
         @property
-        def title(self):
-            """Return the job title."""
-            return self._title
+        def url(self) -> str:
+            """Return the Rice Jobs posting URL.
 
-        @property
-        def description(self):
-            """Return the job summary."""
-            return self._description
+            :return: the Rice jobs board posting for the position
+            :rtype: str
 
-        @property
-        def url(self):
-            """Return the Rice Jobs posting URL."""
-            return self._url
+            """
+            return self.root.get_attribute('href')
 
         def view_position(self):
-            """Click on the position name to view the Rice Jobs board."""
-            button = self.page.find_element(By.LINK_TEXT, self.title)
-            Utility.switch_to(self.page.driver, element=button)
+            """Click on the position name to view the Rice Jobs board.
+
+            :return: the job posting on the Rice Jobs board
+            :rtype: :py:class:`~pages.rice.jobs.RiceJobs`
+
+            """
+            Utility.switch_to(self.page.driver, element=self.root)
             from pages.rice.jobs import RiceJobs
             return go_to_(RiceJobs(self.page.driver))

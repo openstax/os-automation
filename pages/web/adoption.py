@@ -3,10 +3,9 @@
 from time import sleep
 
 from pypom import Region
-from selenium.common.exceptions import ElementNotInteractableException  # NOQA
-from selenium.common.exceptions import NoSuchElementException  # NOQA
-from selenium.common.exceptions import StaleElementReferenceException  # NOQA
-from selenium.common.exceptions import WebDriverException  # NOQA
+from selenium.common.exceptions import (ElementNotInteractableException,
+                                        NoSuchElementException,
+                                        WebDriverException)
 from selenium.webdriver.common.by import By
 
 from pages.web.base import WebBase
@@ -34,13 +33,19 @@ class Adoption(WebBase):
     def loaded(self):
         """Wait until the form is displayed."""
         return (
+            super().loaded and
             self.find_element(*self._loaded_locator).is_displayed() and
-            self.find_element(*self._drop_down_menu_locator).is_displayed()
-        )
+            self.find_element(*self._drop_down_menu_locator).is_displayed())
 
     def is_displayed(self):
         """Return True if the adoption form is displayed."""
-        return self.find_element(*self._drop_down_menu_locator).is_displayed()
+        form = self.find_elements(*self._drop_down_menu_locator)
+        if not form:
+            return False
+        visibility = self.driver.execute_script(
+            'return window.getComputedStyle(arguments[0]).visibility;',
+            form[0])
+        return visibility == 'visible'
 
     def go_to_interest(self, link=None):
         """Switch to the interest form."""
@@ -90,13 +95,14 @@ class Adoption(WebBase):
 
         """
         self.form.select(user_type)
+        sleep(1.0)
         self.form.first_name = first
         self.form.last_name = last
         self.form.email = email
         self.form.phone = phone
         self.form.school = school
         self.form.next()
-        sleep(1)
+        sleep(1.0)
         user_errors = self.form.get_user_errors
         assert(not user_errors), \
             'User errors: {issues}'.format(issues=user_errors)
@@ -193,20 +199,12 @@ class Adoption(WebBase):
         def select(self, user_type):
             """Select a user type from the user drop down menu."""
             sleep(0.25)
-            Utility.click_option(self.driver,
-                                 locator=self._user_select_locator)
-            for _ in range(60):
-                try:
-                    select = self.find_element(*self._user_select_locator)
-                    if 'open' not in select.get_attribute('class'):
-                        break
-                except StaleElementReferenceException:
-                    sleep(1)
-                    select = self.find_element(*self._user_select_locator)
-                sleep(0.5)
-                for option in self.options:
-                    if option.get_attribute('textContent') == user_type:
-                        Utility.click_option(self.driver, element=option)
+            user = self.find_element(*self._user_select_locator)
+            Utility.click_option(self.driver, element=user)
+            sleep(0.33)
+            for option in self.options:
+                if option.get_attribute('textContent') == user_type:
+                    Utility.click_option(self.driver, element=option)
             sleep(0.5)
             return self
 
@@ -502,6 +500,7 @@ class Adoption(WebBase):
                 """Click the checkbox."""
                 checkbox = self.find_element(*self._checkbox_locator)
                 Utility.safari_exception_click(self.driver, element=checkbox)
+                sleep(0.25)
                 return self.page
 
             @property

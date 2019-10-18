@@ -120,6 +120,7 @@ class Interest(Adoption):
         @property
         def selection(self):
             """Return a list of selected books."""
+            sleep(0.5)
             books = self.find_elements(
                 By.CSS_SELECTOR, '.book-checkbox.checked label')
             return [book.text for book in books]

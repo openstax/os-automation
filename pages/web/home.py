@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from time import sleep
 
-from pypom import Region
+from pypom import Page, Region
 from selenium.common.exceptions import NoSuchElementException
 from selenium.webdriver.common.by import By
 
@@ -47,7 +47,11 @@ class Link(Region):
         a new link is added.
         """
         destination = self.link.get_attribute('href')
-        Utility.wait_for_overlay_then(self.link.click)
+        parent = self.page
+        while not isinstance(parent, Page):
+            parent = parent.page
+        base_url = parent.base_url
+        Utility.click_option(self.driver, element=self.link)
         if destination.endswith(Web.IMPACT):
             from pages.web.impact import OurImpact as Destination
         elif destination.endswith(Web.ANNUAL_REPORT):
@@ -58,7 +62,7 @@ class Link(Region):
             from pages.web.subjects import Subjects as Destination
         elif destination.endswith(Web.TECHNOLOGY):
             from pages.web.technology import Technology as Destination
-        return go_to_(Destination(self.driver))
+        return go_to_(Destination(self.driver, base_url=base_url))
 
 
 class WebHome(WebBase):
@@ -182,18 +186,25 @@ class WebHome(WebBase):
                 Return a 'Destination' so the function will fail if
                 a new banner link is added.
                 """
-                if self.destination.endswith(Web.SUBJECTS):
+                destination = self.destination
+                parent = self.page
+                while not isinstance(parent, Page):
+                    parent = parent.page
+                base_url = parent.base_url
+                if destination.endswith(Web.SUBJECTS):
                     from pages.web.subjects import Subjects as Destination
-                elif self.destination.endswith(Web.ABOUT):
+                elif destination.endswith(Web.ABOUT):
                     from pages.web.about import AboutUs as Destination
-                elif self.destination.endswith(Web.SE_APP):
+                elif destination.endswith(Web.SE_APP):
                     from pages.web.se_app import StudyEdge as Destination
+                elif destination.endswith(Web.GLOBAL_REACH):
+                    from pages.web.reach import GlobalReach as Destination
                 else:
                     raise WebException(
                         'Unknown destination: {0}'
                         .format(self.destination.split('/')[-1]))
-                Utility.wait_for_overlay_then(self.root.click)
-                return go_to_(Destination(self.driver))
+                Utility.click_option(self.driver, element=self.root)
+                return go_to_(Destination(self.driver, base_url=base_url))
 
         class Dot(Region):
             """An individual sellection button."""
@@ -205,7 +216,7 @@ class WebHome(WebBase):
 
             def click(self):
                 """Select a dot to display the corresponding banner."""
-                Utility.wait_for_overlay_then(self.root.click)
+                Utility.click_option(self.driver, element=self.root)
                 return go_to_(WebHome(self.driver))
 
     class Dialog(Region):
@@ -346,11 +357,11 @@ class WebHome(WebBase):
                 """
                 destination = self.button.get_attribute('href')
                 if Web.NEWSLETTER in destination:
-                    Utility.switch_to(self.driver, action=self.button.click)
+                    Utility.switch_to(self.driver, element=self.button)
                     from pages.web.newsletter \
                         import NewsletterSignup as Destination
                 elif Web.BOOKSTORE in destination:
-                    Utility.switch_to(self.driver, action=self.button.click)
+                    Utility.switch_to(self.driver, element=self.button)
                     from pages.web.bookstore_suppliers \
                         import Bookstore as Destination
                 else:

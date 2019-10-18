@@ -168,8 +168,7 @@ def test_get_current_emails_and_status(accounts_base_url, selenium, student):
 
     # THEN: The email is removed from the account
     for email in profile.emails.emails:
-        assert(email.email_text != fake_email), \
-            '"{0}" not removed'.format(fake_email)
+        assert(email.email_text != fake_email), f'"{fake_email}" not removed'
 
 
 @test_case('C195554')

@@ -11,7 +11,7 @@ class Rover(WebBase):
     URL_TEMPLATE = '/rover-by-openstax'
 
     _title_banner_locator = (
-        By.CSS_SELECTOR, '#banner img.for-desktop, #banner img.for-mobile')
+        By.CSS_SELECTOR, '#banner img')
 
     @property
     def loaded(self) -> bool:

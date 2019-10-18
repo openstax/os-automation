@@ -59,24 +59,26 @@ class Profile(AccountsHome):
 
     def log_out(self):
         """Log the user out."""
-        self.find_element(*self._log_out_locator).click()
-        sleep(1)
+        logout = self.find_element(*self._log_out_locator)
+        Utility.click_option(self.driver, element=logout)
         return AccountsHome(self.driver, base_url=self.base_url)
 
     def open_popup_console(self):
         """Open the small admin console."""
         if not self.is_admin:
             raise AccountException('User is not an administrator')
-        self.find_element(*self._popup_console_locator).click()
-        sleep(1)
+        sleep(0.5)
+        console = self.find_element(*self._popup_console_locator)
+        Utility.click_option(self.driver, element=console)
+        sleep(1.0)
         return self.PopupConsole(self)
 
     def open_full_console(self):
         """Open the full admin console."""
         if not self.is_admin:
             raise AccountException('User is not an administrator')
-        self.find_element(*self._full_console_locator).click()
-        sleep(1)
+        console = self.find_element(*self._full_console_locator)
+        Utility.click_option(self.driver, element=console)
         from pages.accounts.admin.console import Console
         return Console(self.driver, base_url=self.base_url)
 
@@ -139,27 +141,28 @@ class Profile(AccountsHome):
             """Open the name inputs."""
             full_name = self.find_element(*self._full_name_locator)
             if 'editable-open' not in full_name.get_attribute('class'):
-                full_name.click()
+                Utility.click_option(self.driver, element=full_name)
                 sleep(0.5)
             return self
 
         def confirm(self):
             """Accept the current values."""
-            self.find_element(*self._edit_submit_locator).click()
-            sleep(1)
+            accept = self.find_element(*self._edit_submit_locator)
+            Utility.click_option(self.driver, element=accept)
+            sleep(0.75)
             return self
 
         def cancel(self):
             """Cancel any changes."""
-            self.find_element(*self._edit_cancel_locator).click()
-            sleep(0.5)
+            cancel = self.find_element(*self._edit_cancel_locator)
+            Utility.click_option(self.driver, element=cancel)
             return self
 
         def _set_field(self, locator, position, new_value):
             """Setter helper."""
             el = self.find_elements(*locator)[position]
-            el.click()
-            el.clear()
+            Utility.click_option(self.driver, element=el)
+            Utility.clear_field(self.driver, field=el)
             el.send_keys(new_value)
 
         @property
@@ -223,17 +226,23 @@ class Profile(AccountsHome):
             return self.find_element(*self._username_locator).text
 
         @username.setter
-        def username(self, username):
+        def username(self, user_name):
             """Set a new username."""
             try:
-                self.find_element(*self._username_locator).click()
+                username = self.find_element(*self._username_locator)
+                Utility.click_option(self.driver, element=username)
             except ElementNotVisibleException:
                 sleep(1)
-                self.find_element(*self._username_locator).click()
-            self.find_element(*Profile._edit_clear_locator).click()
-            self.find_element(*self._input_locator).send_keys(username)
-            self.find_element(*Profile._edit_submit_locator).click()
-            sleep(1)
+                username = self.find_element(*self._username_locator)
+                Utility.click_option(self.driver, element=username)
+            sleep(0.5)
+            clear = self.find_element(*Profile._edit_clear_locator)
+            Utility.click_option(self.driver, element=clear)
+            sleep(0.5)
+            self.find_element(*self._input_locator).send_keys(user_name)
+            submit = self.find_element(*Profile._edit_submit_locator)
+            Utility.click_option(self.driver, element=submit)
+            sleep(0.5)
             return Profile(self.driver, base_url=self.page.base_url)
 
     class Emails(Region):
@@ -263,10 +272,12 @@ class Profile(AccountsHome):
         def add_email(self, email):
             """Add a email to the account's email list."""
             sleep(0.3)
-            self.find_element(*self._add_email_locator).click()
+            add = self.find_element(*self._add_email_locator)
+            Utility.click_option(self.driver, element=add)
             sleep(0.3)
             self.find_element(*self._email_form_locator).send_keys(email)
-            self.find_element(*self._email_submit_locator).click()
+            submit = self.find_element(*self._email_submit_locator)
+            Utility.click_option(self.driver, element=submit)
             for _ in range(3):
                 sleep(1)
                 self.driver.refresh()
@@ -294,21 +305,26 @@ class Profile(AccountsHome):
 
             def delete(self):
                 """Delete an individual email section."""
-                self.find_element(*self._specific_locator).click()
-                sleep(0.25)
-                self.find_element(*self._delete_locator).click()
+                select = self.find_element(*self._specific_locator)
+                Utility.click_option(self.driver, element=select)
                 sleep(0.5)
-                self.find_element(*self._ok_locator).click()
-                sleep(1)
+                delete = self.find_element(*self._delete_locator)
+                Utility.click_option(self.driver, element=delete)
+                sleep(0.5)
+                ok = self.find_element(*self._ok_locator)
+                Utility.click_option(self.driver, element=ok)
+                sleep(0.5)
                 return go_to_(
                     Profile(self.driver, base_url=self.page.page.base_url))
 
             def resend_confirmation(self):
                 """Resend confirmation email for a certain email."""
-                self.find_element(*self._unverified_btn_locator).click()
-                sleep(0.25)
-                self.find_element(*self._confirmation_btn_locator).click()
-                sleep(1)
+                resend = self.find_element(*self._unverified_btn_locator)
+                Utility.click_option(self.driver, element=resend)
+                sleep(0.5)
+                confirm = self.find_element(*self._confirmation_btn_locator)
+                Utility.click_option(self.driver, element=confirm)
+                sleep(0.5)
                 return go_to_(
                     Profile(self.driver, base_url=self.page.page.base_url))
 
@@ -351,8 +367,7 @@ class Profile(AccountsHome):
         def view_other_options(self):
             """Open the inactive option menu."""
             link = self.find_element(*self._inactive_option_expander_locator)
-            link.click()
-            sleep(0.25)
+            Utility.click_option(self.driver, element=link)
             return self
 
         def add_password(self, password):
@@ -375,10 +390,10 @@ class Profile(AccountsHome):
                 """Set a password."""
                 self.find_element(*self._password_locator).send_keys(password)
                 self.find_element(*self._confirm_locator).send_keys(password)
-                self.find_element(*self._submit_locator).click()
-                sleep(1)
-                self.find_element(*self._continue_locator).click()
-                sleep(1)
+                submit = self.find_element(*self._submit_locator)
+                Utility.click_option(self.driver, element=submit)
+                _continue = self.find_element(*self._continue_locator)
+                Utility.click_option(self.driver, element=_continue)
                 return Profile(self.driver, base_url=self.page.page.base_url)
 
         class Option(Region):
@@ -398,23 +413,24 @@ class Profile(AccountsHome):
             @property
             def edit(self):
                 """Edit the login option."""
-                self.find_element(*self._edit_button_locator).click()
-                sleep(0.5)
+                edit = self.find_element(*self._edit_button_locator)
+                Utility.click_option(self.driver, element=edit)
                 return self
 
             @property
             def delete(self):
                 """Delete an active login option."""
-                self.find_element(*self._delete_button_locator).click()
-                sleep(0.5)
-                self.find_element(*self._ok_locator).click()
+                delete = self.find_element(*self._delete_button_locator)
+                Utility.click_option(self.driver, element=delete)
+                ok = self.find_element(*self._ok_locator)
+                Utility.click_option(self.driver, element=ok)
                 return self
 
             @property
             def add(self):
                 """Add an inactive login option."""
-                self.find_element(*self._add_button_locator).click()
-                sleep(0.5)
+                add = self.find_element(*self._add_button_locator)
+                Utility.click_option(self.driver, element=add)
                 return self
 
     class PopupConsole(Region):
@@ -428,24 +444,28 @@ class Profile(AccountsHome):
         @property
         def misc(self):
             """Goes to misc tab of the pop up console."""
-            self.find_element(*self._misc_locator).click()
+            misc = self.find_element(*self._misc_locator)
+            Utility.click_option(self.driver, element=misc)
             return self.Misc(self)
 
         @property
         def users(self):
             """Goes to user tab of the pop up console."""
-            self.find_element(*self._users_locator).click()
+            users = self.find_element(*self._users_locator)
+            Utility.click_option(self.driver, element=users)
             return self.Users(self)
 
         @property
         def links(self):
             """Goes to links tab of the pop up console."""
-            self.find_element(*self._links_locator).click()
+            links = self.find_element(*self._links_locator)
+            Utility.click_option(self.driver, element=links)
             return self.Links(self)
 
         def full_console(self):
             """Goes to full_console tab of the pop up console."""
-            self.find_element(*self._full_console_locator).click()
+            full_console = self.find_element(*self._full_console_locator)
+            Utility.click_option(self.driver, element=full_console)
             return self
 
         class Misc(Region):
@@ -457,17 +477,20 @@ class Profile(AccountsHome):
 
             def go_to_user_section(self):
                 """Go to user section on the tab."""
-                self.find_element(*self._users_locator).click()
+                user = self.find_element(*self._users_locator)
+                Utility.click_option(self.driver, element=user)
                 return self
 
             def go_to_links_section(self):
                 """Go to links section on the tab."""
-                self.find_element(*self._links_locator).click()
+                links = self.find_element(*self._links_locator)
+                Utility.click_option(self.driver, element=links)
                 return self
 
             def go_to_full_section(self):
                 """Go to full section on the tab."""
-                self.find_element(*self._full_console_locator).click()
+                full_section = self.find_element(*self._full_console_locator)
+                Utility.click_option(self.driver, element=full_section)
                 return self
 
         class Users(Region):
@@ -481,8 +504,8 @@ class Profile(AccountsHome):
                 """Search given string."""
                 self.find_element(*self._search_bar_locator).send_keys(
                     topic)
-                self.find_element(*self._search_button_locator).click()
-                sleep(1)
+                search = self.find_element(*self._search_button_locator)
+                Utility.click_option(self.driver, element=search)
                 return [self.Result(self, el)
                         for el in self.find_elements(*self._row_locator)]
 
@@ -520,7 +543,8 @@ class Profile(AccountsHome):
                 @property
                 def username_link(self):
                     """Return the username specific link."""
-                    self.find_element(*self._username_locator).click()
+                    link = self.find_element(*self._username_locator)
+                    Utility.click_option(self.driver, element=link)
                     return self
 
                 @property
@@ -547,14 +571,13 @@ class Profile(AccountsHome):
 
                 def sign_in_as(self):
                     """Return the sign in page."""
-                    self.find_element(*self._sign_in_locator).click()
-
+                    sign_in = self.find_element(*self._sign_in_locator)
+                    Utility.click_option(self.driver, element=sign_in)
                     if "terms" in self.driver.current_url:
-                        checkbox_id = 'agreement_i_agree'
-                        target = self.find(By.ID, checkbox_id)
-                        target.click()
-                        target = self.find(By.ID, 'agreement_submit')
-                        target.click()
+                        i_agree = self.find(By.ID, 'agreement_i_agree')
+                        Utility.click_option(self.driver, element=i_agree)
+                        submit = self.find(By.ID, 'agreement_submit')
+                        Utility.click_option(self.driver, element=submit)
                     return self
 
                 def edit(self):
@@ -572,22 +595,26 @@ class Profile(AccountsHome):
 
             def go_to_security_log(self):
                 """Goes to the security log."""
-                self.find_element(*self._security_log_locator).click()
+                security_log = self.find_element(*self._security_log_locator)
+                Utility.click_option(self.driver, element=security_log)
                 return self
 
             def go_to_oauth_application(self):
                 """Goes to the OAuth application."""
-                self.find_element(*self._application_locator).click()
+                oauth = self.find_element(*self._application_locator)
+                Utility.click_option(self.driver, element=oauth)
                 return self
 
             def go_to_fineprint(self):
                 """Goes to the FinePrint."""
-                self.find_element(*self._print_locator).click()
+                fine_print = self.find_element(*self._print_locator)
+                Utility.click_option(self.driver, element=fine_print)
                 return self
 
             def go_to_api(self):
                 """Goes to the API v1 documentation."""
-                self.find_element(*self._api_locator).click()
+                api = self.find_element(*self._api_locator)
+                Utility.click_option(self.driver, element=api)
                 return self
 
 

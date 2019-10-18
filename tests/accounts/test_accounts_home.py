@@ -140,8 +140,7 @@ def test_attempt_to_log_in_with_an_invalid_password(
 @accounts
 def test_reset_a_users_password(accounts_base_url, selenium):
     """Reset a user's password."""
-    # GIVEN: a valid, accessible e-mail for a user
-    # AND: at the Accounts Home page is loaded
+    # SETUP:
     name = Utility.random_name()
     email = RestMail(
         '{first}.{last}.{tag}'
@@ -152,6 +151,9 @@ def test_reset_a_users_password(accounts_base_url, selenium):
     address = email.address
     password = Utility.random_hex(length=14, lower=True)
     reset_password = Utility.random_hex(length=12, lower=True)
+
+    # GIVEN: a valid, accessible e-mail for a user
+    # AND: at the Accounts Home page is loaded
     home = Home(selenium, accounts_base_url).open()
     home = home.login.go_to_signup.account_signup(
         email=address,

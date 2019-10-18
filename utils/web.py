@@ -26,9 +26,9 @@ class Web(object):
     # *** HOME PAGE, NAV BARS, and FOOTER ***
 
     # Web banner carousel options
-    NEW_APP = 0
-    FREE_BOOKS_NO_CATCH = 1
-    EDUCATION_OVER_PROFIT = 2
+    INTERACTIVE_MAP = 0
+    NEW_APP = 1
+    FREE_BOOKS_NO_CATCH = 2
 
     # Quotes
     SUBSCRIBE = 0
@@ -212,6 +212,7 @@ class Web(object):
     NEWSLETTER = 'www2.openstax.org'
     NO_FILTER = 'View All'
     PARTNERS = 'partners'
+    GLOBAL_REACH = 'global-reach'
     RESEARCH = 'research'
     ROVER = 'rover-by-openstax'
     SE_APP = 'download-openstax-se-app'
@@ -235,6 +236,7 @@ class Web(object):
     VIEW_TUTOR = 'OpenStax Tutor'
 
     VIEW_ABOUT_US = 'About Us'
+    VIEW_CREATOR_FEST = 'Creator Fest'
     VIEW_PARTNERSHIPS = 'Institutional Partnerships'
     VIEW_RESEARCH = 'Research'
     VIEW_TEAM = 'Team'
@@ -366,12 +368,15 @@ class Web(object):
     MENU_TECHNOLOGY = [
         VIEW_TECHNOLOGY,
         VIEW_TUTOR,
+        VIEW_ROVER,
         VIEW_PARTNERS
     ]
     MENU_WHAT_WE_DO = [
         VIEW_ABOUT_US,
         VIEW_TEAM,
-        VIEW_RESEARCH
+        VIEW_RESEARCH,
+        VIEW_PARTNERSHIPS,
+        VIEW_CREATOR_FEST
     ]
 
 
@@ -490,13 +495,16 @@ class Library():
 
     # Business
     ACCOUNTING_1 = 'Principles of Accounting, Volume 1: Financial Accounting'
+    ACCOUNTING_1_ALT = 'Financial Accounting'
     ACCOUNTING_2 = 'Principles of Accounting, Volume 2: Managerial Accounting'
+    ACCOUNTING_2_ALT = 'Managerial Accounting'
     BUSINESS_STATS = 'Introductory Business Statistics'
     BUS_LAW_1 = 'Business Law I Essentials'
     ENTREPRENEUR = 'Entrepreneurship'
     ETHICS = 'Business Ethics'
     INTRO_BUSINESS = 'Introduction to Business'
     MANAGEMENT = 'Principles of Management'
+    MANAGEMENT_ALT = 'Management'
     ORG_BEHAVIOR = 'Organizational Behavior'
 
     # Humanities
@@ -516,9 +524,12 @@ class Library():
 
     # Science
     ANATOMY_PHYS = 'Anatomy and Physiology'
-    AP_BIO = 'Biology for AP® Courses'
+    ANATOMY_PHYS_ALT = 'Anatomy & Physiology'
+    AP_BIO = 'Biology for AP® Courses'  # book title
+    AP_BIO_ALT = 'AP Biology'  # shortened list title
     AP_PHYS = 'College Physics for AP® Courses'  # book title
     AP_PHYS_ALT = 'The AP Physics Collection'  # alternate title
+    AP_PHYS_ALT_2 = 'AP Physics'  # shortened list title
     ASTRONOMY = 'Astronomy'
     BIOLOGY_2E = 'Biology 2e'
     BIO_CONCEPTS = 'Concepts of Biology'
@@ -532,6 +543,7 @@ class Library():
     U_PHYS_1 = 'University Physics Volume 1'
     U_PHYS_2 = 'University Physics Volume 2'
     U_PHYS_3 = 'University Physics Volume 3'
+    U_PHYS_ALT = 'University Physics'
 
     # Social Sciences
     AP_MACRO = 'Principles of Macroeconomics for AP® Courses 2e'
@@ -705,7 +717,7 @@ class Library():
                 self.HAS_I_UNLOCK: True,
                 self.HAS_S_LOCK: False,
                 self.HAS_S_UNLOCK: True,
-                self.INTEREST: 'Intro%20to%20Business',
+                self.INTEREST: r'Introduction%20to%20Business',
                 self.IS_AP: False,
                 self.ITUNES: False,
                 self.KINDLE: False,
@@ -1329,7 +1341,7 @@ class Library():
                 self.HAS_I_UNLOCK: True,
                 self.HAS_S_LOCK: False,
                 self.HAS_S_UNLOCK: True,
-                self.INTEREST: r'Macro%20Econ',
+                self.INTEREST: r'Principles%20of%20Macroeconomics',
                 self.IS_AP: False,
                 self.ITUNES: True,
                 self.KINDLE: True,
@@ -1549,12 +1561,28 @@ class Library():
 
     def get(self, book, field=None):
         """Return the field or fields for a specific book."""
-        if book == self.AP_PHYS_ALT:
-            book = self.AP_PHYS
-        return_book = self.books.get(book)
-        if field:
+        alts = {self.ANATOMY_PHYS_ALT: self.ANATOMY_PHYS,
+                self.AP_PHYS_ALT: self.AP_PHYS,
+                self.AP_PHYS_ALT_2: self.AP_PHYS,
+                self.AP_BIO_ALT: self.AP_BIO,
+                self.ACCOUNTING_1_ALT: self.ACCOUNTING_1,
+                self.ACCOUNTING_2_ALT: self.ACCOUNTING_2,
+                self.MANAGEMENT_ALT: self.MANAGEMENT,
+                self.U_PHYS_ALT: self.U_PHYS_1, }
+
+        if book in alts:  # Is the book using an altered title?
+            return_book = self.books.get(alts[book])
+        else:  # Try to get the book information
+            return_book = self.books.get(book)
+        if return_book is None:  # Retrieval failed; is it a second edition?
+            return_book = self.books.get(book + ' 2e')
+        if return_book is None:  # Retrieval failed; not a second edition...
+            raise WebException(f'{book} not found in the library')
+
+        # Book found...
+        if field:  # return the requested field value.
             return return_book.get(field)
-        return return_book
+        return return_book  # return all of the book's field values.
 
     def get_by_category(self, category):
         """Return the books within a specific category."""

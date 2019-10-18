@@ -76,7 +76,9 @@ def test_selecting_a_partner_logo_scrolls_to_the_partner_summary(
     # AND:  the summary contains a partner description
     # AND:  supported subjects or books
     # AND:  a "Return to top" link
-    assert(Utility.in_viewport(selenium, element=summary.header))
+    assert(Utility.in_viewport(selenium,
+                               element=summary.header,
+                               ignore_bottom=True))
     assert(summary.description)
     if summary.name != TechProviders.OPEN_TEXTBOOK_NETWORK:
         # the partner supports one or more OpenStax titles/subjects
