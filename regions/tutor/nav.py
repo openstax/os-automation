@@ -115,16 +115,20 @@ class TutorNav(Region):
     class Help(Menu):
         """The Help options."""
 
-        _page_tips_locator = (By.CSS_SELECTOR, '.page-tips')
-        _help_articles_locator = (By.CSS_SELECTOR, '.-help-link:first-child')
-        _student_preview_locator = (By.CSS_SELECTOR, '#student-preview-videos')
-        _getting_started_locator = (By.CSS_SELECTOR, '.support-document-link')
-        _best_practices_locator = (By.CSS_SELECTOR, '.best-practices-guide')
+        _page_tips_locator = (
+            By.CSS_SELECTOR, '.page-tips')
+        _help_articles_locator = (
+            By.CSS_SELECTOR, '.-help-link:first-child')
+        _getting_started_locator = (
+            By.CSS_SELECTOR, '.support-document-link')
+        _best_practices_locator = (
+            By.CSS_SELECTOR, '.best-practices-guide')
         _accessibility_statement_locator = (
-                                    By.CSS_SELECTOR, '[href*=accessibility]')
-        _chat_support_enabled_locator = (By.CSS_SELECTOR, '.chat.enabled')
+            By.CSS_SELECTOR, '[href*=accessibility]')
+        _chat_support_enabled_locator = (
+            By.CSS_SELECTOR, '.chat.enabled')
         _chat_support_disabled_locator = (
-                                    By.CSS_SELECTOR, '.chat.disabled span')
+            By.CSS_SELECTOR, '.chat.disabled span')
 
         def view_page_tips(self):
             """Trigger the current page's user tips."""
@@ -137,12 +141,6 @@ class TutorNav(Region):
             return self._select(locator=self._page_tips_locator,
                                 destination=Salesforce,
                                 external=True)
-
-        def view_student_preview_videos(self):
-            """View the student preview videos."""
-            from pages.tutor.preview_videos import Videos
-            return self._select(locator=self._student_preview_locator,
-                                destination=Videos)
 
         @property
         def guide_url(self):
@@ -244,23 +242,42 @@ class TutorNav(Region):
     class Action(Menu):
         """User action options."""
 
-        _my_courses_locator = (By.CSS_SELECTOR, '.myCourses')
-        _dashboard_locator = (By.CSS_SELECTOR, '.dashboard')
-        _browse_the_book_locator = (By.CSS_SELECTOR, '[data-name=browseBook]')
-        _scores_locator = (By.CSS_SELECTOR, '.viewScores')
+        _my_courses_locator = (
+            By.CSS_SELECTOR, '[data-name=myCourses]')
+        _dashboard_locator = (
+            By.CSS_SELECTOR, '[data-name=dashboard]')
+        _browse_the_book_locator = (
+            By.CSS_SELECTOR, '[name=browseBook]')
+        _scores_locator = (
+            By.CSS_SELECTOR, '[data-name=viewScores]')
         _performance_forecast_locator = (
-                                    By.CSS_SELECTOR, '.viewPerformanceGuide')
-        _change_student_id_locator = (By.CSS_SELECTOR, '.changeStudentId')
-        _question_library_locator = (By.CSS_SELECTOR, '.viewQuestionsLibrary')
-        _course_settings_locator = (By.CSS_SELECTOR, '.courseSettings')
-        _course_roster_locator = (By.CSS_SELECTOR, '.courseRoster')
-        _create_a_course_locator = (By.CSS_SELECTOR, '[href$=new-course]')
-        _copy_this_course_locator = (By.CSS_SELECTOR, '[href*="new-course/"]')
-        _manage_payments_locator = (By.CSS_SELECTOR, '[href$=payments]')
-        _customer_service_locator = (By.CSS_SELECTOR, '.customer_service')
-        _admin_console_locator = (By.CSS_SELECTOR, '.admin')
-        _qa_dashboard_locator = (By.CSS_SELECTOR, '.QADashboard')
-        _content_analyst_locator = (By.CSS_SELECTOR, '.qaHome')
+            By.CSS_SELECTOR, '[data-name=viewPerformanceGuide]')
+        _change_student_id_locator = (
+            By.CSS_SELECTOR, 'data-name=changeStudentId]')
+        _question_library_locator = (
+            By.CSS_SELECTOR, '[data-name=viewQuestionsLibrary]')
+        _course_settings_locator = (
+            By.CSS_SELECTOR, '[data-name=courseSettings]')
+        _course_roster_locator = (
+            By.CSS_SELECTOR, '[data-name=courseRoster]')
+        _create_a_course_locator = (
+            # By.CSS_SELECTOR, '[data-item=createCourse]')
+            By.XPATH,
+            '//a[div[contains(@data-tour-anchor-id,"createNewCourse")]]')
+        _copy_this_course_locator = (
+            # By.CSS_SELECTOR, '[data-item=cloneCourse]')
+            By.XPATH,
+            '//a[div[contains(@data-tour-anchor-id),"clone-course"]]')
+        _manage_payments_locator = (
+            By.CSS_SELECTOR, '[data-name=managePayments]')
+        _customer_service_locator = (
+            By.CSS_SELECTOR, '[data-name=customer_service]')
+        _admin_console_locator = (
+            By.CSS_SELECTOR, '[data-name=admin]')
+        _qa_dashboard_locator = (
+            By.CSS_SELECTOR, '[data-name=QADashboard]')
+        _content_analyst_locator = (
+            By.CSS_SELECTOR, '[data-name=qaHome]')
 
         def view_my_courses(self):
             """Go to My Courses.
