@@ -46,6 +46,7 @@ def test_the_donation_banner_is_displayed(web_base_url, selenium):
     # THEN: a sticky note is displayed at the top of the page
     # AND:  a button is displayed linking to the donation page
     assert(home.sticky_note.loaded), 'Sticky note not loaded'
+
     assert(home.sticky_note.button.is_displayed()), \
         'Sticky note found but not displayed'
 
@@ -59,6 +60,7 @@ def test_the_donation_banner_is_displayed(web_base_url, selenium):
     # WHEN: the user returns to the Web home page
     # AND:  clicks the "x" on the sticky note
     home.open()
+
     home.sticky_note.close()
 
     # THEN: the sticky note is closed (no longer visible)
@@ -134,7 +136,7 @@ def test_mobile_menu_navigation(web_base_url, selenium):
     # AND:   the screen width is 960 pixels or less
     home = Home(selenium, web_base_url)
 
-    home.resize_window(width=900)
+    home.resize_window(width=Web.TABLET)
     home.open()
 
     # WHEN: they click on the menu toggle
@@ -256,7 +258,7 @@ def test_nav_our_impact_loads_the_impact_page(web_base_url, selenium):
     # AND:  click the "Our Impact" link
     home.open()
 
-    home.resize_window(width=900)
+    home.resize_window(width=Web.TABLET)
 
     home.web_nav.meta.toggle_menu()
 
@@ -289,7 +291,7 @@ def test_nav_supporters_loads_the_foundation_supporters_page(
     # AND:  click the "Supporters" link
     home.open()
 
-    home.resize_window(width=900)
+    home.resize_window(width=Web.TABLET)
 
     home.web_nav.meta.toggle_menu()
 
@@ -321,7 +323,7 @@ def test_nav_blog_loads_the_openstax_blog(web_base_url, selenium):
     # AND:  click the "Blog" link
     home.open()
 
-    home.resize_window(width=900)
+    home.resize_window(width=Web.TABLET)
 
     home.web_nav.meta.toggle_menu()
 
@@ -354,7 +356,7 @@ def test_nav_give_loads_the_donation_page(web_base_url, selenium):
     # AND:  click the "Give" link
     home.open()
 
-    home.resize_window(width=900)
+    home.resize_window(width=Web.TABLET)
 
     home.web_nav.meta.toggle_menu()
 
@@ -392,7 +394,7 @@ def test_nav_help_loads_the_salesforce_support_site(web_base_url, selenium):
     # AND:  click the "Help" link
     support.close_tab()
 
-    home.resize_window(width=900)
+    home.resize_window(width=Web.TABLET)
 
     home.web_nav.meta.toggle_menu()
 
@@ -435,7 +437,7 @@ def test_nav_rice_logo_loads_the_rice_university_home_page(
     # AND:  click the "Rice" logo
     rice.close_tab()
 
-    home.resize_window(width=900)
+    home.resize_window(width=Web.TABLET)
 
     home.web_nav.meta.toggle_menu()
 
@@ -564,11 +566,6 @@ def test_able_to_view_subjects_using_the_nav_menu(web_base_url, selenium):
 
     # WHEN: the "All" menu option is clicked
     all_subjects = home.web_nav.subjects.view_all()
-
-    # THEN: the subjects webpage is displayed
-    # AND:  the "View All" filter button is grayed (active)
-    # AND:  all subject areas are displayed ("Math", "Science", "Social
-    #       Sciences", "Humanities", "Business", and "AP®")
     visibility = [all_subjects.math,
                   all_subjects.science,
                   all_subjects.social_sciences,
@@ -576,6 +573,11 @@ def test_able_to_view_subjects_using_the_nav_menu(web_base_url, selenium):
                   all_subjects.business,
                   all_subjects.essentials,
                   all_subjects.ap]
+
+    # THEN: the subjects webpage is displayed
+    # AND:  the "View All" filter button is grayed (active)
+    # AND:  all subject areas are displayed ("Math", "Science", "Social
+    #       Sciences", "Humanities", "Business", and "AP®")
     assert(all_subjects.is_displayed()), \
         f'Subjects page not displayed; ended at: {all_subjects.location}'
 
@@ -604,11 +606,6 @@ def test_able_to_view_subjects_using_the_nav_menu(web_base_url, selenium):
     home.web_nav.subjects.open()
 
     all_subjects = home.web_nav.subjects.view_all()
-
-    # THEN: the subjects webpage is displayed
-    # AND:  the "View All" filter button is grayed (active)
-    # AND:  all subject areas are displayed ("Math", "Science", "Social
-    #       Sciences", "Humanities", "Business", and "AP®")
     visibility = [all_subjects.math,
                   all_subjects.science,
                   all_subjects.social_sciences,
@@ -616,6 +613,11 @@ def test_able_to_view_subjects_using_the_nav_menu(web_base_url, selenium):
                   all_subjects.business,
                   all_subjects.essentials,
                   all_subjects.ap]
+
+    # THEN: the subjects webpage is displayed
+    # AND:  the "View All" filter button is grayed (active)
+    # AND:  all subject areas are displayed ("Math", "Science", "Social
+    #       Sciences", "Humanities", "Business", and "AP®")
     assert(all_subjects.is_displayed()), \
         f'Subjects page not displayed; ended at: {all_subjects.location}'
 
@@ -657,12 +659,8 @@ def test_subject_menu_options_load_filtered_views(web_base_url, selenium):
             ]
             if device == 'mobile' and not home.web_nav.meta.is_open:
                 home.web_nav.meta.toggle_menu()
-            subject = categories[index]()
 
-            # THEN: the subject's webpage is displayed
-            # AND:  the subject filter button is grayed (active)
-            # AND:  the subject category is visible
-            # AND:  the other categories are not visible
+            subject = categories[index]()
             visibility = [
                 subject.math,
                 subject.science,
@@ -672,6 +670,11 @@ def test_subject_menu_options_load_filtered_views(web_base_url, selenium):
                 subject.essentials,
                 subject.ap
             ]
+
+            # THEN: the subject's webpage is displayed
+            # AND:  the subject filter button is grayed (active)
+            # AND:  the subject category is visible
+            # AND:  the other categories are not visible
             assert(subject.location.endswith(Web.URL_APPENDS[index])), (
                 f'URL is "{subject.location}" '
                 f'but should end with "{Web.URL_APPENDS[index]}"')
@@ -745,9 +748,9 @@ def test_technology_menu_options_load_the_corresponding_pages(
             f'Rover page not displayed; ended at: {rover.location}'
 
         # WHEN: the "OpenStax Partners" menu option is clicked
-        if device == 'mobile' and not tutor.web_nav.meta.is_open:
-            tutor.web_nav.meta.toggle_menu()
-        partners = tutor.web_nav.technology.view_partners()
+        if device == 'mobile' and not rover.web_nav.meta.is_open:
+            rover.web_nav.meta.toggle_menu()
+        partners = rover.web_nav.technology.view_partners()
 
         # THEN: the OpenStax parners webpage is displayed
         assert(partners.is_displayed()), \
@@ -809,9 +812,9 @@ def test_what_we_do_menu_options_load_corresponding_pages(
 
         # WHEN: they click on the "What we do" menu
         # AND:  click on the "Institutional Partnerships" menu option
-        if device == 'mobile' and not team.web_nav.meta.is_open:
-            team.web_nav.meta.toggle_menu()
-        partnerships = team.web_nav.openstax.view_partnerships()
+        if device == 'mobile' and not research.web_nav.meta.is_open:
+            research.web_nav.meta.toggle_menu()
+        partnerships = research.web_nav.openstax.view_partnerships()
 
         # THEN: the institutional partnerships webpage is displayed
         assert(partnerships.is_displayed()), (
@@ -820,9 +823,9 @@ def test_what_we_do_menu_options_load_corresponding_pages(
 
         # WHEN: they click on the "What we do" menu
         # AND:  click on the "Creator Fest" menu option
-        if device == 'mobile' and not team.web_nav.meta.is_open:
-            team.web_nav.meta.toggle_menu()
-        creator_fest = team.web_nav.openstax.view_creator_fest()
+        if device == 'mobile' and not partnerships.web_nav.meta.is_open:
+            partnerships.web_nav.meta.toggle_menu()
+        creator_fest = partnerships.web_nav.openstax.view_creator_fest()
 
         # THEN: the Creator Fest webpage is displayed
         assert(creator_fest.is_displayed()), (
@@ -846,7 +849,6 @@ def test_able_to_log_into_the_web_site(web_base_url, selenium, student):
         f'Not viewing Accounts ({accounts.current_url})'
 
     # WHEN: they log into Accounts
-    # AND:  close the OpenStax Tutor beta modal
     accounts.login.service_login(*student)
     # wait for the page load because we're accessing
     # Accounts directly instead of using the Web page
@@ -1234,9 +1236,10 @@ def test_home_page_quote_boxes(web_base_url, selenium):
     # AND:  the first box discusses information updates with a mail list
     assert(len(home.quotes.quotes) == quote_boxes), \
         f'Expected {quote_boxes} boxes; found {len(home.quotes.quotes)}'
-    for quote in home.quotes.quotes:
+    for index, quote in enumerate(home.quotes.quotes):
         assert(quote.is_displayed()), \
-            'Subscribe box not displayed'
+            f'Quote box {index + 1} not displayed'
+
     assert(home.quotes.quotes[Web.SUBSCRIBE].has_image), \
         'Subscribe box image not found'
     assert('OpenStax updates' in home.quotes.quotes[Web.SUBSCRIBE].text), \
@@ -1263,6 +1266,7 @@ def test_home_page_quote_boxes(web_base_url, selenium):
            'is game-changing for our students.'
            in home.quotes.quotes[Web.BOOK_QUALITY_RIGGS].text), \
         'Riggs quote box text does not match'
+
     assert('a campus bookstore or school and looking for print copies'
            in home.quotes.quotes[Web.BOOKSTORE_SUPPLIERS].text), \
         'Bookstore suppliers box text does not match'
@@ -1315,6 +1319,9 @@ def test_the_home_page_education_section(web_base_url, selenium):
 @web
 def test_the_home_page_information_bars(web_base_url, selenium):
     """Test the information bars."""
+    # SETUP:
+    information_bars = 2
+
     # GIVEN: a user viewing the Web home page
     home = Home(selenium, web_base_url).open()
 
@@ -1323,6 +1330,10 @@ def test_the_home_page_information_bars(web_base_url, selenium):
 
     # THEN: they are presented 2 boxes
     # AND:  the first discusses the OpenStax impact
+    assert(len(home.information.box) == information_bars), (
+        f'{len(home.information.box)} bar(s) shown; '
+        f'expected {information_bars}')
+
     assert(home.information.box[Web.OUR_IMPACT].is_displayed()), \
         'Our Impact info box not displayed'
     assert('Wolchonok has saved students' in
@@ -1381,11 +1392,11 @@ def test_page_footer_is_displayed(web_base_url, selenium):
 @web
 def test_footer_static_text(web_base_url, selenium):
     """Test for the footer nonprofit status, mission and copyright info."""
-    # GIVEN: a user viewing the Web page footer
+    # GIVEN: a user viewing the Web home page
     home = Home(selenium, web_base_url).open()
-    home.footer.show()
 
-    # WHEN:
+    # WHEN: they view the page footer
+    home.footer.show()
     non_profit = home.footer.directory.non_profit
     mission = home.footer.directory.our_mission
     copyright = home.footer.supplemental.copyright
