@@ -28,7 +28,8 @@ def test_create_and_clone_a_course(tutor_base_url, selenium, teacher):
     book = Tutor.BOOKS[Utility.random(0, len(Tutor.BOOKS) - 1)]
     term = Tutor.TERMS[Utility.random(0, len(Tutor.TERMS) - 1)]
     today = datetime.now()
-    course_name = f"{book} Auto-{today.year}{today.month:02}{today.day:02}"
+    course_name = (f"{book} Auto-{today.year}{today.month:02}{today.day:02}"
+                   f" ({Utility.random_hex(6)})")
     timezone = Tutor.TIMEZONE[Utility.random(0, len(Tutor.TIMEZONE) - 1)]
     total_sections = Utility.random(1, 4)
     estimated_students = Utility.random(1, 500)
