@@ -85,7 +85,8 @@ class Dashboard(TutorBase):
 
         """
         if self.is_safari:
-            sleep(2.5)
+            self.wait.until(lambda _: self.find_elements(
+                *self._create_tile_locator))
         tile = self.find_elements(*self._create_tile_locator)
         assert(tile), (
             "Create a course tile not found - "
@@ -552,16 +553,21 @@ class Courses(Region):
                 "Only verified instructors may clone a course"
             assert(not self.is_preview), \
                 "Preview courses may not be cloned"
-            from selenium.webdriver.common.action_chains import ActionChains
-            Utility.scroll_to(self.driver, element=self.root, shift=-80)
-            ActionChains(self.driver) \
-                .move_to_element(self.course_brand) \
-                .pause(1) \
-                .move_to_element(
-                    self.find_element(By.CSS_SELECTOR, '.btn-sm')) \
-                .pause(1) \
-                .click() \
-                .perform()
+            if Utility.is_safari(self.driver):
+                button = self.find_element(By.CSS_SELECTOR, '.btn-sm')
+                Utility.click_option(self.driver, element=button)
+            else:
+                from selenium.webdriver.common.action_chains import \
+                    ActionChains
+                Utility.scroll_to(self.driver, element=self.root, shift=-80)
+                ActionChains(self.driver) \
+                    .move_to_element(self.course_brand) \
+                    .pause(1) \
+                    .move_to_element(
+                        self.find_element(By.CSS_SELECTOR, '.btn-sm')) \
+                    .pause(1) \
+                    .click() \
+                    .perform()
             from pages.tutor.new_course import CloneCourse
             return go_to_(CloneCourse(self.driver, self.page.page.base_url))
 

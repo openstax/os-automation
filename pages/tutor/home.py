@@ -55,7 +55,8 @@ class TutorHome(TutorLoginBase):
         :rtype: :py:class:`~pages.accounts.home.AccountsHome`
 
         """
-        self.find_element(*self._log_in_locator).click()
+        button = self.find_element(*self._log_in_locator)
+        Utility.click_option(self.driver, element=button)
         from pages.accounts.home import AccountsHome
         return go_to_(AccountsHome(self.driver))
 
@@ -70,7 +71,8 @@ class TutorHome(TutorLoginBase):
 
         """
         try:
-            self.find_element(*self._log_in_locator).click()
+            button = self.find_element(*self._log_in_locator)
+            Utility.click_option(self.driver, element=button)
         except NoSuchElementException:
             pass
         from pages.tutor.dashboard import Dashboard

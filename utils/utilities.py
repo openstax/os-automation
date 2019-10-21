@@ -298,6 +298,18 @@ class Utility(object):
         return reduce(lambda img, group: img and group, map_list, True)
 
     @classmethod
+    def is_safari(cls, driver) -> bool:
+        """Return True if the driver in use is Safari.
+
+        :param driver: a selenium webdriver instance
+        :type driver: :py:class:`~selenium.webdriver.*.webdriver.WebDriver`
+        :return: ``True`` if the browser in use is Safari, otherwise ``False``
+        :rtype: bool
+
+        """
+        return driver.capabilities.get('browserName').lower() == 'safari'
+
+    @classmethod
     def load_background_images(cls, driver, locator):
         """Inject a script to wait for background image downloads.
 
