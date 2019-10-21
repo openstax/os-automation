@@ -70,18 +70,6 @@ class Float(Region):
             *self._is_enrollment_class_locator))
 
     @property
-    def is_welcome(self) -> bool:
-        """Return True if the floating modal is the welcome to OpenStax pane.
-
-        :return: ``True`` if the pane contains the Welcome to OpenStax Tutor
-            Beta view
-        :rtype: bool
-
-        """
-        return bool(self.find_elements(
-            *self._is_welcome_to_openstax_class_locator))
-
-    @property
     def title(self) -> str:
         """Return the modal heading text.
 
