@@ -8,6 +8,7 @@ from typing import List, Tuple, Union
 from pypom import Page, Region
 from selenium.webdriver.common.by import By
 from selenium.webdriver.remote.webelement import WebElement
+from selenium.webdriver.support import expected_conditions as expect
 
 from pages.accounts.signup import Signup as AccountSignup
 from pages.tutor.base import TutorBase
@@ -260,7 +261,10 @@ class PurchaseConfirmation(IframeModal):
         :rtype: bool
 
         """
-        return bool(self.order_number) and bool(self.total)
+        if Utility.is_browser(self.driver, 'chrome'):
+            return bool(self.order_number) and bool(self.total)
+        else:
+            return sleep(3.0) or True
 
     @property
     def content(self) -> str:
@@ -373,7 +377,9 @@ class PurchaseConfirmation(IframeModal):
         confirmation = self.find_element(*self._base_iframe_locator)
         self.driver.switch_to.frame(confirmation)
         button = self.find_element(*self._access_your_course_button_locator)
-        Utility.click_option(self.driver, element=button)
+        is_not_chrome = not Utility.is_browser(self.driver, 'chrome')
+        Utility.click_option(
+            self.driver, element=button, force_js_click=is_not_chrome)
         self.driver.switch_to.default_content()
         return go_to_(StudentCourse(self.driver, base_url=self.page.base_url))
 
@@ -708,7 +714,7 @@ class PurchaseForm(IframeModal):
         self.driver.switch_to.default_content()
         return errors
 
-    def purchase(self) -> Union[PurchaseConfirmation, List[str]]:
+    def purchase(self) -> Union[PurchaseConfirmation]:
         """Click on the 'Purchase' Tutor button.
 
         :return: the purchase confirmation modal or the error message for a
@@ -720,13 +726,16 @@ class PurchaseForm(IframeModal):
         purchase = self.find_element(*self._base_iframe_locator)
         self.driver.switch_to.frame(purchase)
         button = self.wait.until(
-            lambda _: self.find_element(*self._purchase_button_locator))
-        Utility.click_option(self.driver, element=button)
+            expect.presence_of_element_located(self._purchase_button_locator))
+        sleep(0.25)
+        is_not_chrome = not Utility.is_browser(self.driver, 'chrome')
+        Utility.click_option(
+            self.driver, element=button, force_js_click=is_not_chrome)
         sleep(1)
         self.driver.switch_to.default_content()
         errors = self.error_messages
         if errors:
-            return errors
+            raise TutorException(errors)
         return PurchaseConfirmation(self.page)
 
     def cancel(self) -> FreeTrial:

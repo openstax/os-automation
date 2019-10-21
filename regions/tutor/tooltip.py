@@ -19,13 +19,15 @@ class Float(Region):
     _content_locator = (
         By.CSS_SELECTOR, '.body')
     _footer_next_and_close_button_locator = (
-        By.CSS_SELECTOR, '.footer button:last-child')
+        By.CSS_SELECTOR, '.footer button:last-child, .welcome-to-tutor button')
     _get_new_links_button_locator = (
         By.CSS_SELECTOR, '.footer button:first-child')
     _heading_locator = (
         By.CSS_SELECTOR, '.header')
     _is_enrollment_class_locator = (
         By.CSS_SELECTOR, '.new-enrollment-link')
+    is_welcome_to_openstax_class_locator = (
+        By.CSS_SELECTOR, '.welcome-to-tutor')
     _x_close_button_locator = (
         By.CSS_SELECTOR, '.ox-icon-close')
 
@@ -64,7 +66,20 @@ class Float(Region):
         :rtype: bool
 
         """
-        return bool(self.find_elements(*self._is_enrollment_class_locator))
+        return bool(self.find_elements(
+            *self._is_enrollment_class_locator))
+
+    @property
+    def is_welcome(self) -> bool:
+        """Return True if the floating modal is the welcome to OpenStax pane.
+
+        :return: ``True`` if the pane contains the Welcome to OpenStax Tutor
+            Beta view
+        :rtype: bool
+
+        """
+        return bool(self.find_elements(
+            *self._is_welcome_to_openstax_class_locator))
 
     @property
     def title(self) -> str:
