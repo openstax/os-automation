@@ -616,9 +616,11 @@ def test_assignment_creation_homework(tutor_base_url, selenium, store):
             exercise.add_question()
             options_selected += 1
 
-    # THEN:  the 'My Selections' shows the total number of assessments selected
-    assert(problem_selector.toolbar.my_selections == options_selected), \
-        f'My Selections does not match the actual assessment selections'
+    # THEN:  the 'My Selections' shows the total number of assessments
+    #        selected, which will equal or exceed the options selected due to
+    #        multi-part questions
+    assert(problem_selector.toolbar.my_selections >= options_selected), \
+        f'My Selections must be equal or greater than the selections'
 
     # WHEN:  they click on the 'Next' button
     # AND:   click on the 'Save as Draft' button
