@@ -2228,8 +2228,11 @@ class Reading(Assignment):
             :rtype: str
 
             """
-            number = (self.find_element(*self._chapter_section_number_locator)
-                      .text)
+            try:
+                number = (self.find_element(
+                    *self._chapter_section_number_locator).text)
+            except NoSuchElementException:
+                return ''
             if 'Introduction to' in self.title:
                 return f'{number}.0'
             return number

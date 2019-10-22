@@ -169,6 +169,7 @@ class Dashboard(TutorBase):
         """
         if self.is_safari:
             sleep(2)
+            self.wait.until(lambda _: bool(self.current_courses.courses))
         # Look through current courses first
         try:
             for course in self.current_courses.courses:
@@ -401,6 +402,7 @@ class Courses(Region):
 
         _course_info_locator = (By.CSS_SELECTOR, '[data-title]')
         _card_locator = (By.CSS_SELECTOR, '.my-courses-item-title')
+        _card_safari_locator = (By.CSS_SELECTOR, '.my-courses-item-title a')
         _preview_belt_locator = (By.CSS_SELECTOR, '.preview-belt p')
         _course_brand_locator = (By.CSS_SELECTOR, '.course-branding')
         _course_clone_locator = (By.CSS_SELECTOR, 'a')
@@ -538,7 +540,10 @@ class Courses(Region):
                 from pages.tutor.calendar import Calendar as Destination
             else:
                 from pages.tutor.course import StudentCourse as Destination
-            card = self.find_element(*self._card_locator)
+            if Utility.is_browser(self.driver, 'safari'):
+                card = self.find_element(*self._card_safari_locator)
+            else:
+                card = self.find_element(*self._card_locator)
             Utility.click_option(self.driver, element=card)
             return go_to_(Destination(self.driver, self.page.page.base_url))
 

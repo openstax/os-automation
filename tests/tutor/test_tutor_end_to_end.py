@@ -494,7 +494,8 @@ def test_assignment_creation_readings(tutor_base_url, selenium, store):
     #        selected table
     sections_selected = [section.number
                          for section
-                         in assignment.reading_list]
+                         in assignment.reading_list
+                         if section.number]
     assert(len(group) == chapters)
     if chapters:
         chapter = group[0].split('.')[0]

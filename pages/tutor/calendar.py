@@ -172,7 +172,7 @@ class Assignment(Region):
             while not isinstance(target, Page):
                 target = target.page
             return go_to_(Assignment(self.driver, target.base_url))
-        Utility.click_option(self.driver, element=self.root)
+        Utility.click_option(self.driver, element=self.plan)
         sleep(0.5)
         from regions.tutor.quick_look import QuickLook
         return QuickLook(self.page)
