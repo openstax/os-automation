@@ -243,41 +243,37 @@ class TutorNav(Region):
         """User action options."""
 
         _my_courses_locator = (
-            By.CSS_SELECTOR, '[data-name=myCourses]')
+            By.CSS_SELECTOR, '[data-item=myCourses]')
         _dashboard_locator = (
-            By.CSS_SELECTOR, '[data-name=dashboard]')
+            By.CSS_SELECTOR, '[data-item=dashboard]')
         _browse_the_book_locator = (
             By.CSS_SELECTOR, '[name=browseBook]')
         _scores_locator = (
-            By.CSS_SELECTOR, '[data-name=viewScores]')
+            By.CSS_SELECTOR, '[data-item=viewScores]')
         _performance_forecast_locator = (
-            By.CSS_SELECTOR, '[data-name=viewPerformanceGuide]')
+            By.CSS_SELECTOR, '[data-item=viewPerformanceGuide]')
         _change_student_id_locator = (
-            By.CSS_SELECTOR, 'data-name=changeStudentId]')
+            By.CSS_SELECTOR, 'data-item=changeStudentId]')
         _question_library_locator = (
-            By.CSS_SELECTOR, '[data-name=viewQuestionsLibrary]')
+            By.CSS_SELECTOR, '[data-item=viewQuestionsLibrary]')
         _course_settings_locator = (
-            By.CSS_SELECTOR, '[data-name=courseSettings]')
+            By.CSS_SELECTOR, '[data-item=courseSettings]')
         _course_roster_locator = (
-            By.CSS_SELECTOR, '[data-name=courseRoster]')
+            By.CSS_SELECTOR, '[data-item=courseRoster]')
         _create_a_course_locator = (
-            # By.CSS_SELECTOR, '[data-item=createCourse]')
-            By.XPATH,
-            '//a[div[contains(@data-tour-anchor-id,"createNewCourse")]]')
+            By.CSS_SELECTOR, '[data-item=createNewCourse]')
         _copy_this_course_locator = (
-            # By.CSS_SELECTOR, '[data-item=cloneCourse]')
-            By.XPATH,
-            '//a[div[contains(@data-tour-anchor-id),"clone-course"]]')
+            By.CSS_SELECTOR, '[data-item=cloneCourse]')
         _manage_payments_locator = (
-            By.CSS_SELECTOR, '[data-name=managePayments]')
+            By.CSS_SELECTOR, '[data-item=managePayments]')
         _customer_service_locator = (
-            By.CSS_SELECTOR, '[data-name=customer_service]')
+            By.CSS_SELECTOR, '[data-item=customer_service]')
         _admin_console_locator = (
-            By.CSS_SELECTOR, '[data-name=admin]')
+            By.CSS_SELECTOR, '[data-item=admin]')
         _qa_dashboard_locator = (
-            By.CSS_SELECTOR, '[data-name=QADashboard]')
+            By.CSS_SELECTOR, '[data-item=QADashboard]')
         _content_analyst_locator = (
-            By.CSS_SELECTOR, '[data-name=qaHome]')
+            By.CSS_SELECTOR, '[data-item=qaHome]')
 
         def view_my_courses(self):
             """Go to My Courses.

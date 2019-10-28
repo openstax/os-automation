@@ -39,11 +39,11 @@ class Assignment(TutorBase):
     _tooltip_button_locator = (
         By.CSS_SELECTOR, '[class*="--primary"]')
     _assignment_nav_bar_locator = (
-        By.CSS_SELECTOR, '[class*=SecondaryToolbar]')
+        By.CSS_SELECTOR, '.tutor-navbar:first-child ~ div:nth-child(2)')
     _assignment_body_locator = (
-        By.CSS_SELECTOR, '[class*="Content-sc-"]')
+        By.CSS_SELECTOR, '.tutor-navbar:first-child ~ div:nth-child(3)')
     _assignment_footer_locator = (
-        By.CSS_SELECTOR, '.tutor-navbar')
+        By.CSS_SELECTOR, '.tutor-navbar:not(:first-child)')
     _assignment_type_locator = (
         By.CSS_SELECTOR, '.task-screen')
     _debug_information_locator = (
@@ -174,15 +174,19 @@ class Assignment(TutorBase):
     class Content(Region):
         """A placeholder for the assignment body."""
 
-        _is_free_response_locator = (By.CSS_SELECTOR, '[class*=FreeResponse]')
-        _is_multiple_choice_locator = (By.CSS_SELECTOR, '.answers-table')
-        _correctness_shown_locator = (By.CSS_SELECTOR, '.has-correct-answer')
-        _assignment_completion_locator = (By.CSS_SELECTOR, '.task-steps-end')
-        _interstitial_card_locator = (By.CSS_SELECTOR,
-                                      '.openstax-spaced-practice-intro , '
-                                      '.openstax-individual-review-intro , '
-                                      '.openstax-two-step-intro , '
-                                      '.openstax-personalized-intro')
+        _is_free_response_locator = (
+            By.CSS_SELECTOR, 'textarea')
+        _is_multiple_choice_locator = (
+            By.CSS_SELECTOR, '.answers-table')
+        _correctness_shown_locator = (
+            By.CSS_SELECTOR, '.has-correct-answer')
+        _assignment_completion_locator = (
+            By.CSS_SELECTOR, '.task-steps-end')
+        _interstitial_card_locator = (
+            By.CSS_SELECTOR, '.openstax-spaced-practice-intro , '
+                             '.openstax-individual-review-intro , '
+                             '.openstax-two-step-intro , '
+                             '.openstax-personalized-intro')
 
         @property
         def is_free_response(self) -> bool:
@@ -420,18 +424,22 @@ class Homework(Assignment):
     class Content(Assignment.Content):
         """The assessment pane."""
 
+        _assessment_root_locator = (
+            By.CSS_SELECTOR, '.exercise-step')
+        _back_to_dashboard_button_locator = (
+            By.CSS_SELECTOR, '.task-steps-end .btn-default')
         _continue_button_locator = (
             By.CSS_SELECTOR, 'button.btn-primary , button.continue')
         _is_free_response_locator = (
-            By.CSS_SELECTOR, '[class*=FreeResponse]')
+            By.CSS_SELECTOR, 'textarea')
         _is_multipart_locator = (
-            By.CSS_SELECTOR, '[class*=MultipartGroup]')
+            By.CSS_SELECTOR, '.mpq')
         _is_multiple_choice_locator = (
-            By.CSS_SELECTOR, '[class*=ExerciseQuestion]')
+            By.CSS_SELECTOR, '.answers-table')
         _is_two_step_intro_locator = (
             By.CSS_SELECTOR, '.openstax-two-step-intro')
-        _back_to_dashboard_button_locator = (
-            By.CSS_SELECTOR, '[class*=CenteredBackButton]')
+        _multipart_root_locator = (
+            By.CSS_SELECTOR, '.homework-task > div')
 
         @property
         def pane(self):
@@ -439,17 +447,19 @@ class Homework(Assignment):
             sleep(0.33)
             multipart = self.find_elements(*self._is_multipart_locator)
             if multipart:
+                mpq_root = self.find_element(*self._multipart_root_locator)
                 from regions.tutor.assessment import MultipartQuestion
-                return MultipartQuestion(self, multipart[0])
+                return MultipartQuestion(self, mpq_root)
+            assessment_root = self.find_element(*self._assessment_root_locator)
             free_response = self.find_elements(*self._is_free_response_locator)
             if free_response:
                 from regions.tutor.assessment import FreeResponse
-                return FreeResponse(self, free_response[0])
+                return FreeResponse(self, assessment_root)
             multiple_choice = self.find_elements(
                 *self._is_multiple_choice_locator)
             if multiple_choice:
                 from regions.tutor.assessment import MultipleChoice
-                return MultipleChoice(self, multiple_choice[0])
+                return MultipleChoice(self, assessment_root)
             # No assessment found; wait
             sleep(1)
             return self.pane

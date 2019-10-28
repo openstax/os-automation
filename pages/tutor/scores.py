@@ -569,7 +569,7 @@ class Scores(TutorBase):
     _no_data_locator = (By.CSS_SELECTOR, '.no-students p , .no-assignments p')
     _section_tab_locator = (By.CSS_SELECTOR, 'li a')
     _table_root_locator = (By.CSS_SELECTOR, '.scores-table')
-    _title_locator = (By.CSS_SELECTOR, 'h1[class*=Title]')
+    _title_locator = (By.CSS_SELECTOR, '.title-wrapper h1')
     _toast_message_popup_locator = (By.CSS_SELECTOR, '.toast-notification')
 
     @property

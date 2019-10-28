@@ -1176,7 +1176,8 @@ def test_student_task_practice(tutor_base_url, selenium, store):
     """
     # SETUP:
     test_data = store.get('C485041')
-    user = test_data.get('username')
+    user = test_data.get('users')
+    user = user[Utility.random(0, len(user) - 1)]
     if '-dev.' in tutor_base_url:
         password = test_data.get('password_dev')
     elif '-qa.' in tutor_base_url:
@@ -1187,13 +1188,14 @@ def test_student_task_practice(tutor_base_url, selenium, store):
         password = test_data.get('password_prod')
     else:
         password = test_data.get('password_unique')
+    course_name = test_data.get('course_name')
     book = bookterm.Biology2e()
 
     # GIVEN: a Tutor student enrolled in a course with at least one reading or
     #        homework
     home = TutorHome(selenium, tutor_base_url).open()
-    home.log_in(user, password)
-    # only one course means the student bypasses the course picker
+    courses = home.log_in(user, password)
+    this_week = courses.go_to_course(course_name)
     this_week = go_to_(StudentCourse(selenium, tutor_base_url))
     this_week.clear_training_wheels()
 
@@ -1250,8 +1252,11 @@ def test_student_task_practice(tutor_base_url, selenium, store):
     assert(this_week.is_displayed()), \
         'Not viewing the student work dashboard'
 
-    assert(this_week.performance_sidebar.sections[topic]
-           .worked.split()[0] == str(already_worked + assessments)), \
+    worked = [section.worked.split()[0]
+              for section
+              in this_week.performance_sidebar.sections
+              if section.title == section_title][0]
+    assert(worked == str(already_worked + assessments)), \
         f'Incorrect number of worked assessments for section {section_number}'
 
     # WHEN:  they click the 'Practice my weakest topics' button
@@ -1611,7 +1616,8 @@ def test_student_viewing_their_performance_forecast(
     """
     # SETUP:
     test_data = store.get('C485045')
-    user = test_data.get('username')
+    user = test_data.get('users')
+    user = user[Utility.random(0, len(user) - 1)]
     if '-dev.' in tutor_base_url:
         password = test_data.get('password_dev')
     elif '-qa.' in tutor_base_url:

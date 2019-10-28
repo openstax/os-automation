@@ -5,7 +5,7 @@ from __future__ import annotations
 from time import sleep
 
 from pypom import Region
-from selenium.common.exceptions import NoSuchElementException
+from selenium.common.exceptions import NoSuchElementException, TimeoutException
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as expect
 
@@ -348,7 +348,10 @@ class DeleteSection(Modal):
         button = self.find_element(*self._delete_button_locator)
         Utility.click_option(self.driver, element=button)
         sleep(0.25)
-        self.wait.until(expect.staleness_of(self.root))
+        try:
+            self.wait.until(expect.staleness_of(self.root))
+        except TimeoutException:
+            raise TutorException('Could not delete the course section')
         sleep(1)
         return self.page
 

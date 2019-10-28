@@ -1506,7 +1506,7 @@ class Assignment(TutorBase):
     _individual_sections_radio_button_locator = (
         By.CSS_SELECTOR, '#show-periods-radio')
     _individual_sections_plan_locator = (
-        By.CSS_SELECTOR, '[class*=StyledTasking]')
+        By.CSS_SELECTOR, '.tasking')
     _section_name_locator = (
         By.CSS_SELECTOR, '.period')
     _section_checkbox_locator = (

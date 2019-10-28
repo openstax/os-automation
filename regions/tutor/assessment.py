@@ -366,11 +366,11 @@ class DetailedAssessment(Assessment):
 class QuestionBase(Region):
     """Shared assessment resources for student responses."""
 
-    _question_stem_locator = (By.CSS_SELECTOR, '[class*=QuestionStem]')
+    _question_stem_locator = (By.CSS_SELECTOR, '.question-stem')
     _question_answer_button_locator = (By.CSS_SELECTOR, '.btn-primary')
     _exercise_id_locator = (By.CSS_SELECTOR, '.exercise-identifier-link')
     _suggest_a_correction_link_locator = (By.CSS_SELECTOR, '[href*=errata]')
-    _view_book_section_link_locator = (By.CSS_SELECTOR, '.reference')
+    _view_book_section_link_locator = (By.CSS_SELECTOR, '.browse-the-book')
     _book_section_number_locator = (By.CSS_SELECTOR, '.chapter-section')
     _book_section_title_locator = (By.CSS_SELECTOR, '.title')
     _correct_answer_shown_locator = (

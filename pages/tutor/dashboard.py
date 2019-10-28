@@ -558,7 +558,7 @@ class Courses(Region):
                 "Only verified instructors may clone a course"
             assert(not self.is_preview), \
                 "Preview courses may not be cloned"
-            if Utility.is_safari(self.driver):
+            if Utility.is_browser(self.driver, 'safari'):
                 button = self.find_element(By.CSS_SELECTOR, '.btn-sm')
                 Utility.click_option(self.driver, element=button)
             else:
