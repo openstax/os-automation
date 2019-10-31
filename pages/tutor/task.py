@@ -14,6 +14,7 @@ from selenium.common.exceptions import NoSuchElementException
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.remote.webelement import WebElement
+from selenium.webdriver.support import expected_conditions as expect
 
 from pages.tutor.base import TutorBase
 from pages.tutor.course import StudentCourse
@@ -21,6 +22,7 @@ from pages.tutor.performance import PerformanceForecast
 from pages.tutor.reference import ReferenceBook
 from regions.tutor.assessment import FreeResponse, MultipleChoice
 from regions.tutor.print_preview import PrintPreview
+from regions.tutor.tooltip import Float
 from utils.tutor import Tutor, TutorException
 from utils.utilities import Utility, go_to_
 
@@ -61,14 +63,17 @@ class Assignment(TutorBase):
         :rtype: bool
 
         """
+        ready = self.driver.execute_script(
+            '(document.readyState!="loading" | '
+            'document.readyState=="complete")==1')
         page_load = self.driver.execute_script(
             'return document.querySelector("{document} , {step}");'
             .format(document=self._document_loading_selector,
                     step=self._step_loading_selector))
-        joyride = self.find_elements(*self._joyride_root_locator)
-        tooltip = Utility.has_children(joyride[0]) if joyride else ''
+        tooltip = Float(self).is_open
         # quit if no page loader is present or a tooltip is found
-        if not page_load or tooltip:
+        if ready and (not page_load or tooltip):
+            sleep(1.0)
             return True
         # otherwise check for a reading panel loader
         try:
@@ -118,7 +123,8 @@ class Assignment(TutorBase):
         :rtype: :py:class:`~pages.tutor.task.Assignment.Content`
 
         """
-        body_root = self.find_element(*self._assignment_body_locator)
+        body_root = self.wait.until(
+            expect.presence_of_element_located(self._assignment_body_locator))
         return self.Content(self, body_root)
 
     @property
@@ -156,20 +162,8 @@ class Assignment(TutorBase):
         :return: None
 
         """
-        sleep(0.5)
-        for attempt in range(6):
-            tip = self.find_elements(*self._joyride_root_locator)
-            if tip and Utility.has_children(tip[0]):
-                button = self.driver.execute_script(
-                    'return document.querySelector("[class*=\'--primary\']");')
-                if button:
-                    if attempt % 2 == 0:
-                        Utility.click_option(self.driver, element=button)
-                    else:
-                        button.send_keys(Keys.RETURN)
-                sleep(1)
-                tip = self.find_elements(*self._joyride_root_locator)
-            sleep(0.5)
+        while Float(self).is_open:
+            Float(self).close()
 
     class Content(Region):
         """A placeholder for the assignment body."""

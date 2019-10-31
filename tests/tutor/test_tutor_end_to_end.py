@@ -854,14 +854,11 @@ def test_student_task_reading_assignment(tutor_base_url, selenium, store):
     student_id = Utility.random(100000000, 999999999)
     assignment_name = test_data.get('assignment_name')
     annotation_text = chomsky()
-    free_response_giberish = Utility.random_hex(30)
-    # muck up the valid math number by adding spaces to force verification
-    random_string = 'abcdefghijklmnopqrstuvwxyz      '
+    random_string = 'abcdefghijklmnopqrstuvwxyz;:@,./?><[]-_=+()&^%$#!      '
     options = len(random_string)
     free_response_giberish = ''
     for _ in range(30):
         free_response_giberish += random_string[Utility.random(0, options - 1)]
-    # end muck up
     book = bookterm.CollegePhysics()
 
     # GIVEN: a Tutor student enrolled in a course with a reading assignment

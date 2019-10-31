@@ -691,10 +691,9 @@ class MultipleChoice(QuestionBase):
 class MultipartQuestion(Region):
     """A multi-part assessment with two or more questions."""
 
-    _question_locator = (By.CSS_SELECTOR, '[class*=MultipartGroup] > div')
-    _is_free_response_locator = (By.CSS_SELECTOR, '[class*=FreeResponse]')
-    _is_multiple_choice_locator = (
-                                By.CSS_SELECTOR, '[class*=ExerciseQuestion]')
+    _question_locator = (By.CSS_SELECTOR, '[data-task-step-id]')
+    _is_free_response_locator = (By.CSS_SELECTOR, 'textarea')
+    _is_multiple_choice_locator = (By.CSS_SELECTOR, '.answers-table')
 
     @property
     def questions(self) -> List[QuestionBase]:
