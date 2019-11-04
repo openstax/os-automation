@@ -303,11 +303,15 @@ class Utility(object):
 
         :param driver: a selenium webdriver instance
         :type driver: :py:class:`~selenium.webdriver.*.webdriver.WebDriver`
-        :return: ``True`` if the browser in use is Safari, otherwise ``False``
+        :param str browser: (optional) the browser name
+            `chrome`, `firefox`, or `safari`
+        :return: ``True`` if the browser in use is a specific browser,
+            otherwise ``False``
         :rtype: bool
 
         """
-        return driver.capabilities.get('browserName').lower() == browser
+        return \
+            driver.capabilities.get('browserName').lower() == browser.lower()
 
     @classmethod
     def load_background_images(cls, driver, locator):

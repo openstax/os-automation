@@ -9,7 +9,6 @@ from typing import Union
 
 from autochomsky import chomsky
 
-from pages.tutor.course import StudentCourse
 from pages.tutor.enrollment import Enrollment
 from pages.tutor.home import TutorHome
 from pages.tutor.task import Homework
@@ -17,7 +16,7 @@ from tests.markers import nondestructive, test_case, tutor
 from utils import bookterm
 from utils.email import RestMail
 from utils.tutor import States, Tutor
-from utils.utilities import Actions, Card, Utility, go_to_
+from utils.utilities import Actions, Card, Utility
 
 
 @test_case('C485035')
@@ -854,7 +853,7 @@ def test_student_task_reading_assignment(tutor_base_url, selenium, store):
     student_id = Utility.random(100000000, 999999999)
     assignment_name = test_data.get('assignment_name')
     annotation_text = chomsky()
-    random_string = 'abcdefghijklmnopqrstuvwxyz;:@,./?><[]-_=+()&^%$#!      '
+    random_string = 'abcdefghijklmnopqrstuvwxyz      '
     options = len(random_string)
     free_response_giberish = ''
     for _ in range(30):
@@ -898,7 +897,7 @@ def test_student_task_reading_assignment(tutor_base_url, selenium, store):
     Actions(selenium) \
         .move_to_element(reading.body.paragraphs[0]) \
         .click_and_hold() \
-        .move_by_offset(Utility.random(-20, 20) * 5 + 5, 0) \
+        .move_by_offset(max(Utility.random(-20, 20) * 5 + 5, 30), 0) \
         .release() \
         .perform()
 
@@ -949,7 +948,9 @@ def test_student_task_reading_assignment(tutor_base_url, selenium, store):
     reading = reading.highlights()
 
     while not reading.body.is_free_response:
-        if reading.body.is_multiple_choice:
+        if reading.body.next_page_available:
+            reading = reading.body.next_page()
+        elif reading.body.is_multiple_choice:
             reading.body.pane.random_answer()
             reading.body.pane.answer()
             reading.body.pane._continue()
@@ -960,8 +961,9 @@ def test_student_task_reading_assignment(tutor_base_url, selenium, store):
     reading.body.pane.answer()
 
     # THEN:  the answer verification flags the answer
-    assert(reading.body.pane.nudge), \
-        'Response verification message not displayed'
+    assert(reading.body.pane.nudge), (
+        'Response verification message not displayed for '
+        f'"{free_response_giberish}"')
 
     # WHEN:  they enter new text is in the text area and click the 'Re-answer'
     #        button
@@ -981,16 +983,16 @@ def test_student_task_reading_assignment(tutor_base_url, selenium, store):
     reading.body.pane._continue()
     while not reading.body.assignment_complete:
         if reading.body.next_page_available:
-            reading.body.next_page()
+            reading = reading.body.next_page()
         elif reading.body.is_multiple_choice:
             reading.body.pane.random_answer()
             reading.body.pane.answer()
-        elif reading.body.has_correct_answer:
-            reading.body.pane._continue()
         elif reading.body.is_free_response:
             reading.body.pane.free_response = (
                 book.get_term(reading.body.pane.chapter_section)[1])
             reading.body.pane.answer()
+        else:
+            reading = reading.body.next_page()
 
     milestones = reading.milestones()
 
@@ -1193,7 +1195,6 @@ def test_student_task_practice(tutor_base_url, selenium, store):
     home = TutorHome(selenium, tutor_base_url).open()
     courses = home.log_in(user, password)
     this_week = courses.go_to_course(course_name)
-    this_week = go_to_(StudentCourse(selenium, tutor_base_url))
     this_week.clear_training_wheels()
 
     # WHEN:  they click the 'Practice more to get forecast' button or a
@@ -1625,14 +1626,14 @@ def test_student_viewing_their_performance_forecast(
         password = test_data.get('password_prod')
     else:
         password = test_data.get('password_unique')
+    course_name = test_data.get('course_name')
     book = bookterm.Biology2e()
 
     # GIVEN: a Tutor student enrolled in a course with at least one completed
     #        reading or homework
     home = TutorHome(selenium, tutor_base_url).open()
-    home.log_in(user, password)
-    # only one course means the student bypasses the course picker
-    this_week = go_to_(StudentCourse(selenium, tutor_base_url))
+    courses = home.log_in(user, password)
+    this_week = courses.go_to_course(course_name)
     this_week.clear_training_wheels()
 
     # WHEN:  they click the 'Performance Forecast' link in the 'Menu'

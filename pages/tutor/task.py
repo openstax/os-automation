@@ -10,7 +10,7 @@ from time import sleep
 from typing import Dict, List, Union
 
 from pypom import Region
-from selenium.common.exceptions import NoSuchElementException
+from selenium.common.exceptions import NoSuchElementException, TimeoutException
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.remote.webelement import WebElement
@@ -191,6 +191,7 @@ class Assignment(TutorBase):
             :rtype: bool
 
             """
+            sleep(0.5)
             return bool(self.find_elements(*self._is_free_response_locator))
 
         @property
@@ -202,6 +203,7 @@ class Assignment(TutorBase):
             :rtype: bool
 
             """
+            sleep(0.5)
             return bool(self.find_elements(*self._is_multiple_choice_locator))
 
         @property
@@ -213,6 +215,7 @@ class Assignment(TutorBase):
             :rtype: bool
 
             """
+            sleep(0.5)
             return bool(self.find_elements(*self._correctness_shown_locator))
 
         @property
@@ -224,6 +227,7 @@ class Assignment(TutorBase):
             :rtype: bool
 
             """
+            sleep(0.5)
             return self.is_free_response or self.is_multiple_choice
 
         @property
@@ -235,6 +239,7 @@ class Assignment(TutorBase):
             :rtype: bool
 
             """
+            sleep(0.5)
             return bool(self.find_elements(*self._interstitial_card_locator))
 
         @property
@@ -245,6 +250,7 @@ class Assignment(TutorBase):
             :rtype: bool
 
             """
+            sleep(0.5)
             return bool(self.find_elements(
                 *self._assignment_completion_locator))
 
@@ -444,7 +450,12 @@ class Homework(Assignment):
                 mpq_root = self.find_element(*self._multipart_root_locator)
                 from regions.tutor.assessment import MultipartQuestion
                 return MultipartQuestion(self, mpq_root)
-            assessment_root = self.find_element(*self._assessment_root_locator)
+            try:
+                assessment_root = self.wait.until(
+                    expect.presence_of_element_located(
+                        self._assessment_root_locator))
+            except TimeoutException:
+                raise TutorException('Assessment root not found')
             free_response = self.find_elements(*self._is_free_response_locator)
             if free_response:
                 from regions.tutor.assessment import FreeResponse
@@ -772,6 +783,18 @@ class Reading(Assignment):
         """
         return self.highlights(milestones=True)
 
+    @property
+    def current_highlights_on_page(self) -> int:
+        """Return the number of highlights currently found on the page.
+
+        :return: the number of highlighted sections
+        :rtype: int
+
+        """
+        return len(self.driver.execute_script(
+            'return document.querySelectorAll("'
+            f'{self._highlight_segment_locator[1]}");'))
+
     def highlight(self) -> None:
         """Click the inline highlight button.
 
@@ -783,13 +806,20 @@ class Reading(Assignment):
         """
         # Use the javascript selector to find the inline buttons wherever they
         # appear.
+        sleep(1.0)
+        initial_highlights = self.current_highlights_on_page
         highlighter = self.driver.execute_script(
             'return document.querySelector("' +
             f'{self._highlight_button_selector}");')
+        sleep(1.0)
         if not highlighter:
             raise TutorException('Highlight button not available')
         Utility.click_option(self.driver, element=highlighter)
-        sleep(1)
+        try:
+            self.wait.until(
+                lambda _: self.current_highlights_on_page > initial_highlights)
+        except TimeoutException:
+            raise TutorException('New highlight not found on page')
 
     def annotate(self) -> Reading.AnnotationBox:
         """Click the inline annotation button.
@@ -801,13 +831,20 @@ class Reading(Assignment):
         :rtype: :py:class:`~pages.tutor.task.Reading.AnnotationBox`
 
         """
+        sleep(1.0)
+        initial_highlights = self.current_highlights_on_page
         annotater = self.driver.execute_script(
             'return document.querySelector("' +
             f'{self._annotation_button_selector}");')
+        sleep(1.0)
         if not annotater:
             raise TutorException('Annotation button not available')
         Utility.click_option(self.driver, element=annotater)
-        sleep(1)
+        try:
+            self.wait.until(
+                lambda _: self.current_highlights_on_page > initial_highlights)
+        except TimeoutException:
+            raise TutorException('New annotation highlight not found on page')
         return self.AnnotationBox(self)
 
     @property
@@ -970,7 +1007,7 @@ class Reading(Assignment):
         _image_caption_locator = (By.CSS_SELECTOR, '.os-caption-container')
         _paragraph_locator = (By.CSS_SELECTOR, '.annotater-content p[id]')
         _back_to_dashboard_button_locator = (
-            By.CSS_SELECTOR, '[class*=CenteredBackButton]')
+            By.CSS_SELECTOR, '.task-steps-end a')
 
         def previous_page(self) -> Reading:
             """Click on the left arrow button.
@@ -1247,9 +1284,8 @@ class Reading(Assignment):
             :rtype: list(:py:class:`~pages.tutor.task.Reading.Highlights.Note`)
 
             """
-            return [self.Note(self, note)
-                    for note
-                    in self.find_elements(*self._annotation_card_locator)]
+            notes = self.find_elements(*self._annotation_card_locator)
+            return [self.Note(self, note) for note in notes]
 
         class Note(Region):
             """An individual highlight or annotation."""
@@ -1372,7 +1408,7 @@ class Reading(Assignment):
 
         _milestone_card_locator = (By.CSS_SELECTOR, '[data-step-index]')
 
-        _milestone_chart_toggle_selector = '[class*=StyledToggle]'
+        _milestone_chart_toggle_selector = '.icons > button'
         _overlay_page_selector = '.overlay.task-milestones'
 
         def is_displayed(self) -> bool:

@@ -858,7 +858,7 @@ class CourseRoster(TutorBase):
                 sleep(0.25)
                 id_field = self.find_element(
                     *self._student_id_input_box_locator)
-                Utility.clear_field(self.driver, id_field)
+                Utility.clear_field(self.driver, field=id_field)
                 if _id:
                     edit_button = self.find_element(
                         *self._edit_student_id_locator)
