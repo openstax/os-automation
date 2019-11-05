@@ -734,7 +734,7 @@ def go_to_external_(destination, url=None):
         return destination
     except TimeoutException:
         raise TimeoutException(
-            'Expected <{_class}> failed to load{url}; ended at: {finish}'
+            'Expected page <{_class}> failed to load{url}; ended at: {finish}'
             .format(_class=type(destination).__name__,
                     url=f' (URL: {url})' if url else '',
                     finish=destination.driver.current_url))

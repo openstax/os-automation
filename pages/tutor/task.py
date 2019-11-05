@@ -746,15 +746,15 @@ class Reading(Assignment):
 
         # find the current state of the overlay to figure out what page or
         # region to return
-        overlay_open = 'hidden' in self.driver.execute_script(
-            'return document.querySelector' +
-            f'("{self._main_content_selector}").classList;')
+        overlay_open = self.driver.execute_script(
+            'return window.getComputedStyle(arguments[0]).display != "none";',
+            overlay_root)
         highlights_active = (
-            overlay_root and
+            overlay_open and
             'notes-summary' in overlay_root.get_attribute('class'))
 
         toggle.send_keys(Keys.RETURN)
-        sleep(0.3)
+        sleep(0.75)
 
         if (not overlay_open and not milestones) or \
                 (overlay_open and not highlights_active and not milestones):

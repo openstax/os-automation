@@ -852,6 +852,11 @@ def test_student_task_reading_assignment(tutor_base_url, selenium, store):
     school = 'Automation'
     student_id = Utility.random(100000000, 999999999)
     assignment_name = test_data.get('assignment_name')
+    highlight_length = Utility.random(-20, 20) * 5 + 5
+    highlight_length = highlight_length if abs(highlight_length) > 30 else 30
+    annotation_length = (
+        Utility.random(-15, 15) * 10 + 5,
+        Utility.random(-2, 2) * 33 + 20)
     annotation_text = chomsky()
     random_string = 'abcdefghijklmnopqrstuvwxyz      '
     options = len(random_string)
@@ -893,13 +898,14 @@ def test_student_task_reading_assignment(tutor_base_url, selenium, store):
 
     # WHEN:  they select a section of text
     # AND:   click the highlighter icon
-    Utility.scroll_to(selenium, element=reading.body.paragraphs[0], shift=-250)
-    Actions(selenium) \
-        .move_to_element(reading.body.paragraphs[0]) \
-        .click_and_hold() \
-        .move_by_offset(max(Utility.random(-20, 20) * 5 + 5, 30), 0) \
-        .release() \
-        .perform()
+    Utility.scroll_to(selenium, element=reading.body.paragraphs[0], shift=-150)
+    (Actions(selenium)
+        .move_to_element(reading.body.paragraphs[0])
+        .move_by_offset(-30, -30)
+        .click_and_hold()
+        .move_by_offset(highlight_length, 0)
+        .release()
+        .perform())
 
     reading.highlight()
 
@@ -910,14 +916,14 @@ def test_student_task_reading_assignment(tutor_base_url, selenium, store):
     # WHEN:  they select a different section of text
     # AND:   click the speech bubble icon
     # AND:   enter text in the annotation box and click the check mark button
-    Utility.scroll_to(selenium, element=reading.body.paragraphs[1], shift=-250)
-    Actions(selenium) \
-        .move_to_element(reading.body.paragraphs[1]) \
-        .click_and_hold() \
-        .move_by_offset(Utility.random(-15, 15) * 10 + 5,
-                        Utility.random(-2, 2) * 33 + 16) \
-        .release() \
-        .perform()
+    Utility.scroll_to(selenium, element=reading.body.paragraphs[1], shift=-150)
+    (Actions(selenium)
+        .move_to_element(reading.body.paragraphs[1])
+        .move_by_offset(-30, -30)
+        .click_and_hold()
+        .move_by_offset(*annotation_length)
+        .release()
+        .perform())
 
     annotation = reading.annotate()
 
