@@ -628,6 +628,15 @@ class Scores(TutorBase):
                     self._toast_message_popup_locator))
         except TimeoutException:
             return False
+        if Utility.is_browser(self.driver, 'safari'):
+            from selenium.common.exceptions import NoAlertPresentException
+            sleep(1.0)
+            try:
+                alert = self.driver.switch_to.alert
+                alert.accept()
+                sleep(1.0)
+            except NoAlertPresentException:
+                pass
         try:
             self.wait.until(expect.staleness_of(toast))
         except TimeoutException:

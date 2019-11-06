@@ -1424,9 +1424,6 @@ def test_teacher_viewing_student_scores(tutor_base_url, selenium, store):
         random_assignment = assignments[random]
         assignment_type = random_assignment.assignment_type
     assignment_name = random_assignment.name
-    # ### Patch for missing toolbar
-    url = scores.location
-    # ###
     review = random_assignment.review_assignment()
     review.resize_window(width=1024, height=768)
 
@@ -1436,16 +1433,7 @@ def test_teacher_viewing_student_scores(tutor_base_url, selenium, store):
 
     # WHEN:  they go back to the scores page
     # AND:   click a student name
-    # ### Patch for missing toolbar
-    try:
-        from selenium.common.exceptions import NoSuchElementException
-        scores = review.toolbar.back_to_scores()
-    except NoSuchElementException:
-        from pages.tutor.scores import Scores
-        from utils.utilities import go_to_
-        selenium.get(url)
-        scores = go_to_(Scores(selenium, tutor_base_url))
-    # ###
+    scores = review.toolbar.back_to_scores()
 
     students = scores.table.students
     random_student = students[Utility.random(0, len(students) - 1)]

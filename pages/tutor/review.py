@@ -21,7 +21,8 @@ class Metrics(TutorBase):
     _assignment_book_sections_locator = (By.CSS_SELECTOR, 'h2[data-section]')
     _assignment_exercise_locator = (By.CSS_SELECTOR, '.openstax-exercise-card')
     _metrics_overview_sidebar_locator = (By.CSS_SELECTOR, '.col-sm-4')
-    _metrics_toolbar_locator = (By.CSS_SELECTOR, '[class*=SecondaryToolbar]')
+    _metrics_toolbar_locator = (
+        By.CSS_SELECTOR, '.tutor-navbar ~ div:nth-child(2)')
 
     @property
     def loaded(self) -> bool:
