@@ -808,12 +808,13 @@ class Reading(Assignment):
         # appear.
         sleep(1.0)
         initial_highlights = self.current_highlights_on_page
-        highlighter = self.driver.execute_script(
-            'return document.querySelector("' +
-            f'{self._highlight_button_selector}");')
-        sleep(1.0)
-        if not highlighter:
+        try:
+            highlighter = self.wait.until(lambda _: self.driver.execute_script(
+                'return document.querySelector' +
+                f'("{self._highlight_button_selector}");'))
+        except TimeoutException:
             raise TutorException('Highlight button not available')
+        sleep(1.0)
         Utility.click_option(self.driver, element=highlighter)
         try:
             self.wait.until(
@@ -833,12 +834,13 @@ class Reading(Assignment):
         """
         sleep(1.0)
         initial_highlights = self.current_highlights_on_page
-        annotater = self.driver.execute_script(
-            'return document.querySelector("' +
-            f'{self._annotation_button_selector}");')
-        sleep(1.0)
-        if not annotater:
+        try:
+            annotater = self.wait.until(lambda _: self.driver.execute_script(
+                'return document.querySelector' +
+                f'("{self._annotation_button_selector}");'))
+        except TimeoutException:
             raise TutorException('Annotation button not available')
+        sleep(1.0)
         Utility.click_option(self.driver, element=annotater)
         try:
             self.wait.until(

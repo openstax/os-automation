@@ -898,14 +898,25 @@ def test_student_task_reading_assignment(tutor_base_url, selenium, store):
 
     # WHEN:  they select a section of text
     # AND:   click the highlighter icon
-    Utility.scroll_to(selenium, element=reading.body.paragraphs[0], shift=-150)
-    (Actions(selenium)
-        .move_to_element(reading.body.paragraphs[0])
-        .move_by_offset(-30, -30)
-        .click_and_hold()
-        .move_by_offset(highlight_length, 0)
-        .release()
-        .perform())
+    if not Utility.is_browser(selenium, 'safari'):
+        Utility.scroll_to(selenium,
+                          element=reading.body.paragraphs[0],
+                          shift=-150)
+        (Actions(selenium)
+            .move_to_element(reading.body.paragraphs[0])
+            .move_by_offset(-30, -30)
+            .click_and_hold()
+            .move_by_offset(highlight_length, 0)
+            .release()
+            .perform())
+    else:
+        Utility.scroll_to(selenium, element=reading.body.paragraphs[0])
+        (Actions(selenium)
+            .move_by_offset(200, 30)
+            .click_and_hold()
+            .move_by_offset(0, 30)
+            .release()
+            .perform())
 
     reading.highlight()
 
@@ -916,14 +927,24 @@ def test_student_task_reading_assignment(tutor_base_url, selenium, store):
     # WHEN:  they select a different section of text
     # AND:   click the speech bubble icon
     # AND:   enter text in the annotation box and click the check mark button
-    Utility.scroll_to(selenium, element=reading.body.paragraphs[1], shift=-150)
-    (Actions(selenium)
-        .move_to_element(reading.body.paragraphs[1])
-        .move_by_offset(-30, -30)
-        .click_and_hold()
-        .move_by_offset(*annotation_length)
-        .release()
-        .perform())
+    if not Utility.is_browser(selenium, 'safari'):
+        Utility.scroll_to(selenium,
+                          element=reading.body.paragraphs[1],
+                          shift=-150)
+        (Actions(selenium)
+            .move_to_element(reading.body.paragraphs[1])
+            .move_by_offset(-30, -30)
+            .click_and_hold()
+            .move_by_offset(*annotation_length)
+            .release()
+            .perform())
+    else:
+        (Actions(selenium)
+            .move_by_offset(0, 100)
+            .click_and_hold()
+            .move_by_offset(0, 30)
+            .release()
+            .perform())
 
     annotation = reading.annotate()
 
