@@ -719,8 +719,9 @@ class PurchaseForm(IframeModal):
 
         :return: the purchase confirmation modal or the error message for a
             failed transaction
-        :rtype: :py:class:`~pages.tutor.enrollment.PurchaseConfirmation` or
-            list(str)
+        :rtype: :py:class:`~pages.tutor.enrollment.PurchaseConfirmation`
+        :raises: :py:class:`~utils.tutor.TutorException` if error messages are
+            found
 
         """
         purchase = self.find_element(*self._base_iframe_locator)

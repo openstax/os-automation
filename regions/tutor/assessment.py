@@ -6,9 +6,9 @@ from time import sleep
 from typing import Dict, List, Tuple, Union
 
 from pypom import Region
-from selenium.common.exceptions import NoSuchElementException
-from selenium.common.exceptions import StaleElementReferenceException  # NOQA
-from selenium.common.exceptions import TimeoutException  # NOQA
+from selenium.common.exceptions import (NoSuchElementException,  # NOQA
+                                        StaleElementReferenceException,  # NOQA
+                                        TimeoutException)  # NOQA
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.remote.webelement import WebElement
@@ -438,21 +438,35 @@ class QuestionBase(Region):
         except NoSuchElementException:
             return ''
 
-    def _check_button(self):
+    def _check_button(self) -> bool:
+        """Check the answer or continue button.
+
+        :return: the boolean status for the answer/continue button
+        :rtype: bool
+
+        """
         text = self.answer_button.get_attribute('textContent')
-        print(f'Text content: "{text}"')
-        reanswer = 'Re-' not in text
+
+        # Not "Re-answer"
+        not_reanswer = 'Re-' not in text
+
+        # "Continue"
         _continue = 'Continue' in text
+
+        # Not "Continue"
         not_continue = not _continue
+
+        # Is a two-step intro card with "Continue"
         two_step = bool(
             self.find_elements(*self._two_step_intro_locator))
+
+        # Is an individual review intro card with "Continue"
         review = bool(
             self.find_elements(*self._individual_review_intro_locator))
-        result = (reanswer or
+
+        result = (not_reanswer or
                   not_continue or
                   (_continue and (two_step or review)))
-        print(f'{reanswer} or {not_continue} or ({_continue} and '
-              f'({two_step} or {review})) => {result}')
         return result
 
     def answer(self, multipart: bool = False) -> None:
@@ -650,6 +664,8 @@ class MultipleChoice(QuestionBase):
         """Select a random answer for the question.
 
         :return: None
+        :raises: :py:class:`~utils.tutor.TutorException` if no multiple choice
+            answers are available
 
         """
         sleep(0.25)

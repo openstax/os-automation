@@ -443,7 +443,16 @@ class Homework(Assignment):
 
         @property
         def pane(self):
-            """Access the question pane."""
+            """Access the question pane.
+
+            :return: the assessment question pane
+            :rtype: :py:class:`~regions.tutor.assessment.MultipartQuestion` or
+                :py:class:`~regions.tutor.assessment.FreeResponse` or
+                :py:class:`~regions.tutor.assessment.MultipleChoice`
+            :raises: :py:class:`~utils.tutor.TutorException` if the assessment
+                root element isn't found
+
+            """
             sleep(0.33)
             multipart = self.find_elements(*self._is_multipart_locator)
             if multipart:
@@ -802,6 +811,9 @@ class Reading(Assignment):
         the selected text to the user's annotation list.
 
         :return: None
+        :raises: :py:class:`~utils.tutor.TutorException` if the highlight
+            button is not available or the new highlight is not found on the
+            page after clicking the highlight button
 
         """
         # Use the javascript selector to find the inline buttons wherever they
@@ -830,6 +842,9 @@ class Reading(Assignment):
 
         :return: the annotation slide out edit box
         :rtype: :py:class:`~pages.tutor.task.Reading.AnnotationBox`
+        :raises: :py:class:`~utils.tutor.TutorException` if the annotate
+            button is not available or the new annotation is not found on the
+            page after clicking the annotate button
 
         """
         sleep(1.0)

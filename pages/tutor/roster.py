@@ -343,6 +343,8 @@ class DeleteSection(Modal):
 
         :return: the course roster
         :rtype: :py:class:`CourseRoster`
+        :raises: :py:class:`~utils.tutor.TutorException` when the course
+            period/section cannot be deleted
 
         """
         button = self.find_element(*self._delete_button_locator)
