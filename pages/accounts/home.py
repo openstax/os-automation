@@ -3,9 +3,9 @@
 from time import sleep
 
 from pypom import Region
-from selenium.common.exceptions import (ElementNotInteractableException,
-                                        TimeoutException,
-                                        WebDriverException)
+from selenium.common.exceptions import (ElementNotInteractableException,  # NOQA
+                                        TimeoutException,  # NOQA
+                                        WebDriverException)  # NOQA
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as expect
 

@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-from datetime import datetime
 from time import sleep
 from typing import List, Union
 
@@ -83,7 +82,7 @@ class Practice(Homework):
     _debug_information_locator = (
         By.CSS_SELECTOR, '.visible-when-debugging li')
     _footer_root_locator = (
-        By.CSS_SELECTOR, '[class*=Content] ~ .tutor-navbar')
+        By.CSS_SELECTOR, '.tutor-navbar:not(:first-child)')
 
     @property
     def loaded(self) -> bool:
@@ -270,8 +269,7 @@ class Practice(Homework):
     class Footer(Region):
         """The practice session footer."""
 
-        _title_locator = (By.CSS_SELECTOR, '[class*=Title]')
-        _due_at_datetime_locator = (By.CSS_SELECTOR, '[class*=DueDate]')
+        _title_locator = (By.CSS_SELECTOR, '.left-side-controls div')
         _back_to_page_locator = (By.CSS_SELECTOR, '.btn-default')
 
         @property
@@ -282,21 +280,8 @@ class Practice(Homework):
             :rtype: str
 
             """
-            return self.find_element(*self._title_locator).text
-
-        @property
-        def due_at(self, date_time=False) -> Union[str, datetime]:
-            """Return the practice session due date and time.
-
-            :return: the session due date and time
-            :rtype: str or datetime
-
-            """
-            due_at = self.find_element(*self._due_at_datetime_locator).text
-            if not date_time:
-                return due_at
-            return datetime.strptime(due_at.split(', ', 1)[-1],
-                                     '%b %d, %Y %I:%M %p')
+            return (self.find_element(*self._title_locator)
+                    .get_attribute('textContent'))
 
         def back_to(self) -> Union[StudentCourse, PerformanceForecast]:
             """Click the 'Back to ...' button.

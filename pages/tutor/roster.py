@@ -5,7 +5,7 @@ from __future__ import annotations
 from time import sleep
 
 from pypom import Region
-from selenium.common.exceptions import NoSuchElementException
+from selenium.common.exceptions import NoSuchElementException, TimeoutException
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as expect
 
@@ -343,12 +343,17 @@ class DeleteSection(Modal):
 
         :return: the course roster
         :rtype: :py:class:`CourseRoster`
+        :raises: :py:class:`~utils.tutor.TutorException` when the course
+            period/section cannot be deleted
 
         """
         button = self.find_element(*self._delete_button_locator)
         Utility.click_option(self.driver, element=button)
         sleep(0.25)
-        self.wait.until(expect.staleness_of(self.root))
+        try:
+            self.wait.until(expect.staleness_of(self.root))
+        except TimeoutException:
+            raise TutorException('Could not delete the course section')
         sleep(1)
         return self.page
 
@@ -855,7 +860,7 @@ class CourseRoster(TutorBase):
                 sleep(0.25)
                 id_field = self.find_element(
                     *self._student_id_input_box_locator)
-                Utility.clear_field(self.driver, id_field)
+                Utility.clear_field(self.driver, field=id_field)
                 if _id:
                     edit_button = self.find_element(
                         *self._edit_student_id_locator)

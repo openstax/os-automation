@@ -6,12 +6,14 @@ from time import sleep
 from typing import Dict, List, Tuple, Union
 
 from pypom import Region
-from selenium.common.exceptions import NoSuchElementException
-from selenium.common.exceptions import StaleElementReferenceException  # NOQA
+from selenium.common.exceptions import (NoSuchElementException,  # NOQA
+                                        StaleElementReferenceException,  # NOQA
+                                        TimeoutException)  # NOQA
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.remote.webelement import WebElement
 from selenium.webdriver.support import expected_conditions as expect
+from selenium.webdriver.support.ui import WebDriverWait
 
 from pages.tutor.base import TutorBase
 from pages.tutor.reference import ReferenceBook
@@ -366,19 +368,28 @@ class DetailedAssessment(Assessment):
 class QuestionBase(Region):
     """Shared assessment resources for student responses."""
 
-    _question_stem_locator = (By.CSS_SELECTOR, '[class*=QuestionStem]')
-    _question_answer_button_locator = (By.CSS_SELECTOR, '.btn-primary')
-    _exercise_id_locator = (By.CSS_SELECTOR, '.exercise-identifier-link')
-    _suggest_a_correction_link_locator = (By.CSS_SELECTOR, '[href*=errata]')
-    _view_book_section_link_locator = (By.CSS_SELECTOR, '.reference')
-    _book_section_number_locator = (By.CSS_SELECTOR, '.chapter-section')
-    _book_section_title_locator = (By.CSS_SELECTOR, '.title')
+    _book_section_number_locator = (
+        By.CSS_SELECTOR, '.chapter-section')
+    _book_section_title_locator = (
+        By.CSS_SELECTOR, '.title')
     _correct_answer_shown_locator = (
         By.CSS_SELECTOR, '.has-correct-answer , .answer-correct')
+    _exercise_id_locator = (
+        By.CSS_SELECTOR, '.exercise-identifier-link')
+    _individual_review_intro_locator = (
+        By.CSS_SELECTOR, '.openstax-individual-review-intro')
     _nudge_message_locator = (
-        By.CSS_SELECTOR,
-        '[class*=Nudge] > [class*=Title], [class*=Nudge] > [class*=Message]')
-    _two_step_intro_locator = (By.CSS_SELECTOR, '.openstax-two-step-intro')
+        By.XPATH, '//textarea/following-sibling::div[div[h5]]')
+    _question_answer_button_locator = (
+        By.CSS_SELECTOR, '.btn-primary')
+    _question_stem_locator = (
+        By.CSS_SELECTOR, '.question-stem')
+    _suggest_a_correction_link_locator = (
+        By.CSS_SELECTOR, '[href*=errata]')
+    _two_step_intro_locator = (
+        By.CSS_SELECTOR, '.openstax-two-step-intro')
+    _view_book_section_link_locator = (
+        By.CSS_SELECTOR, '.browse-the-book')
 
     @property
     def step_id(self) -> str:
@@ -427,6 +438,37 @@ class QuestionBase(Region):
         except NoSuchElementException:
             return ''
 
+    def _check_button(self) -> bool:
+        """Check the answer or continue button.
+
+        :return: the boolean status for the answer/continue button
+        :rtype: bool
+
+        """
+        text = self.answer_button.get_attribute('textContent')
+
+        # Not "Re-answer"
+        not_reanswer = 'Re-' not in text
+
+        # "Continue"
+        _continue = 'Continue' in text
+
+        # Not "Continue"
+        not_continue = not _continue
+
+        # Is a two-step intro card with "Continue"
+        two_step = bool(
+            self.find_elements(*self._two_step_intro_locator))
+
+        # Is an individual review intro card with "Continue"
+        review = bool(
+            self.find_elements(*self._individual_review_intro_locator))
+
+        result = (not_reanswer or
+                  not_continue or
+                  (_continue and (two_step or review)))
+        return result
+
     def answer(self, multipart: bool = False) -> None:
         """Click the 'Answer' button.
 
@@ -439,21 +481,15 @@ class QuestionBase(Region):
         Utility.click_option(self.driver, element=self.answer_button)
         if not multipart:
             sleep(1)
-            browser = self.driver.capabilities.get('browserName').lower()
-            if browser == 'safari':
+            if Utility.is_browser(self.driver, 'safari'):
                 sleep(3)
             else:
                 try:
-                    self.wait.until(lambda _: (
-                        'Re-' not
-                        in self.answer_button.get_attribute('textContent') or
-                        'Continue' not
-                        in self.answer_button.get_attribute('textContent') or (
-                            'Continue' in self.answer_button.get_attribute(
-                                'textContent') and
-                            self.find_element(*self._two_step_intro_locator))))
+                    self.wait.until(lambda _: self._check_button())
                 except StaleElementReferenceException:
                     pass
+                except TimeoutException:
+                    return
         else:
             sleep(1.5)
         sleep(1)
@@ -609,8 +645,7 @@ class MultipleChoice(QuestionBase):
 
     _question_answer_locator = (By.CSS_SELECTOR, '.openstax-answer')
     _nudge_message_locator = (
-        By.CSS_SELECTOR,
-        '[class*=Nudge] > [class*=Title], [class*=Nudge] > [class*=Message]')
+        By.XPATH, '//textarea/following-sibling::div[div[h5]]')
 
     @property
     def answers(self) -> List[MultipleChoice.Answer]:
@@ -629,10 +664,14 @@ class MultipleChoice(QuestionBase):
         """Select a random answer for the question.
 
         :return: None
+        :raises: :py:class:`~utils.tutor.TutorException` if no multiple choice
+            answers are available
 
         """
         sleep(0.25)
         answers = self.answers
+        if not answers:
+            raise TutorException('No answers found')
         answers[Utility.random(0, len(answers) - 1)].select()
         sleep(0.25)
 
@@ -681,9 +720,12 @@ class MultipleChoice(QuestionBase):
             :return: None
 
             """
-            button = self.wait.until(
-                expect.presence_of_element_located(
-                    self._answer_button_locator))
+            try:
+                button = WebDriverWait(self.driver, 5).until(
+                    expect.presence_of_element_located(
+                        self._answer_button_locator))
+            except TimeoutException:
+                return
             Utility.click_option(self.driver, element=button)
             sleep(0.75)
 
@@ -691,10 +733,9 @@ class MultipleChoice(QuestionBase):
 class MultipartQuestion(Region):
     """A multi-part assessment with two or more questions."""
 
-    _question_locator = (By.CSS_SELECTOR, '[class*=MultipartGroup] > div')
-    _is_free_response_locator = (By.CSS_SELECTOR, '[class*=FreeResponse]')
-    _is_multiple_choice_locator = (
-                                By.CSS_SELECTOR, '[class*=ExerciseQuestion]')
+    _question_locator = (By.CSS_SELECTOR, '[data-task-step-id]')
+    _is_free_response_locator = (By.CSS_SELECTOR, 'textarea')
+    _is_multiple_choice_locator = (By.CSS_SELECTOR, '.answers-table')
 
     @property
     def questions(self) -> List[QuestionBase]:

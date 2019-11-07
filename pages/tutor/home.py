@@ -1,5 +1,7 @@
 """Tutor Home page objects."""
 
+from time import sleep
+
 from selenium.common.exceptions import NoSuchElementException
 from selenium.webdriver.common.by import By
 
@@ -55,7 +57,8 @@ class TutorHome(TutorLoginBase):
         :rtype: :py:class:`~pages.accounts.home.AccountsHome`
 
         """
-        self.find_element(*self._log_in_locator).click()
+        button = self.find_element(*self._log_in_locator)
+        Utility.click_option(self.driver, element=button)
         from pages.accounts.home import AccountsHome
         return go_to_(AccountsHome(self.driver))
 
@@ -70,7 +73,8 @@ class TutorHome(TutorLoginBase):
 
         """
         try:
-            self.find_element(*self._log_in_locator).click()
+            button = self.find_element(*self._log_in_locator)
+            Utility.click_option(self.driver, element=button)
         except NoSuchElementException:
             pass
         from pages.tutor.dashboard import Dashboard
@@ -88,8 +92,10 @@ class TutorHome(TutorLoginBase):
         accounts = self.go_to_log_in()
         accounts.service_log_in(username, password)
         self.wait.until(lambda _: self.logged_in)
+        if Utility.is_browser(self.driver, 'safari'):
+            sleep(2.0)
         from pages.tutor.dashboard import Dashboard
-        return Dashboard(self.driver, self.base_url)
+        return go_to_(Dashboard(self.driver, self.base_url))
 
     @property
     def logged_in(self):

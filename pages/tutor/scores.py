@@ -569,7 +569,7 @@ class Scores(TutorBase):
     _no_data_locator = (By.CSS_SELECTOR, '.no-students p , .no-assignments p')
     _section_tab_locator = (By.CSS_SELECTOR, 'li a')
     _table_root_locator = (By.CSS_SELECTOR, '.scores-table')
-    _title_locator = (By.CSS_SELECTOR, 'h1[class*=Title]')
+    _title_locator = (By.CSS_SELECTOR, '.title-wrapper h1')
     _toast_message_popup_locator = (By.CSS_SELECTOR, '.toast-notification')
 
     @property
@@ -628,6 +628,15 @@ class Scores(TutorBase):
                     self._toast_message_popup_locator))
         except TimeoutException:
             return False
+        if Utility.is_browser(self.driver, 'safari'):
+            from selenium.common.exceptions import NoAlertPresentException
+            sleep(1.0)
+            try:
+                alert = self.driver.switch_to.alert
+                alert.accept()
+                sleep(1.0)
+            except NoAlertPresentException:
+                pass
         try:
             self.wait.until(expect.staleness_of(toast))
         except TimeoutException:

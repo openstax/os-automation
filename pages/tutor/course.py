@@ -11,7 +11,7 @@ from selenium.webdriver.common.by import By
 
 from pages.tutor.base import TutorBase
 from regions.tutor.notification import Notifications
-from regions.tutor.tooltip import Tooltip
+from regions.tutor.tooltip import Float
 from utils.tutor import Tutor, TutorException
 from utils.utilities import Utility, go_to_
 
@@ -159,9 +159,8 @@ class StudentCourse(TutorBase):
     """The weekly course view for students."""
 
     _body_locator = (By.CSS_SELECTOR, 'body')
-    _joyride_root_selector = (By.CSS_SELECTOR, '.joyride')
     _notification_bar_locator = (
-                                By.CSS_SELECTOR, '.openstax-notifications-bar')
+        By.CSS_SELECTOR, '.openstax-notifications-bar')
     _banner_locator = (By.CSS_SELECTOR, '.course-title-banner')
     _this_week_locator = (By.CSS_SELECTOR, '.nav-tabs li:first-child a')
     _all_past_work_locator = (By.CSS_SELECTOR, '.nav-tabs li:last-child a')
@@ -212,15 +211,8 @@ class StudentCourse(TutorBase):
         :return: None
 
         """
-        try:
-            while Utility.has_children(
-                    self.find_element(*self._joyride_root_selector)):
-                tooltip = Tooltip(self, self.find_element(
-                    *self._joyride_root_selector))
-                tooltip.next()
-                sleep(1)
-        except NoSuchElementException:
-            sleep(0.5)
+        while Float(self).is_open:
+            Float(self).close()
 
     # ---------------------------------------------------- #
     # Course overview

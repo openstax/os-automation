@@ -298,6 +298,22 @@ class Utility(object):
         return reduce(lambda img, group: img and group, map_list, True)
 
     @classmethod
+    def is_browser(cls, driver, browser='safari') -> bool:
+        """Return True if the driver matches an expected browser.
+
+        :param driver: a selenium webdriver instance
+        :type driver: :py:class:`~selenium.webdriver.*.webdriver.WebDriver`
+        :param str browser: (optional) the browser name
+            `chrome`, `firefox`, or `safari`
+        :return: ``True`` if the browser in use is a specific browser,
+            otherwise ``False``
+        :rtype: bool
+
+        """
+        return \
+            driver.capabilities.get('browserName').lower() == browser.lower()
+
+    @classmethod
     def load_background_images(cls, driver, locator):
         """Inject a script to wait for background image downloads.
 
@@ -718,7 +734,7 @@ def go_to_external_(destination, url=None):
         return destination
     except TimeoutException:
         raise TimeoutException(
-            'Expected <{_class}> failed to load{url}; ended at: {finish}'
+            'Expected page <{_class}> failed to load{url}; ended at: {finish}'
             .format(_class=type(destination).__name__,
                     url=f' (URL: {url})' if url else '',
                     finish=destination.driver.current_url))

@@ -11,7 +11,7 @@ from selenium.webdriver.common.by import By
 
 from pages.tutor.base import TutorBase
 from regions.tutor.notification import Notifications
-from regions.tutor.tooltip import Tooltip
+from regions.tutor.tooltip import Float
 from utils.tutor import Tutor, TutorException
 from utils.utilities import Utility, go_to_
 
@@ -172,7 +172,7 @@ class Assignment(Region):
             while not isinstance(target, Page):
                 target = target.page
             return go_to_(Assignment(self.driver, target.base_url))
-        Utility.click_option(self.driver, element=self.root)
+        Utility.click_option(self.driver, element=self.plan)
         sleep(0.5)
         from regions.tutor.quick_look import QuickLook
         return QuickLook(self.page)
@@ -193,7 +193,7 @@ class Assignment(Region):
 class Calendar(TutorBase):
     """The instructor course calendar."""
 
-    _joyride_root_selector = (By.CSS_SELECTOR, '.joyride')
+    _joyride_root_locator = (By.CSS_SELECTOR, '.joyride')
     _banner_locator = (By.CSS_SELECTOR, '.course-page header')
     _assignment_sidebar_locator = (By.CSS_SELECTOR, '.add-assignment-sidebar')
     _calendar_body_locator = (By.CSS_SELECTOR, '.month-body')
@@ -305,12 +305,8 @@ class Calendar(TutorBase):
         :return: None
 
         """
-        joyride = self.find_elements(*self._joyride_root_selector)
-        if not joyride or not Utility.has_children(joyride[0]):
-            return
-        Tooltip(self, joyride[0]).next()
-        sleep(1)
-        return self.clear_training_wheels()
+        while Float(self).is_open:
+            Float(self).close()
 
     def add_assignment(self,
                        assignment: str,

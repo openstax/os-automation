@@ -85,7 +85,8 @@ class Dashboard(TutorBase):
 
         """
         if self.is_safari:
-            sleep(2.5)
+            self.wait.until(lambda _: self.find_elements(
+                *self._create_tile_locator))
         tile = self.find_elements(*self._create_tile_locator)
         assert(tile), (
             "Create a course tile not found - "
@@ -168,6 +169,7 @@ class Dashboard(TutorBase):
         """
         if self.is_safari:
             sleep(2)
+            self.wait.until(lambda _: bool(self.current_courses.courses))
         # Look through current courses first
         try:
             for course in self.current_courses.courses:
@@ -400,6 +402,7 @@ class Courses(Region):
 
         _course_info_locator = (By.CSS_SELECTOR, '[data-title]')
         _card_locator = (By.CSS_SELECTOR, '.my-courses-item-title')
+        _card_safari_locator = (By.CSS_SELECTOR, '.my-courses-item-title a')
         _preview_belt_locator = (By.CSS_SELECTOR, '.preview-belt p')
         _course_brand_locator = (By.CSS_SELECTOR, '.course-branding')
         _course_clone_locator = (By.CSS_SELECTOR, 'a')
@@ -537,7 +540,10 @@ class Courses(Region):
                 from pages.tutor.calendar import Calendar as Destination
             else:
                 from pages.tutor.course import StudentCourse as Destination
-            card = self.find_element(*self._card_locator)
+            if Utility.is_browser(self.driver, 'safari'):
+                card = self.find_element(*self._card_safari_locator)
+            else:
+                card = self.find_element(*self._card_locator)
             Utility.click_option(self.driver, element=card)
             return go_to_(Destination(self.driver, self.page.page.base_url))
 
@@ -552,16 +558,21 @@ class Courses(Region):
                 "Only verified instructors may clone a course"
             assert(not self.is_preview), \
                 "Preview courses may not be cloned"
-            from selenium.webdriver.common.action_chains import ActionChains
-            Utility.scroll_to(self.driver, element=self.root, shift=-80)
-            ActionChains(self.driver) \
-                .move_to_element(self.course_brand) \
-                .pause(1) \
-                .move_to_element(
-                    self.find_element(By.CSS_SELECTOR, '.btn-sm')) \
-                .pause(1) \
-                .click() \
-                .perform()
+            if Utility.is_browser(self.driver, 'safari'):
+                button = self.find_element(By.CSS_SELECTOR, '.btn-sm')
+                Utility.click_option(self.driver, element=button)
+            else:
+                from selenium.webdriver.common.action_chains import \
+                    ActionChains
+                Utility.scroll_to(self.driver, element=self.root, shift=-80)
+                ActionChains(self.driver) \
+                    .move_to_element(self.course_brand) \
+                    .pause(1) \
+                    .move_to_element(
+                        self.find_element(By.CSS_SELECTOR, '.btn-sm')) \
+                    .pause(1) \
+                    .click() \
+                    .perform()
             from pages.tutor.new_course import CloneCourse
             return go_to_(CloneCourse(self.driver, self.page.page.base_url))
 

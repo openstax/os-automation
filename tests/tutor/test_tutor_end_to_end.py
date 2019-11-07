@@ -9,7 +9,6 @@ from typing import Union
 
 from autochomsky import chomsky
 
-from pages.tutor.course import StudentCourse
 from pages.tutor.enrollment import Enrollment
 from pages.tutor.home import TutorHome
 from pages.tutor.task import Homework
@@ -17,7 +16,7 @@ from tests.markers import nondestructive, test_case, tutor
 from utils import bookterm
 from utils.email import RestMail
 from utils.tutor import States, Tutor
-from utils.utilities import Actions, Card, Utility, go_to_
+from utils.utilities import Actions, Card, Utility
 
 
 @test_case('C485035')
@@ -28,7 +27,8 @@ def test_create_and_clone_a_course(tutor_base_url, selenium, teacher):
     book = Tutor.BOOKS[Utility.random(0, len(Tutor.BOOKS) - 1)]
     term = Tutor.TERMS[Utility.random(0, len(Tutor.TERMS) - 1)]
     today = datetime.now()
-    course_name = f"{book} Auto-{today.year}{today.month:02}{today.day:02}"
+    course_name = (f"{book} Auto-{today.year}{today.month:02}{today.day:02}"
+                   f" ({Utility.random_hex(6)})")
     timezone = Tutor.TIMEZONE[Utility.random(0, len(Tutor.TIMEZONE) - 1)]
     total_sections = Utility.random(1, 4)
     estimated_students = Utility.random(1, 500)
@@ -493,7 +493,8 @@ def test_assignment_creation_readings(tutor_base_url, selenium, store):
     #        selected table
     sections_selected = [section.number
                          for section
-                         in assignment.reading_list]
+                         in assignment.reading_list
+                         if section.number]
     assert(len(group) == chapters)
     if chapters:
         chapter = group[0].split('.')[0]
@@ -614,9 +615,11 @@ def test_assignment_creation_homework(tutor_base_url, selenium, store):
             exercise.add_question()
             options_selected += 1
 
-    # THEN:  the 'My Selections' shows the total number of assessments selected
-    assert(problem_selector.toolbar.my_selections == options_selected), \
-        f'My Selections does not match the actual assessment selections'
+    # THEN:  the 'My Selections' shows the total number of assessments
+    #        selected, which will equal or exceed the options selected due to
+    #        multi-part questions
+    assert(problem_selector.toolbar.my_selections >= options_selected), \
+        f'My Selections must be equal or greater than the selections'
 
     # WHEN:  they click on the 'Next' button
     # AND:   click on the 'Save as Draft' button
@@ -849,15 +852,17 @@ def test_student_task_reading_assignment(tutor_base_url, selenium, store):
     school = 'Automation'
     student_id = Utility.random(100000000, 999999999)
     assignment_name = test_data.get('assignment_name')
+    highlight_length = Utility.random(-20, 20) * 5 + 5
+    highlight_length = highlight_length if abs(highlight_length) > 30 else 30
+    annotation_length = (
+        Utility.random(-15, 15) * 10 + 5,
+        Utility.random(-2, 2) * 33 + 20)
     annotation_text = chomsky()
-    free_response_giberish = Utility.random_hex(30)
-    # muck up the valid math number by adding spaces to force verification
     random_string = 'abcdefghijklmnopqrstuvwxyz      '
     options = len(random_string)
     free_response_giberish = ''
     for _ in range(30):
         free_response_giberish += random_string[Utility.random(0, options - 1)]
-    # end muck up
     book = bookterm.CollegePhysics()
 
     # GIVEN: a Tutor student enrolled in a course with a reading assignment
@@ -893,13 +898,25 @@ def test_student_task_reading_assignment(tutor_base_url, selenium, store):
 
     # WHEN:  they select a section of text
     # AND:   click the highlighter icon
-    Utility.scroll_to(selenium, element=reading.body.paragraphs[0], shift=-250)
-    Actions(selenium) \
-        .move_to_element(reading.body.paragraphs[0]) \
-        .click_and_hold() \
-        .move_by_offset(Utility.random(-20, 20) * 5 + 5, 0) \
-        .release() \
-        .perform()
+    if not Utility.is_browser(selenium, 'safari'):
+        Utility.scroll_to(selenium,
+                          element=reading.body.paragraphs[0],
+                          shift=-150)
+        (Actions(selenium)
+            .move_to_element(reading.body.paragraphs[0])
+            .move_by_offset(-30, -30)
+            .click_and_hold()
+            .move_by_offset(highlight_length, 0)
+            .release()
+            .perform())
+    else:
+        Utility.scroll_to(selenium, element=reading.body.paragraphs[0])
+        (Actions(selenium)
+            .move_by_offset(200, 30)
+            .click_and_hold()
+            .move_by_offset(0, 30)
+            .release()
+            .perform())
 
     reading.highlight()
 
@@ -910,14 +927,24 @@ def test_student_task_reading_assignment(tutor_base_url, selenium, store):
     # WHEN:  they select a different section of text
     # AND:   click the speech bubble icon
     # AND:   enter text in the annotation box and click the check mark button
-    Utility.scroll_to(selenium, element=reading.body.paragraphs[1], shift=-250)
-    Actions(selenium) \
-        .move_to_element(reading.body.paragraphs[1]) \
-        .click_and_hold() \
-        .move_by_offset(Utility.random(-15, 15) * 10 + 5,
-                        Utility.random(-2, 2) * 33 + 16) \
-        .release() \
-        .perform()
+    if not Utility.is_browser(selenium, 'safari'):
+        Utility.scroll_to(selenium,
+                          element=reading.body.paragraphs[1],
+                          shift=-150)
+        (Actions(selenium)
+            .move_to_element(reading.body.paragraphs[1])
+            .move_by_offset(-30, -30)
+            .click_and_hold()
+            .move_by_offset(*annotation_length)
+            .release()
+            .perform())
+    else:
+        (Actions(selenium)
+            .move_by_offset(0, 100)
+            .click_and_hold()
+            .move_by_offset(0, 30)
+            .release()
+            .perform())
 
     annotation = reading.annotate()
 
@@ -948,7 +975,9 @@ def test_student_task_reading_assignment(tutor_base_url, selenium, store):
     reading = reading.highlights()
 
     while not reading.body.is_free_response:
-        if reading.body.is_multiple_choice:
+        if reading.body.next_page_available:
+            reading = reading.body.next_page()
+        elif reading.body.is_multiple_choice:
             reading.body.pane.random_answer()
             reading.body.pane.answer()
             reading.body.pane._continue()
@@ -959,8 +988,9 @@ def test_student_task_reading_assignment(tutor_base_url, selenium, store):
     reading.body.pane.answer()
 
     # THEN:  the answer verification flags the answer
-    assert(reading.body.pane.nudge), \
-        'Response verification message not displayed'
+    assert(reading.body.pane.nudge), (
+        'Response verification message not displayed for '
+        f'"{free_response_giberish}"')
 
     # WHEN:  they enter new text is in the text area and click the 'Re-answer'
     #        button
@@ -980,16 +1010,16 @@ def test_student_task_reading_assignment(tutor_base_url, selenium, store):
     reading.body.pane._continue()
     while not reading.body.assignment_complete:
         if reading.body.next_page_available:
-            reading.body.next_page()
+            reading = reading.body.next_page()
         elif reading.body.is_multiple_choice:
             reading.body.pane.random_answer()
             reading.body.pane.answer()
-        elif reading.body.has_correct_answer:
-            reading.body.pane._continue()
         elif reading.body.is_free_response:
             reading.body.pane.free_response = (
                 book.get_term(reading.body.pane.chapter_section)[1])
             reading.body.pane.answer()
+        else:
+            reading = reading.body.next_page()
 
     milestones = reading.milestones()
 
@@ -1172,7 +1202,8 @@ def test_student_task_practice(tutor_base_url, selenium, store):
     """
     # SETUP:
     test_data = store.get('C485041')
-    user = test_data.get('username')
+    user = test_data.get('users')
+    user = user[Utility.random(0, len(user) - 1)]
     if '-dev.' in tutor_base_url:
         password = test_data.get('password_dev')
     elif '-qa.' in tutor_base_url:
@@ -1183,14 +1214,14 @@ def test_student_task_practice(tutor_base_url, selenium, store):
         password = test_data.get('password_prod')
     else:
         password = test_data.get('password_unique')
+    course_name = test_data.get('course_name')
     book = bookterm.Biology2e()
 
     # GIVEN: a Tutor student enrolled in a course with at least one reading or
     #        homework
     home = TutorHome(selenium, tutor_base_url).open()
-    home.log_in(user, password)
-    # only one course means the student bypasses the course picker
-    this_week = go_to_(StudentCourse(selenium, tutor_base_url))
+    courses = home.log_in(user, password)
+    this_week = courses.go_to_course(course_name)
     this_week.clear_training_wheels()
 
     # WHEN:  they click the 'Practice more to get forecast' button or a
@@ -1246,8 +1277,11 @@ def test_student_task_practice(tutor_base_url, selenium, store):
     assert(this_week.is_displayed()), \
         'Not viewing the student work dashboard'
 
-    assert(this_week.performance_sidebar.sections[topic]
-           .worked.split()[0] == str(already_worked + assessments)), \
+    worked = [section.worked.split()[0]
+              for section
+              in this_week.performance_sidebar.sections
+              if section.title == section_title][0]
+    assert(worked == str(already_worked + assessments)), \
         f'Incorrect number of worked assessments for section {section_number}'
 
     # WHEN:  they click the 'Practice my weakest topics' button
@@ -1390,9 +1424,6 @@ def test_teacher_viewing_student_scores(tutor_base_url, selenium, store):
         random_assignment = assignments[random]
         assignment_type = random_assignment.assignment_type
     assignment_name = random_assignment.name
-    # ### Patch for missing toolbar
-    url = scores.location
-    # ###
     review = random_assignment.review_assignment()
     review.resize_window(width=1024, height=768)
 
@@ -1402,16 +1433,7 @@ def test_teacher_viewing_student_scores(tutor_base_url, selenium, store):
 
     # WHEN:  they go back to the scores page
     # AND:   click a student name
-    # ### Patch for missing toolbar
-    try:
-        from selenium.common.exceptions import NoSuchElementException
-        scores = review.toolbar.back_to_scores()
-    except NoSuchElementException:
-        from pages.tutor.scores import Scores
-        from utils.utilities import go_to_
-        selenium.get(url)
-        scores = go_to_(Scores(selenium, tutor_base_url))
-    # ###
+    scores = review.toolbar.back_to_scores()
 
     students = scores.table.students
     random_student = students[Utility.random(0, len(students) - 1)]
@@ -1607,7 +1629,8 @@ def test_student_viewing_their_performance_forecast(
     """
     # SETUP:
     test_data = store.get('C485045')
-    user = test_data.get('username')
+    user = test_data.get('users')
+    user = user[Utility.random(0, len(user) - 1)]
     if '-dev.' in tutor_base_url:
         password = test_data.get('password_dev')
     elif '-qa.' in tutor_base_url:
@@ -1618,14 +1641,14 @@ def test_student_viewing_their_performance_forecast(
         password = test_data.get('password_prod')
     else:
         password = test_data.get('password_unique')
+    course_name = test_data.get('course_name')
     book = bookterm.Biology2e()
 
     # GIVEN: a Tutor student enrolled in a course with at least one completed
     #        reading or homework
     home = TutorHome(selenium, tutor_base_url).open()
-    home.log_in(user, password)
-    # only one course means the student bypasses the course picker
-    this_week = go_to_(StudentCourse(selenium, tutor_base_url))
+    courses = home.log_in(user, password)
+    this_week = courses.go_to_course(course_name)
     this_week.clear_training_wheels()
 
     # WHEN:  they click the 'Performance Forecast' link in the 'Menu'

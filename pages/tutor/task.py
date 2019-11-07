@@ -10,10 +10,11 @@ from time import sleep
 from typing import Dict, List, Union
 
 from pypom import Region
-from selenium.common.exceptions import NoSuchElementException
+from selenium.common.exceptions import NoSuchElementException, TimeoutException
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.remote.webelement import WebElement
+from selenium.webdriver.support import expected_conditions as expect
 
 from pages.tutor.base import TutorBase
 from pages.tutor.course import StudentCourse
@@ -21,6 +22,7 @@ from pages.tutor.performance import PerformanceForecast
 from pages.tutor.reference import ReferenceBook
 from regions.tutor.assessment import FreeResponse, MultipleChoice
 from regions.tutor.print_preview import PrintPreview
+from regions.tutor.tooltip import Float
 from utils.tutor import Tutor, TutorException
 from utils.utilities import Utility, go_to_
 
@@ -39,11 +41,11 @@ class Assignment(TutorBase):
     _tooltip_button_locator = (
         By.CSS_SELECTOR, '[class*="--primary"]')
     _assignment_nav_bar_locator = (
-        By.CSS_SELECTOR, '[class*=SecondaryToolbar]')
+        By.CSS_SELECTOR, '.tutor-navbar:first-child ~ div:nth-child(2)')
     _assignment_body_locator = (
-        By.CSS_SELECTOR, '[class*="Content-sc-"]')
+        By.CSS_SELECTOR, '.tutor-navbar:first-child ~ div:nth-child(3)')
     _assignment_footer_locator = (
-        By.CSS_SELECTOR, '.tutor-navbar')
+        By.CSS_SELECTOR, '.tutor-navbar:not(:first-child)')
     _assignment_type_locator = (
         By.CSS_SELECTOR, '.task-screen')
     _debug_information_locator = (
@@ -61,14 +63,17 @@ class Assignment(TutorBase):
         :rtype: bool
 
         """
+        ready = self.driver.execute_script(
+            '(document.readyState!="loading" | '
+            'document.readyState=="complete")==1')
         page_load = self.driver.execute_script(
             'return document.querySelector("{document} , {step}");'
             .format(document=self._document_loading_selector,
                     step=self._step_loading_selector))
-        joyride = self.find_elements(*self._joyride_root_locator)
-        tooltip = Utility.has_children(joyride[0]) if joyride else ''
+        tooltip = Float(self).is_open
         # quit if no page loader is present or a tooltip is found
-        if not page_load or tooltip:
+        if ready and (not page_load or tooltip):
+            sleep(1.0)
             return True
         # otherwise check for a reading panel loader
         try:
@@ -118,7 +123,8 @@ class Assignment(TutorBase):
         :rtype: :py:class:`~pages.tutor.task.Assignment.Content`
 
         """
-        body_root = self.find_element(*self._assignment_body_locator)
+        body_root = self.wait.until(
+            expect.presence_of_element_located(self._assignment_body_locator))
         return self.Content(self, body_root)
 
     @property
@@ -156,33 +162,25 @@ class Assignment(TutorBase):
         :return: None
 
         """
-        sleep(0.5)
-        for attempt in range(6):
-            tip = self.find_elements(*self._joyride_root_locator)
-            if tip and Utility.has_children(tip[0]):
-                button = self.driver.execute_script(
-                    'return document.querySelector("[class*=\'--primary\']");')
-                if button:
-                    if attempt % 2 == 0:
-                        Utility.click_option(self.driver, element=button)
-                    else:
-                        button.send_keys(Keys.RETURN)
-                sleep(1)
-                tip = self.find_elements(*self._joyride_root_locator)
-            sleep(0.5)
+        while Float(self).is_open:
+            Float(self).close()
 
     class Content(Region):
         """A placeholder for the assignment body."""
 
-        _is_free_response_locator = (By.CSS_SELECTOR, '[class*=FreeResponse]')
-        _is_multiple_choice_locator = (By.CSS_SELECTOR, '.answers-table')
-        _correctness_shown_locator = (By.CSS_SELECTOR, '.has-correct-answer')
-        _assignment_completion_locator = (By.CSS_SELECTOR, '.task-steps-end')
-        _interstitial_card_locator = (By.CSS_SELECTOR,
-                                      '.openstax-spaced-practice-intro , '
-                                      '.openstax-individual-review-intro , '
-                                      '.openstax-two-step-intro , '
-                                      '.openstax-personalized-intro')
+        _is_free_response_locator = (
+            By.CSS_SELECTOR, 'textarea')
+        _is_multiple_choice_locator = (
+            By.CSS_SELECTOR, '.answers-table')
+        _correctness_shown_locator = (
+            By.CSS_SELECTOR, '.has-correct-answer')
+        _assignment_completion_locator = (
+            By.CSS_SELECTOR, '.task-steps-end')
+        _interstitial_card_locator = (
+            By.CSS_SELECTOR, '.openstax-spaced-practice-intro , '
+                             '.openstax-individual-review-intro , '
+                             '.openstax-two-step-intro , '
+                             '.openstax-personalized-intro')
 
         @property
         def is_free_response(self) -> bool:
@@ -193,6 +191,7 @@ class Assignment(TutorBase):
             :rtype: bool
 
             """
+            sleep(0.5)
             return bool(self.find_elements(*self._is_free_response_locator))
 
         @property
@@ -204,6 +203,7 @@ class Assignment(TutorBase):
             :rtype: bool
 
             """
+            sleep(0.5)
             return bool(self.find_elements(*self._is_multiple_choice_locator))
 
         @property
@@ -215,6 +215,7 @@ class Assignment(TutorBase):
             :rtype: bool
 
             """
+            sleep(0.5)
             return bool(self.find_elements(*self._correctness_shown_locator))
 
         @property
@@ -226,6 +227,7 @@ class Assignment(TutorBase):
             :rtype: bool
 
             """
+            sleep(0.5)
             return self.is_free_response or self.is_multiple_choice
 
         @property
@@ -237,6 +239,7 @@ class Assignment(TutorBase):
             :rtype: bool
 
             """
+            sleep(0.5)
             return bool(self.find_elements(*self._interstitial_card_locator))
 
         @property
@@ -247,6 +250,7 @@ class Assignment(TutorBase):
             :rtype: bool
 
             """
+            sleep(0.5)
             return bool(self.find_elements(
                 *self._assignment_completion_locator))
 
@@ -420,36 +424,56 @@ class Homework(Assignment):
     class Content(Assignment.Content):
         """The assessment pane."""
 
+        _assessment_root_locator = (
+            By.CSS_SELECTOR, '.exercise-step')
+        _back_to_dashboard_button_locator = (
+            By.CSS_SELECTOR, '.task-steps-end .btn-default')
         _continue_button_locator = (
             By.CSS_SELECTOR, 'button.btn-primary , button.continue')
         _is_free_response_locator = (
-            By.CSS_SELECTOR, '[class*=FreeResponse]')
+            By.CSS_SELECTOR, 'textarea')
         _is_multipart_locator = (
-            By.CSS_SELECTOR, '[class*=MultipartGroup]')
+            By.CSS_SELECTOR, '.mpq')
         _is_multiple_choice_locator = (
-            By.CSS_SELECTOR, '[class*=ExerciseQuestion]')
+            By.CSS_SELECTOR, '.answers-table')
         _is_two_step_intro_locator = (
             By.CSS_SELECTOR, '.openstax-two-step-intro')
-        _back_to_dashboard_button_locator = (
-            By.CSS_SELECTOR, '[class*=CenteredBackButton]')
+        _multipart_root_locator = (
+            By.CSS_SELECTOR, '.homework-task > div')
 
         @property
         def pane(self):
-            """Access the question pane."""
+            """Access the question pane.
+
+            :return: the assessment question pane
+            :rtype: :py:class:`~regions.tutor.assessment.MultipartQuestion` or
+                :py:class:`~regions.tutor.assessment.FreeResponse` or
+                :py:class:`~regions.tutor.assessment.MultipleChoice`
+            :raises: :py:class:`~utils.tutor.TutorException` if the assessment
+                root element isn't found
+
+            """
             sleep(0.33)
             multipart = self.find_elements(*self._is_multipart_locator)
             if multipart:
+                mpq_root = self.find_element(*self._multipart_root_locator)
                 from regions.tutor.assessment import MultipartQuestion
-                return MultipartQuestion(self, multipart[0])
+                return MultipartQuestion(self, mpq_root)
+            try:
+                assessment_root = self.wait.until(
+                    expect.presence_of_element_located(
+                        self._assessment_root_locator))
+            except TimeoutException:
+                raise TutorException('Assessment root not found')
             free_response = self.find_elements(*self._is_free_response_locator)
             if free_response:
                 from regions.tutor.assessment import FreeResponse
-                return FreeResponse(self, free_response[0])
+                return FreeResponse(self, assessment_root)
             multiple_choice = self.find_elements(
                 *self._is_multiple_choice_locator)
             if multiple_choice:
                 from regions.tutor.assessment import MultipleChoice
-                return MultipleChoice(self, multiple_choice[0])
+                return MultipleChoice(self, assessment_root)
             # No assessment found; wait
             sleep(1)
             return self.pane
@@ -731,15 +755,15 @@ class Reading(Assignment):
 
         # find the current state of the overlay to figure out what page or
         # region to return
-        overlay_open = 'hidden' in self.driver.execute_script(
-            'return document.querySelector' +
-            f'("{self._main_content_selector}").classList;')
+        overlay_open = self.driver.execute_script(
+            'return window.getComputedStyle(arguments[0]).display != "none";',
+            overlay_root)
         highlights_active = (
-            overlay_root and
+            overlay_open and
             'notes-summary' in overlay_root.get_attribute('class'))
 
         toggle.send_keys(Keys.RETURN)
-        sleep(0.3)
+        sleep(0.75)
 
         if (not overlay_open and not milestones) or \
                 (overlay_open and not highlights_active and not milestones):
@@ -768,6 +792,18 @@ class Reading(Assignment):
         """
         return self.highlights(milestones=True)
 
+    @property
+    def current_highlights_on_page(self) -> int:
+        """Return the number of highlights currently found on the page.
+
+        :return: the number of highlighted sections
+        :rtype: int
+
+        """
+        return len(self.driver.execute_script(
+            'return document.querySelectorAll("'
+            f'{self._highlight_segment_locator[1]}");'))
+
     def highlight(self) -> None:
         """Click the inline highlight button.
 
@@ -775,17 +811,28 @@ class Reading(Assignment):
         the selected text to the user's annotation list.
 
         :return: None
+        :raises: :py:class:`~utils.tutor.TutorException` if the highlight
+            button is not available or the new highlight is not found on the
+            page after clicking the highlight button
 
         """
         # Use the javascript selector to find the inline buttons wherever they
         # appear.
-        highlighter = self.driver.execute_script(
-            'return document.querySelector("' +
-            f'{self._highlight_button_selector}");')
-        if not highlighter:
+        sleep(1.0)
+        initial_highlights = self.current_highlights_on_page
+        try:
+            highlighter = self.wait.until(lambda _: self.driver.execute_script(
+                'return document.querySelector' +
+                f'("{self._highlight_button_selector}");'))
+        except TimeoutException:
             raise TutorException('Highlight button not available')
+        sleep(1.0)
         Utility.click_option(self.driver, element=highlighter)
-        sleep(1)
+        try:
+            self.wait.until(
+                lambda _: self.current_highlights_on_page > initial_highlights)
+        except TimeoutException:
+            raise TutorException('New highlight not found on page')
 
     def annotate(self) -> Reading.AnnotationBox:
         """Click the inline annotation button.
@@ -795,15 +842,26 @@ class Reading(Assignment):
 
         :return: the annotation slide out edit box
         :rtype: :py:class:`~pages.tutor.task.Reading.AnnotationBox`
+        :raises: :py:class:`~utils.tutor.TutorException` if the annotate
+            button is not available or the new annotation is not found on the
+            page after clicking the annotate button
 
         """
-        annotater = self.driver.execute_script(
-            'return document.querySelector("' +
-            f'{self._annotation_button_selector}");')
-        if not annotater:
+        sleep(1.0)
+        initial_highlights = self.current_highlights_on_page
+        try:
+            annotater = self.wait.until(lambda _: self.driver.execute_script(
+                'return document.querySelector' +
+                f'("{self._annotation_button_selector}");'))
+        except TimeoutException:
             raise TutorException('Annotation button not available')
+        sleep(1.0)
         Utility.click_option(self.driver, element=annotater)
-        sleep(1)
+        try:
+            self.wait.until(
+                lambda _: self.current_highlights_on_page > initial_highlights)
+        except TimeoutException:
+            raise TutorException('New annotation highlight not found on page')
         return self.AnnotationBox(self)
 
     @property
@@ -966,7 +1024,7 @@ class Reading(Assignment):
         _image_caption_locator = (By.CSS_SELECTOR, '.os-caption-container')
         _paragraph_locator = (By.CSS_SELECTOR, '.annotater-content p[id]')
         _back_to_dashboard_button_locator = (
-            By.CSS_SELECTOR, '[class*=CenteredBackButton]')
+            By.CSS_SELECTOR, '.task-steps-end a')
 
         def previous_page(self) -> Reading:
             """Click on the left arrow button.
@@ -1243,9 +1301,8 @@ class Reading(Assignment):
             :rtype: list(:py:class:`~pages.tutor.task.Reading.Highlights.Note`)
 
             """
-            return [self.Note(self, note)
-                    for note
-                    in self.find_elements(*self._annotation_card_locator)]
+            notes = self.find_elements(*self._annotation_card_locator)
+            return [self.Note(self, note) for note in notes]
 
         class Note(Region):
             """An individual highlight or annotation."""
@@ -1368,7 +1425,7 @@ class Reading(Assignment):
 
         _milestone_card_locator = (By.CSS_SELECTOR, '[data-step-index]')
 
-        _milestone_chart_toggle_selector = '[class*=StyledToggle]'
+        _milestone_chart_toggle_selector = '.icons > button'
         _overlay_page_selector = '.overlay.task-milestones'
 
         def is_displayed(self) -> bool:
