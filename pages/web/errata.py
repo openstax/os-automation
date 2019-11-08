@@ -83,7 +83,6 @@ class Errata(WebBase):
     ASCENDING = 'sortdir1'
     DESCENDING = 'sortdir-1'
 
-    _loaded_locator = (By.CLASS_NAME, 'page-loaded')
     _table_locator = (By.CSS_SELECTOR, '.summary-table tbody')
     _title_locator = (By.CSS_SELECTOR, '.hero h1')
     _tooltip_base_locator = (By.CSS_SELECTOR, '.with-tooltip')
@@ -102,7 +101,6 @@ class Errata(WebBase):
         """
         return (
             super().loaded and
-            bool(self.find_element(*self._loaded_locator)) and
             (Utility.has_children(self.find_element(*self._table_locator)) or
              (sleep(3) or True)))
 

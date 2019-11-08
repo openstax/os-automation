@@ -100,7 +100,7 @@ def test_non_students_may_fill_out_the_form(web_base_url, selenium):
     phone = Utility.random_phone(713, False)
     school = 'Automation'
     books = Library().random_book(Utility.random(start=5, end=5))
-    students = Utility.random(Web.STUDENT_MIN)
+    students = Utility.random(Web.STUDENT_MIN, Web.STUDENT_MAX)
     from utils.web import TechProviders
     tech_providers = TechProviders.get_tech(Utility.random(0, 3))
     if TechProviders.OTHER in tech_providers:
