@@ -110,6 +110,10 @@ def test_non_students_may_fill_out_the_form(web_base_url, selenium):
 
     # GIVEN: a user viewing the interest page
     interest = Interest(selenium, web_base_url).open()
+    if interest.survey.is_displayed():
+        interest.survey.close()
+    if interest.privacy_notice.is_displayed():
+        interest.privacy_notice.got_it()
 
     # WHEN: they select a non-Student role from the drop down menu
     # AND:  fill out the contact form fields

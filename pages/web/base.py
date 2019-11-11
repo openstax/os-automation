@@ -8,7 +8,7 @@ from selenium.common.exceptions import (StaleElementReferenceException,  # NOQA
                                         WebDriverException)  # NOQA
 from selenium.webdriver.common.by import By
 
-from regions.web.footer import Footer
+from regions.web.footer import Dialog, Footer, Survey
 from regions.web.openstax_nav import OpenStaxNav
 from regions.web.sticky_note import StickyNote
 from regions.web.web_nav import WebNav
@@ -60,6 +60,16 @@ class WebBase(Page):
     def footer(self):
         """Return Web footer."""
         return Footer(self)
+
+    @property
+    def privacy_notice(self):
+        """Access the privacy notice."""
+        return Dialog(self)
+
+    @property
+    def survey(self):
+        """Access the Pulse Insights pop up survey."""
+        return Survey(self)
 
     def reload(self):
         """Reload the current page.
