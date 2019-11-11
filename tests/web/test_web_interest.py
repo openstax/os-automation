@@ -100,7 +100,7 @@ def test_non_students_may_fill_out_the_form(web_base_url, selenium):
     phone = Utility.random_phone(713, False)
     school = 'Automation'
     books = Library().random_book(Utility.random(start=5, end=5))
-    students = Utility.random(Web.STUDENT_MIN)
+    students = Utility.random(Web.STUDENT_MIN, Web.STUDENT_MAX)
     from utils.web import TechProviders
     tech_providers = TechProviders.get_tech(Utility.random(0, 3))
     if TechProviders.OTHER in tech_providers:
@@ -110,6 +110,10 @@ def test_non_students_may_fill_out_the_form(web_base_url, selenium):
 
     # GIVEN: a user viewing the interest page
     interest = Interest(selenium, web_base_url).open()
+    if interest.survey.is_displayed():
+        interest.survey.close()
+    if interest.privacy_notice.is_displayed():
+        interest.privacy_notice.got_it()
 
     # WHEN: they select a non-Student role from the drop down menu
     # AND:  fill out the contact form fields

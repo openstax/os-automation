@@ -287,7 +287,7 @@ def test_page_links_to_the_interest_form(web_base_url, selenium):
     # GIVEN: a user viewing the book details page
     home = WebHome(selenium, web_base_url).open()
     subjects = home.web_nav.subjects.view_all()
-    book = subjects.select_random_book(_from=Library.OPENSTAX)
+    book = subjects.select_random_book(_from=Library.AVAILABLE)
 
     # WHEN: they click on the "Sign up to learn more" link
     library = Library()
@@ -450,7 +450,7 @@ def test_users_may_view_the_current_list_of_errata_for_a_book(
     # AND:   are not logged into the website
     home = WebHome(selenium, web_base_url).open()
     subjects = home.web_nav.subjects.view_all()
-    book = subjects.select_random_book(_from=Library.OPENSTAX,
+    book = subjects.select_random_book(_from=Library.AVAILABLE,
                                        filter_current=True)
     book_title = book.title
 
@@ -487,7 +487,7 @@ def test_logged_in_users_may_view_the_errata_submission_form(
     home = WebHome(selenium, web_base_url).open()
     home.web_nav.login.log_in(*teacher, destination=WebHome, url=web_base_url)
     subjects = home.web_nav.subjects.view_all()
-    book = subjects.select_random_book(_from=Library.OPENSTAX,
+    book = subjects.select_random_book(_from=Library.AVAILABLE,
                                        filter_current=True)
     book_title = book.title
 
@@ -526,7 +526,7 @@ def test_non_logged_in_users_are_directed_to_log_in_to_view_the_errata_form(
     # AND:   are not logged into the website
     home = WebHome(selenium, web_base_url).open()
     subjects = home.web_nav.subjects.view_all()
-    book = subjects.select_random_book(_from=Library.OPENSTAX,
+    book = subjects.select_random_book(_from=Library.AVAILABLE,
                                        filter_current=True)
     book_title = book.title
     book_errata = book.details.errata_append
@@ -568,7 +568,7 @@ def test_non_logged_in_users_on_mobile_are_directed_to_log_in_for_errata_form(
     home.open()
     home.web_nav.meta.toggle_menu()
     subjects = home.web_nav.subjects.view_all()
-    book = subjects.select_random_book(_from=Library.OPENSTAX,
+    book = subjects.select_random_book(_from=Library.AVAILABLE,
                                        filter_current=True)
     book_title = book.title
     book_errata = book.phone.errata.errata_append
@@ -969,7 +969,7 @@ def test_books_may_have_ally_tiles(web_base_url, selenium):
     # GIVEN: a user viewing the book details page
     home = WebHome(selenium, web_base_url).open()
     subjects = home.web_nav.subjects.view_all()
-    book = subjects.select_random_book(_from=Library.OPENSTAX)
+    book = subjects.select_random_book(_from=Library.AVAILABLE)
 
     # WHEN: they click on the "Partner resources" tab
     book.select_tab(Web.PARTNER_RESOURCES)

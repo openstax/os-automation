@@ -20,7 +20,6 @@ class Adoption(WebBase):
 
     URL_TEMPLATE = '/adoption'
 
-    _loaded_locator = (By.CSS_SELECTOR, '.page-loaded')
     _banner_locator = (By.CSS_SELECTOR, '.subhead h1')
     _description_locator = (By.CSS_SELECTOR, '.subhead p:first-child')
     _drop_down_menu_locator = (By.CSS_SELECTOR, '.proxy-select')
@@ -34,7 +33,6 @@ class Adoption(WebBase):
         """Wait until the form is displayed."""
         return (
             super().loaded and
-            self.find_element(*self._loaded_locator).is_displayed() and
             self.find_element(*self._drop_down_menu_locator).is_displayed())
 
     def is_displayed(self):

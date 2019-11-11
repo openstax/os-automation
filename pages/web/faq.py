@@ -12,7 +12,7 @@ class FAQ(WebBase):
 
     URL_TEMPLATE = '/faq'
 
-    _main_content_locator = (By.CSS_SELECTOR, '.page-loaded')
+    _main_content_locator = (By.CSS_SELECTOR, '#main')
     _title_locator = (By.CSS_SELECTOR, '.boxed h1')
     _heading_locator = (By.CSS_SELECTOR, '[data-html=subhead] p')
     _support_locator = (By.CSS_SELECTOR, '.hero [href*=force]')
@@ -21,7 +21,7 @@ class FAQ(WebBase):
     @property
     def loaded(self):
         """Return True if the hero banner is found."""
-        content = self.find_element(*self._main_content_locator)
+        content = self.find_elements(*self._main_content_locator)
         return super().loaded and bool(content)
 
     def is_displayed(self):

@@ -1620,7 +1620,7 @@ class Library():
             for book in group:
                 names.append(book[0])
             return names[0] if len(names) == 1 else names
-        return Utility.random_set(self.openstax, number)
+        return Utility.random_set(self.available, number)
 
 
 class WebException(WebDriverException):

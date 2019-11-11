@@ -3,10 +3,12 @@
 from time import sleep
 
 from pypom import Page
-from selenium.common.exceptions import StaleElementReferenceException, TimeoutException, WebDriverException  # NOQA
+from selenium.common.exceptions import (StaleElementReferenceException,  # NOQA
+                                        TimeoutException,  # NOQA
+                                        WebDriverException)  # NOQA
 from selenium.webdriver.common.by import By
 
-from regions.web.footer import Footer
+from regions.web.footer import Dialog, Footer, Survey
 from regions.web.openstax_nav import OpenStaxNav
 from regions.web.sticky_note import StickyNote
 from regions.web.web_nav import WebNav
@@ -18,7 +20,6 @@ class WebBase(Page):
     """Base class."""
 
     _async_hide_locator = (By.CSS_SELECTOR, '.async-hide')
-    _root_locator = (By.CSS_SELECTOR, 'body.page-loaded')
 
     def __init__(self, driver, base_url=None, timeout=60, **url_kwargs):
         """Override the initialization to hold onto the Web timeout."""
@@ -27,8 +28,7 @@ class WebBase(Page):
     @property
     def loaded(self):
         """Return True when the page-loaded class is added to the body tag."""
-        return (self.find_element(*self._root_locator).is_displayed() and
-                self.web_nav.loaded and
+        return (self.web_nav.loaded and
                 not self.find_elements(*self._async_hide_locator))
 
     def open(self):
@@ -60,6 +60,16 @@ class WebBase(Page):
     def footer(self):
         """Return Web footer."""
         return Footer(self)
+
+    @property
+    def privacy_notice(self):
+        """Access the privacy notice."""
+        return Dialog(self)
+
+    @property
+    def survey(self):
+        """Access the Pulse Insights pop up survey."""
+        return Survey(self)
 
     def reload(self):
         """Reload the current page.

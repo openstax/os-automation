@@ -17,7 +17,7 @@ class Bookstore(WebBase):
     _subjects_full_locator = (By.CSS_SELECTOR, '.larger-screen a')
     _subjects_phone_locator = (By.CSS_SELECTOR, '.smaller-screen a')
     _background_image_locator = (By.CSS_SELECTOR, '.images img')
-    _isbn_pdf_locator = (By.CSS_SELECTOR, '.main-content > a')
+    _isbn_pdf_locator = (By.CSS_SELECTOR, '.main-content .button-row a')
     _fulfillment_locator = (By.CSS_SELECTOR, '.featured .card')
     _publisher_locator = (By.CSS_SELECTOR, '.cards:not(.featured) .card')
 
