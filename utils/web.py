@@ -248,6 +248,7 @@ class Web(object):
     HOMESCHOOL = 'Home School Teacher'
     INSTRUCTOR = 'Faculty'
     LIBRARIAN = 'Librarian'
+    NO_USER_TYPE = 'Please select one'
     OTHER = 'Other'
     STUDENT = 'Student'
 
@@ -261,6 +262,17 @@ class Web(object):
         ADJUNCT,
         OTHER
     ]
+
+    USER_CONVERSION = {
+        ADJUNCT: ADJUNCT,
+        ADMINISTRATOR: ADMINISTRATOR,
+        DESIGNER: DESIGNER,
+        USERS[2]: HOMESCHOOL,
+        USERS[1]: INSTRUCTOR,
+        INSTRUCTOR: USERS[1],
+        LIBRARIAN: LIBRARIAN,
+        OTHER: OTHER,
+        STUDENT: STUDENT, }
 
     # Adoption or interest status
     ADOPTED = 'Confirmed Adoption Won'

@@ -71,7 +71,7 @@ def test_students_do_not_need_to_fill_out_the_form(web_base_url, selenium):
     # AND:  click on the "GO BACK" button
     home = WebHome(selenium, web_base_url).open()
     subjects = home.web_nav.subjects.view_all()
-    book = subjects.select_random_book()
+    book = subjects.select_random_book(_from=Library.AVAILABLE)
     book_title = book.title
     interest = book.is_interested()
     interest.form.select(Web.STUDENT)
