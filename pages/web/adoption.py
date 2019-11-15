@@ -145,6 +145,8 @@ class Adoption(WebBase):
         _user_select_option_locator = (By.CSS_SELECTOR, '.options .option')
         _user_selected_role_locator = (By.CSS_SELECTOR, 'span.item')
 
+        _user_role_selector = '.options [data-value="{user}"]'
+
         # Student-specific locators
         _student_message_locator = (By.CSS_SELECTOR,
                                     '.student-form .text-content')
@@ -213,16 +215,16 @@ class Adoption(WebBase):
                     raise WebException('User select menu not open')
             for step in range(10):
                 user = self.find_element(
-                    'css selector',
-                    '.options ' +
-                    f'[data-value="{Web.USER_CONVERSION[user_type]}"]')
+                    By.CSS_SELECTOR,
+                    self._user_role_selector.format(
+                        user=Web.USER_CONVERSION[user_type]))
                 Utility.click_option(self.driver, element=user)
                 sleep(0.5)
                 is_closed = 'open' not in (
                     self.find_element(
-                        'css selector',
-                        '.options ' +
-                        f'[data-value="{Web.USER_CONVERSION[user_type]}"]')
+                        By.CSS_SELECTOR,
+                        self._user_role_selector.format(
+                            user=Web.USER_CONVERSION[user_type]))
                     .get_attribute('class'))
                 if is_closed:
                     break
