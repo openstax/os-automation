@@ -219,7 +219,7 @@ def test_adoption_form_identity_fields_are_required(web_base_url, selenium):
             email='',
             phone='',
             school='',
-            books='')
+            books={})
 
     # THEN: the contact form fields are shaded red
     # AND:  "Please fill out this field." is below each

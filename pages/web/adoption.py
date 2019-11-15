@@ -3,14 +3,15 @@
 from time import sleep
 
 from pypom import Region
-from selenium.common.exceptions import (ElementNotInteractableException,
-                                        NoSuchElementException,
-                                        WebDriverException)
+from selenium.common.exceptions import (ElementNotInteractableException,  # NOQA
+                                        NoSuchElementException,  # NOQA
+                                        TimeoutException,  # NOQA
+                                        WebDriverException)  # NOQA
 from selenium.webdriver.common.by import By
 
 from pages.web.base import WebBase
 from utils.utilities import Utility, go_to_
-from utils.web import TechProviders, Web
+from utils.web import TechProviders, Web, WebException
 
 ERROR = ' ~ .invalid-message'
 
@@ -30,10 +31,10 @@ class Adoption(WebBase):
 
     @property
     def loaded(self):
-        """Wait until the form is displayed."""
+        """Wait until the form is found."""
         return (
             super().loaded and
-            self.find_element(*self._drop_down_menu_locator).is_displayed())
+            bool(self.find_elements(*self._drop_down_menu_locator)))
 
     def is_displayed(self):
         """Return True if the adoption form is displayed."""
@@ -116,7 +117,7 @@ class Adoption(WebBase):
         self.form.set_using(books)
         sleep(0.5)
         self.form.next()
-        sleep(1)
+        sleep(1.0)
         book_error = self.form.get_book_error
         assert(not book_error), \
             'Book error - {book}'.format(book=book_error)
@@ -127,6 +128,7 @@ class Adoption(WebBase):
         if tech_providers and TechProviders.OTHER in tech_providers:
             self.form.other = other_provider
         self.form.submit()
+        sleep(1.0)
         return go_to_(AdoptionConfirmation(self.driver, self.base_url))
 
     @property
@@ -141,6 +143,9 @@ class Adoption(WebBase):
         # User role selection
         _user_select_locator = (By.CSS_SELECTOR, '.proxy-select')
         _user_select_option_locator = (By.CSS_SELECTOR, '.options .option')
+        _user_selected_role_locator = (By.CSS_SELECTOR, 'span.item')
+
+        _user_role_selector = '.options [data-value="{user}"]'
 
         # Student-specific locators
         _student_message_locator = (By.CSS_SELECTOR,
@@ -194,16 +199,47 @@ class Adoption(WebBase):
             """Return the option menu responses."""
             return self.find_elements(*self._user_select_option_locator)
 
-        def select(self, user_type):
+        def select(self, user_type, retry=0):
             """Select a user type from the user drop down menu."""
-            sleep(0.25)
-            user = self.find_element(*self._user_select_locator)
-            Utility.click_option(self.driver, element=user)
             sleep(0.33)
-            for option in self.options:
-                if option.get_attribute('textContent') == user_type:
-                    Utility.click_option(self.driver, element=option)
+            for step in range(10):
+                user = self.find_element(*self._user_select_locator)
+                Utility.click_option(self.driver, element=user)
+                sleep(0.5)
+                is_open = 'open' in (
+                    self.find_element(*self._user_select_locator)
+                    .get_attribute('class'))
+                if is_open:
+                    break
+                if step == 9:
+                    raise WebException('User select menu not open')
+            for step in range(10):
+                user = self.find_element(
+                    By.CSS_SELECTOR,
+                    self._user_role_selector.format(
+                        user=Web.USER_CONVERSION[user_type]))
+                Utility.click_option(self.driver, element=user)
+                sleep(0.5)
+                is_closed = 'open' not in (
+                    self.find_element(
+                        By.CSS_SELECTOR,
+                        self._user_role_selector.format(
+                            user=Web.USER_CONVERSION[user_type]))
+                    .get_attribute('class'))
+                if is_closed:
+                    break
+                if step == 9:
+                    raise WebException('User select menu still open')
             sleep(0.5)
+            selected = (self.find_element(*self._user_selected_role_locator)
+                        .get_attribute('textContent'))
+            if selected == Web.NO_USER_TYPE and retry <= 2:
+                self.select(user_type, retry=retry + 1)
+            elif retry == 3:
+                raise WebException('No user type selected after 3 tries')
+            elif selected != user_type:
+                raise WebException(
+                    f'"{user_type}" not selected; found "{selected}"')
             return self
 
         @property
