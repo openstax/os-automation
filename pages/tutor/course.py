@@ -182,13 +182,15 @@ class StudentCourse(TutorBase):
         :rtype: bool
 
         """
+        ready = self.driver.execute_script(
+            'return document.readyState === "complete";')
         body_source = (self.find_element(*self._body_locator)
                        .get_attribute('outerHTML'))
         loaded = ('Loading' not in body_source and
                   'is-loading' not in body_source)
         if loaded:
             sleep(1)
-        return loaded
+        return ready and loaded
 
     # ---------------------------------------------------- #
     # Notifications
