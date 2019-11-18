@@ -5,7 +5,7 @@ from __future__ import annotations
 from time import sleep
 
 from pypom import Region
-from selenium.common.exceptions import NoSuchElementException
+from selenium.common.exceptions import NoSuchElementException, TimeoutException
 from selenium.webdriver.common.by import By
 
 from pages.tutor.base import TutorBase
@@ -84,13 +84,13 @@ class Dashboard(TutorBase):
         :rtype: :py:class:`~pages.tutor.new_course.NewCourse`
 
         """
-        if self.is_safari:
+        try:
             self.wait.until(lambda _: self.find_elements(
                 *self._create_tile_locator))
+        except TimeoutException:
+            raise TutorException("Create a course tile not found; "
+                                 "check user's faculty verification")
         tile = self.find_elements(*self._create_tile_locator)
-        assert(tile), (
-            "Create a course tile not found - "
-            "check user's faculty verification")
         link = tile[0].find_element(By.CSS_SELECTOR, 'a')
         Utility.scroll_to(self.driver, element=tile[0], shift=-80)
         Utility.click_option(self.driver, element=link)
