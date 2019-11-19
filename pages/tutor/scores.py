@@ -509,7 +509,8 @@ class ViewWeights(Weights):
         :rtype: int
 
         """
-        return int(self.find_element(*self._homework_score_locator).text[:-1])
+        return int(float(
+            self.find_element(*self._homework_score_locator).text[:-1]))
 
     @property
     def homework_progress(self):
@@ -519,8 +520,8 @@ class ViewWeights(Weights):
         :rtype: int
 
         """
-        return int(
-            self.find_element(*self._homework_progress_locator).text[:-1])
+        return int(float(
+            self.find_element(*self._homework_progress_locator).text[:-1]))
 
     @property
     def reading_score(self):
@@ -530,7 +531,8 @@ class ViewWeights(Weights):
         :rtype: int
 
         """
-        return int(self.find_element(*self._reading_score_locator).text[:-1])
+        return int(float(
+            self.find_element(*self._reading_score_locator).text[:-1]))
 
     @property
     def reading_progress(self):
@@ -540,8 +542,8 @@ class ViewWeights(Weights):
         :rtype: int
 
         """
-        return int(
-            self.find_element(*self._reading_progress_locator).text[:-1])
+        return int(float(
+            self.find_element(*self._reading_progress_locator).text[:-1]))
 
     @property
     def weights(self):
