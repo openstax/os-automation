@@ -1,59 +1,124 @@
 """Basic page parent for all Accounts pages."""
 
+from __future__ import annotations
+
 from time import sleep
+from typing import Union
 
 from pypom import Page, Region
+from selenium.common.exceptions import NoSuchElementException
 from selenium.webdriver.common.by import By
 
+from pages.accounts.legal import Copyright, Terms
 from pages.rice.home import Rice
 from utils.utilities import Utility, go_to_
 
 
 class AccountsBase(Page):
-    """Base class."""
+    """The base page for each Accounts class."""
 
-    _root_locator = (By.CSS_SELECTOR, 'body')
-    _root_locator_logged_in = (By.ID, 'application-header')
+    _content_locator = (
+        By.CSS_SELECTOR, '.main-menu ~ .content:not([id]), #application-body')
+    _footer_locator = (
+        By.CSS_SELECTOR, '.main-menu ~ [id*=footer], #application-footer')
+    _main_menu_locator = (
+        By.CSS_SELECTOR, '.main-menu, #application-header')
 
     @property
-    def loaded(self):
-        """Override the default loaded function."""
-        return (self.find_element(*self._root_locator) and
-                Utility.load_background_images(self.driver,
-                                               self._root_locator) and
-                'accounts' in self.driver.current_url and
+    def content(self) -> AccountsBase.Content:
+        """Access the Accounts' page content.
+
+        :return: the Accounts page content
+        :rtype: :py:class:`~pages.accounts.base.AccountsBase.Content`
+
+        """
+        content_root = self.find_element(*self._content_locator)
+        return self.Content(self, content_root)
+
+    @property
+    def footer(self) -> AccountsBase.Footer:
+        """Access the Accounts' page footer.
+
+        :return: the Accounts page footer
+        :rtype: :py:class:`~pages.accounts.base.AccountsBase.Footer`
+
+        """
+        footer_root = self.find_element(*self._footer_locator)
+        return self.Footer(self, footer_root)
+
+    @property
+    def is_displayed(self) -> bool:
+        """Return True when the Accounts content is displayed.
+
+        :return: ``True`` when the Accounts main body content is displayed
+        :rtype: bool
+
+        """
+        try:
+            return self.find_element(*self._content_locator).is_displayed()
+        except NoSuchElementException:
+            return False
+
+    @property
+    def is_safari(self) -> bool:
+        """Return True if the browser in use is Safari.
+
+        :return: ``True`` if the browser in use is Safari
+        :rtype: bool
+
+        """
+        return self.driver.capabilities.get('browserName').lower() == 'safari'
+
+    @property
+    def loaded(self) -> bool:
+        """Return True when the Accounts page is loaded.
+
+        .. note::
+           We delay the return by 2 seconds for Safari to insure the page is
+           loaded and displayed.
+
+        :return: ``True`` when the Accounts content is found
+        :rtype: bool
+
+        """
+        return (self.find_element(*self._content_locator) and
                 ((sleep(2.0) or True) if self.is_safari else True))
 
-    def is_displayed(self):
-        """Return True when Accounts is loaded."""
-        return self.loaded
+    @property
+    def menu(self) -> Union[AccountsBase.MenuBar, None]:
+        """Access the Accounts' page menu bar, if found.
+
+        :return: the Accounts' menu bar or ``None`` if it is missing (Profile)
+        :rtype: :py:class:`~pages.accounts.base.AccountsBase.MenuBar` or None
+
+        """
+        bar_root = self.find_element(*self._main_menu_locator)
+        return self.MenuBar(self, bar_root)
 
     @property
-    def header(self):
-        """Return Accounts' header."""
-        return self.Header(self)
+    def url(self) -> str:
+        """Return the last segment of the current URL.
 
-    @property
-    def footer(self):
-        """Return Accounts' footer."""
-        return self.Footer(self)
+        :return: the final segment of the current URL (everything after the
+            last '/')
+        :rtype: str
 
-    @property
-    def current_url(self):
-        """Return the current page URL."""
-        return self.driver.current_url
+        """
+        return self.location.split('/')[-1]
 
-    def reload(self):
-        """Reload the current page."""
-        self.driver.refresh()
-        self.wait_for_page_to_load()
+    def back(self) -> Page:
+        """Go to the previous page in the browser history.
 
-    def back(self):
-        """Go back to the previous page."""
-        self.driver.execute_script('window.history.go(-1)')
+        :return: the current page
+        :rtype: :py:class:`~pages.accounts.base.AccountsBase`
+
+        """
+        self.driver.execute_script(
+            'window.history.go(-1);'
+            r'document.addEventListener("DOMContent", function(event) {});')
         return self
 
-    def close_tab(self):
+    def close_tab(self) -> Page:
         """Close the current tab and switch to the remaining one.
 
         Assumes 2 browser tabs are open.
@@ -62,80 +127,130 @@ class AccountsBase(Page):
         return self
 
     @property
-    def location(self):
-        """Return the current URL."""
+    def location(self) -> str:
+        """Return the current URL.
+
+        :return: the current page URL
+        :rtype: str
+
+        """
         return self.driver.current_url
 
-    @property
-    def url(self):
-        """Return the last segment of the current URL."""
-        return self.location.split('/')[-1]
+    def reload(self) -> Page:
+        """Reload the current page.
 
-    def resize_window(self, width=1024, height=768):
+        :return: the current page
+        :rtype: :py:class:`~pages.accounts.base.AccountsBase`
+
+        """
+        self.driver.refresh()
+        self.wait_for_page_to_load()
+        return self
+
+    def resize_window(self, width: int = 1024, height: int = 768):
         """Set the browser window size.
 
-        Args:
-            width (int): browser window width, default 4:3
-            height (int): browser window height, default 4:3
+        .. note::
+           We default to a standard 4:3 ration 1024px x 768px.
+
+        :param int width: (optional) the desired browser window width
+        :param int height: (optional) the desired browser window height
+        :return: None
 
         """
         self.driver.set_window_size(width, height)
-        sleep(1.5)
-
-    @property
-    def is_safari(self):
-        """Return True if the browser in use is Safari."""
-        return self.driver.capabilities.get('browserName').lower() == 'safari'
-
-    class Header(Region):
-        """Accounts header."""
-
-        _root_locator = (By.ID, 'application-header')
-        _logo_locator = (By.ID, 'top-nav-logo')
-
-        @property
-        def is_header_displayed(self):
-            """Header display boolean."""
-            return self.loaded
-
-        def go_to_accounts_home(self):
-            """Follow the OpenStax icon link back to the site root."""
-            go_home = self.find_element(*self._logo_locator)
-            Utility.click_option(self.driver, element=go_home)
-            return self
+        sleep(1.0)
 
     class Footer(Region):
-        """Accounts footer."""
+        """The Accounts footer."""
 
-        _root_locator = (By.ID, 'application-footer')
-        _rice_link_locator = (By.CSS_SELECTOR, '#footer-rice-logo img')
-        _copyright_locator = (By.PARTIAL_LINK_TEXT, 'Copyright')
-        _terms_locator = (By.PARTIAL_LINK_TEXT, 'Terms')
-
-        @property
-        def is_footer_displayed(self):
-            """Footer display boolean."""
-            return self.loaded
+        _rice_link_locator = (
+            By.CSS_SELECTOR, '[href*=rice]')
+        _copyright_locator = (
+            By.CSS_SELECTOR, '[href*=copyright]')
+        _terms_locator = (
+            By.CSS_SELECTOR, '[href*=terms]')
 
         @property
-        def show_copyright(self):
-            """Display the copyright."""
+        def copyright(self) -> str:
+            """Return the brief copyright message.
+
+            :return: the short copyright message displayed on Accounts pages
+            :rtype: str
+
+            """
+            return self.find_element(*self._copyright_locator).text
+
+        @property
+        def is_displayed(self) -> bool:
+            """Return True if the footer is displayed.
+
+            :return: ``True`` if the Accounts footer is displayed
+            :rtype: bool
+
+            """
+            return self.root.is_displayed()
+
+        @property
+        def view_copyright(self) -> Copyright:
+            """Display the OpenStax Accounts copyright and licensing notice.
+
+            :return: the copyright notice
+            :rtype: :py:class:`~pages.accounts.legal.Copyright`
+
+            """
             copyright = self.find_element(*self._copyright_locator)
             Utility.click_option(self.driver, element=copyright)
-            sleep(1.0)
-            return self
+            return go_to_(Copyright(self.driver, self.page.base_url))
 
         @property
-        def show_terms_of_use(self):
-            """Display the terms of use."""
+        def view_terms_of_use(self) -> Terms:
+            """Display the OpenStax Accounts policies.
+
+            :return: the terms of use and privacy policy page
+            :rtype: :py:class:`~pages.accounts.legal.Terms`
+
+            """
             terms = self.find_element(*self._terms_locator)
             Utility.click_option(self.driver, element=terms)
-            sleep(1.0)
-            return self
+            return go_to_(Terms(self.driver, self.page.base_url))
 
         def go_to_rice(self):
             """Load the Rice webpage."""
             rice = self.find_element(*self._rice_link_locator)
             Utility.click_option(self.driver, element=rice)
-            sleep(1.0)
             return go_to_(Rice(self.driver))
+
+    class MenuBar(Region):
+        """The Accounts menu bar."""
+
+        _logo_locator = (
+            By.CSS_SELECTOR, 'a')
+
+        @property
+        def is_displayed(self) -> bool:
+            """Return True if the menu bar is displayed.
+
+            :return: ``True`` if the Accounts menu bar is displayed
+            :rtype: bool
+
+            """
+            return self.root.is_displayed()
+
+        def go_home(self) -> Page:
+            """Follow the OpenStax logo link back to the site home page.
+
+            :return: the Accounts login page if a user is not logged in or the
+                Profile page if a user is logged in
+            :rtype: :py:class:`~pages.accounts.home.AccountsHome` or
+                :py:class:`~pages.accounts.profile.Profile`
+
+            """
+            go_home = self.find_element(*self._logo_locator)
+            Utility.click_option(self.driver, element=go_home)
+            sleep(0.5)
+            if 'profile' in self.page.location:
+                from pages.accounts.profile import Profile
+                return go_to_(Profile(self.driver, self.page.base_url))
+            from pages.accounts.home import AccountsHome
+            return go_to_(AccountsHome(self.driver, self.page.base_url))
