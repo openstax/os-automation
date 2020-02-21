@@ -77,7 +77,7 @@ class AccountsBase(Page):
 
         .. note::
            We delay the check by 1/2 second for Safari and Firefox to insure
-           the page is loading  prior to the DOM load.
+           the page is loading prior to the full DOM ``load``.
 
         :return: ``True`` when the Accounts content is found
         :rtype: bool
@@ -143,13 +143,17 @@ class AccountsBase(Page):
             r'document.addEventListener("DOMContent", function(event) {});')
         return self
 
-    def close_tab(self) -> Page:
+    def close_tab(self):
         """Close the current tab and switch to the remaining one.
 
-        Assumes 2 browser tabs are open.
+        .. note::
+           Assumes 2 browser tabs are open; switches the window handle to the
+           remaining tab.
+
+        :return: None
+
         """
         Utility.close_tab(self.driver)
-        return self
 
     def reload(self) -> Page:
         """Reload the current page.
@@ -166,7 +170,7 @@ class AccountsBase(Page):
         """Set the browser window size.
 
         .. note::
-           We default to a standard 4:3 ration 1024px x 768px.
+           We default to a standard 4:3 ratio 1024px x 768px.
 
         :param int width: (optional) the desired browser window width
         :param int height: (optional) the desired browser window height
@@ -250,8 +254,15 @@ class AccountsBase(Page):
             """
             return self.root.is_displayed()
 
-        def go_to_rice(self):
-            """Load the Rice webpage."""
+        def go_to_rice(self) -> Rice:
+            """Click the Rice University logo.
+
+            :return: the Rice University home page
+            :rtype: :py:class:`~pages.rice.home.Rice`
+            :raises :py:class:`~utils.accounts.AccountsException`: if the Rice
+                webpage is not loaded
+
+            """
             rice = self.find_element(*self._rice_link_locator)
             Utility.click_option(self.driver, element=rice)
             try:

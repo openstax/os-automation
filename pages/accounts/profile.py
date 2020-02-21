@@ -1088,10 +1088,10 @@ class Profile(AccountsBase):
 
                 """
                 self.change_name()
-                name = [self.title,
+                name = (self.title,
                         self.first_name,
                         self.last_name,
-                        self.suffix]
+                        self.suffix)
                 self.cancel()
                 return name
 
