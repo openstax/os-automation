@@ -1,6 +1,13 @@
 """Accounts helper."""
 
+from typing import Tuple
+
+from selenium.common.exceptions import WebDriverException
+
 from utils.utilities import Utility
+
+Name = Tuple[str, str, str, str]
+Selector = Tuple[str, str]
 
 
 class Accounts(object):
@@ -93,3 +100,9 @@ class Accounts(object):
         for code, title in Accounts.SUBJECTS:
             if title == book_title:
                 return code
+
+
+class AccountsException(WebDriverException):
+    """A generic exception for Accounts."""
+
+    pass

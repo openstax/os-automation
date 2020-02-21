@@ -28,7 +28,7 @@ jobs:
           name: run tests for os-web
           command: |
             . .venv/bin/activate
-            pytest -vvv --driver chrome --instance qa --systems web --strip-flake --skip-social --smoke-test --reruns 1 --circleci-parallelize --html report.html --self-contained-html --junitxml=/tmp/test-reports/junit.xml
+            pytest --driver chrome --instance qa --systems web --strip-flake --skip-social --smoke-test --reruns 1 --circleci-parallelize --html report.html --self-contained-html --junitxml=/tmp/test-reports/junit.xml
       - store_artifacts:
           path: /tmp/test-reports/junit.xml
           destination: test-reports

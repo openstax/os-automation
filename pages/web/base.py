@@ -42,6 +42,16 @@ class WebBase(Page):
         raise WebDriverException('Website failed to open or load')
 
     @property
+    def location(self) -> str:
+        """Return the current page URL.
+
+        :return: the current page URL
+        :rtype: str
+
+        """
+        return self.driver.current_url
+
+    @property
     def sticky_note(self):
         """Access the sticky note."""
         return StickyNote(self)
@@ -98,11 +108,6 @@ class WebBase(Page):
         """
         Utility.close_tab(self.driver)
         return self
-
-    @property
-    def location(self):
-        """Return the current URL."""
-        return self.driver.current_url
 
     @property
     def url(self):

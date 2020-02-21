@@ -6,17 +6,19 @@ from time import sleep
 from typing import Union
 
 from pypom import Page, Region
-from selenium.common.exceptions import NoSuchElementException
+from selenium.common.exceptions import NoSuchElementException, TimeoutException
 from selenium.webdriver.common.by import By
 
-from pages.accounts.legal import Copyright, Terms
 from pages.rice.home import Rice
+from utils.accounts import AccountsException
 from utils.utilities import Utility, go_to_
 
 
 class AccountsBase(Page):
     """The base page for each Accounts class."""
 
+    _body_tag_locator = (
+        By.CSS_SELECTOR, 'body')
     _content_locator = (
         By.CSS_SELECTOR, '.main-menu ~ .content:not([id]), #application-body')
     _footer_locator = (
@@ -74,15 +76,28 @@ class AccountsBase(Page):
         """Return True when the Accounts page is loaded.
 
         .. note::
-           We delay the return by 2 seconds for Safari to insure the page is
-           loaded and displayed.
+           We delay the check by 1/2 second for Safari and Firefox to insure
+           the page is loading  prior to the DOM load.
 
         :return: ``True`` when the Accounts content is found
         :rtype: bool
 
         """
-        return (self.find_element(*self._content_locator) and
-                ((sleep(2.0) or True) if self.is_safari else True))
+        self.wait.until(
+            lambda _: self.find_elements(*self._body_tag_locator))
+        script = (r'document.addEventListener("load", function(event) {});')
+        sleep(0.5)
+        return self.driver.execute_script(script) or self.content
+
+    @property
+    def location(self) -> str:
+        """Return the current URL.
+
+        :return: the current page URL
+        :rtype: str
+
+        """
+        return self.driver.current_url
 
     @property
     def menu(self) -> Union[AccountsBase.MenuBar, None]:
@@ -94,6 +109,16 @@ class AccountsBase(Page):
         """
         bar_root = self.find_element(*self._main_menu_locator)
         return self.MenuBar(self, bar_root)
+
+    @property
+    def page_source(self) -> str:
+        """Return the current page source HTML.
+
+        :return: the current page source
+        :rtype: str
+
+        """
+        return self.driver.page_source
 
     @property
     def url(self) -> str:
@@ -126,16 +151,6 @@ class AccountsBase(Page):
         Utility.close_tab(self.driver)
         return self
 
-    @property
-    def location(self) -> str:
-        """Return the current URL.
-
-        :return: the current page URL
-        :rtype: str
-
-        """
-        return self.driver.current_url
-
     def reload(self) -> Page:
         """Reload the current page.
 
@@ -160,6 +175,50 @@ class AccountsBase(Page):
         """
         self.driver.set_window_size(width, height)
         sleep(1.0)
+
+    class Content(Region):
+        """The main content region."""
+
+        _header_text_locator = (
+            By.CSS_SELECTOR, '.page-header')
+        _log_in_tab_locator = (
+            By.CSS_SELECTOR, '.tab.login')
+        _sign_up_tab_locator = (
+            By.CSS_SELECTOR, '.tab.signup')
+
+        @property
+        def header(self) -> str:
+            """Return the page heading.
+
+            :return: the body content header
+            :rtype: str
+
+            """
+            return self.find_element(*self._header_text_locator).text
+
+        def view_log_in(self) -> Page:
+            """Click the Log in tab.
+
+            :return: the Accounts Log in page
+            :rtype: :py:class:`~pages.accounts.home.AccountsHome`
+
+            """
+            tab = self.find_element(*self._log_in_tab_locator)
+            Utility.click_option(self.driver, element=tab)
+            from page.accounts.home import AccountsHome
+            return go_to_(AccountsHome(self.driver, self.page.base_url))
+
+        def view_sign_up(self) -> Page:
+            """Click the Sign up tab.
+
+            :return: the Accounts Log in page
+            :rtype: :py:class:`~pages.accounts.home.AccountsHome`
+
+            """
+            tab = self.find_element(*self._sign_up_tab_locator)
+            Utility.click_option(self.driver, element=tab)
+            from pages.accounts.signup import Signup
+            return go_to_(Signup(self.driver, self.page.base_url))
 
     class Footer(Region):
         """The Accounts footer."""
@@ -191,8 +250,18 @@ class AccountsBase(Page):
             """
             return self.root.is_displayed()
 
-        @property
-        def view_copyright(self) -> Copyright:
+        def go_to_rice(self):
+            """Load the Rice webpage."""
+            rice = self.find_element(*self._rice_link_locator)
+            Utility.click_option(self.driver, element=rice)
+            try:
+                self.wait.until(
+                    lambda _: 'rice.edu' in self.driver.current_url)
+            except TimeoutException:
+                raise AccountsException('Rice webpage did not load')
+            return go_to_(Rice(self.driver))
+
+        def view_copyright(self) -> Page:
             """Display the OpenStax Accounts copyright and licensing notice.
 
             :return: the copyright notice
@@ -201,10 +270,10 @@ class AccountsBase(Page):
             """
             copyright = self.find_element(*self._copyright_locator)
             Utility.click_option(self.driver, element=copyright)
+            from pages.accounts.legal import Copyright
             return go_to_(Copyright(self.driver, self.page.base_url))
 
-        @property
-        def view_terms_of_use(self) -> Terms:
+        def view_terms_of_use(self) -> Page:
             """Display the OpenStax Accounts policies.
 
             :return: the terms of use and privacy policy page
@@ -213,13 +282,11 @@ class AccountsBase(Page):
             """
             terms = self.find_element(*self._terms_locator)
             Utility.click_option(self.driver, element=terms)
+            from pages.accounts.legal import Terms
             return go_to_(Terms(self.driver, self.page.base_url))
 
-        def go_to_rice(self):
-            """Load the Rice webpage."""
-            rice = self.find_element(*self._rice_link_locator)
-            Utility.click_option(self.driver, element=rice)
-            return go_to_(Rice(self.driver))
+        show_copyright = view_copyright
+        show_terms_of_use = view_terms_of_use
 
     class MenuBar(Region):
         """The Accounts menu bar."""
@@ -240,17 +307,12 @@ class AccountsBase(Page):
         def go_home(self) -> Page:
             """Follow the OpenStax logo link back to the site home page.
 
-            :return: the Accounts login page if a user is not logged in or the
-                Profile page if a user is logged in
-            :rtype: :py:class:`~pages.accounts.home.AccountsHome` or
-                :py:class:`~pages.accounts.profile.Profile`
+            :return: the OpenStax.org web page
+            :rtype: :py:class:`~pages.web.home.WebHome`
 
             """
             go_home = self.find_element(*self._logo_locator)
             Utility.click_option(self.driver, element=go_home)
             sleep(0.5)
-            if 'profile' in self.page.location:
-                from pages.accounts.profile import Profile
-                return go_to_(Profile(self.driver, self.page.base_url))
-            from pages.accounts.home import AccountsHome
-            return go_to_(AccountsHome(self.driver, self.page.base_url))
+            from pages.web.home import WebHome
+            return go_to_(WebHome(self.driver, self.page.base_url))

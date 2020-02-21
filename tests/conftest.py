@@ -204,11 +204,12 @@ def pytest_addoption(parser):
     user_options.addoption(
         '--salesforce',
         action='store',
-        nargs=2,
+        nargs=3,
         default=[
             os.getenv('SALESFORCE_USERNAME'),
-            os.getenv('SALESFORCE_PASSWORD')],
-        help='OpenStax test Salesforce manager account')
+            os.getenv('SALESFORCE_PASSWORD'),
+            os.getenv('SALESFORCE_DOMAIN')],
+        help='OpenStax Salesforce reader account and domain')
     user_options.addoption(
         '--facebook',
         action='store',

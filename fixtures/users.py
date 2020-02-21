@@ -17,8 +17,7 @@ FACEBOOK_SIGNUP = 'facebook_signup'
 GOOGLE = 'google'
 GOOGLE_SIGNUP = 'google_signup'
 
-SINGLETON = [SALESFORCE,
-             FACEBOOK,
+SINGLETON = [FACEBOOK,
              FACEBOOK_SIGNUP,
              GOOGLE,
              GOOGLE_SIGNUP]
@@ -91,7 +90,12 @@ def _data_return(request, target):
                 config.getini('instance').lower())
     user = (config.getoption(target) or config.getini(target))
     name = 0
-    if target in SINGLETON or instance == DEV or len(user) == 2:
+    if target == salesforce:
+        name = 0 if instance != PROD else 2
+        password = 1 if instance != PROD else 3
+        domain = 4
+        return (user[name], user[password], user[domain])
+    elif target in SINGLETON or instance == DEV or len(user) == 2:
         password = 1
     else:
         if instance == QA:

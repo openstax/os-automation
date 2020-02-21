@@ -3,6 +3,12 @@
 from pages.accounts.admin.base import AccountsAdmin
 
 
+class Doorkeeper(AccountsAdmin):
+    """The OAuth application list."""
+
+    URL_TEMPLATE = '/oauth/applications'
+
+
 class Security(AccountsAdmin):
     """The Accounts security log entries page."""
 
