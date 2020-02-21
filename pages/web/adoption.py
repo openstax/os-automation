@@ -257,7 +257,7 @@ class Adoption(WebBase):
         def go_back(self, destination=WebBase, url=None):
             """Click the student GO BACK button."""
             back_button = self.find_element(*self._go_back_button_locator)
-            Utility.safari_exception_click(self.driver, element=back_button)
+            Utility.click_option(self.driver, element=back_button)
             if url:
                 return go_to_(destination(self.driver, url=url))
             return go_to_(destination(self.driver))
@@ -490,7 +490,7 @@ class Adoption(WebBase):
 
             def select(self):
                 """Click on the school name to select it."""
-                Utility.safari_exception_click(self.driver, element=self.root)
+                Utility.click_option(self.driver, element=self.root)
                 return self.page
 
         class Book(Region):
@@ -533,7 +533,7 @@ class Adoption(WebBase):
             def select(self):
                 """Click the checkbox."""
                 checkbox = self.find_element(*self._checkbox_locator)
-                Utility.safari_exception_click(self.driver, element=checkbox)
+                Utility.click_option(self.driver, element=checkbox)
                 sleep(0.25)
                 return self.page
 
@@ -658,7 +658,7 @@ class AdoptionConfirmation(WebBase):
 
     def report_another(self):
         """Click on the 'Report another ...' link."""
-        Utility.safari_exception_click(self.driver, element=self.another)
+        Utility.click_option(self.driver, element=self.another)
         return go_to_(Adoption(self.driver, self.base_url))
 
     @property

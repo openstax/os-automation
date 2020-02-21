@@ -19,11 +19,7 @@ class Webview(Page):
         """Override the loaded property."""
         try:
             main = self.find_element(*self._main_locator)
-            print('Main: {0}'.format(Utility.has_children(main)))
             images = self.find_elements(*self._image_locator)
-            print('Images: {0} {1}'
-                  .format(len(images),
-                          Utility.is_image_visible(self.driver, image=images)))
             return (
                 Utility.has_children(main) and
                 Utility.is_image_visible(self.driver, image=images)

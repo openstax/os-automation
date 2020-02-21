@@ -20,7 +20,7 @@ class Menu(Region):
         """Open or close a nav menu."""
         Utility.scroll_top(self.driver)
         menu = self.find_element(*self._toggle_locator)
-        Utility.safari_exception_click(self.driver, element=menu)
+        Utility.click_option(self.driver, element=menu)
         sleep(0.15)
         return self
 
@@ -49,7 +49,7 @@ class Menu(Region):
         # Go to the internal site and wait for load; pass
         # the Page base URL (attached to the Page, not the
         # parent Region) so Page.open() can work
-        Utility.safari_exception_click(self.driver, element=target)
+        Utility.click_option(self.driver, element=target)
         if destination:
             return go_to_(destination(self.driver, self.page.page.base_url))
 
@@ -73,7 +73,7 @@ class TutorNav(Region):
 
     def go_to_dashboard(self):
         """Click on the OpenStax Tutor Beta logo."""
-        Utility.safari_exception_click(self.driver, element=self.logo)
+        Utility.click_option(self.driver, element=self.logo)
         sleep(0.5)
         if 'dashboard' in self.driver.current_url:
             # The user has multiple courses and ends up at
@@ -235,7 +235,7 @@ class TutorNav(Region):
         def pay_now(self):
             """Click the 'Pay now' button."""
             button = self.find_element(*self._pay_now_locator)
-            Utility.safari_exception_click(self.driver, element=button)
+            Utility.click_option(self.driver, element=button)
             from regions.tutor.purchase import Purchase
             return Purchase(self.page.page)
 

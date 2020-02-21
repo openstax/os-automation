@@ -62,9 +62,8 @@ class Search(AccountsAdmin):
                 if ', ' in terms.get(term):
                     terms[term] = terms.get(term).replace(', ', ',')
                 elif ' ' in terms.get(term):
-                    terms[term] = '"{term}"'.format(term=terms.get(term))
-                text.append('{term}:{values}'
-                            .format(term=term, values=terms.get(term)))
+                    terms[term] = f'"{terms.get(term)}"'
+                text.append(f'{term}:{terms.get(term)}')
         search_bar = self.find_element(*self._search_term_locator)
         search_bar.send_keys(' '.join(text))
         return self
@@ -91,9 +90,7 @@ class Search(AccountsAdmin):
             text.append(terms.get('literal'))
         else:
             for term in terms:
-                text.append(
-                    '{term} {direction}'
-                    .format(term=term, direction=terms.get(term)))
+                text.append(f'{term} {terms.get(term)}')
         order_bar = self.find_element(*self._ordering_locator)
         order_bar.send_keys(', '.join(text))
         return self

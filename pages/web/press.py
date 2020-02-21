@@ -64,8 +64,7 @@ class Release(Region):
         """Select a press release to view the entire text."""
         if self.continue_reading:
             append = self.continue_reading.get_attribute('href').split('/')[-1]
-            Utility.safari_exception_click(self.driver,
-                                           element=self.continue_reading)
+            Utility.click_option(self.driver, element=self.continue_reading)
             return go_to_(PressRelease(driver=self.driver,
                                        base_url=self.page.base_url,
                                        article=append))
@@ -173,10 +172,10 @@ class Press(WebBase):
         if option == self.current_menu_item or not self.is_phone:
             return self
         menu = self.find_element(*self._menu_select_locator)
-        Utility.safari_exception_click(self.driver, element=menu)
+        Utility.click_option(self.driver, element=menu)
         for section in self.menu_options:
             if section.text == option:
-                Utility.safari_exception_click(self.driver, element=section)
+                Utility.click_option(self.driver, element=section)
                 return self
         raise(ValueError('"{0}" is not an available section'.format(option)))
 
@@ -211,7 +210,7 @@ class Press(WebBase):
     def see_more_releases(self):
         """Toggle the fewer / more press releases switch."""
         switch = self.find_element(*self._see_toggle_locator)
-        Utility.safari_exception_click(self.driver, element=switch)
+        Utility.click_option(self.driver, element=switch)
         return self
 
     def see_fewer_releases(self):
@@ -321,7 +320,7 @@ class Press(WebBase):
             switch = self.find_element(*full)
         if 'presentation' not in switch.get_attribute('role'):
             # there is another pagination group of older or newer links
-            Utility.safari_exception_click(self.driver, element=switch)
+            Utility.click_option(self.driver, element=switch)
         return self
 
     class Mention(Region):
@@ -548,7 +547,7 @@ class PressRelease(WebBase):
     def see_more_releases(self):
         """Toggle the fewer / more press releases switch."""
         switch = self.find_element(*self._see_toggle_locator)
-        Utility.safari_exception_click(self.driver, element=switch)
+        Utility.click_option(self.driver, element=switch)
         return self
 
     def see_fewer_releases(self):
@@ -561,7 +560,7 @@ class PressRelease(WebBase):
             switch = self.find_element(*self._older_releases_locator)
             if 'presentation' not in switch.get_attribute('role'):
                 # there is another pagination group of older or newer links
-                Utility.safari_exception_click(self.driver, element=switch)
+                Utility.click_option(self.driver, element=switch)
         return self
 
     def view_newer_releases(self):
@@ -570,5 +569,5 @@ class PressRelease(WebBase):
             switch = self.find_element(*self._newer_releases_locator)
             if 'presentation' not in switch.get_attribute('role'):
                 # there is another pagination group of older or newer links
-                Utility.safari_exception_click(self.driver, element=switch)
+                Utility.click_option(self.driver, element=switch)
         return self

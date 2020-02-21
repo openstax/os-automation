@@ -71,8 +71,7 @@ class Give(WebBase):
 
     def contact_us(self):
         """Click on the 'Contact us for help...' button."""
-        Utility.safari_exception_click(self.driver,
-                                       locator=self._contact_locator)
+        Utility.click_option(self.driver, locator=self._contact_locator)
         from pages.web.contact import Contact
         return go_to_(Contact(self.driver, base_url=self.base_url))
 
@@ -128,8 +127,7 @@ class Give(WebBase):
 
         def donate(self):
             """Click the 'donate!' button."""
-            Utility.safari_exception_click(self.driver,
-                                           element=self.donate_button)
+            Utility.click_option(self.driver, element=self.donate_button)
             return go_to_(Donate(self.driver, self.page.base_url))
 
     class Option(Region):
@@ -223,8 +221,8 @@ class Donate(WebBase):
     def clear_test(self):
         """Uncheck the is_test checkbox."""
         if self.is_test:
-            Utility.safari_exception_click(driver=self.driver,
-                                           locator=self._is_test_locator)
+            Utility.click_option(driver=self.driver,
+                                 locator=self._is_test_locator)
         return self
 
     @property
@@ -379,8 +377,7 @@ class Donate(WebBase):
 
     def submit(self):
         """Click the Continue button."""
-        Utility.safari_exception_click(self.driver,
-                                       element=self.continue_button)
+        Utility.click_option(self.driver, element=self.continue_button)
         sleep(1.5)
         if not self.get_errors:
             from pages.rice.ebank import EBank
@@ -423,7 +420,7 @@ class Donate(WebBase):
         """Set a pull down menu field."""
         Utility.scroll_to(driver=self.driver, element=field, shift=-80)
         if 'open' not in field.get_attribute('class'):
-            Utility.safari_exception_click(self.driver, element=field)
+            Utility.click_option(self.driver, element=field)
         if len(option) > 2:
             # received a full option name
             locator = (By.XPATH, '//li[text()="{0}"]'.format(option))
@@ -437,6 +434,6 @@ class Donate(WebBase):
         self.driver.execute_script(
             'arguments[0].scrollTop = {0}'.format(offset),
             field.find_element(*self._options_locator))
-        Utility.safari_exception_click(driver=self.driver,
-                                       element=field.find_element(*locator))
+        Utility.click_option(driver=self.driver,
+                             element=field.find_element(*locator))
         return self

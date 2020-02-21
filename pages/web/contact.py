@@ -97,11 +97,10 @@ class Contact(WebBase):
                 raise ValueError('{0} is not a recognized contact topic'
                                  .format(subject))
             if 'open' not in self.topic_drop_down.get_attribute('class'):
-                Utility.safari_exception_click(self.driver,
-                                               element=self.topic_drop_down)
+                Utility.click_option(self.driver, element=self.topic_drop_down)
             for option in self.find_elements(*self._option_locator):
                 if subject == option.get_attribute('data-value'):
-                    Utility.safari_exception_click(self.driver, element=option)
+                    Utility.click_option(self.driver, element=option)
             return self
 
         @property
@@ -140,7 +139,7 @@ class Contact(WebBase):
         def send(self):
             """Submit the contact message."""
             button = self.find_element(*self._send_locator)
-            Utility.safari_exception_click(self.driver, element=button)
+            Utility.click_option(self.driver, element=button)
             issues = self.errors
             if issues:
                 return issues
@@ -190,6 +189,6 @@ class ContactConfirmation(WebBase):
 
     def view_subjects(self):
         """Click on the Subjects button."""
-        Utility.safari_exception_click(self.driver, element=self.button)
+        Utility.click_option(self.driver, element=self.button)
         from pages.web.subjects import Subjects
         return go_to_(Subjects(self.driver, self.base_url))

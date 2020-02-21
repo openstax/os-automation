@@ -25,7 +25,7 @@ class Pagination(Region):
     def next(self):
         """Click the continuation button."""
         button = self.find_element(*self._continue_locator)
-        Utility.safari_exception_click(self.driver, element=button)
+        Utility.click_option(self.driver, element=button)
         return self.page
 
 
@@ -278,7 +278,7 @@ class Signup(AccountsBase):
         def log_in(self):
             """Return to the login home page."""
             link = self.find_element(*self._sign_in_locator)
-            Utility.safari_exception_click(self.driver, element=link)
+            Utility.click_option(self.driver, element=link)
             return go_to_(AccountsHome(self.driver, self.page.base_url))
 
     class Pin(Pagination):
@@ -302,7 +302,7 @@ class Signup(AccountsBase):
         def edit_email(self):
             """Return to the user role selection to enter a new email."""
             link = self.find_element(*self._email_change_locator)
-            Utility.safari_exception_click(self.driver, element=link)
+            Utility.click_option(self.driver, element=link)
             return self.page
 
         @property
@@ -372,7 +372,7 @@ class Signup(AccountsBase):
         def use_social_login(self):
             """Go to the social login setup."""
             link = self.find_element(*self._use_social_locator)
-            Utility.safari_exception_click(self.driver, element=link)
+            Utility.click_option(self.driver, element=link)
             return Signup.SocialLogin(self.page)
 
     class Profile(Pagination):
@@ -457,7 +457,7 @@ class Signup(AccountsBase):
                 option = self.find_element(*self._adopted_locator)
             elif method == Accounts.NOT_USING:
                 option = self.find_element(*self._not_using_locator)
-            Utility.safari_exception_click(self.driver, element=option)
+            Utility.click_option(self.driver, element=option)
             return self.page
 
         @property
@@ -501,7 +501,7 @@ class Signup(AccountsBase):
         @property
         def use_facebook(self):
             """Use Facebook to log in."""
-            Utility.safari_exception_click(
+            Utility.click_option(
                 self.driver, locator=self._facebook_button_locator)
             from pages.facebook.home import Facebook
             return Facebook(self.driver)
@@ -509,7 +509,7 @@ class Signup(AccountsBase):
         @property
         def use_google(self):
             """Use Google to log in."""
-            Utility.safari_exception_click(
+            Utility.click_option(
                 self.driver, locator=self._google_button_locator)
             from pages.google.home import Google
             return Google(self.driver)
@@ -517,7 +517,7 @@ class Signup(AccountsBase):
         @property
         def use_a_password(self):
             """Use a non-social log in."""
-            Utility.safari_exception_click(
+            Utility.click_option(
                 self.driver, locator=self._go_to_password_setup_locator)
             return self.page
 
@@ -563,7 +563,7 @@ class Signup(AccountsBase):
                     selector = (self._recommend_book_selector
                                 .format(book_code=code))
                 button = self.find_element(By.CSS_SELECTOR, selector)
-                Utility.safari_exception_click(self.driver, element=button)
+                Utility.click_option(self.driver, element=button)
                 self.find_element(
                     By.CSS_SELECTOR,
                     self._student_number_selector.format(book_code=code)
@@ -591,7 +591,7 @@ class Signup(AccountsBase):
             """Uncheck the newsletter box."""
             if self.driver.execute_script('return arguments[0].checked;',
                                           self.newsletter):
-                Utility.safari_exception_click(self.driver,
+                Utility.click_option(self.driver,
                                                element=self.newsletter)
             return self.page
 
@@ -604,20 +604,20 @@ class Signup(AccountsBase):
             """Check the 'I agree' checkbox."""
             if not self.driver.execute_script('return arguments[0].checked;',
                                               self.agreement):
-                Utility.safari_exception_click(self.driver,
+                Utility.click_option(self.driver,
                                                element=self.agreement)
             return self.page
 
         def view_terms(self):
             """Open the Terms of Use."""
             link = self.find_element(*self._terms_locator)
-            Utility.safari_exception_click(self.driver, element=link)
+            Utility.click_option(self.driver, element=link)
             return self.page
 
         def view_privacy_policy(self):
             """Open the Privacy Policy."""
             link = self.find_element(*self._privacy_locator)
-            Utility.safari_exception_click(self.driver, element=link)
+            Utility.click_option(self.driver, element=link)
             return self.page
 
         @property
@@ -630,7 +630,7 @@ class Signup(AccountsBase):
         def back(self):
             """Return to the previous page."""
             button = self.find_element(*self._back_button_locator)
-            Utility.safari_exception_click(self.driver, element=button)
+            Utility.click_option(self.driver, element=button)
             return self.page
 
         def create_account(self):
@@ -669,7 +669,7 @@ class Signup(AccountsBase):
 
             def select(self):
                 """Select the book."""
-                Utility.safari_exception_click(self.driver,
+                Utility.click_option(self.driver,
                                                element=self.checkbox)
                 return self.page.page
 
@@ -692,7 +692,7 @@ class Signup(AccountsBase):
             def close(self):
                 """Close the modal."""
                 button = self.find_element(*self._close_locator)
-                Utility.safari_exception_click(self.driver, element=button)
+                Utility.click_option(self.driver, element=button)
                 return self.page.page
 
     class Approval(Pagination):
@@ -709,7 +709,7 @@ class Signup(AccountsBase):
             """Click the checkbox to receive notice."""
             if not self.driver.execute_script('return arguments[0].checked;',
                                               self.approval):
-                Utility.safari_exception_click(self.driver,
+                Utility.click_option(self.driver,
                                                element=self.approval)
             return self.page
 

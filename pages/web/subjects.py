@@ -444,7 +444,7 @@ class Book(Region):
     def select(self):
         """Click on the book cover."""
         book_name = self.url_append
-        Utility.safari_exception_click(
+        Utility.click_option(
             self.driver, element=self.find_element(*self._url_locator))
         from pages.web.book import Book as Details
         return go_to_(Details(self.driver,

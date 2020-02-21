@@ -58,7 +58,7 @@ class Bookstore(WebBase):
 
     def view_subjects(self):
         """Click on the visible subjects link."""
-        Utility.safari_exception_click(self.driver, element=self.subjects)
+        Utility.click_option(self.driver, element=self.subjects)
         from pages.web.subjects import Subjects
         return go_to_(Subjects(driver=self.driver, base_url=self.base_url))
 

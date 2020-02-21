@@ -139,7 +139,7 @@ class Team(WebBase):
 
         def select(self):
             """Select a group tab to view."""
-            Utility.safari_exception_click(self.driver, element=self.root)
+            Utility.click_option(self.driver, element=self.root)
             return self.page
 
         @property
@@ -166,8 +166,7 @@ class Team(WebBase):
 
         def toggle(self):
             """Open or close the bar region."""
-            Utility.safari_exception_click(self.driver,
-                                           element=self.toggle_bar)
+            Utility.click_option(self.driver, element=self.toggle_bar)
             return self.page
 
         @property
@@ -206,7 +205,7 @@ class Team(WebBase):
 
         def select(self):
             """Click on the person's card to open or close the bio."""
-            Utility.safari_exception_click(self.driver, element=self.root)
+            Utility.click_option(self.driver, element=self.root)
             return self
 
         @property

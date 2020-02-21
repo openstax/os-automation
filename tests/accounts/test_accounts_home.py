@@ -181,7 +181,6 @@ def test_view_the_accounts_terms_of_use(accounts_base_url, selenium):
     terms = home.footer.view_terms_of_use()
 
     # THEN: the "Site Terms & Policies" page is displayed
-    print(terms.page_source)
     assert('Site Terms' in terms.page_source), \
         'Terms of use not shown'
 

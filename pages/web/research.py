@@ -126,7 +126,7 @@ class Research(WebBase):
 
         def select(self):
             """Select a group tab to view."""
-            Utility.safari_exception_click(self.driver, element=self.root)
+            Utility.click_option(self.driver, element=self.root)
             return self.page
 
         @property
@@ -153,8 +153,7 @@ class Research(WebBase):
 
         def toggle(self):
             """Open or close the bar region."""
-            Utility.safari_exception_click(self.driver,
-                                           element=self.toggle_bar)
+            Utility.click_option(self.driver, element=self.toggle_bar)
             return self.page
 
         @property

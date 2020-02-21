@@ -121,7 +121,7 @@ class OurImpact(WebBase):
         def give_today(self):
             """Click the 'Give today!' button."""
             button = self.find_element(*self._give_locator)
-            Utility.safari_exception_click(self.driver, element=button)
+            Utility.click_option(self.driver, element=button)
             from pages.web.donation import Give
             return go_to_(Give(self.driver, self.page.base_url))
 
@@ -250,7 +250,7 @@ class OurImpact(WebBase):
             def read_more(self):
                 """Click on the 'Read more' link to view the blog entry."""
                 link = self.find_element(*self._link_locator)
-                Utility.safari_exception_click(self.driver, element=link)
+                Utility.click_option(self.driver, element=link)
                 from pages.web.blog import Article
                 return go_to_(Article(self.driver, self.page.page.base_url))
 
@@ -284,7 +284,7 @@ class OurImpact(WebBase):
         def view_business_textbooks(self):
             """Click on the 'business textbooks' link to view the subject."""
             link = self.find_element(*self._business_locator)
-            Utility.safari_exception_click(self.driver, element=link)
+            Utility.click_option(self.driver, element=link)
             from pages.web.subject import Subjects
             return go_to_(Subjects(self.driver, self.page.base_url))
 
@@ -307,7 +307,7 @@ class OurImpact(WebBase):
         def view_adoptions(self):
             """Click on adoptions link."""
             link = self.find_element(*self._adoptions_locator)
-            Utility.safari_exception_click(self.driver, element=link)
+            Utility.click_option(self.driver, element=link)
             from pages.web.adopters import Adopters
             return go_to_(Adopters(self.driver, self.page.base_url))
 
@@ -326,7 +326,7 @@ class OurImpact(WebBase):
         def learn_more_about_openstax_tutor_beta(self):
             """Click on the 'Learn more...' link."""
             link = self.find_element(*self._learn_more_locator)
-            Utility.safari_exception_click(self.driver, element=link)
+            Utility.click_option(self.driver, element=link)
             from pages.web.tutor import TutorMarketing
             return go_to_(TutorMarketing(self.driver, self.page.base_url))
 
@@ -378,6 +378,6 @@ class OurImpact(WebBase):
         def give_today(self):
             """Click on the 'Give today!' button."""
             button = self.find_element(*self._give_locator)
-            Utility.safari_exception_click(self.driver, element=button)
+            Utility.click_option(self.driver, element=button)
             from pages.web.donation import Give
             return go_to_(Give(self.driver, self.page.base_url))

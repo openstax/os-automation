@@ -170,6 +170,6 @@ class InterestConfirmation(AdoptionConfirmation):
 
     def back_to_books(self):
         """Return to the subjects page."""
-        Utility.safari_exception_click(self.driver, element=self.subjects)
+        Utility.click_option(self.driver, element=self.subjects)
         from pages.web.subjects import Subjects
         return go_to_(Subjects(self.driver, self.base_url))

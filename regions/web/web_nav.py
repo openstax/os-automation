@@ -121,7 +121,7 @@ class WebNav(Region):
     def go_home(self):
         """Return to the home page by clicking on the OpenStax logo."""
         logo = self.find_element(*self._openstax_logo_locator)
-        Utility.safari_exception_click(self.driver, element=logo)
+        Utility.click_option(self.driver, element=logo)
         from pages.web.home import WebHome
         return go_to_(WebHome(self.driver, self.page.base_url))
 
