@@ -62,7 +62,7 @@ class Partners(WebBase):
     @property
     def loaded(self):
         """Return True if the title is set and images are visible."""
-        return ('OpenStax Partners' in self.title and
+        return ('OpenStax Tech Scout' in self.title and
                 Utility.is_image_visible(self.driver,
                                          locator=self._image_locator))
 

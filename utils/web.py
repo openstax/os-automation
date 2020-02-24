@@ -503,6 +503,12 @@ class TechProviders():
 class Library():
     """OpenStax book library."""
 
+    # AP®
+    # AP_BIO (Science)
+    # AP_PHYS (Science)
+    # AP_MACRO (Social Sciences)
+    # AP_MICRO (Social Sciences)
+
     # Business
     ACCOUNTING_1 = 'Principles of Accounting, Volume 1: Financial Accounting'
     ACCOUNTING_1_ALT = 'Financial Accounting'
@@ -517,12 +523,19 @@ class Library():
     MANAGEMENT_ALT = 'Management'
     ORG_BEHAVIOR = 'Organizational Behavior'
 
+    # College Success
+    COLL_SUCCESS = 'College Success'
+
+    # Essentials
+    # BUS_LAW_1 (Business)
+
     # Humanities
     US_HISTORY = 'U.S. History'
 
     # Math
     ALGEBRA = 'College Algebra'
     ALGEBRA_TRIG = 'Algebra and Trigonometry'
+    # BUSINESS_STATS (Business)
     CALCULUS_1 = 'Calculus Volume 1'
     CALCULUS_2 = 'Calculus Volume 2'
     CALCULUS_3 = 'Calculus Volume 3'
@@ -596,6 +609,7 @@ class Library():
     ALL = 'View All'
     AP = 'AP®'
     BUSINESS = 'Business'
+    COLLEGE_SUCESS = 'College Success'
     ESSENTIALS = 'Essentials'
     HUMANITIES = 'Humanities'
     MATH = 'Math'
@@ -772,6 +786,26 @@ class Library():
                 self.PRINT_COPY: False,
                 self.SHORT_NAME: 'Behavior', },
 
+            # College Success
+            self.COLL_SUCCESS: {
+                self.BOOKSHARE: False,
+                self.CATEGORY: [self.ALL, self.COLLEGE_SUCESS],
+                self.CHEGG: False,
+                self.COMP_COPY: False,
+                self.DETAILS: 'college-success',
+                self.HAS_I_LOCK: False,
+                self.HAS_I_UNLOCK: True,
+                self.HAS_S_LOCK: False,
+                self.HAS_S_UNLOCK: True,
+                self.INTEREST: 'College%20Success',
+                self.IS_AP: False,
+                self.ITUNES: False,
+                self.KINDLE: False,
+                self.LANGUAGE: self.ENGLISH,
+                self.PRE_RELEASE: True,
+                self.PRINT_COPY: False,
+                self.SHORT_NAME: '', },
+
             # Essentials
             #     currently, only Entrepreneurship and Busness Law I are in
             #     Essentials
@@ -797,6 +831,24 @@ class Library():
                 self.SHORT_NAME: 'U.S. History', },
 
             # Math
+            self.ALGEBRA: {
+                self.BOOKSHARE: False,
+                self.CATEGORY: [self.ALL, self.MATH],
+                self.CHEGG: False,
+                self.COMP_COPY: False,
+                self.DETAILS: 'college-algebra',
+                self.HAS_I_LOCK: True,
+                self.HAS_I_UNLOCK: True,
+                self.HAS_S_LOCK: False,
+                self.HAS_S_UNLOCK: True,
+                self.INTEREST: 'College%20Algebra',
+                self.IS_AP: False,
+                self.ITUNES: False,
+                self.KINDLE: True,
+                self.LANGUAGE: self.ENGLISH,
+                self.PRE_RELEASE: False,
+                self.PRINT_COPY: True,
+                self.SHORT_NAME: 'College Algebra', },
             self.ALGEBRA_TRIG: {
                 self.BOOKSHARE: False,
                 self.CATEGORY: [self.ALL, self.MATH],
@@ -869,24 +921,6 @@ class Library():
                 self.PRE_RELEASE: False,
                 self.PRINT_COPY: True,
                 self.SHORT_NAME: 'Calculus', },
-            self.ALGEBRA: {
-                self.BOOKSHARE: False,
-                self.CATEGORY: [self.ALL, self.MATH],
-                self.CHEGG: False,
-                self.COMP_COPY: False,
-                self.DETAILS: 'college-algebra',
-                self.HAS_I_LOCK: True,
-                self.HAS_I_UNLOCK: True,
-                self.HAS_S_LOCK: False,
-                self.HAS_S_UNLOCK: True,
-                self.INTEREST: 'College%20Algebra',
-                self.IS_AP: False,
-                self.ITUNES: False,
-                self.KINDLE: True,
-                self.LANGUAGE: self.ENGLISH,
-                self.PRE_RELEASE: False,
-                self.PRINT_COPY: True,
-                self.SHORT_NAME: 'College Algebra', },
             self.ELEM_ALGEBRA: {
                 self.BOOKSHARE: False,
                 self.CATEGORY: [self.ALL, self.MATH],
@@ -997,6 +1031,42 @@ class Library():
                 self.PRE_RELEASE: False,
                 self.PRINT_COPY: True,
                 self.SHORT_NAME: 'Anatomy & Physiology', },
+            self.AP_BIO: {
+                self.BOOKSHARE: False,
+                self.CATEGORY: [self.ALL, self.AP, self.SCIENCE],
+                self.CHEGG: True,
+                self.COMP_COPY: False,
+                self.DETAILS: 'biology-ap-courses',
+                self.HAS_I_LOCK: True,
+                self.HAS_I_UNLOCK: True,
+                self.HAS_S_LOCK: True,
+                self.HAS_S_UNLOCK: True,
+                self.INTEREST: 'AP%20Bio',
+                self.IS_AP: True,
+                self.ITUNES: False,
+                self.KINDLE: True,
+                self.LANGUAGE: self.ENGLISH,
+                self.PRE_RELEASE: False,
+                self.PRINT_COPY: True,
+                self.SHORT_NAME: 'AP Biology', },
+            self.AP_PHYS: {
+                self.BOOKSHARE: False,
+                self.CATEGORY: [self.ALL, self.AP, self.SCIENCE],
+                self.CHEGG: False,
+                self.COMP_COPY: True,
+                self.DETAILS: 'college-physics-ap-courses',
+                self.HAS_I_LOCK: True,
+                self.HAS_I_UNLOCK: True,
+                self.HAS_S_LOCK: True,
+                self.HAS_S_UNLOCK: True,
+                self.INTEREST: 'AP%20Physics',
+                self.IS_AP: True,
+                self.ITUNES: True,
+                self.KINDLE: True,
+                self.LANGUAGE: self.ENGLISH,
+                self.PRE_RELEASE: False,
+                self.PRINT_COPY: True,
+                self.SHORT_NAME: 'AP Physics', },
             self.ASTRONOMY: {
                 self.BOOKSHARE: False,
                 self.CATEGORY: [self.ALL, self.SCIENCE],
@@ -1033,24 +1103,24 @@ class Library():
                 self.PRE_RELEASE: False,
                 self.PRINT_COPY: True,
                 self.SHORT_NAME: 'Biology', },
-            self.AP_BIO: {
-                self.BOOKSHARE: False,
-                self.CATEGORY: [self.ALL, self.AP, self.SCIENCE],
+            self.BIO_CONCEPTS: {
+                self.BOOKSHARE: True,
+                self.CATEGORY: [self.ALL, self.SCIENCE],
                 self.CHEGG: True,
                 self.COMP_COPY: False,
-                self.DETAILS: 'biology-ap-courses',
+                self.DETAILS: 'concepts-biology',
                 self.HAS_I_LOCK: True,
                 self.HAS_I_UNLOCK: True,
                 self.HAS_S_LOCK: True,
                 self.HAS_S_UNLOCK: True,
-                self.INTEREST: 'AP%20Bio',
-                self.IS_AP: True,
-                self.ITUNES: False,
+                self.INTEREST: r'Concepts%20of%20Bio%20(non-majors)',
+                self.IS_AP: False,
+                self.ITUNES: True,
                 self.KINDLE: True,
                 self.LANGUAGE: self.ENGLISH,
                 self.PRE_RELEASE: False,
                 self.PRINT_COPY: True,
-                self.SHORT_NAME: 'AP Biology', },
+                self.SHORT_NAME: 'Concepts of Biology', },
             self.CHEMISTRY_2E: {
                 self.BOOKSHARE: False,
                 self.CATEGORY: [self.ALL, self.SCIENCE],
@@ -1087,60 +1157,6 @@ class Library():
                 self.PRE_RELEASE: False,
                 self.PRINT_COPY: True,
                 self.SHORT_NAME: 'Chemistry: Atoms First', },
-            self.PHYSICS: {
-                self.BOOKSHARE: True,
-                self.CATEGORY: [self.ALL, self.SCIENCE],
-                self.CHEGG: False,
-                self.COMP_COPY: False,
-                self.DETAILS: 'college-physics',
-                self.HAS_I_LOCK: True,
-                self.HAS_I_UNLOCK: True,
-                self.HAS_S_LOCK: True,
-                self.HAS_S_UNLOCK: True,
-                self.INTEREST: 'College%20Physics%20(Algebra)',
-                self.IS_AP: False,
-                self.ITUNES: True,
-                self.KINDLE: True,
-                self.LANGUAGE: self.ENGLISH,
-                self.PRE_RELEASE: False,
-                self.PRINT_COPY: True,
-                self.SHORT_NAME: 'College Physics', },
-            self.AP_PHYS: {
-                self.BOOKSHARE: False,
-                self.CATEGORY: [self.ALL, self.AP, self.SCIENCE],
-                self.CHEGG: False,
-                self.COMP_COPY: True,
-                self.DETAILS: 'college-physics-ap-courses',
-                self.HAS_I_LOCK: True,
-                self.HAS_I_UNLOCK: True,
-                self.HAS_S_LOCK: True,
-                self.HAS_S_UNLOCK: True,
-                self.INTEREST: 'AP%20Physics',
-                self.IS_AP: True,
-                self.ITUNES: True,
-                self.KINDLE: True,
-                self.LANGUAGE: self.ENGLISH,
-                self.PRE_RELEASE: False,
-                self.PRINT_COPY: True,
-                self.SHORT_NAME: 'AP Physics', },
-            self.BIO_CONCEPTS: {
-                self.BOOKSHARE: True,
-                self.CATEGORY: [self.ALL, self.SCIENCE],
-                self.CHEGG: True,
-                self.COMP_COPY: False,
-                self.DETAILS: 'concepts-biology',
-                self.HAS_I_LOCK: True,
-                self.HAS_I_UNLOCK: True,
-                self.HAS_S_LOCK: True,
-                self.HAS_S_UNLOCK: True,
-                self.INTEREST: r'Concepts%20of%20Bio%20(non-majors)',
-                self.IS_AP: False,
-                self.ITUNES: True,
-                self.KINDLE: True,
-                self.LANGUAGE: self.ENGLISH,
-                self.PRE_RELEASE: False,
-                self.PRINT_COPY: True,
-                self.SHORT_NAME: 'Concepts of Biology', },
             self.FIZYKA_1: {
                 self.BOOKSHARE: False,
                 self.CATEGORY: [self.ALL, self.SCIENCE],
@@ -1213,6 +1229,24 @@ class Library():
                 self.PRE_RELEASE: False,
                 self.PRINT_COPY: True,
                 self.SHORT_NAME: 'Microbiology', },
+            self.PHYSICS: {
+                self.BOOKSHARE: True,
+                self.CATEGORY: [self.ALL, self.SCIENCE],
+                self.CHEGG: False,
+                self.COMP_COPY: False,
+                self.DETAILS: 'college-physics',
+                self.HAS_I_LOCK: True,
+                self.HAS_I_UNLOCK: True,
+                self.HAS_S_LOCK: True,
+                self.HAS_S_UNLOCK: True,
+                self.INTEREST: 'College%20Physics%20(Algebra)',
+                self.IS_AP: False,
+                self.ITUNES: True,
+                self.KINDLE: True,
+                self.LANGUAGE: self.ENGLISH,
+                self.PRE_RELEASE: False,
+                self.PRINT_COPY: True,
+                self.SHORT_NAME: 'College Physics', },
             self.U_PHYS_1: {
                 self.BOOKSHARE: False,
                 self.CATEGORY: [self.ALL, self.SCIENCE],
