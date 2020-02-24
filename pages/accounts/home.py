@@ -253,7 +253,8 @@ class AccountsHome(AccountsBase):
             if previous:
                 return go_to_(previous(self.driver, base_url, **kwargs))
             source = self.driver.page_source
-            if 'Terms of Use' in source or 'Privacy policy' in source:
+            policies = 'Terms of Use' in source or 'Privacy policy' in source
+            if 'accounts' in self.page.location and policies:
                 from pages.accounts.legal import AcceptTerms
                 return go_to_(AcceptTerms(self.driver, self.page.base_url))
             return go_to_(Profile(self.driver, self.page.base_url))

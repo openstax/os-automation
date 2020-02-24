@@ -591,8 +591,7 @@ class Signup(AccountsBase):
             """Uncheck the newsletter box."""
             if self.driver.execute_script('return arguments[0].checked;',
                                           self.newsletter):
-                Utility.click_option(self.driver,
-                                               element=self.newsletter)
+                Utility.click_option(self.driver, element=self.newsletter)
             return self.page
 
         @property
@@ -604,8 +603,7 @@ class Signup(AccountsBase):
             """Check the 'I agree' checkbox."""
             if not self.driver.execute_script('return arguments[0].checked;',
                                               self.agreement):
-                Utility.click_option(self.driver,
-                                               element=self.agreement)
+                Utility.click_option(self.driver, element=self.agreement)
             return self.page
 
         def view_terms(self):
@@ -669,8 +667,7 @@ class Signup(AccountsBase):
 
             def select(self):
                 """Select the book."""
-                Utility.click_option(self.driver,
-                                               element=self.checkbox)
+                Utility.click_option(self.driver, element=self.checkbox)
                 return self.page.page
 
             @property
@@ -709,8 +706,7 @@ class Signup(AccountsBase):
             """Click the checkbox to receive notice."""
             if not self.driver.execute_script('return arguments[0].checked;',
                                               self.approval):
-                Utility.click_option(self.driver,
-                                               element=self.approval)
+                Utility.click_option(self.driver, element=self.approval)
             return self.page
 
         def ok(self):

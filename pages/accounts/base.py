@@ -49,6 +49,15 @@ class AccountsBase(Page):
         return self.Footer(self, footer_root)
 
     @property
+    def is_safari(self) -> bool:
+        """Return True if the browser in use is Safari.
+
+        :return: ``True`` if the browser in use is Safari
+        :rtype: bool
+
+        """
+        return self.driver.capabilities.get('browserName').lower() == 'safari'
+
     def is_displayed(self) -> bool:
         """Return True when the Accounts content is displayed.
 
@@ -60,16 +69,6 @@ class AccountsBase(Page):
             return self.find_element(*self._content_locator).is_displayed()
         except NoSuchElementException:
             return False
-
-    @property
-    def is_safari(self) -> bool:
-        """Return True if the browser in use is Safari.
-
-        :return: ``True`` if the browser in use is Safari
-        :rtype: bool
-
-        """
-        return self.driver.capabilities.get('browserName').lower() == 'safari'
 
     @property
     def loaded(self) -> bool:

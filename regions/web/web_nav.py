@@ -342,34 +342,16 @@ class WebNav(Region):
         _open_menu_locator = (By.CSS_SELECTOR, '[href="."]')
         _partners_option_locator = (By.CSS_SELECTOR, '[href$=partners]')
         _rover_option_locator = (By.CSS_SELECTOR, '[href*=rover]')
-        _technology_option_locator = (By.CSS_SELECTOR, '[href$=technology]')
         _tutor_option_locator = (By.CSS_SELECTOR, '[href$=openstax-tutor]')
-
-        def hover(self):
-            """Return the CSS style of a hovered element."""
-            return self._hover(self._technology_option_locator)
 
         def is_available(self, label):
             """Return True if the menu option is available."""
             topics = {
-                Web.VIEW_TECHNOLOGY: self._technology_option_locator[1],
                 Web.VIEW_TUTOR: self._tutor_option_locator[1],
                 Web.VIEW_ROVER: self._rover_option_locator[1],
                 Web.VIEW_PARTNERS: self._partners_option_locator[1],
             }
             return self._is_available(label, 'technology', topics)
-
-        @property
-        def technology(self):
-            """Return the technology link."""
-            return self.find_element(*self._technology_option_locator)
-
-        def view_technology(self):
-            """View the technology page."""
-            from pages.web.technology import Technology
-            return self.open()._selection_helper(
-                self._technology_option_locator,
-                Technology)
 
         @property
         def tutor(self):
@@ -526,10 +508,9 @@ class WebNav(Region):
             from pages.accounts.home import AccountsHome
             if do_not_log_in:
                 return go_to_(AccountsHome(self.driver, url))
-            else:
-                AccountsHome(self.driver).service_log_in(user, password)
-            if destination:
-                return go_to_(destination(self.driver, url))
+            elif destination:
+                return go_to_(AccountsHome(self.driver)) \
+                    .log_in(user, password, destination, url)
             from pages.web.home import WebHome as Home
             return go_to_(Home(self.driver, url))
 
