@@ -280,7 +280,7 @@ class Article(Blog):
         """
         super(Blog, self).wait_for_page_to_load()
         self.wait.until(
-            lambda _: (self.find_element(*self._hero_banner_locator)
+            lambda _: (self.find_element(*self._article_title_locator)
                        .is_displayed()))
 
     def is_displayed(self):
@@ -293,7 +293,7 @@ class Article(Blog):
         """
         return (
             self.wait.until(expect.visibility_of_element_located(
-                self._hero_banner_locator)).is_displayed() and
+                self._article_title_locator)).is_displayed() and
             self.wait.until(
                 expect.presence_of_element_located(self._disqus_locator)
             ).is_displayed())
