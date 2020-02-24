@@ -50,7 +50,7 @@ class Contact(WebBase):
 
     def visit_the_support_center(self):
         """Click on the support link."""
-        link = self.find_element(*self._support_locator)
+        link = self.support
         url = link.get_attribute('href')
         Utility.switch_to(self.driver, self._support_locator,
                           force_js_click=self.is_safari)
