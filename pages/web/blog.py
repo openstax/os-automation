@@ -266,7 +266,6 @@ class Article(Blog):
 
     URL_TEMPLATE = '/blog/{article}'
 
-    _hero_banner_locator = (By.CSS_SELECTOR, '.hero')
     _article_title_locator = (By.CSS_SELECTOR, '.article h1')
     _disqus_locator = (By.CSS_SELECTOR, '#disqus_thread')
 
