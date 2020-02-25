@@ -8,7 +8,7 @@ from pages.web.interest import Interest, InterestConfirmation
 from tests.markers import nondestructive, skip_test, smoke_test, test_case, web
 from utils.email import RestMail
 from utils.utilities import Utility
-from utils.web import Library, Web
+from utils.web import Library, TechProviders, Web, WebException
 
 
 @test_case('C210508')
@@ -18,6 +18,10 @@ def test_the_interest_form_loads(web_base_url, selenium):
     """Test the interest form loads."""
     # GIVEN: a user and a web browser
     interest = Interest(selenium, web_base_url)
+    if interest.survey.is_displayed():
+        interest.survey.close()
+    if interest.privacy_notice.is_displayed():
+        interest.privacy_notice.got_it()
 
     # WHEN: they go to the interest form
     interest.open()
@@ -35,6 +39,10 @@ def test_the_interest_form_links_to_the_adoption_form(web_base_url, selenium):
     """Test a user viewing the interest form can go to the adoption form."""
     # GIVEN: a user viewing the interest page
     interest = Interest(selenium, web_base_url).open()
+    if interest.survey.is_displayed():
+        interest.survey.close()
+    if interest.privacy_notice.is_displayed():
+        interest.privacy_notice.got_it()
 
     # WHEN: they click on the "Let us know!" link
     adoption = interest.go_to_adoption()
@@ -52,6 +60,10 @@ def test_students_do_not_need_to_fill_out_the_form(web_base_url, selenium):
     """Test students are informed they do not need to fill out the form."""
     # GIVEN: a user viewing the interest page
     interest = Interest(selenium, web_base_url).open()
+    if interest.survey.is_displayed():
+        interest.survey.close()
+    if interest.privacy_notice.is_displayed():
+        interest.privacy_notice.got_it()
 
     # WHEN: they select "Student" from the drop down menu
     interest.form.select(Web.STUDENT)
@@ -94,19 +106,14 @@ def test_non_students_may_fill_out_the_form(web_base_url, selenium):
     user_type = Web.USERS[Utility.random(1, len(Web.USERS) - 1)]
     _, first_name, last_name, _ = Utility.random_name()
     email = RestMail(
-        '{first}.{last}.{rand}'
-        .format(first=first_name, last=last_name, rand=Utility.random_hex(3))
-        .lower())
+        f'{first_name}.{last_name}.{Utility.random_hex(3)}'.lower())
     phone = Utility.random_phone(713, False)
     school = 'Automation'
-    books = Library().random_book(Utility.random(start=5, end=5))
+    books = Library().random_book(Utility.random(start=2, end=5))
     students = Utility.random(Web.STUDENT_MIN, Web.STUDENT_MAX)
-    from utils.web import TechProviders
     tech_providers = TechProviders.get_tech(Utility.random(0, 3))
-    if TechProviders.OTHER in tech_providers:
-        other = 'Another product provider'
-    else:
-        other = None
+    other = 'Another product provider' \
+        if TechProviders.OTHER in tech_providers else None
 
     # GIVEN: a user viewing the interest page
     interest = Interest(selenium, web_base_url).open()
@@ -167,13 +174,17 @@ def test_a_book_is_preselected_when_a_book_details_interest_link_is_used(
 
     # GIVEN: a user viewing a book page
     book_details = Book(selenium, web_base_url, book_name=detail_append).open()
-    interest = book_details.is_interested()
 
     # WHEN: they click on the "Sign up to learn more" link
     # AND:  select a non-Student role from the drop down menu
     # AND:  fill out the contact form fields
     # AND:  click on the "Next" button
-    with pytest.raises(AssertionError) as error:
+    interest = book_details.is_interested()
+    if interest.survey.is_displayed():
+        interest.survey.close()
+    if interest.privacy_notice.is_displayed():
+        interest.privacy_notice.got_it()
+    with pytest.raises(WebException) as error:
         interest.submit_interest(
             user_type=user_type,
             first=first_name,
@@ -202,11 +213,15 @@ def test_interest_form_identity_fields_are_required(web_base_url, selenium):
     # GIVEN: a user viewing the interest page
     user_type = Web.USERS[Utility.random(1, len(Web.USERS) - 1)]
     interest = Interest(selenium, web_base_url).open()
+    if interest.survey.is_displayed():
+        interest.survey.close()
+    if interest.privacy_notice.is_displayed():
+        interest.privacy_notice.got_it()
 
     # WHEN: they select a non-Student role from the drop
     #       down menu
     # AND:  click on the "Next" button
-    with pytest.raises(AssertionError) as error:
+    with pytest.raises(WebException) as error:
         interest.submit_interest(
             user_type=user_type,
             first='',
@@ -293,12 +308,16 @@ def test_interest_form_requires_at_least_one_book_selection(
 
     # GIVEN: a user viewing the interest page
     interest = Interest(selenium, web_base_url).open()
+    if interest.survey.is_displayed():
+        interest.survey.close()
+    if interest.privacy_notice.is_displayed():
+        interest.privacy_notice.got_it()
 
     # WHEN: they select a non-Student role from the drop down menu
     # AND:  fill out the contact form fields
     # AND:  click on the "Next" button
     # AND:  click on the "Next" button
-    with pytest.raises(AssertionError) as error:
+    with pytest.raises(WebException) as error:
         interest.submit_interest(
             user_type=user_type,
             first=first_name,

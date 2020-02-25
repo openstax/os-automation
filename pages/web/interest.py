@@ -6,7 +6,7 @@ from selenium.webdriver.common.by import By
 
 from pages.web.adoption import ERROR, Adoption, AdoptionConfirmation
 from utils.utilities import Utility, go_to_
-from utils.web import TechProviders
+from utils.web import TechProviders, WebException
 
 
 class Interest(Adoption):
@@ -59,8 +59,8 @@ class Interest(Adoption):
         self.form.school = school
         self.form.next()
         user_errors = self.form.get_user_errors
-        assert(not user_errors), \
-            'User errors: {issues}'.format(issues=user_errors)
+        if user_errors:
+            raise WebException(f'User errors: {user_errors}')
         self.wait.until(
             lambda _:
                 Utility.is_image_visible(self.driver,
@@ -70,16 +70,14 @@ class Interest(Adoption):
         self.form.select_books(books)
         sleep(0.5)
         self.form.students = students
-        self.form.receive(additional_resources)
         self.form.heard(heard_on)
         self.form.next()
         book_error = self.form.get_book_error
-        assert(not book_error), \
-            'Book error - {book}\n{source}'.format(
-                book=book_error, source=self.driver.page_source)
+        if book_error:
+            raise WebException(f'Book error - {book_error}')
         using_error = self.form.using_error
-        assert(not using_error), \
-            'Using error - {using}'.format(using=using_error)
+        if using_error:
+            raise WebException(f'Using error - {using_error}')
         self.form.select_tech(tech_providers)
         if TechProviders.OTHER in tech_providers:
             self.form.other = other_provider
@@ -141,7 +139,8 @@ class Interest(Adoption):
                 group = {}
                 for option in self.find_elements(*options_locator):
                     group[option.get_attribute('value')] = option
-                assert(group), 'No {0} options found'.format(_type)
+                if not group:
+                    raise WebException(f'No {_type} options found')
                 for option in group:
                     if option in selected:
                         group.get(option).click()

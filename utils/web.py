@@ -695,7 +695,7 @@ class Library():
                 self.PRE_RELEASE: False,
                 self.PRINT_COPY: False,
                 self.SHORT_NAME: 'Business Law I Essentials', },
-            self.ENTREPRENEUR: {  # Pre-release
+            self.ENTREPRENEUR: {
                 self.BOOKSHARE: False,
                 self.CATEGORY: [self.ALL, self.BUSINESS, self.ESSENTIALS],
                 self.CHEGG: False,
@@ -712,7 +712,7 @@ class Library():
                 self.LANGUAGE: self.ENGLISH,
                 self.PRE_RELEASE: True,
                 self.PRINT_COPY: False,
-                self.SHORT_NAME: None, },
+                self.SHORT_NAME: 'Entrepreneurship', },
             self.ETHICS: {
                 self.BOOKSHARE: False,
                 self.CATEGORY: [self.ALL, self.BUSINESS],
@@ -784,7 +784,7 @@ class Library():
                 self.LANGUAGE: self.ENGLISH,
                 self.PRE_RELEASE: False,
                 self.PRINT_COPY: False,
-                self.SHORT_NAME: 'Behavior', },
+                self.SHORT_NAME: 'Organizational Behavior', },
 
             # College Success
             self.COLL_SUCCESS: {
@@ -804,7 +804,7 @@ class Library():
                 self.LANGUAGE: self.ENGLISH,
                 self.PRE_RELEASE: True,
                 self.PRINT_COPY: False,
-                self.SHORT_NAME: '', },
+                self.SHORT_NAME: None, },
 
             # Essentials
             #     currently, only Entrepreneurship and Busness Law I are in
@@ -1138,7 +1138,7 @@ class Library():
                 self.LANGUAGE: self.ENGLISH,
                 self.PRE_RELEASE: False,
                 self.PRINT_COPY: True,
-                self.SHORT_NAME: 'Chemistry', },
+                self.SHORT_NAME: 'Chemistry 2e', },
             self.CHEM_ATOMS_2E: {
                 self.BOOKSHARE: False,
                 self.CATEGORY: [self.ALL, self.SCIENCE],
@@ -1156,7 +1156,7 @@ class Library():
                 self.LANGUAGE: self.ENGLISH,
                 self.PRE_RELEASE: False,
                 self.PRINT_COPY: True,
-                self.SHORT_NAME: 'Chemistry: Atoms First', },
+                self.SHORT_NAME: 'Chemistry: Atoms First 2e', },
             self.FIZYKA_1: {
                 self.BOOKSHARE: False,
                 self.CATEGORY: [self.ALL, self.SCIENCE],
@@ -1320,7 +1320,8 @@ class Library():
                 self.LANGUAGE: self.ENGLISH,
                 self.PRE_RELEASE: False,
                 self.PRINT_COPY: False,
-                self.SHORT_NAME: 'AP Macro Econ', },
+                self.SHORT_NAME: ('Principles of Macroeconomics '
+                                  'for AP Courses 2e'), },
             self.AP_MICRO: {
                 self.BOOKSHARE: False,
                 self.CATEGORY: [self.ALL, self.AP, self.SOCIAL],
@@ -1338,7 +1339,8 @@ class Library():
                 self.LANGUAGE: self.ENGLISH,
                 self.PRE_RELEASE: False,
                 self.PRINT_COPY: False,
-                self.SHORT_NAME: 'AP Micro Econ', },
+                self.SHORT_NAME: ('Principles of Microeconomics '
+                                  'for AP Courses 2e'), },
             self.GOVERNMENT_2E: {
                 self.BOOKSHARE: False,
                 self.CATEGORY: [self.ALL, self.SOCIAL],
@@ -1356,7 +1358,7 @@ class Library():
                 self.LANGUAGE: self.ENGLISH,
                 self.PRE_RELEASE: False,
                 self.PRINT_COPY: True,
-                self.SHORT_NAME: 'American Government', },
+                self.SHORT_NAME: 'American Government 2e', },
             self.PRINCIPLES_ECON: {
                 self.BOOKSHARE: False,
                 self.CATEGORY: [self.ALL, self.SOCIAL],
@@ -1374,7 +1376,7 @@ class Library():
                 self.LANGUAGE: self.ENGLISH,
                 self.PRE_RELEASE: False,
                 self.PRINT_COPY: True,
-                self.SHORT_NAME: 'Principles of Economics', },
+                self.SHORT_NAME: 'Principles of Economics 2e', },
             self.PRINCIPLES_MACRO: {
                 self.BOOKSHARE: False,
                 self.CATEGORY: [self.ALL, self.SOCIAL],
@@ -1392,7 +1394,7 @@ class Library():
                 self.LANGUAGE: self.ENGLISH,
                 self.PRE_RELEASE: False,
                 self.PRINT_COPY: True,
-                self.SHORT_NAME: 'Principles of Macroeconomics', },
+                self.SHORT_NAME: 'Principles of Macroeconomics 2e', },
             self.PRINCIPLES_MICRO: {
                 self.BOOKSHARE: False,
                 self.CATEGORY: [self.ALL, self.SOCIAL],
@@ -1410,7 +1412,7 @@ class Library():
                 self.LANGUAGE: self.ENGLISH,
                 self.PRE_RELEASE: False,
                 self.PRINT_COPY: True,
-                self.SHORT_NAME: 'Principles of Microeconomics', },
+                self.SHORT_NAME: 'Principles of Microeconomics 2e', },
             self.PSYCHOLOGY: {
                 self.BOOKSHARE: False,
                 self.CATEGORY: [self.ALL, self.SOCIAL],
