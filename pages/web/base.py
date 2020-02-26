@@ -28,8 +28,11 @@ class WebBase(Page):
     @property
     def loaded(self):
         """Return True when the page-loaded class is added to the body tag."""
-        return (self.web_nav.loaded and
-                not self.find_elements(*self._async_hide_locator))
+        script = (r'document.addEventListener("load", function(event) {});')
+        sleep(0.5)
+        async_hide = bool(self.find_elements(*self._async_hide_locator))
+        return (self.driver.execute_script(script) or
+                (self.web_nav.loaded and not async_hide))
 
     def open(self):
         """Open the page."""

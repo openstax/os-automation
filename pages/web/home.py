@@ -53,7 +53,7 @@ class Link(Region):
         base_url = parent.base_url
         Utility.click_option(self.driver, element=self.link)
         if destination.endswith(Web.IMPACT):
-            from pages.web.impact import OurImpact as Destination
+            from pages.web.impact import Impact as Destination
         elif destination.endswith(Web.ANNUAL_REPORT):
             from pages.web.annual import AnnualReport as Destination
         elif destination.endswith(Web.PARTNERS):
@@ -428,13 +428,24 @@ class WebHome(WebBase):
         class Bucket(Link):
             """Individual information boxes."""
 
+            _button_locator = (By.CSS_SELECTOR, 'a.btn')
             _image_locator = (By.CLASS_NAME, 'image')
 
             @property
             def has_image(self):
                 """Return True if the box has an image."""
                 try:
-                    self.find_element(*self._image_locator)
-                    return True
+                    return bool(self.find_elements(*self._image_locator))
                 except NoSuchElementException:
                     return False
+
+            def select(self):
+                """Click the information bucket."""
+                from pages.web.impact import Impact
+                from pages.web.partners import Partners
+                button = self.find_element(*self._button_locator)
+                base_url = Utility.parent_page(self).base_url
+                destination = Impact if 'impact' in button.text.lower() \
+                    else Partners
+                Utility.click_option(self.driver, element=button)
+                return go_to_(destination(self.driver, base_url=base_url))
