@@ -1,11 +1,12 @@
 """Test the partners page."""
 
 from pages.web.home import WebHome
-from tests.markers import nondestructive, test_case, web
+from tests.markers import nondestructive, skip_test, test_case, web
 from utils.utilities import Utility
 from utils.web import TechProviders, Web
 
 
+@skip_test(reason='partner tech scout replacement page')
 @test_case('C210443')
 @nondestructive
 @web
@@ -23,6 +24,7 @@ def test_the_openstax_ally_logo_is_available(web_base_url, selenium):
     assert(Utility.is_image_visible(selenium, image=partners.logo))
 
 
+@skip_test(reason='partner tech scout replacement page')
 @test_case('C210444', 'C210445')
 @nondestructive
 @web
@@ -57,6 +59,7 @@ def test_able_to_filter_partners_by_category(web_base_url, selenium):
                 assert(company.name in TechProviders.tech_list)
 
 
+@skip_test(reason='partner tech scout replacement page')
 @test_case('C210446')
 @nondestructive
 @web
@@ -92,6 +95,7 @@ def test_selecting_a_partner_logo_scrolls_to_the_partner_summary(
     assert(Utility.in_viewport(selenium, element=logo.logo))
 
 
+@skip_test(reason='partner tech scout replacement page')
 @test_case('C210447')
 @nondestructive
 @web

@@ -132,7 +132,8 @@ class ResetPassword(AccountsBase):
         _contact_support_link_locator = (
             By.CSS_SELECTOR, '[href*="force.com"]')
         _email_locator = (
-            By.CSS_SELECTOR, '#reset_password_form_email')
+            By.CSS_SELECTOR,
+            '#reset_password_form_email, #forgot_password_form_email')
         _reset_my_password_button_locator = (
             By.CSS_SELECTOR, '[type=submit]')
 

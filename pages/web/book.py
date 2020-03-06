@@ -1461,7 +1461,7 @@ class BookOrder(Modal):
                 target = self.root
             else:
                 target = self.find_element(*self._non_root_link_locator)
-            if self.title == 'Individual':
+            if 'Individual' in self.title:
                 if url:
                     return target.get_attribute('href')
                 Utility.switch_to(self.driver, element=target)

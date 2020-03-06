@@ -10,7 +10,6 @@ from selenium.common.exceptions import NoSuchElementException
 from pages.accounts.admin.users import Search
 from pages.accounts.home import AccountsHome
 from pages.accounts.profile import Profile
-from pages.accounts.signup import Signup
 from pages.web.book import Book
 from pages.web.errata import ErrataForm
 from pages.web.home import WebHome
@@ -637,12 +636,15 @@ def test_pending_instructors_see_access_pending_for_locked_resources(
     address = email.address
     password = Utility.random_hex(17)
     accounts = AccountsHome(selenium, accounts_base_url).open()
-    accounts.login.go_to_signup.account_signup(
-        email=address, password=password, _type=Signup.INSTRUCTOR,
-        provider=Signup.RESTMAIL, name=name, school='Automation',
-        news=False, phone=Utility.random_phone(),
-        webpage='https://openstax.org/', subjects=subject_list(2), students=10,
-        use=Signup.ADOPTED)
+    (accounts.content
+        .view_sign_up().content
+        .sign_up_as_an_educator()
+        .account_signup(
+            email=address, password=password, _type=Accounts.INSTRUCTOR,
+            provider=Accounts.RESTMAIL, name=name, school='Automation',
+            news=False, phone=Utility.random_phone(),
+            webpage='https://openstax.org/', subjects=subject_list(2),
+            students=10, use=Accounts.ADOPTED))
     home = WebHome(selenium, web_base_url).open()
     subjects = home.web_nav.subjects.view_all()
     book = subjects.select_random_book(_from=Library.HAS_I_LOCK)
@@ -849,12 +851,16 @@ def test_unverified_users_sent_to_faculty_verification_for_locked_resources(
     # AND:  have a non-verified, non-pending account
     # AND:  are logged into the site
     accounts = AccountsHome(selenium, accounts_base_url).open()
-    profile = accounts.login.go_to_signup.account_signup(
-        name=name, email=address, password=password, _type=Signup.INSTRUCTOR,
-        provider=Signup.RESTMAIL, school='Automation', news=False,
-        phone=Utility.random_phone(), webpage=web_base_url,
-        subjects=Signup(selenium).subject_list(2), students=10,
-        use=Signup.RECOMMENDED)
+    profile = (
+        accounts.content
+        .view_sign_up().content
+        .sign_up_as_an_educator()
+        .account_signup(
+            email=address, password=password, _type=Accounts.INSTRUCTOR,
+            provider=Accounts.RESTMAIL, name=name, school='Automation',
+            news=False, phone=Utility.random_phone(),
+            webpage=web_base_url, subjects=subject_list(2),
+            students=10, use=Accounts.RECOMMENDED))
     profile.log_out()
     profile = accounts.log_in(*admin)
     search = Search(selenium, accounts_base_url).open()
@@ -1042,13 +1048,13 @@ def test_available_student_resources_can_be_downloaded(web_base_url, selenium):
 
 def subject_list(size=1):
     """Return a list of subjects for an elevated signup."""
-    subjects = len(Signup.SUBJECTS)
+    subjects = len(Accounts.SUBJECTS)
     if size > subjects:
         size = subjects
     book = ''
     group = []
     while len(group) < size:
-        book = (Signup.SUBJECTS[Utility.random(0, subjects - 1)])[1]
+        book = (Accounts.SUBJECTS[Utility.random(0, subjects - 1)])[1]
         if book not in group:
             group.append(book)
     return group

@@ -47,6 +47,8 @@ class Subjects(WebBase):
         By.XPATH, category_xpath.format(subject=Web.VIEW_BUSINESS))
     _essentials_category_locator = (
         By.XPATH, category_xpath.format(subject=Web.VIEW_ESSENTIALS))
+    _college_success_category_locator = (
+        By.XPATH, category_xpath.format(subject=Web.VIEW_COLLEGE_SUCCESS))
     _ap_category_locator = (
         By.XPATH, category_xpath.format(subject=Web.VIEW_AP.replace('®', '')))
     _book_locator = (By.CSS_SELECTOR, 'div.book-category:not(.hidden) .cover')
@@ -107,8 +109,9 @@ class Subjects(WebBase):
 
     def is_filtered_by(self, subject_filter):
         """Return True if the books are filtered by the submitted subject."""
-        return (
-            subject_filter in self.find_element(*self._filter_by_locator).text)
+        return (subject_filter
+                in self.find_element(*self._filter_by_locator)
+                .get_attribute('textContent'))
 
     @property
     def math(self):
@@ -146,6 +149,13 @@ class Subjects(WebBase):
         """Return the subjects filtered by the essentials titles."""
         essentials_root = self.find_element(*self._essentials_category_locator)
         return self.Category(self, essentials_root)
+
+    @property
+    def college_success(self):
+        """Return the subjects filtered by the College Success titles."""
+        success_root = self.find_element(
+            *self._college_success_category_locator)
+        return self.Category(self, success_root)
 
     @property
     def ap(self):

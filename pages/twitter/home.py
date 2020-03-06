@@ -1,5 +1,7 @@
 """The OpenStax Twitter landing page."""
 
+from time import sleep
+
 from pypom import Page
 from selenium.webdriver.common.by import By
 
@@ -9,12 +11,20 @@ class Twitter(Page):
 
     URL_TEMPLATE = 'https://twitter.com/openstax'
 
-    _username_locator = (By.CSS_SELECTOR, '.ProfileHeaderCard-nameLink')
+    _body_tag_locator = (
+        By.CSS_SELECTOR, 'body')
+    _username_locator = (
+        By.CSS_SELECTOR, 'a[href*=OpenStax][role=link]')
 
     @property
     def loaded(self):
         """Return True if the username is found."""
-        return bool(self.find_element(*self._username_locator))
+        self.wait.until(
+            lambda _: self.find_elements(*self._body_tag_locator))
+        script = (r'document.addEventListener("load", function(event) {});')
+        sleep(0.5)
+        return (self.driver.execute_script(script) or
+                bool(self.find_elements(*self._username_locator)))
 
     def is_displayed(self):
         """Return True if the main content is loaded."""

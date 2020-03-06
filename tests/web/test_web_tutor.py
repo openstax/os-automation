@@ -1,8 +1,7 @@
 """Test the OpenStax Tutor Beta marketing page."""
 
 from pages.web.home import WebHome
-from tests.markers import accounts, nondestructive, smoke_test  # NOQA
-from tests.markers import skip_test, test_case, tutor, web  # NOQA
+from tests.markers import accounts, nondestructive, skip_test, smoke_test, test_case, tutor, web  # NOQA
 from utils.utilities import Utility
 
 
@@ -213,10 +212,8 @@ def test_frequently_asked_questions_are_displayed(web_base_url, selenium):
     tutor_marketing = home.web_nav.technology.view_tutor()
     tutor_marketing.sidebar.view_faq()
 
-    print(len(tutor_marketing.faq.questions))
     for question in tutor_marketing.faq.questions:
         # WHEN: they click on a question
-        print(question.question)
         question.toggle()
 
         # THEN: the answer is displayed

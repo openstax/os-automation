@@ -207,31 +207,42 @@ class WebNav(Region):
     class Subjects(WebNavMenu):
         """The Subject navigation menu dropdown."""
 
-        _open_menu_locator = (By.CSS_SELECTOR, '[href="."]')
-        _menu_expand_locator = (By.CSS_SELECTOR, 'nav.dropdown-menu')
-        _all_option_locator = (By.CSS_SELECTOR, '[href$=view-all]')
-        _math_option_locator = (By.CSS_SELECTOR, '[href$=math]')
-        _science_option_locator = (By.CSS_SELECTOR, '[href$=science]')
-        _social_sciences_option_locator = (By.CSS_SELECTOR,
-                                           '[href$=social-sciences]')
-        _humanities_option_locator = (By.CSS_SELECTOR, '[href$=humanities]')
-        _business_option_locator = (By.CSS_SELECTOR, '[href$=business]')
-        _essentials_option_locator = (By.CSS_SELECTOR, '[href$=essentials]')
-        _ap_option_locator = (By.CSS_SELECTOR, '[href$=ap]')
+        _all_option_locator = (
+            By.CSS_SELECTOR, '[href$=view-all]')
+        _ap_option_locator = (
+            By.CSS_SELECTOR, '[href$=ap]')
+        _business_option_locator = (
+            By.CSS_SELECTOR, '[href$=business]')
+        _college_success_option_locator = (
+            By.CSS_SELECTOR, '[href$=college-success]')
+        _essentials_option_locator = (
+            By.CSS_SELECTOR, '[href$=essentials]')
+        _humanities_option_locator = (
+            By.CSS_SELECTOR, '[href$=humanities]')
+        _math_option_locator = (
+            By.CSS_SELECTOR, '[href$=math]')
+        _menu_expand_locator = (
+            By.CSS_SELECTOR, 'nav.dropdown-menu')
+        _open_menu_locator = (
+            By.CSS_SELECTOR, '[href="."]')
+        _science_option_locator = (
+            By.CSS_SELECTOR, '[href$=science]')
+        _social_sciences_option_locator = (
+            By.CSS_SELECTOR, '[href$=social-sciences]')
 
         def is_available(self, label):
             """Return True if the menu option is available."""
             sleep(0.5)
             subjects = {
                 Web.VIEW_ALL: self._all_option_locator[1],
+                Web.VIEW_AP: self._ap_option_locator[1],
+                Web.VIEW_BUSINESS: self._business_option_locator[1],
+                Web.VIEW_COLLEGE_SUCCESS: self._college_success_option_locator[1],  # NOQA
+                Web.VIEW_ESSENTIALS: self._essentials_option_locator[1],
+                Web.VIEW_HUMANITIES: self._humanities_option_locator[1],
                 Web.VIEW_MATH: self._math_option_locator[1],
                 Web.VIEW_SCIENCE: self._science_option_locator[1],
-                Web.VIEW_SOCIAL_SCIENCES: (
-                    self._social_sciences_option_locator[1]),
-                Web.VIEW_HUMANITIES: self._humanities_option_locator[1],
-                Web.VIEW_BUSINESS: self._business_option_locator[1],
-                Web.VIEW_ESSENTIALS: self._essentials_option_locator[1],
-                Web.VIEW_AP: self._ap_option_locator[1],
+                Web.VIEW_SOCIAL_SCIENCES: (self._social_sciences_option_locator[1]),  # NOQA
             }
             return self._is_available(label, 'subjects', subjects)
 
@@ -321,6 +332,18 @@ class WebNav(Region):
             from pages.web.subjects import Subjects
             return self.open()._selection_helper(
                 self._essentials_option_locator,
+                Subjects)
+
+        @property
+        def college_success(self):
+            """Return the college success subjects link."""
+            return self.find_element(*self._college_success_option_locator)
+
+        def view_college_success(self):
+            """View all college success books."""
+            from pages.web.subjects import Subjects
+            return self.open()._selection_helper(
+                self._college_success_option_locator,
                 Subjects)
 
         @property
@@ -502,17 +525,18 @@ class WebNav(Region):
             return self.login.is_displayed()
 
         def log_in(self, user=None, password=None,
-                   do_not_log_in=False, destination=None, url=None):
+                   destination=None, url=None, do_not_log_in=False):
             """Log a user into the website."""
             Utility.click_option(self.driver, element=self.login)
+            sleep(0.25)
             from pages.accounts.home import AccountsHome
             if do_not_log_in:
                 return go_to_(AccountsHome(self.driver, url))
-            elif destination:
-                return go_to_(AccountsHome(self.driver)) \
-                    .log_in(user, password, destination, url)
-            from pages.web.home import WebHome as Home
-            return go_to_(Home(self.driver, url))
+            if destination:
+                home = go_to_(AccountsHome(self.driver))
+                return go_to_(home.log_in(user, password, destination, url))
+            from pages.web.home import WebHome
+            return go_to_(WebHome(self.driver, url))
 
         @property
         def logged_in(self):

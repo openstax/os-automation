@@ -43,3 +43,7 @@ class RiceConnect(Page):
         script = (r'document.addEventListener("load", function(event) {});')
         sleep(0.5)
         return self.driver.execute_script(script) or True
+
+    def is_displayed(self):
+        """Return True if the amount header is displayed."""
+        return self.find_element(*self._main_content_locator).is_displayed()

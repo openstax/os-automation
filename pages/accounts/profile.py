@@ -264,6 +264,15 @@ class Profile(AccountsBase):
         console_root = self.find_element(*self._console_panel_locator)
         return self.Console(self, console_root)
 
+    def log_out(self) -> AccountsBase:
+        """Click the content log out link.
+
+        :return: the Accounts home page
+        :rtype: :py:class:`~pages.accounts.home.AccountsHome`
+
+        """
+        return self.content.log_out()
+
     class Console(Region):
         """The admin console links."""
 

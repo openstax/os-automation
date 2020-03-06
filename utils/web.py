@@ -26,9 +26,14 @@ class Web(object):
     # *** HOME PAGE, NAV BARS, and FOOTER ***
 
     # Web banner carousel options
-    INTERACTIVE_MAP = 0
-    NEW_APP = 1
-    FREE_BOOKS_NO_CATCH = 2
+    # Full
+    F_INTERACTIVE_MAP = 0
+    F_NEW_APP = 1
+
+    # Mobile
+    M_INTERACTIVE_MAP = 0
+    M_NEW_APP = 1
+    M_FREE_BOOKS_NO_CATCH = 2
 
     # Quotes
     SUBSCRIBE = 0
@@ -47,8 +52,8 @@ class Web(object):
     # Book page tabs
     BOOK_DETAILS = 0
     INSTRUCTOR_RESOURCES = 1
-    PARTNER_RESOURCES = 3
     STUDENT_RESOURCES = 2
+    BOOK_VIDEOS = 3
 
     # Book page order modals
     INDIVIDUAL = 0
@@ -57,53 +62,56 @@ class Web(object):
     # *** BOOKSTORE SUPPLIERS ***
 
     # Bookstore supplier cards
-    MBS_TEXTBOOK = 0
-    TRILITERAL = 1
-    VRETTA = 2
-
     XANEDU = 0
+
+    MBS_TEXTBOOK = 0
+    VRETTA = 2
     LAD_CUSTOM = 1
     MONTEZUMA = 2
 
     # *** CONTACT US ***
 
-    ABOUT_GENERAL = 'General'
     ABOUT_ADOPTION = 'Adopting OpenStax Textbooks'
-    ABOUT_TUTOR = 'OpenStax Tutor Support'
     ABOUT_CNX = 'OpenStax CNX'
     ABOUT_DONATIONS = 'Donations'
-    ABOUT_PARTNERSHIP = 'College/University Partnerships'
-    ABOUT_MEDIA = 'Media Inquiries'
     ABOUT_FOUNDATION = 'Foundational Support'
+    ABOUT_GENERAL = 'General'
+    ABOUT_MEDIA = 'Media Inquiries'
+    ABOUT_PARTNERS = 'OpenStax Partners'
+    ABOUT_PARTNERSHIP = 'College/University Partnerships'
+    ABOUT_POLSKA = 'OpenStax Polska'
+    ABOUT_TUTOR = 'OpenStax Tutor Support'
+    ABOUT_WEBSITE = 'Website'
 
     TOPICS = [
-        ABOUT_GENERAL, ABOUT_ADOPTION, ABOUT_TUTOR, ABOUT_CNX,
-        ABOUT_DONATIONS, ABOUT_PARTNERSHIP, ABOUT_MEDIA, ABOUT_FOUNDATION
-    ]
-
-    # *** DONATIONS ***
-
-    # Donation page values
-    MIN_DONATION = 5
-    DOLLAR_OPTIONS = [
-        10, 25, 50, 100, 500, 1000, 'Other'
+        ABOUT_GENERAL,
+        ABOUT_ADOPTION,
+        ABOUT_TUTOR,
+        ABOUT_CNX,
+        ABOUT_DONATIONS,
+        ABOUT_PARTNERSHIP,
+        ABOUT_MEDIA,
+        ABOUT_FOUNDATION,
+        ABOUT_PARTNERS,
+        ABOUT_WEBSITE,
+        ABOUT_POLSKA
     ]
 
     # *** OUR IMPACT ***
 
     # Sections
     BANNER = 0
-    REVOLUTION = 1
-    FOUNDING = 2
-    REACH = 3
-    TESTIMONIALS = 4
-    SUSTAINABILITY = 5
     DISRUPTION = 6
+    DONATION = 11
+    FOUNDING = 2
     LOOKING_AHEAD = 7
     MAP = 8
     OS_TUTOR = 9
     PHILANTHROPIC_PARTNERS = 10
-    DONATION = 11
+    REACH = 3
+    REVOLUTION = 1
+    SUSTAINABILITY = 5
+    TESTIMONIALS = 4
 
     # *** PRESS ***
 
@@ -144,8 +152,7 @@ class Web(object):
         'Sharing Your Information',
         'Accuracy of Data, Storage',
         'Links to Other Websites',
-        ('Security and Liability for Theft and/or Disclosure'
-         ' of Login Credentials')
+        'Security and Liability for Theft and/or Disclosure of Login Credentials'  # NOQA
     ]
 
     # *** OPENSTAX RESEARCH ***
@@ -164,7 +171,6 @@ class Web(object):
     # Team page tabs
     OPENSTAX_TEAM = 0
     STRATEGIC_ADVISORS = 1
-    ADVISORY_BOARD = 2
 
     TEAM_GROUPS = [
         'OpenStax Team',
@@ -198,8 +204,7 @@ class Web(object):
     TRANSITION = 'Transition Guide'
 
     ACCESS_OK = [
-        ACCESS, CODE, DOWNLOAD, EXTERNAL, PENDING,
-        REQUEST, TRANSITION
+        ACCESS, CODE, DOWNLOAD, EXTERNAL, PENDING, REQUEST, TRANSITION
     ]
 
     # Matching strings
@@ -224,6 +229,7 @@ class Web(object):
     VIEW_ALL = 'All'
     VIEW_AP = 'AP®'
     VIEW_BUSINESS = 'Business'
+    VIEW_COLLEGE_SUCCESS = 'College Success'
     VIEW_ESSENTIALS = 'Essentials'
     VIEW_HUMANITIES = 'Humanities'
     VIEW_MATH = 'Math'
@@ -342,7 +348,8 @@ class Web(object):
         'Feedback',
         'Interactive Simulations',
         'User-Contributed Content',
-        'Voluntary Product Accessibility Template (VPAT)'
+        'Voluntary Product Accessibility Template (VPAT)',
+        'Conformance and Remediation Form'
     ]
     URL_APPENDS = [
         'math',
@@ -351,6 +358,7 @@ class Web(object):
         'humanities',
         'business',
         'essentials',
+        'college-success',
         'ap'
     ]
     FILTERS = [
@@ -360,22 +368,13 @@ class Web(object):
         VIEW_HUMANITIES,
         VIEW_BUSINESS,
         VIEW_ESSENTIALS,
+        VIEW_COLLEGE_SUCCESS,
         VIEW_AP
     ]
     MENU_SUBJECTS = [
         VIEW_ALL,
         *FILTERS
     ]
-    PARTNER_FILTERS = {
-        VIEW_ALL: 0,
-        VIEW_MATH: 1,
-        VIEW_SCIENCE: 2,
-        VIEW_SOCIAL_SCIENCES: 3,
-        VIEW_HUMANITIES: 4,
-        VIEW_BUSINESS: 5,
-        VIEW_ESSENTIALS: 6,
-        VIEW_AP: 7,
-    }
     MENU_TECHNOLOGY = [
         VIEW_TUTOR,
         VIEW_ROVER,
@@ -393,97 +392,136 @@ class Web(object):
 class TechProviders():
     """Adoption and interest technology providers."""
 
-    AMBASSADOR = 'Ambassador'
+    AMBASSADOR = 'Ambassador Education'
     BARNES_AND_NOBLE = 'Barnes & Noble Education'
-    BLENDING_EDUCATION = 'Blending Education'
-    BLUPOINT = 'BluPoint'
+    BLENDING_EDUCATION = 'BLENDING EDUCATION'
+    BOOK_IT_ZAMBIA = 'Book-It Zambia'
     CARNEGIE = 'Carnegie Learning'
     CAROLINA_LEARNING = 'Carolina Distance Learning'
     CATALYST = 'Catalyst Education'
-    CENGAGE = 'Cengage'
     CHEGG = 'Chegg'
-    CHEGG_STUDY = 'Chegg Study'
-    CHEGG_TUTORS = 'Chegg Tutors'
     CHEM101 = 'Chem101'
     CLASSAVO = 'Classavo'
+    CNOWV2 = 'CNOWv2'
     COGBOOKS = 'CogBooks'
-    COGNELLA = 'Cognella'
-    CONNECT = 'Connect For Education'
+    COGNELLA_AL = 'Cognella Active Learning'
+    COGNELLA_CCAP = 'Cognella Custom and Cognella Academic Publishing'
+    CONNECT = 'Connect for Education'
     COPIA = 'Copia'
-    CRITICAL_CHEM = 'Critical Chemistry'
     EDFINITY = 'Edfinity'
     EMATH = 'eMath'
     EXPERT_TA = 'Expert TA'
-    EXPERT_TA_ASSESS = 'Expert TA Assess'
-    EXPERT_TA_STUDY = 'Expert TA Study'
     GRAPHLOCK = 'GraphLock'
     HAWKES = 'Hawkes Learning'
-    INTELLUS = 'Intellus Learning'
+    ICLICKER = 'iClicker'
+    INSTRUCTURE = 'Instructure / Canvas'
+    INTROMATH = 'IntroMath by Vretta'
     JUNCTION = 'Junction'
     KNEWTON = 'Knewton'
     LABARCHIVES = 'LabArchives'
     LRNR = 'Lrnr'
-    LUMEN = 'Lumen'
     LYRYX = 'Lyryx Learning'
     MCGRAW_HILL = 'McGraw-Hill Education'
-    MINDEDGE = 'MindEdge Learning'
+    MINDEDGE = 'MindEdge'
+    MY_EDUCATOR = 'MyEducator'
+    NEW_WILEY_PLUS = 'New WileyPLUS'
     ODIGIA = 'Odigia'
+    OHM = 'OHM'
     OPEN_TEXTBOOK_NETWORK = 'Open Textbook Network'
-    TUTOR = 'OpenStax Tutor Beta'
+    OPENNOW = 'OpenNow'
+    OPENSTAX_TUTOR = 'OpenStax Tutor'
     PANOPEN = 'panOpen'
     PERLEGO = 'Perlego'
     PERUSALL = 'Perusall'
-    REALIZEIT = 'Realizeit'
+    REALIZEIT = 'RealizeIt'
     RICE_ONLINE = 'Rice Online Learning'
+    ROVER_BY_OPENSTAX = 'Rover by OpenStax'
     SAPLING = 'Sapling Learning'
     SIMBIO = 'SimBio'
+    SMART_SPARROW = 'Smart Sparrow'
     SQUARECAP = 'Squarecap'
     STUDY_EDGE = 'Study Edge'
     TOP_HAT = 'Top Hat'
     VANGRINER = 'Van-Griner Learning'
     VARAFY = 'Varafy'
     VISIBLE_BODY = 'Visible Body'
-    VRETTA = 'Vretta'
+    WAYMAKER = 'Waymaker'
     WEBASSIGN = 'WebAssign'
-    WILEY = 'Wiley'
     XYZ = 'XYZ Homework'
     ZYBOOKS = 'zyBooks'
     OTHER = 'Other (specify below)'
 
     tech_list = [
-        AMBASSADOR, BARNES_AND_NOBLE, BLENDING_EDUCATION, BLUPOINT,
-        CARNEGIE, CAROLINA_LEARNING, CATALYST, CENGAGE, CHEGG, CHEGG_STUDY,
-        CHEGG_TUTORS, CHEM101, CLASSAVO, COGBOOKS, COGNELLA, CONNECT, COPIA,
-        CRITICAL_CHEM, EDFINITY, EMATH, EXPERT_TA, EXPERT_TA_ASSESS,
-        EXPERT_TA_STUDY, GRAPHLOCK, HAWKES, INTELLUS, JUNCTION, KNEWTON,
-        LABARCHIVES, LRNR, LUMEN, LYRYX, MCGRAW_HILL, MINDEDGE, ODIGIA,
-        OPEN_TEXTBOOK_NETWORK, TUTOR, PANOPEN, PERLEGO, PERUSALL, REALIZEIT,
+        AMBASSADOR, BARNES_AND_NOBLE, BLENDING_EDUCATION,
+        CARNEGIE, CAROLINA_LEARNING, CATALYST, CHEGG,
+        CHEM101, CLASSAVO, COGBOOKS, CONNECT, COPIA,
+        EDFINITY, EMATH, EXPERT_TA,
+        GRAPHLOCK, HAWKES, JUNCTION, KNEWTON,
+        LABARCHIVES, LRNR, LYRYX, MCGRAW_HILL, MINDEDGE, ODIGIA,
+        OPEN_TEXTBOOK_NETWORK, OPENSTAX_TUTOR, PANOPEN, PERLEGO, PERUSALL,
+        REALIZEIT,
         RICE_ONLINE, SAPLING, SIMBIO, SQUARECAP, STUDY_EDGE, TOP_HAT,
-        VANGRINER, VARAFY, VISIBLE_BODY, VRETTA, WEBASSIGN, WILEY, XYZ,
+        VANGRINER, VARAFY, VISIBLE_BODY, WEBASSIGN, XYZ,
         ZYBOOKS, OTHER
     ]
 
-    full_catalog = [
-        AMBASSADOR,
-        BLENDING_EDUCATION,
-        BLUPOINT,
-        COGNELLA,
-        COPIA,
-        ODIGIA,
+    adaptive_courseware = [
+        CARNEGIE,
+        COGBOOKS,
+        CONNECT,
+        EMATH,
+        HAWKES,
+        JUNCTION,
+        KNEWTON,
+        LRNR,
+        MCGRAW_HILL,
+        MINDEDGE,
+        MY_EDUCATOR,
+        OPENSTAX_TUTOR,
         PERUSALL,
         REALIZEIT,
+        SMART_SPARROW,
+        WAYMAKER,
+        ZYBOOKS
+    ]
+    clicker_classroom = [
+        CLASSAVO,
+        ICLICKER,
         SQUARECAP,
+        TOP_HAT
+    ]
+    content_customization = [
+        AMBASSADOR,
+        BARNES_AND_NOBLE,
+        CAROLINA_LEARNING,
+        CATALYST,
+        COGNELLA_CCAP,
+        COPIA,
+        GRAPHLOCK,
+        LABARCHIVES,
+        ODIGIA,
+        PANOPEN,
         VANGRINER
     ]
-
-    math_titles = [
-        GRAPHLOCK
-    ]
-
-    no_titles = [
-        CHEGG_STUDY,
-        CHEGG_TUTORS,
-        OPEN_TEXTBOOK_NETWORK
+    online_homework = [
+        BLENDING_EDUCATION,
+        CHEGG,
+        CHEM101,
+        CNOWV2,
+        COGNELLA_AL,
+        EDFINITY,
+        EXPERT_TA,
+        INTROMATH,
+        LYRYX,
+        NEW_WILEY_PLUS,
+        OHM,
+        OPENNOW,
+        ROVER_BY_OPENSTAX,
+        SAPLING,
+        VARAFY,
+        VISIBLE_BODY,
+        WEBASSIGN,
+        XYZ
     ]
 
     @classmethod
@@ -543,6 +581,7 @@ class Library():
     INTER_ALGEBRA = 'Intermediate Algebra'
     INTRO_STATS = 'Introductory Statistics'
     PREALGEBRA = 'Prealgebra'
+    PREALGEBRA_2E = 'Prealgebra 2e'
     PRECALCULUS = 'Precalculus'
 
     # Science
@@ -604,6 +643,7 @@ class Library():
     PRINT_COPY = 'print'
     SHORT_NAME = 'short_name'
     SUPERSEDED = 'not_current'
+    VIDEOS = 'videos'
 
     # Subjects
     ALL = 'View All'
@@ -640,7 +680,8 @@ class Library():
                 self.LANGUAGE: self.ENGLISH,
                 self.PRE_RELEASE: False,
                 self.PRINT_COPY: True,
-                self.SHORT_NAME: 'Financial Accounting', },
+                self.SHORT_NAME: 'Financial Accounting',
+                self.VIDEOS: False, },
             self.ACCOUNTING_2: {
                 self.BOOKSHARE: False,
                 self.CATEGORY: [self.ALL, self.BUSINESS],
@@ -658,7 +699,8 @@ class Library():
                 self.LANGUAGE: self.ENGLISH,
                 self.PRE_RELEASE: False,
                 self.PRINT_COPY: True,
-                self.SHORT_NAME: 'Managerial Accounting', },
+                self.SHORT_NAME: 'Managerial Accounting',
+                self.VIDEOS: False, },
             self.BUSINESS_STATS: {
                 self.BOOKSHARE: False,
                 self.CATEGORY: [self.ALL, self.BUSINESS, self.MATH],
@@ -676,7 +718,8 @@ class Library():
                 self.LANGUAGE: self.ENGLISH,
                 self.PRE_RELEASE: False,
                 self.PRINT_COPY: True,
-                self.SHORT_NAME: 'Introductory Business Statistics', },
+                self.SHORT_NAME: 'Introductory Business Statistics',
+                self.VIDEOS: False, },
             self.BUS_LAW_1: {
                 self.BOOKSHARE: False,
                 self.CATEGORY: [self.ALL, self.BUSINESS, self.ESSENTIALS],
@@ -694,25 +737,27 @@ class Library():
                 self.LANGUAGE: self.ENGLISH,
                 self.PRE_RELEASE: False,
                 self.PRINT_COPY: False,
-                self.SHORT_NAME: 'Business Law I Essentials', },
+                self.SHORT_NAME: 'Business Law I Essentials',
+                self.VIDEOS: False, },
             self.ENTREPRENEUR: {
                 self.BOOKSHARE: False,
-                self.CATEGORY: [self.ALL, self.BUSINESS, self.ESSENTIALS],
+                self.CATEGORY: [self.ALL, self.BUSINESS],
                 self.CHEGG: False,
                 self.COMP_COPY: False,
                 self.DETAILS: 'entrepreneurship',
-                self.HAS_I_LOCK: False,
+                self.HAS_I_LOCK: True,
                 self.HAS_I_UNLOCK: True,
                 self.HAS_S_LOCK: False,
                 self.HAS_S_UNLOCK: True,
-                self.INTEREST: None,
+                self.INTEREST: 'Entrepreneurship',
                 self.IS_AP: False,
                 self.ITUNES: False,
                 self.KINDLE: False,
                 self.LANGUAGE: self.ENGLISH,
-                self.PRE_RELEASE: True,
+                self.PRE_RELEASE: False,
                 self.PRINT_COPY: False,
-                self.SHORT_NAME: 'Entrepreneurship', },
+                self.SHORT_NAME: 'Entrepreneurship',
+                self.VIDEOS: False, },
             self.ETHICS: {
                 self.BOOKSHARE: False,
                 self.CATEGORY: [self.ALL, self.BUSINESS],
@@ -726,11 +771,12 @@ class Library():
                 self.INTEREST: r'Business%20Ethics',
                 self.IS_AP: False,
                 self.ITUNES: False,
-                self.KINDLE: False,
+                self.KINDLE: True,
                 self.LANGUAGE: self.ENGLISH,
                 self.PRE_RELEASE: False,
                 self.PRINT_COPY: True,
-                self.SHORT_NAME: 'Business Ethics', },
+                self.SHORT_NAME: 'Business Ethics',
+                self.VIDEOS: False, },
             self.INTRO_BUSINESS: {
                 self.BOOKSHARE: False,
                 self.CATEGORY: [self.ALL, self.BUSINESS],
@@ -744,11 +790,12 @@ class Library():
                 self.INTEREST: r'Introduction%20to%20Business',
                 self.IS_AP: False,
                 self.ITUNES: False,
-                self.KINDLE: False,
+                self.KINDLE: True,
                 self.LANGUAGE: self.ENGLISH,
                 self.PRE_RELEASE: False,
                 self.PRINT_COPY: True,
-                self.SHORT_NAME: 'Introduction to Business', },
+                self.SHORT_NAME: 'Introduction to Business',
+                self.VIDEOS: True, },
             self.MANAGEMENT: {
                 self.BOOKSHARE: False,
                 self.CATEGORY: [self.ALL, self.BUSINESS],
@@ -762,11 +809,12 @@ class Library():
                 self.INTEREST: 'Management',
                 self.IS_AP: False,
                 self.ITUNES: False,
-                self.KINDLE: False,
+                self.KINDLE: True,
                 self.LANGUAGE: self.ENGLISH,
                 self.PRE_RELEASE: False,
                 self.PRINT_COPY: True,
-                self.SHORT_NAME: 'Management', },
+                self.SHORT_NAME: 'Management',
+                self.VIDEOS: True, },
             self.ORG_BEHAVIOR: {
                 self.BOOKSHARE: False,
                 self.CATEGORY: [self.ALL, self.BUSINESS],
@@ -777,14 +825,15 @@ class Library():
                 self.HAS_I_UNLOCK: True,
                 self.HAS_S_LOCK: False,
                 self.HAS_S_UNLOCK: True,
-                self.INTEREST: 'Behavior',
+                self.INTEREST: 'Organizational%20Behavior',
                 self.IS_AP: False,
                 self.ITUNES: False,
                 self.KINDLE: False,
                 self.LANGUAGE: self.ENGLISH,
                 self.PRE_RELEASE: False,
-                self.PRINT_COPY: False,
-                self.SHORT_NAME: 'Organizational Behavior', },
+                self.PRINT_COPY: True,
+                self.SHORT_NAME: 'Organizational Behavior',
+                self.VIDEOS: True, },
 
             # College Success
             self.COLL_SUCCESS: {
@@ -804,11 +853,11 @@ class Library():
                 self.LANGUAGE: self.ENGLISH,
                 self.PRE_RELEASE: True,
                 self.PRINT_COPY: False,
-                self.SHORT_NAME: None, },
+                self.SHORT_NAME: '',
+                self.VIDEOS: False, },
 
             # Essentials
-            #     currently, only Entrepreneurship and Busness Law I are in
-            #     Essentials
+            #     currently, only Busness Law I is in Essentials
 
             # Humanities
             self.US_HISTORY: {
@@ -828,7 +877,8 @@ class Library():
                 self.LANGUAGE: self.ENGLISH,
                 self.PRE_RELEASE: False,
                 self.PRINT_COPY: True,
-                self.SHORT_NAME: 'U.S. History', },
+                self.SHORT_NAME: 'U.S. History',
+                self.VIDEOS: False, },
 
             # Math
             self.ALGEBRA: {
@@ -848,7 +898,8 @@ class Library():
                 self.LANGUAGE: self.ENGLISH,
                 self.PRE_RELEASE: False,
                 self.PRINT_COPY: True,
-                self.SHORT_NAME: 'College Algebra', },
+                self.SHORT_NAME: 'College Algebra',
+                self.VIDEOS: False, },
             self.ALGEBRA_TRIG: {
                 self.BOOKSHARE: False,
                 self.CATEGORY: [self.ALL, self.MATH],
@@ -866,7 +917,8 @@ class Library():
                 self.LANGUAGE: self.ENGLISH,
                 self.PRE_RELEASE: False,
                 self.PRINT_COPY: True,
-                self.SHORT_NAME: 'Algebra and Trigonometry', },
+                self.SHORT_NAME: 'Algebra and Trigonometry',
+                self.VIDEOS: False, },
             self.CALCULUS_1: {
                 self.BOOKSHARE: False,
                 self.CATEGORY: [self.ALL, self.MATH],
@@ -884,7 +936,8 @@ class Library():
                 self.LANGUAGE: self.ENGLISH,
                 self.PRE_RELEASE: False,
                 self.PRINT_COPY: True,
-                self.SHORT_NAME: 'Calculus', },
+                self.SHORT_NAME: 'Calculus',
+                self.VIDEOS: False, },
             self.CALCULUS_2: {
                 self.BOOKSHARE: False,
                 self.CATEGORY: [self.ALL, self.MATH],
@@ -902,7 +955,8 @@ class Library():
                 self.LANGUAGE: self.ENGLISH,
                 self.PRE_RELEASE: False,
                 self.PRINT_COPY: True,
-                self.SHORT_NAME: 'Calculus', },
+                self.SHORT_NAME: 'Calculus',
+                self.VIDEOS: False, },
             self.CALCULUS_3: {
                 self.BOOKSHARE: False,
                 self.CATEGORY: [self.ALL, self.MATH],
@@ -920,7 +974,8 @@ class Library():
                 self.LANGUAGE: self.ENGLISH,
                 self.PRE_RELEASE: False,
                 self.PRINT_COPY: True,
-                self.SHORT_NAME: 'Calculus', },
+                self.SHORT_NAME: 'Calculus',
+                self.VIDEOS: False, },
             self.ELEM_ALGEBRA: {
                 self.BOOKSHARE: False,
                 self.CATEGORY: [self.ALL, self.MATH],
@@ -929,7 +984,7 @@ class Library():
                 self.DETAILS: 'elementary-algebra',
                 self.HAS_I_LOCK: True,
                 self.HAS_I_UNLOCK: True,
-                self.HAS_S_LOCK: False,
+                self.HAS_S_LOCK: True,
                 self.HAS_S_UNLOCK: True,
                 self.INTEREST: 'Elementary%20Algebra',
                 self.IS_AP: False,
@@ -938,7 +993,8 @@ class Library():
                 self.LANGUAGE: self.ENGLISH,
                 self.PRE_RELEASE: False,
                 self.PRINT_COPY: True,
-                self.SHORT_NAME: 'Elementary Algebra', },
+                self.SHORT_NAME: 'Elementary Algebra',
+                self.VIDEOS: False, },
             self.INTER_ALGEBRA: {
                 self.BOOKSHARE: True,
                 self.CATEGORY: [self.ALL, self.MATH],
@@ -947,7 +1003,7 @@ class Library():
                 self.DETAILS: 'intermediate-algebra',
                 self.HAS_I_LOCK: True,
                 self.HAS_I_UNLOCK: True,
-                self.HAS_S_LOCK: False,
+                self.HAS_S_LOCK: True,
                 self.HAS_S_UNLOCK: True,
                 self.INTEREST: 'Intermediate%20Algebra',
                 self.IS_AP: False,
@@ -956,12 +1012,13 @@ class Library():
                 self.LANGUAGE: self.ENGLISH,
                 self.PRE_RELEASE: False,
                 self.PRINT_COPY: True,
-                self.SHORT_NAME: 'Intermediate Algebra', },
+                self.SHORT_NAME: 'Intermediate Algebra',
+                self.VIDEOS: False, },
             self.INTRO_STATS: {
                 self.BOOKSHARE: True,
                 self.CATEGORY: [self.ALL, self.MATH],
                 self.CHEGG: False,
-                self.COMP_COPY: True,
+                self.COMP_COPY: False,
                 self.DETAILS: 'introductory-statistics',
                 self.HAS_I_LOCK: True,
                 self.HAS_I_UNLOCK: True,
@@ -974,7 +1031,8 @@ class Library():
                 self.LANGUAGE: self.ENGLISH,
                 self.PRE_RELEASE: False,
                 self.PRINT_COPY: True,
-                self.SHORT_NAME: 'Introductory Statistics', },
+                self.SHORT_NAME: 'Introductory Statistics',
+                self.VIDEOS: False, },
             self.PREALGEBRA: {
                 self.BOOKSHARE: False,
                 self.CATEGORY: [self.ALL, self.MATH],
@@ -983,7 +1041,7 @@ class Library():
                 self.DETAILS: 'prealgebra',
                 self.HAS_I_LOCK: True,
                 self.HAS_I_UNLOCK: True,
-                self.HAS_S_LOCK: False,
+                self.HAS_S_LOCK: True,
                 self.HAS_S_UNLOCK: True,
                 self.INTEREST: 'Prealgebra',
                 self.IS_AP: False,
@@ -992,7 +1050,27 @@ class Library():
                 self.LANGUAGE: self.ENGLISH,
                 self.PRE_RELEASE: False,
                 self.PRINT_COPY: True,
-                self.SHORT_NAME: 'Prealgebra', },
+                self.SHORT_NAME: 'Prealgebra',
+                self.VIDEOS: False, },
+            self.PREALGEBRA_2E: {
+                self.BOOKSHARE: False,
+                self.CATEGORY: [self.ALL, self.MATH],
+                self.CHEGG: False,
+                self.COMP_COPY: False,
+                self.DETAILS: 'prealgebra-2e',
+                self.HAS_I_LOCK: False,
+                self.HAS_I_UNLOCK: True,
+                self.HAS_S_LOCK: False,
+                self.HAS_S_UNLOCK: True,
+                self.INTEREST: 'Prealgebra',
+                self.IS_AP: False,
+                self.ITUNES: False,
+                self.KINDLE: False,
+                self.LANGUAGE: self.ENGLISH,
+                self.PRE_RELEASE: True,
+                self.PRINT_COPY: False,
+                self.SHORT_NAME: 'Prealgebra',
+                self.VIDEOS: False, },
             self.PRECALCULUS: {
                 self.BOOKSHARE: True,
                 self.CATEGORY: [self.ALL, self.MATH],
@@ -1010,7 +1088,8 @@ class Library():
                 self.LANGUAGE: self.ENGLISH,
                 self.PRE_RELEASE: False,
                 self.PRINT_COPY: True,
-                self.SHORT_NAME: 'Precalculus', },
+                self.SHORT_NAME: 'Precalculus',
+                self.VIDEOS: False, },
 
             # Science
             self.ANATOMY_PHYS: {
@@ -1030,7 +1109,8 @@ class Library():
                 self.LANGUAGE: self.ENGLISH,
                 self.PRE_RELEASE: False,
                 self.PRINT_COPY: True,
-                self.SHORT_NAME: 'Anatomy & Physiology', },
+                self.SHORT_NAME: 'Anatomy & Physiology',
+                self.VIDEOS: False, },
             self.AP_BIO: {
                 self.BOOKSHARE: False,
                 self.CATEGORY: [self.ALL, self.AP, self.SCIENCE],
@@ -1048,12 +1128,13 @@ class Library():
                 self.LANGUAGE: self.ENGLISH,
                 self.PRE_RELEASE: False,
                 self.PRINT_COPY: True,
-                self.SHORT_NAME: 'AP Biology', },
+                self.SHORT_NAME: 'AP Biology',
+                self.VIDEOS: False, },
             self.AP_PHYS: {
                 self.BOOKSHARE: False,
                 self.CATEGORY: [self.ALL, self.AP, self.SCIENCE],
                 self.CHEGG: False,
-                self.COMP_COPY: True,
+                self.COMP_COPY: False,
                 self.DETAILS: 'college-physics-ap-courses',
                 self.HAS_I_LOCK: True,
                 self.HAS_I_UNLOCK: True,
@@ -1066,7 +1147,8 @@ class Library():
                 self.LANGUAGE: self.ENGLISH,
                 self.PRE_RELEASE: False,
                 self.PRINT_COPY: True,
-                self.SHORT_NAME: 'AP Physics', },
+                self.SHORT_NAME: 'AP Physics',
+                self.VIDEOS: False, },
             self.ASTRONOMY: {
                 self.BOOKSHARE: False,
                 self.CATEGORY: [self.ALL, self.SCIENCE],
@@ -1084,7 +1166,8 @@ class Library():
                 self.LANGUAGE: self.ENGLISH,
                 self.PRE_RELEASE: False,
                 self.PRINT_COPY: True,
-                self.SHORT_NAME: 'Astronomy', },
+                self.SHORT_NAME: 'Astronomy',
+                self.VIDEOS: False, },
             self.BIOLOGY_2E: {
                 self.BOOKSHARE: False,
                 self.CATEGORY: [self.ALL, self.SCIENCE],
@@ -1102,7 +1185,8 @@ class Library():
                 self.LANGUAGE: self.ENGLISH,
                 self.PRE_RELEASE: False,
                 self.PRINT_COPY: True,
-                self.SHORT_NAME: 'Biology', },
+                self.SHORT_NAME: 'Biology 2e',
+                self.VIDEOS: False, },
             self.BIO_CONCEPTS: {
                 self.BOOKSHARE: True,
                 self.CATEGORY: [self.ALL, self.SCIENCE],
@@ -1120,7 +1204,8 @@ class Library():
                 self.LANGUAGE: self.ENGLISH,
                 self.PRE_RELEASE: False,
                 self.PRINT_COPY: True,
-                self.SHORT_NAME: 'Concepts of Biology', },
+                self.SHORT_NAME: 'Concepts of Biology',
+                self.VIDEOS: False, },
             self.CHEMISTRY_2E: {
                 self.BOOKSHARE: False,
                 self.CATEGORY: [self.ALL, self.SCIENCE],
@@ -1138,7 +1223,8 @@ class Library():
                 self.LANGUAGE: self.ENGLISH,
                 self.PRE_RELEASE: False,
                 self.PRINT_COPY: True,
-                self.SHORT_NAME: 'Chemistry 2e', },
+                self.SHORT_NAME: 'Chemistry 2e',
+                self.VIDEOS: False, },
             self.CHEM_ATOMS_2E: {
                 self.BOOKSHARE: False,
                 self.CATEGORY: [self.ALL, self.SCIENCE],
@@ -1156,7 +1242,8 @@ class Library():
                 self.LANGUAGE: self.ENGLISH,
                 self.PRE_RELEASE: False,
                 self.PRINT_COPY: True,
-                self.SHORT_NAME: 'Chemistry: Atoms First 2e', },
+                self.SHORT_NAME: 'Chemistry: Atoms First 2e',
+                self.VIDEOS: False, },
             self.FIZYKA_1: {
                 self.BOOKSHARE: False,
                 self.CATEGORY: [self.ALL, self.SCIENCE],
@@ -1174,7 +1261,8 @@ class Library():
                 self.LANGUAGE: self.POLISH,
                 self.PRE_RELEASE: False,
                 self.PRINT_COPY: False,
-                self.SHORT_NAME: None, },
+                self.SHORT_NAME: '',
+                self.VIDEOS: False, },
             self.FIZYKA_2: {
                 self.BOOKSHARE: False,
                 self.CATEGORY: [self.ALL, self.SCIENCE],
@@ -1192,7 +1280,8 @@ class Library():
                 self.LANGUAGE: self.POLISH,
                 self.PRE_RELEASE: False,
                 self.PRINT_COPY: False,
-                self.SHORT_NAME: None, },
+                self.SHORT_NAME: '',
+                self.VIDEOS: False, },
             self.FIZYKA_3: {
                 self.BOOKSHARE: False,
                 self.CATEGORY: [self.ALL, self.SCIENCE],
@@ -1210,7 +1299,8 @@ class Library():
                 self.LANGUAGE: self.POLISH,
                 self.PRE_RELEASE: False,
                 self.PRINT_COPY: False,
-                self.SHORT_NAME: None, },
+                self.SHORT_NAME: '',
+                self.VIDEOS: False, },
             self.MICROBIOLOGY: {
                 self.BOOKSHARE: False,
                 self.CATEGORY: [self.ALL, self.SCIENCE],
@@ -1228,7 +1318,8 @@ class Library():
                 self.LANGUAGE: self.ENGLISH,
                 self.PRE_RELEASE: False,
                 self.PRINT_COPY: True,
-                self.SHORT_NAME: 'Microbiology', },
+                self.SHORT_NAME: 'Microbiology',
+                self.VIDEOS: False, },
             self.PHYSICS: {
                 self.BOOKSHARE: True,
                 self.CATEGORY: [self.ALL, self.SCIENCE],
@@ -1246,7 +1337,8 @@ class Library():
                 self.LANGUAGE: self.ENGLISH,
                 self.PRE_RELEASE: False,
                 self.PRINT_COPY: True,
-                self.SHORT_NAME: 'College Physics', },
+                self.SHORT_NAME: 'College Physics',
+                self.VIDEOS: False, },
             self.U_PHYS_1: {
                 self.BOOKSHARE: False,
                 self.CATEGORY: [self.ALL, self.SCIENCE],
@@ -1264,7 +1356,8 @@ class Library():
                 self.LANGUAGE: self.ENGLISH,
                 self.PRE_RELEASE: False,
                 self.PRINT_COPY: True,
-                self.SHORT_NAME: 'University Physics', },
+                self.SHORT_NAME: 'University Physics',
+                self.VIDEOS: False, },
             self.U_PHYS_2: {
                 self.BOOKSHARE: False,
                 self.CATEGORY: [self.ALL, self.SCIENCE],
@@ -1282,7 +1375,8 @@ class Library():
                 self.LANGUAGE: self.ENGLISH,
                 self.PRE_RELEASE: False,
                 self.PRINT_COPY: True,
-                self.SHORT_NAME: 'University Physics', },
+                self.SHORT_NAME: 'University Physics',
+                self.VIDEOS: False, },
             self.U_PHYS_3: {
                 self.BOOKSHARE: False,
                 self.CATEGORY: [self.ALL, self.SCIENCE],
@@ -1300,7 +1394,8 @@ class Library():
                 self.LANGUAGE: self.ENGLISH,
                 self.PRE_RELEASE: False,
                 self.PRINT_COPY: True,
-                self.SHORT_NAME: 'University Physics', },
+                self.SHORT_NAME: 'University Physics',
+                self.VIDEOS: False, },
 
             # Social Sciences
             self.AP_MACRO: {
@@ -1321,7 +1416,8 @@ class Library():
                 self.PRE_RELEASE: False,
                 self.PRINT_COPY: False,
                 self.SHORT_NAME: ('Principles of Macroeconomics '
-                                  'for AP Courses 2e'), },
+                                  'for AP Courses 2e'),
+                self.VIDEOS: False, },
             self.AP_MICRO: {
                 self.BOOKSHARE: False,
                 self.CATEGORY: [self.ALL, self.AP, self.SOCIAL],
@@ -1340,7 +1436,8 @@ class Library():
                 self.PRE_RELEASE: False,
                 self.PRINT_COPY: False,
                 self.SHORT_NAME: ('Principles of Microeconomics '
-                                  'for AP Courses 2e'), },
+                                  'for AP Courses 2e'),
+                self.VIDEOS: False, },
             self.GOVERNMENT_2E: {
                 self.BOOKSHARE: False,
                 self.CATEGORY: [self.ALL, self.SOCIAL],
@@ -1354,11 +1451,12 @@ class Library():
                 self.INTEREST: r'American%20Government',
                 self.IS_AP: False,
                 self.ITUNES: False,
-                self.KINDLE: False,
+                self.KINDLE: True,
                 self.LANGUAGE: self.ENGLISH,
                 self.PRE_RELEASE: False,
                 self.PRINT_COPY: True,
-                self.SHORT_NAME: 'American Government 2e', },
+                self.SHORT_NAME: 'American Government 2e',
+                self.VIDEOS: False, },
             self.PRINCIPLES_ECON: {
                 self.BOOKSHARE: False,
                 self.CATEGORY: [self.ALL, self.SOCIAL],
@@ -1376,7 +1474,8 @@ class Library():
                 self.LANGUAGE: self.ENGLISH,
                 self.PRE_RELEASE: False,
                 self.PRINT_COPY: True,
-                self.SHORT_NAME: 'Principles of Economics 2e', },
+                self.SHORT_NAME: 'Principles of Economics 2e',
+                self.VIDEOS: False, },
             self.PRINCIPLES_MACRO: {
                 self.BOOKSHARE: False,
                 self.CATEGORY: [self.ALL, self.SOCIAL],
@@ -1387,14 +1486,15 @@ class Library():
                 self.HAS_I_UNLOCK: True,
                 self.HAS_S_LOCK: False,
                 self.HAS_S_UNLOCK: True,
-                self.INTEREST: r'Principles%20of%20Macroeconomics',
+                self.INTEREST: r'Macro%20Econ',
                 self.IS_AP: False,
                 self.ITUNES: True,
                 self.KINDLE: True,
                 self.LANGUAGE: self.ENGLISH,
                 self.PRE_RELEASE: False,
                 self.PRINT_COPY: True,
-                self.SHORT_NAME: 'Principles of Macroeconomics 2e', },
+                self.SHORT_NAME: 'Principles of Macroeconomics 2e',
+                self.VIDEOS: False, },
             self.PRINCIPLES_MICRO: {
                 self.BOOKSHARE: False,
                 self.CATEGORY: [self.ALL, self.SOCIAL],
@@ -1412,7 +1512,8 @@ class Library():
                 self.LANGUAGE: self.ENGLISH,
                 self.PRE_RELEASE: False,
                 self.PRINT_COPY: True,
-                self.SHORT_NAME: 'Principles of Microeconomics 2e', },
+                self.SHORT_NAME: 'Principles of Microeconomics 2e',
+                self.VIDEOS: False, },
             self.PSYCHOLOGY: {
                 self.BOOKSHARE: False,
                 self.CATEGORY: [self.ALL, self.SOCIAL],
@@ -1430,7 +1531,8 @@ class Library():
                 self.LANGUAGE: self.ENGLISH,
                 self.PRE_RELEASE: False,
                 self.PRINT_COPY: True,
-                self.SHORT_NAME: 'Psychology', },
+                self.SHORT_NAME: 'Psychology',
+                self.VIDEOS: False, },
             self.SOCIOLOGY: {
                 self.BOOKSHARE: False,
                 self.CATEGORY: [self.ALL, self.SOCIAL],
@@ -1448,7 +1550,8 @@ class Library():
                 self.LANGUAGE: self.ENGLISH,
                 self.PRE_RELEASE: False,
                 self.PRINT_COPY: True,
-                self.SHORT_NAME: 'Introduction to Sociology 2e', },
+                self.SHORT_NAME: 'Introduction to Sociology 2e',
+                self.VIDEOS: False, },
         }
 
     @property
@@ -1491,6 +1594,11 @@ class Library():
         """Return the books available through Chegg."""
         return [(book, self.get(book)) for book in self.books
                 if self.get(book, self.CHEGG)]
+
+    @property
+    def college_success(self):
+        """Return the College Success books."""
+        return self.get_by_category(self.COLLEGE_SUCESS)
 
     @property
     def coming_soon(self):

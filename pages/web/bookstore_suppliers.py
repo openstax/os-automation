@@ -47,6 +47,15 @@ class Bookstore(WebBase):
                         in self.find_elements(*self._description_locator)
                         if self.driver.execute_script(IS_DISPLAYED, content)])
 
+    def is_displayed(self) -> bool:
+        """Return True when the bookstore providers are found.
+
+        :return: ``True`` when the preferred and other providers are found
+        :rtype: bool
+
+        """
+        return bool(self.preferred_provider) and bool(self.other_providers)
+
     @property
     def other_providers(self) -> List[Bookstore.Provider]:
         r"""Access the non-preferred OpenStax book provider blocks.
