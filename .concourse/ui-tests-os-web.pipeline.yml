@@ -1,0 +1,44 @@
+---
+resource_types:
+
+  - name: slack
+    type: docker-image
+    source:
+      repository: karenc/concourse-slack-resource
+
+resources:
+  - name: listen-os-cms
+    type: slack
+    source:
+      user_access_token: ((qabot-user-access-token))
+      bot_access_token: ((qabot-user-access-token))
+      bot_user_id: ((qabot-user-id))
+      regexp: '<(?:http|https):\/\/(?:cms-\w+(?=.)|openstax.org).*\|(cms-\w+(?=.)|openstax.org).*<(?:http|https):.*(openstax-cms@\w*).*:heavy_check_mark:'
+  
+  - name: notify
+    type: slack
+    source:
+      user_access_token: ((qabot-user-access-token))
+      bot_access_token: ((qabot-user-access-token))
+      bot_user_id: ((qabot-user-id))
+
+  - name: os-automation
+    type: git
+    source:
+      uri: https://github.com/openstax/os-automation
+      branch: 107-defer-to-ci
+
+jobs:
+  - name: test-web
+    plan:
+      - get: listen-os-cms
+        trigger: true
+      - get: os-automation
+      - task: defer-to-circleci
+        file: os-automation/.concourse/tasks/test-osweb-ui-circleci/task.yml
+      - task: create-version-message
+        file: os-automation/.concourse/tasks/version-message/task.yml
+      - put: notify
+        params:
+          text: ((message-output/out.txt))
+          channel: qa-stream
