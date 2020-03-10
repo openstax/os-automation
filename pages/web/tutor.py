@@ -446,10 +446,10 @@ class TutorMarketing(WebHome):
         @property
         def features(self):
             """Return the current features."""
-            return list([feature.find_element_by_tag_name('div').text.strip()
-                        for feature
-                        in self.find_elements(*self._feature_locator)
-                        if 'false' not in feature.get_attribute('innerHTML')])
+            return list([
+                feature.get_attribute('textContent')
+                for feature
+                in self.find_elements(*self._feature_locator)])
 
         @property
         def new_features(self):

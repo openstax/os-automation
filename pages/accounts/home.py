@@ -52,7 +52,8 @@ class AccountsHome(AccountsBase):
         return self.log_in(user, password, destination, url, **kwargs)
 
     def student_signup(self, first_name: str, last_name: str, password: str,
-                       email: RestMail = None) -> Page:
+                       email: RestMail = None,
+                       page: Page = None, base_url: str = None) -> Page:
         """Register a new student user.
 
         :param str first_name: the user's first name
@@ -61,6 +62,9 @@ class AccountsHome(AccountsBase):
         :param email: (optional) a provided RestMail address; if one is not
             given, an automatically generated one will be used
         :type email: :py:class:`~utils.email.RestMail`
+        :param page: (optional) the expected page return
+        :type page: :py:class:`~pypom.Page`
+        :param str base_url: the template base URL for the returned page
         :return: the sign up page if there is an error, the user profile if the
             user signed up from Accounts, or the originating page if redirected
             from another OpenStax product
@@ -84,8 +88,10 @@ class AccountsHome(AccountsBase):
         box = email.wait_for_mail()
         pin = box[-1].pin
         confirm_email.pin = pin
-        complete_signup = confirm_email.confirm_my_account().content
-        return complete_signup.finish()
+        complete_signup = confirm_email.confirm_my_account().content.finish()
+        if page:
+            return go_to_(page(self.driver, base_url=base_url))
+        return complete_signup
 
     class Content(AccountsBase.Content, SocialLogins):
         """The log in pane."""
