@@ -6,9 +6,10 @@ import sys
 import requests
 
 CIRCLE_API_TOKEN = os.environ["CIRCLE_API_TOKEN"]
+CIRCLE_BRANCH = os.environ.get("CIRCLE_BRANCH", "master")
 CIRCLE_JOB = "test-web"
 CIRCLE_API_URL = f"https://circleci.com/api/v1.1/project/github/" \
-                   f"openstax/os-automation/tree/master?circle-token={CIRCLE_API_TOKEN}"
+                   f"openstax/os-automation/tree/{CIRCLE_BRANCH}?circle-token={CIRCLE_API_TOKEN}"
 
 INSTANCE_MAPPING = {
     "cms-qa": "qa",
@@ -32,16 +33,17 @@ def parse_instance(instance_str):
     return INSTANCE_MAPPING[instance_str]
 
 
-full_message = read_file("./listen-os-cms/message_text")
+full_message = read_file("./listen-os-cms/message_text").strip()
 log(f"Processing message from #deployments: '{full_message}'")
 
-instance = parse_instance(read_file("./listen-os-cms/message_text_0"))
+instance = parse_instance(read_file("./listen-os-cms/message_text_0").strip())
 log(f"Instance detected: {instance}")
 
-commit_sha = read_file("./listen-os-cms/message_text_1").split("@")[1]
+commit_sha = read_file("./listen-os-cms/message_text_1").strip().split("@")[1]
 log(f"Running tests for commit sha: {commit_sha}")
 
 headers = {"Content-Type": "application/json"}
+
 
 data = {"build_parameters":
     {
