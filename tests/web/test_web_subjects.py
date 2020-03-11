@@ -30,13 +30,29 @@ def test_able_to_filter_books_by_category(web_base_url, selenium):
     subjects = home.web_nav.subjects.view_all()
     filter_list = [*(subjects.filters[1:])]
     subject_list = [
-        subjects.math, subjects.science, subjects.social_sciences,
-        subjects.humanities, subjects.business, subjects.essentials,
-        subjects.ap]
+        subjects.math,
+        subjects.science,
+        subjects.social_sciences if '-dev.' not in selenium.current_url else
+        subjects.humanities,
+        subjects.humanities if '-dev.' not in selenium.current_url else
+        subjects.social_sciences,
+        subjects.business,
+        subjects.essentials,
+        subjects.college_success,
+        subjects.ap
+    ]
     subject_list_text = [
-        'Math', 'Science', 'Social sciences',
-        'Humanities', 'Business', 'Essentials',
-        'AP']
+        'Math',
+        'Science',
+        'Social Sciences' if '-dev.' not in selenium.current_url else
+        'Humanities',
+        'Humanities' if '-dev.' not in selenium.current_url else
+        'Social Sciences',
+        'Business',
+        'Essentials',
+        'College Success',
+        'AP'
+    ]
 
     for index in range(len(subject_list)):
         # WHEN: they click on a subject filter button
@@ -76,13 +92,27 @@ def test_able_to_filter_books_by_category_using_the_drop_down_menu(
     subjects.open()
     filter_list = [*(subjects.filters[1:])]
     subject_list = [
-        subjects.math, subjects.science, subjects.social_sciences,
-        subjects.humanities, subjects.business, subjects.essentials,
-        subjects.ap]
+        subjects.math,
+        subjects.science,
+        subjects.social_sciences if '-dev.' not in selenium.current_url else
+        subjects.humanities,
+        subjects.humanities if '-dev.' not in selenium.current_url else
+        subjects.social_sciences,
+        subjects.business,
+        subjects.essentials,
+        subjects.college_success,
+        subjects.ap
+    ]
     subject_list_text = [
-        'Math', 'Science', 'Social sciences',
-        'Humanities', 'Business', 'Essentials',
-        'AP']
+        'Math',
+        'Science',
+        'Social Sciences' if '-dev.' not in selenium.current_url else 'Humanities',  # NOQA
+        'Humanities' if '-dev.' not in selenium.current_url else 'Social Sciences',  # NOQA
+        'Business',
+        'Essentials',
+        'College Success',
+        'AP'
+    ]
 
     for index in range(len(subject_list)):
         # WHEN: they click on the "Filter by:" drop down menu

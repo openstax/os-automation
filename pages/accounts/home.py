@@ -1,297 +1,266 @@
 """Home page objects."""
 
+from __future__ import annotations
+
 from time import sleep
 
-from pypom import Region
-from selenium.common.exceptions import (ElementNotInteractableException,  # NOQA
-                                        TimeoutException,  # NOQA
-                                        WebDriverException)  # NOQA
+from pypom import Page
 from selenium.webdriver.common.by import By
-from selenium.webdriver.support import expected_conditions as expect
 
 from pages.accounts.base import AccountsBase
-from pages.salesforce.home import Salesforce
+from pages.accounts.profile import Profile
+from pages.accounts.reset import ResetPassword
+from regions.accounts.fields import ERROR_SELECTOR
+from regions.accounts.social import SocialLogins
+from utils.accounts import AccountsException
+from utils.email import RestMail
 from utils.utilities import Utility, go_to_
 
 
 class AccountsHome(AccountsBase):
-    """Home page base."""
+    """The Accounts log in page."""
 
-    URL_TEMPLATE = ''
+    URL_TEMPLATE = '/i/login'
 
-    @property
-    def login(self):
-        """Return the login pane."""
-        return self.Login(self)
+    def log_in(self, username: str, password: str,
+               destination: Page = None, base_url: str = None, **kwargs) \
+            -> Page:
+        """Log a user into the site.
 
-    def log_in(self, user, password):
-        """Log into the site with a specific user."""
-        return self.login.login(user, password)
+        :param str username: the username or email address for the user
+        :param str password: the password for the user
+        :param Page destination: (optional) a Page destination, if known
+        :param str base_url: (optional) the base URL for the destination Page
+        :param kwargs: (optional) additional keyword arguments for the Page
+        :return: the user's profile, a legal page, or the originating page
+        :rtype: :py:class:`~pypom.Page`
 
-    def service_log_in(self, user, password,
-                       destination=None, url=None, **kwargs):
-        """Log into the site with a specific user from another service."""
-        return (self.Login(self)
-                .service_login(user, password, destination, url, **kwargs))
+        """
+        self.content.email = username
+        self.content.password = password
+        return self.content._continue(destination, base_url, **kwargs)
 
-    @property
-    def logged_in(self):
-        """Return user log in status."""
-        return self.Login(self).logged_in
+    def service_log_in(self, user: str, password: str,
+                       destination: Page = None, url: str = None, **kwargs) \
+            -> Page:
+        """Log into the site with a specific user from another service.
 
-    @property
-    def location(self):
-        """Return the current URL."""
-        return self.driver.current_url
+        .. note::
+           Included for backwards compatibility
 
-    class Login(Region):
-        """User login pane."""
+        """
+        return self.log_in(user, password, destination, url, **kwargs)
 
-        _user_field_locator = (By.ID, 'login_username_or_email')
-        _password_field_locator = (By.ID, 'login_password')
-        _login_submit_button_locator = (By.CSS_SELECTOR, '[type=submit]')
-        _trouble_locator = (By.CSS_SELECTOR, '.trouble')
-        _login_help_locator = (By.CSS_SELECTOR, '.login-help')
-        _salesforce_link_locator = (By.CSS_SELECTOR, '.login-help a')
-        _salesforce_loader = (By.CSS_SELECTOR, 'div.body-and-support-buttons')
-        _input_field_locator = (By.CLASS_NAME, 'form-group')
-        _form_box_locator = (By.TAG_NAME, 'input')
-        _error_locator = (By.CSS_SELECTOR, '.alert')
-        _signup_locator = (By.CSS_SELECTOR, '.extra-info a')
-        _terms_agreement = (By.CSS_SELECTOR, '#agreement_i_agree')
+    def student_signup(self, first_name: str, last_name: str, password: str,
+                       email: RestMail = None,
+                       page: Page = None, base_url: str = None) -> Page:
+        """Register a new student user.
 
-        _password_reset_locator = (By.CSS_SELECTOR, '.footer a')
-        _password_reset_fields_locator = (By.CSS_SELECTOR, '[type=password]')
-        _password_reset_submit = (By.CSS_SELECTOR, '.footer input')
+        :param str first_name: the user's first name
+        :param str last_name: the user's last name
+        :param str password: the user's selected password
+        :param email: (optional) a provided RestMail address; if one is not
+            given, an automatically generated one will be used
+        :type email: :py:class:`~utils.email.RestMail`
+        :param page: (optional) the expected page return
+        :type page: :py:class:`~pypom.Page`
+        :param str base_url: the template base URL for the returned page
+        :return: the sign up page if there is an error, the user profile if the
+            user signed up from Accounts, or the originating page if redirected
+            from another OpenStax product
+        :rtype: :py:class:`~pypom.Page`
 
-        _fb_locator = (By.ID, 'facebook-login-button')
-        _fb_email_field_locator = (By.ID, 'email')
-        _fb_password_field_locator = (By.ID, 'pass')
-        _fb_submit_locator = (By.ID, 'loginbutton')
-        _fb_safari_specific_locator = (By.NAME, '__CONFIRM__')
+        """
+        sign_up = self.content.view_sign_up()
+        student_signup = sign_up.content.sign_up_as_a_student().content
+        student_signup.first_name = first_name
+        student_signup.last_name = last_name
+        if not email:
+            email_user = (
+                f'{first_name}.{last_name}.'
+                f'{Utility.random_hex(Utility.random(3, 7))}'
+                ).lower()
+            email = RestMail(email_user)
+        student_signup.email = email.address
+        student_signup.password = password
+        student_signup.i_agree()
+        confirm_email = student_signup._continue().content
+        box = email.wait_for_mail()
+        pin = box[-1].pin
+        confirm_email.pin = pin
+        complete_signup = confirm_email.confirm_my_account().content.finish()
+        if page:
+            return go_to_(page(self.driver, base_url=base_url))
+        return complete_signup
 
-        _google_locator = (By.ID, 'google-login-button')
-        _google_user_locator = (By.CSS_SELECTOR, '[type=email]')
-        _google_user_next_locator = (By.ID, 'identifierNext')
-        _google_password_locator = (By.CSS_SELECTOR, '[type=password]')
-        _google_pass_next_locator = (By.ID, 'passwordNext')
+    class Content(AccountsBase.Content, SocialLogins):
+        """The log in pane."""
+
+        _continue_button_locator = (
+            By.CSS_SELECTOR, '[type=submit]')
+        _email_field_locator = (
+            By.CSS_SELECTOR, '#login_form_email')
+        _forgot_your_password_link_locator = (
+            By.CSS_SELECTOR, '#forgot-password-link, #forgot-passwork-link')
+        _password_field_locator = (
+            By.CSS_SELECTOR, '#login_form_password')
+        _show_password_toggle_locator = (
+            By.CSS_SELECTOR, '#show-hide-button')
+
+        _email_error_message_locator = (
+            By.CSS_SELECTOR, _email_field_locator[1] + ERROR_SELECTOR)
+        _password_error_message_locator = (
+            By.CSS_SELECTOR, _password_field_locator[1] + ERROR_SELECTOR)
 
         @property
-        def logged_in(self):
-            """Return True if a user is logged in."""
-            return 'profile' in self.driver.current_url
+        def email(self) -> str:
+            """Return the current email field address.
+
+            :return: the current email form field value
+            :rtype: str
+
+            """
+            return (self.find_element(*self._email_field_locator)
+                    .get_attribute('value'))
 
         @property
-        def user(self):
-            """Return the user field."""
-            return self.wait.until(
-                expect.presence_of_element_located(self._user_field_locator))
+        def email_error(self) -> str:
+            """Return the email error message.
 
-        @user.setter
-        def user(self, login):
-            """Send the login email or username."""
-            self.user.send_keys(login)
-            return self
+            :return: the email field error message, if found
+            :rtype: str
 
-        def next(self):
-            """Click the NEXT button."""
-            next_button = self.find_element(*self._login_submit_button_locator)
-            Utility.click_option(self.driver, element=next_button)
-            sleep(0.5)
-            return self
-
-        def reset(self):
-            """Click the reset password link."""
-            reset_button = self.find_element(*self._password_reset_locator)
-            Utility.click_option(self.driver, element=reset_button)
-            sleep(0.5)
-            return self
+            """
+            if self.email_has_error:
+                return (self.find_element(*self._email_error_message_locator)
+                            .text)
+            return ''
 
         @property
-        def password(self):
-            """Return the password field."""
-            return self.find_element(*self._password_field_locator)
+        def email_has_error(self) -> bool:
+            """Return True if the email field has an error.
+
+            :return: ``True`` if an error message is displayed below the email
+                field
+            :rtype: bool
+
+            """
+            email = self.find_element(*self._email_field_locator)
+            return 'has-error' in email.get_attribute('class')
+
+        @property
+        def password(self) -> str:
+            """Return the current password field value.
+
+            :return: the current password form field value
+            :rtype: str
+
+            """
+            return (self.find_element(*self._password_field_locator)
+                    .get_attribute('value'))
+
+        @property
+        def password_error(self) -> str:
+            """Return the password error message.
+
+            :return: the password field error message, if found
+            :rtype: str
+
+            """
+            if self.password_has_error:
+                return (
+                    self.find_element(*self._password_error_message_locator)
+                        .text)
+            return ''
+
+        @property
+        def password_has_error(self) -> bool:
+            """Return True if the password field has an error.
+
+            :return: ``True`` if an error message is displayed below the
+                password field
+            :rtype: bool
+
+            """
+            password = self.find_element(*self._password_field_locator)
+            return 'has-error' in password.get_attribute('class')
+
+        @email.setter
+        def email(self, email: str):
+            """Set the email log in field.
+
+            :param str email: the email log in value
+            :return: None
+
+            """
+            self.find_element(*self._email_field_locator) \
+                .send_keys(email)
+
+        def forgot_your_password(self) -> ResetPassword:
+            """Click the Forgot your password? link.
+
+            :return: the Reset my password page
+            :rtype: :py:class:`~pages.accounts.reset.ResetPassword`
+
+            """
+            link = self.find_element(*self._forgot_your_password_link_locator)
+            Utility.click_option(self.driver, element=link)
+            return go_to_(
+                ResetPassword(self.driver, base_url=self.page.base_url))
 
         @password.setter
-        def password(self, password):
-            """Send the password."""
-            self.password.send_keys(password)
-            return self
+        def password(self, password: str):
+            """Set the password log in field.
 
-        @property
-        def agreement_checkbox(self):
-            """Return the terms of use agreement checkbox."""
-            return self.find_element(*self._terms_agreement)
+            :param str password: the log in password
+            :return: None
 
-        def login(self, user, password):
-            """Log into Accounts with a specific user."""
-            self.service_login(user, password)
-            try:
-                self.wait.until(lambda _: self.logged_in)
-            except TimeoutException:
-                pass
-            from pages.accounts.profile import Profile
-            return go_to_(Profile(self.driver, self.page.base_url))
-
-        def service_login(self, user, password,
-                          destination=None, url=None, **kwargs):
-            """Log into the site with a specific user from another service."""
-            self.user = user
-            self.next()
-            if self.page.is_safari:
-                sleep(1)
-            assert(not self.get_login_error()), 'Username failed'
-            self.password = password
-            self.next()
-            if self.page.is_safari:
-                sleep(1)
-            assert(not self.get_login_error()), 'Password failed'
-            while 'terms/pose' in self.page.location:
-                Utility.click_option(self.driver,
-                                     element=self.agreement_checkbox)
-                self.next()
-            if destination:
-                return go_to_(destination(self.driver, url, **kwargs))
-
-        def facebook_login(self, user, facebook_user, password):
-            """Log into the site with facebook."""
-            self.user = user
-            self.next()
-            fb_button = self.find_element(*self._fb_locator)
-            Utility.click_option(self.driver, element=fb_button)
-            self.wait.until(
-                expect.visibility_of_element_located(
-                    self._fb_email_field_locator))
-            self.find_element(*self._fb_email_field_locator) \
-                .send_keys(facebook_user)
-            self.find_element(*self._fb_password_field_locator) \
+            """
+            self.find_element(*self._password_field_locator) \
                 .send_keys(password)
-            fb_submit = self.find_element(*self._fb_submit_locator)
-            Utility.click_option(self.driver, element=fb_submit)
-            if self.driver.capabilities['browserName'] == 'safari':
-                fb_safari = self.wait.until(
-                    expect.visibility_of_element_located(
-                        self._fb_safari_specific_locator))
-                Utility.click_option(self.driver, element=fb_safari)
-            sleep(2.0)
-            from pages.accounts.profile import Profile
-            return go_to_(Profile(self.driver, self.page.base_url))
 
-        def google_login(self, user, google_user, password):
-            """Log into the site with google."""
-            self.user = user
-            self.next()
-            g_login = self.find_element(*self._google_locator)
-            Utility.click_option(self.driver, element=g_login)
-            self.wait.until(
-                expect.visibility_of_element_located(
-                    self._google_user_locator))
-            g_next = self.find_element(*self._google_user_next_locator)
-            Utility.click_option(self.driver, element=g_next)
-            self.wait.until(
-                expect.visibility_of_element_located(
-                    self._google_password_locator))
-            self.find_element(*self._google_password_locator) \
-                .send_keys(password)
-            g_pass = self.find_element(*self._google_pass_next_locator)
-            Utility.click_option(self.driver, element=g_pass)
-            sleep(1.0)
-            from pages.accounts.profile import Profile
-            return go_to_(Profile(self.driver, self.page.base_url))
+        def toggle_password_display(self) -> AccountsHome:
+            """Toggle the password field to show or hide the value.
 
-        def trigger_reset(self, user):
-            """Start a password reset for a user."""
-            self.user = user
-            self.next()
-            self.reset()
+            :return: the Accounts log in page
+            :rtype: :py:class:`~pages.accounts.home.AccountsHome`
 
-        def reset_password(self, url, password):
-            """Reset the password for the current user."""
-            self.driver.get(url)
-            fields = self.find_elements(*self._password_reset_fields_locator)
-            for field in fields:
-                field.send_keys(password)
-            reset = self.find_element(*self._password_reset_submit)
-            Utility.click_option(self.driver, element=reset)
-            sleep(0.25)
-            try:
-                submit = self.find_element(*self._password_reset_submit)
-                Utility.click_option(self.driver, element=submit)
-                sleep(0.5)
-            except ElementNotInteractableException:
-                sleep(1.0)
-                submit = self.find_element(*self._password_reset_submit)
-                Utility.click_option(self.driver, element=submit)
-                sleep(0.5)
-            sleep(1.0)
-            try:
-                submit = self.find_element(*self._password_reset_submit)
-                Utility.click_option(self.driver, element=submit)
-                sleep(0.5)
-            except WebDriverException:
-                pass
-            from pages.accounts.profile import Profile
-            return go_to_(Profile(self.driver, self.page.base_url))
-
-        @property
-        def is_help_shown(self):
-            """Return True if help text is visible."""
-            return self.is_element_displayed(*self._login_help_locator)
-
-        @property
-        def toggle_help(self):
-            """Show or hide Account help info."""
-            toggle = self.find_element(*self._trouble_locator)
+            """
+            toggle = self.find_element(*self._show_password_toggle_locator)
             Utility.click_option(self.driver, element=toggle)
-            sleep(0.25)
-            return self
+            sleep(0.1)
+            return self.page
 
-        @property
-        def go_to_help(self):
-            """Click the Salesforce help link."""
-            if not self.is_help_shown:
-                self.toggle_help
-            current = self.driver.current_window_handle
-            salesforce = self.find_element(*self._salesforce_link_locator)
-            Utility.click_option(self.driver, element=salesforce)
-            new_handle = 1 if current == self.driver.window_handles[0] else 0
-            if len(self.driver.window_handles) > 1:
-                self.driver.switch_to.window(
-                    self.driver.window_handles[new_handle])
-            return go_to_(Salesforce(self.driver))
+        def _continue(self, previous: Page = None, base_url: str = None,
+                      **kwargs) \
+                -> Page:
+            """Click the Continue button.
 
-        def get_login_error(self):
-            """Return Account log in error message."""
-            try:
-                return self.find_element(*self._error_locator).text
-            except WebDriverException:
-                return ''
+            :param Page previous: (optional) the Page object for the initial
+                page that sent the log in request
+            :param str base_url: (optional) the base URL for the previous Page
+            :param kwargs: (optional) additional keyword arguments for the Page
+            :return: the log in page if there is an error, the profile page if
+                remaining on Accounts, the terms of use or privacy policy if a
+                new policy is available, or the previous page if logging on to
+                another OpenStax resource (like Tutor or OpenStax.org)
+            :rtype: :py:class:`~pypom.Page`
 
-        def get_error_color(self):
-            """Return the background color for missing or illegal fields."""
-            fields = self.find_elements(*self._input_field_locator)
-            issues = list(filter(
-                lambda element: 'has-error' in element.get_attribute('class'),
-                fields
-            ))
-            if not isinstance(issues, list):
-                issues = [issues]
-            if issues:
-                return (
-                    issues[0]
-                    .find_element(*self._form_box_locator)
-                    .value_of_css_property('background-color')
-                )
-            return None
-
-        @property
-        def go_to_signup(self):
-            """Go to user signup."""
-            signup = self.find_element(*self._signup_locator)
-            Utility.click_option(self.driver, element=signup)
-            from utils.accounts import Accounts
-            if Accounts.accounts_old:
-                from pages.accounts.signup import Signup
-            else:
-                from pages.accounts.signup_two import Signup
-            return go_to_(Signup(self.driver, self.page.seed_url))
+            """
+            current_page = self.page.location
+            button = self.find_element(*self._continue_button_locator)
+            Utility.click_option(self.driver, element=button)
+            sleep(0.75)
+            if self.driver.current_url == current_page:
+                raise AccountsException(
+                    self.driver.execute_script(
+                        'return document.querySelector(".invalid-message")'
+                        '.textContent;'))
+            if previous:
+                return go_to_(previous(self.driver, base_url, **kwargs))
+            source = self.driver.page_source
+            policies = 'Terms of Use' in source or 'Privacy policy' in source
+            if 'accounts' in self.page.location and policies:
+                from pages.accounts.legal import AcceptTerms
+                return go_to_(AcceptTerms(self.driver, self.page.base_url))
+            return go_to_(Profile(self.driver, self.page.base_url))

@@ -219,7 +219,7 @@ class Footer(Region):
 
             """
             link = self.find_element(*self._contact_us_locator)
-            Utility.safari_exception_click(self.driver, element=link)
+            Utility.click_option(self.driver, element=link)
             from pages.web.contact import Contact
             return go_to_(
                 Contact(self.driver, base_url=self.page.page.base_url))
@@ -328,7 +328,7 @@ class Footer(Region):
 
             """
             link = self.find_element(*self._license_locator)
-            Utility.safari_exception_click(self.driver, element=link)
+            Utility.click_option(self.driver, element=link)
             from pages.web.legal import License
             return go_to_(
                 License(self.driver, base_url=self.page.page.base_url))

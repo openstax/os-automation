@@ -1,383 +1,373 @@
-"""The Our Impact webpage."""
+"""The OpenStax textbook impact webpage."""
+
+from __future__ import annotations
+
+from typing import List
 
 from pypom import Region
 from selenium.webdriver.common.by import By
 
+from pages.rice.riceconnect import RiceConnect
 from pages.web.base import WebBase
+from pages.web.blog import Article
+from pages.web.global_reach import GlobalReach
+from pages.web.partners import Partners
+from pages.web.subjects import Subjects
+from pages.web.tutor import TutorMarketing
 from utils.utilities import Utility, go_to_
-from utils.web import Web
 
 
-class Section(Region):
-    """A basic section of the Our Impact page."""
+class Impact(WebBase):
+    """The Impact page."""
 
-    _heading_locator = (By.CSS_SELECTOR, 'h1 , h2')
-    _description_locator = (By.CSS_SELECTOR, 'h2 ~ div')
+    _banner_give_today_button_locator = (
+        By.CSS_SELECTOR, '#banner a')
+    _page_description_locator = (
+        By.CSS_SELECTOR, '#banner p')
+    _page_heading_locator = (
+        By.CSS_SELECTOR, '#banner h1')
 
-    @property
-    def heading(self):
-        """Return the section heading."""
-        return self.find_element(*self._heading_locator).text
+    _doerr_statement_locator = (
+        By.CSS_SELECTOR, '#revolution')
 
-    @property
-    def description(self):
-        """Return the section description or sub-heading text."""
-        return self.find_element(*self._description_locator).text
+    _vision_statement_locator = (
+        By.CSS_SELECTOR, '#founding')
 
+    _student_reach_locator = (
+        By.CSS_SELECTOR, '.reach > .text-block')
+    _student_reach_stat_locator = (
+        By.CSS_SELECTOR, '#reach .card')
 
-class OurImpact(WebBase):
-    """The Our Impact page."""
+    _testimonial_locator = (
+        By.CSS_SELECTOR, '#testimonials .card')
 
-    URL_TEMPLATE = '/impact'
+    _partnerships_locator = (
+        By.CSS_SELECTOR, '#sustainability .text-content')
+    _partner_list_link_locator = (
+        By.CSS_SELECTOR, '[href$=partners]')
 
-    _section_locator = (By.CSS_SELECTOR, 'section')
-    _backgrounds_locator = (By.CSS_SELECTOR, '#banner , #map')
-    _images_locator = (By.CSS_SELECTOR, 'img')
+    _disruption_locator = (
+        By.CSS_SELECTOR, '#disruption')
 
-    @property
-    def loaded(self):
-        """Return True when the background image and partner images load."""
-        return (len(self.sections) == 12 and
-                Utility.load_background_images(
-                    driver=self.driver, locator=self._backgrounds_locator) and
-                Utility.is_image_visible(
-                    driver=self.driver, locator=self._images_locator))
+    _business_books_link_locator = (
+        By.CSS_SELECTOR, '#looking_ahead a')
+    _looking_ahead_locator = (
+        By.CSS_SELECTOR, '#lookingAhead')
 
-    def is_displayed(self):
-        """Return True if the heading statement is displayed."""
-        return self.banner.heading
+    _map_exploration_locator = (
+        By.CSS_SELECTOR, '#map a')
+    _textbook_use_locator = (
+        By.CSS_SELECTOR, '#map')
 
-    @property
-    def sections(self):
-        """Return the section roots."""
-        return self.find_elements(*self._section_locator)
+    _tutor_information_link_locator = (
+        By.CSS_SELECTOR, '#tutor a')
+    _tutor_locator = (
+        By.CSS_SELECTOR, '#tutor')
 
-    @property
-    def banner(self):
-        """Access the banner section."""
-        return self.Banner(self, self.sections[Web.BANNER])
+    _philanthropic_locator = (
+        By.CSS_SELECTOR, '#philanthropic-partners')
 
-    @property
-    def revolution(self):
-        """Access the revolution section."""
-        return self.Revolution(self, self.sections[Web.REVOLUTION])
-
-    @property
-    def founding(self):
-        """Access the founding section."""
-        return self.Founding(self, self.sections[Web.FOUNDING])
+    _giving_locator = (
+        By.CSS_SELECTOR, '#giving')
+    _giving_give_today_button_locator = (
+        By.CSS_SELECTOR, '#giving a')
 
     @property
-    def reach(self):
-        """Access the reach section."""
-        return self.Reach(self, self.sections[Web.REACH])
+    def description(self) -> str:
+        """Return the page description.
+
+        :return: the impact page description
+        :rtype: str
+
+        """
+        content = self.find_element(*self._page_description_locator)
+        return content.text if content.is_displayed() else ''
 
     @property
-    def testimonials(self):
-        """Access the testimonials section."""
-        return self.Testimonials(self, self.sections[Web.TESTIMONIALS])
+    def disruption(self) -> str:
+        """Return the positive disruption to textbook prices statement.
+
+        :return: the price disruption statement
+        :rtype: str
+
+        """
+        return (self.find_element(*self._disruption_locator)
+                .get_attribute('textContent'))
 
     @property
-    def sustainability(self):
-        """Access the sustainability section."""
-        return self.Sustainability(self, self.sections[Web.SUSTAINABILITY])
+    def doerr_statement(self) -> str:
+        """Return the Ann Doerr education revolution statement.
+
+        :return: the Ann Doerr revolution in education letter
+        :rtype: str
+
+        """
+        return (self.find_element(*self._doerr_statement_locator)
+                .get_attribute('textContent'))
 
     @property
-    def disruption(self):
-        """Access the disruption section."""
-        return self.Disruption(self, self.sections[Web.DISRUPTION])
+    def giving(self) -> str:
+        """Return the donation request.
+
+        :return: the donation and support request
+        :rtype: str
+
+        """
+        return (self.find_element(*self._giving_locator)
+                .get_attribute('textContent'))
 
     @property
-    def looking_ahead(self):
-        """Access the looking ahead section."""
-        return self.Ahead(self, self.sections[Web.LOOKING_AHEAD])
+    def heading(self) -> str:
+        """Return the page heading.
+
+        :return: the impact page heading statement
+        :rtype: str
+
+        """
+        return self.find_element(*self._page_heading_locator).text
 
     @property
-    def map(self):
-        """Access the map section."""
-        return self.Map(self, self.sections[Web.MAP])
+    def loaded(self) -> bool:
+        """Return True when the impact page heading is found.
+
+        :return: ``True`` when the impact page heading is found
+        :rtype: bool
+
+        """
+        return super().loaded and self.heading
 
     @property
-    def tutor(self):
-        """Access the Tutor Beta section."""
-        return self.Tutor(self, self.sections[Web.OS_TUTOR])
+    def looking_ahead(self) -> str:
+        """Return the OpenStax ecosystem outlook statement.
+
+        :return: the planned direction statement for the OpenStax ecosystem
+        :rtype: str
+
+        """
+        return (self.find_element(*self._looking_ahead_locator)
+                .get_attribute('textContent'))
 
     @property
-    def partners(self):
-        """Access the philanthropic section."""
-        return self.Partners(self, self.sections[Web.PHILANTHROPIC_PARTNERS])
+    def partnerships(self) -> str:
+        """Return the textbook ecosystem partnerships statement.
+
+        :return: the textbook ecosystem partnerships statement
+        :rtype: str
+
+        """
+        return (self.find_element(*self._partnerships_locator)
+                .get_attribute('textContent'))
 
     @property
-    def give(self):
-        """Access the donation section."""
-        return self.Give(self, self.sections[Web.DONATION])
+    def philanthropic_partners(self) -> str:
+        """Return the philanthropic partners statement and quote.
 
-    class Banner(Section):
-        """The introductory section."""
+        :return: the philanthropic thank you and Bob Maxfield's quote
+        :rtype: str
 
-        _description_locator = (By.CSS_SELECTOR, '[data-html=description] p')
-        _give_locator = (By.CSS_SELECTOR, '[href$=give]')
+        """
+        return (self.find_element(*self._philanthropic_locator)
+                .get_attribute('textContent'))
 
-        def give_today(self):
-            """Click the 'Give today!' button."""
-            button = self.find_element(*self._give_locator)
-            Utility.safari_exception_click(self.driver, element=button)
-            from pages.web.donation import Give
-            return go_to_(Give(self.driver, self.page.base_url))
+    @property
+    def student_reach(self) -> str:
+        """Return the student impact statement.
 
-    class Revolution(Section):
-        """On OpenStax direction and effect on education."""
+        :return: the student reach and impact statement
+        :rtype: str
 
-        _letter_locator = (By.CSS_SELECTOR, '.text-block > p')
-        _signature_locator = (By.CSS_SELECTOR, '.signature-image')
-        _role_locator = (By.CSS_SELECTOR, '[data-html=signatureText] p')
-        _picture_locator = (By.CSS_SELECTOR, 'img.hide-on-mobile')
+        """
+        return (self.find_element(*self._student_reach_locator)
+                .get_attribute('textContent'))
 
-        @property
-        def description(self):
-            """Return the body of the letter."""
-            return self.letter
+    @property
+    def student_reach_stats(self) -> List[Impact.StatBox]:
+        """Access the student impact number boxes.
 
-        @property
-        def letter(self):
-            """Return the body of the letter."""
-            return ('\n'.join(
-                paragraph.text
-                for paragraph in self.find_elements(*self._letter_locator)))
+        :return: the list of student impact boxes
+        :rtype: list(:py:class:`~pages.web.impact.Impact.StatBox`)
 
-        @property
-        def signature(self):
-            """Return the signature image."""
-            return self.find_element(*self._signature_locator)
+        """
+        return [self.StatBox(self, box)
+                for box
+                in self.find_elements(*self._student_reach_stat_locator)]
 
-        @property
-        def role(self):
-            """Return the advisor's name and/or their role with OpenStax."""
-            return ('\n'.join(
-                line.text
-                for line in self.find_elements(*self._role_locator)))
+    @property
+    def testimonials(self) -> List[Impact.Testimonial]:
+        """Access the user testimonial quote boxes.
 
-        @property
-        def picture(self):
-            """Return the advisor's portrait."""
-            return self.find_element(*self._picture_locator)
+        :return: the list of user testimonial quote boxes
+        :rtype: list(:py:class:`~pages.web.impact.Impact.Testimonial`)
 
-    class Founding(Section):
-        """The vision for OpenStax according to the founder."""
+        """
+        return [self.Testimonial(self, quote)
+                for quote
+                in self.find_elements(*self._testimonial_locator)]
 
-        _picture_locator = (By.CSS_SELECTOR, 'img')
-        _name_locator = (By.CSS_SELECTOR, '.caption b')
-        _role_locator = (By.CSS_SELECTOR, '.hide-on-mobile p:last-child')
+    @property
+    def textbook_use(self) -> str:
+        """Return the global textbook use statement.
 
-        @property
-        def picture(self):
-            """Return the founder's portrait."""
-            return self.find_element(*self._picture_locator)
+        :return: the global use of OpenStax textbooks statement
+        :rtype: str
 
-        @property
-        def name(self):
-            """Return the founder's name."""
-            line = self.find_element(*self._name_locator).text
-            if line.endswith(','):
-                return line[:-1]
-            return line
+        """
+        return (self.find_element(*self._textbook_use_locator)
+                .get_attribute('textContent'))
 
-        @property
-        def role(self):
-            """Return the founder's role."""
-            return self.find_element(*self._role_locator).text
+    @property
+    def tutor(self) -> str:
+        """Return the OpenStax Tutor Beta overview statement.
 
-    class Reach(Section):
-        """The reach of OpenStax materials."""
+        :return: the OpenStax Tutor Beta overview statement
+        :rtype: str
 
-        _box_locator = (By.CSS_SELECTOR, '.fact-boxes .card')
+        """
+        return (self.find_element(*self._tutor_locator)
+                .get_attribute('textContent'))
 
-        @property
-        def boxes(self):
-            """Access the stats boxes."""
-            return [self.Box(self, root)
-                    for root in self.find_elements(*self._box_locator)]
+    @property
+    def vision_statement(self) -> str:
+        """Return the founding vision statement.
 
-        @property
-        def stats(self):
-            """Return the group of stats."""
-            return [box.stat for box in self.boxes]
+        :return: the founding vision statement
+        :rtype: str
 
-        class Box(Region):
-            """An information box."""
+        """
+        return (self.find_element(*self._vision_statement_locator)
+                .get_attribute('textContent'))
 
-            _number_locator = (By.CSS_SELECTOR, '.card-header')
-            _order_locator = (By.CSS_SELECTOR, '.smaller')
-            _category_locator = (By.CSS_SELECTOR, 'div.card-header ~ div')
+    def business_textbooks(self) -> Subjects:
+        """Click the 'business textbooks' link.
 
-            @property
-            def stat(self):
-                """Return the combined stat line."""
-                number = self.find_element(*self._number_locator).text,
-                order = self.find_element(*self._order_locator).text,
-                description = self.find_element(*self._category_locator).text
-                return '{number}{order} {description}'.format(
-                    number=number, order=order, description=description)
+        :return: the subjects page displaying the business books
+        :rtype: :py:class:`~pages.web.subjects.Subjects`
 
-    class Testimonials(Section):
-        """User testimonials."""
+        """
+        link = self.find_element(*self._business_books_link_locator)
+        Utility.click_option(self.driver, element=link)
+        return go_to_(Subjects(self.driver, base_url=self.base_url))
 
-        _box_locator = (By.CSS_SELECTOR, '.testimonial-boxes')
+    def explore_our_interactive_map(self) -> GlobalReach:
+        """Click the interactive map link.
 
-        @property
-        def testimonial(self):
-            """Access the quote boxes."""
-            return [self.Box(self, root)
-                    for root in self.find_elements(*self._box_locator)]
+        :return: the global reach page
+        :rtype: :py:class:`~pages.web.global_reach.GlobalReach`
 
-        class Box(Region):
-            """A quote box."""
+        """
+        link = self.find_element(*self._map_exploration_locator)
+        Utility.click_option(self.driver, element=link)
+        return go_to_(GlobalReach(self.driver, base_url=self.base_url))
 
-            _picture_locator = (By.CSS_SELECTOR, 'img')
-            _quote_locator = (By.CSS_SELECTOR, '.text-block > div')
-            _link_locator = (By.CSS_SELECTOR, '.text-block > a')
+    def give_today(self, use_banner_button: bool = True) -> RiceConnect:
+        """Click a 'Give today!' button.
 
-            @property
-            def picture(self):
-                """Return the user's picture."""
-                return self.find_element(*self._picture_locator)
+        :param bool use_banner_button: (optional) click the banner donation
+            button when ``True`` or the Give section button when ``False``
+        :return: the RiceConnect OpenStax donation page
+        :rtype: :py:class:`~pages.rice.riceconnect.RiceConnect`
 
-            @property
-            def quote(self):
-                """Return the user's quote."""
-                return self.find_element(*self._quote_locator).text
+        """
+        locator = self._banner_give_today_button_locator if use_banner_button \
+            else self._giving_give_today_button_locator
+        button = self.find_element(*locator)
+        Utility.click_option(self.driver, element=button)
+        return go_to_(RiceConnect(self.driver))
 
-            def read_more(self):
-                """Click on the 'Read more' link to view the blog entry."""
-                link = self.find_element(*self._link_locator)
-                Utility.safari_exception_click(self.driver, element=link)
-                from pages.web.blog import Article
-                return go_to_(Article(self.driver, self.page.page.base_url))
+    def is_displayed(self) -> bool:
+        """Return True if the impact page title and description are displayed.
 
-    class Sustainability(Section):
-        """The sustainability of OpenStax ecosystems section."""
+        :return: ``True`` when the impact page title and description are
+            displayed
+        :rtype: bool
 
-        _partner_locator = (By.CSS_SELECTOR, 'img')
+        """
+        title = self.find_elements(*self._page_heading_locator)
+        description = self.find_elements(*self._page_description_locator)
+        return (title and description and
+                title[0].is_displayed() and description[0].is_displayed())
 
-        @property
-        def partners(self):
-            """Return a dictionary of partner names to logos."""
-            return {company.get_attribute('alt'): company
-                    for company in self.find_elements(*self._partner_locator)}
+    def learn_more_about_openstax_tutor_beta(self) -> TutorMarketing:
+        """Click the 'Learn more about OpenStax Tutor Beta' link.
 
-    class Disruption(Section):
-        """The disruption in the book marketplace."""
+        :return: the OpenStax Tutor Beta marketing page
+        :rtype: :py:class:`~pages.web.tutor.TutorMarketing`
 
-        _cost_graph_locator = (By.CSS_SELECTOR, 'img')
+        """
+        link = self.find_element(*self._tutor_information_link_locator)
+        Utility.click_option(self.driver, element=link)
+        return go_to_(TutorMarketing(self.driver, base_url=self.base_url))
+
+    def see_a_full_list_of_our_partners(self) -> Partners:
+        """Click the partnership link.
+
+        :return: the OpenStax ecosystem partners page
+        :rtype: :py:class:`~pages.web.partners.Partners`
+
+        """
+        link = self.find_element(*self._partner_list_link_locator)
+        Utility.click_option(self.driver, element=link)
+        return go_to_(Partners(self.driver, base_url=self.base_url))
+
+    class StatBox(Region):
+        """A student use stat box."""
+
+        _description_locator = (
+            By.CSS_SELECTOR, '.card-header ~ div')
+        _number_locator = (
+            By.CSS_SELECTOR, '.card-header')
+        _number_extension_locator = (
+            By.CSS_SELECTOR, '.smaller')
 
         @property
-        def cost_graph(self):
-            """Return the cost graph image."""
-            return self.find_element(*self._cost_graph_locator)
+        def description(self) -> str:
+            """Return the number's description.
 
-    class Ahead(Section):
-        """Upcoming content from OpenStax."""
+            :return: the stat number's description/explanation
+            :rtype: str
 
-        _business_locator = (By.CSS_SELECTOR, '[href$=business]')
-        _image_locator = (By.CSS_SELECTOR, 'img')
-
-        def view_business_textbooks(self):
-            """Click on the 'business textbooks' link to view the subject."""
-            link = self.find_element(*self._business_locator)
-            Utility.safari_exception_click(self.driver, element=link)
-            from pages.web.subject import Subjects
-            return go_to_(Subjects(self.driver, self.page.base_url))
+            """
+            return self.find_element(*self._description_locator).text
 
         @property
-        def image(self):
-            """Return the future subjects image."""
-            return self.find_element(*self._image_locator)
+        def number(self) -> str:
+            """Return the stat number.
 
-    class Map(Section):
-        """Textbook usage in the world."""
+            :return: the textbook use stat number
+            :rtype: str
 
-        _demo_map_locator = (By.CSS_SELECTOR, 'img')
-        _adoptions_locator = (By.CSS_SELECTOR, 'a')
+            """
+            number = self.find_element(*self._number_locator).text
+            extension = self.find_element(*self._number_extension_locator).text
+            return f'{number.strip()} {extension.strip()}'
 
-        @property
-        def demo_map(self):
-            """Return the demo map image."""
-            return self.find_element(*self._demo_map_locator)
+    class Testimonial(Region):
+        """A user testimonial box."""
 
-        def view_adoptions(self):
-            """Click on adoptions link."""
-            link = self.find_element(*self._adoptions_locator)
-            Utility.safari_exception_click(self.driver, element=link)
-            from pages.web.adopters import Adopters
-            return go_to_(Adopters(self.driver, self.page.base_url))
-
-    class Tutor(Section):
-        """About OpenStax Tutor Beta."""
-
-        _demo_image_locator = (By.CSS_SELECTOR, '.right-image')
-        _learn_more_locator = (By.CSS_SELECTOR, 'a')
-        _bottom_image_locator = (By.CSS_SELECTOR, '.bottom-image')
+        _content_locator = (
+            By.CSS_SELECTOR, '.text-block div')
+        _read_more_link_locator = (
+            By.CSS_SELECTOR, '.text-block a')
 
         @property
-        def demo_tutor(self):
-            """Return the student Tutor demo image."""
-            return self.find_element(*self._demo_image_locator)
+        def content(self) -> str:
+            """Return the testimonial quote.
 
-        def learn_more_about_openstax_tutor_beta(self):
-            """Click on the 'Learn more...' link."""
-            link = self.find_element(*self._learn_more_locator)
-            Utility.safari_exception_click(self.driver, element=link)
-            from pages.web.tutor import TutorMarketing
-            return go_to_(TutorMarketing(self.driver, self.page.base_url))
+            :return: the textbook use testimonial text quote
+            :rtype: str
 
-    class Partners(Section):
-        """Philanthropic partners."""
+            """
+            return self.find_element(*self._content_locator).text
 
-        _advisor_locator = (By.CSS_SELECTOR, '.text-overlapping-photo')
+        def read_more(self) -> Article:
+            """Click the testimonial 'Read more >' link.
 
-        @property
-        def advisors(self):
-            """Access the OpenStax advisor blocks."""
-            return [self.Advisor(self, advisor)
-                    for advisor in self.find_elements(*self._advisor_locator)]
+            :return: the testimonial's associated blog entry
+            :rtype: :py:class:`~pages.web.blog.Article`
 
-        class Advisor(Region):
-            """An OpenStax advisor."""
-
-            _picture_locator = (By.CSS_SELECTOR, 'img')
-            _name_locator = (By.CSS_SELECTOR, '.name')
-            _role_locator = (By.CSS_SELECTOR, '.title')
-            _quote_locator = (By.CSS_SELECTOR,
-                              '.big-orange-quote > div:not(.attribution)')
-
-            @property
-            def picture(self):
-                """Return the advisor's headshot."""
-                return self.find_element(*self._picture_locator)
-
-            @property
-            def name(self):
-                """Return the advisor's name."""
-                return self.find_element(*self._name_locator).text
-
-            @property
-            def role(self):
-                """Return the advisor's role and position."""
-                return self.find_element(*self._role_locator).text
-
-            @property
-            def quote(self):
-                """Return the advisor's quote."""
-                return self.find_element(*self._quote_locator).text
-
-    class Give(Section):
-        """Donate to OpenStax."""
-
-        _give_locator = (By.CSS_SELECTOR, '[href$=give]')
-
-        def give_today(self):
-            """Click on the 'Give today!' button."""
-            button = self.find_element(*self._give_locator)
-            Utility.safari_exception_click(self.driver, element=button)
-            from pages.web.donation import Give
-            return go_to_(Give(self.driver, self.page.base_url))
+            """
+            link = self.find_element(*self._read_more_link_locator)
+            url = self.page.base_url
+            article = link.get_attribute('href').split('/')[-1]
+            Utility.click_option(self.driver, element=link)
+            return go_to_(Article(self.driver, base_url=url, article=article))

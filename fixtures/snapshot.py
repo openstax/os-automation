@@ -30,10 +30,9 @@ class Snapshot(object):
             snapshot_file.seek(0)
             snapshot = snapshot_file.read()
             if snapshot:
-                assert value == json.loads(snapshot), \
-                       ('Value did not match snapshot.\n\n' +
-                        f'Value:\n\n{value}\n\n' +
-                        f'Snapshot:\n\n{snapshot}')
+                assert value == json.loads(snapshot), (
+                    'Value did not match snapshot.\n\n' +
+                    f'Value:\n\n{value}\n\nSnapshot:\n\n{snapshot}')
             else:
                 snapshot_file.write(json.dumps(value))
 

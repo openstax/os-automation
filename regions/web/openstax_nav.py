@@ -29,7 +29,7 @@ class OpenStaxNav(Region):
         self._click(self._our_impact_locator)
         sleep(1.0)
         if 'impact' in self._our_impact_locator[1]:
-            from pages.web.impact import OurImpact as Destination
+            from pages.web.impact import Impact as Destination
         else:
             from pages.web.annual import AnnualReport as Destination
         return go_to_(Destination(self.driver, base_url=self.page.base_url))
@@ -50,10 +50,11 @@ class OpenStaxNav(Region):
 
     def view_donation_options(self):
         """Go to the donation page."""
-        self._click(self._give_locator)
-        sleep(1.0)
-        from pages.web.donation import Give
-        return go_to_(Give(self.driver, base_url=self.page.base_url))
+        link = self.find_element(*self._give_locator)
+        url = link.get_attribute('href')
+        Utility.switch_to(self.driver, element=link)
+        from pages.rice.riceconnect import RiceConnect
+        return go_to_(RiceConnect(self.driver, url))
 
     def view_help_articles(self):
         """Go to the Salesforce help site."""

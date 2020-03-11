@@ -233,14 +233,6 @@ class Book(WebBase):
         return self.phone.instructor
 
     @property
-    def partners(self):
-        """Access the partner resources."""
-        if self.driver.get_window_size().get('width') > Web.PHONE:
-            partner_root = self.find_element(*self._partner_locator)
-            return self.PartnerResources(self, partner_root)
-        return None
-
-    @property
     def student(self):
         """Access the student resources."""
         if self.driver.get_window_size().get('width') > Web.PHONE:
@@ -548,7 +540,7 @@ class Book(WebBase):
         _oer_commons_locator = (By.CSS_SELECTOR, '.resource-box.double')
         _webinar_link_locator = (By.CSS_SELECTOR, '.webinars')
         _slogan_locator = (By.CSS_SELECTOR, '.ally-blurb h2')
-        _partner_resource_locator = (By.CSS_SELECTOR, '.ally-box')
+        _partner_resource_locator = (By.CSS_SELECTOR, '.blurb-scroller .blurb')
 
         def is_displayed(self):
             """Return True if the instructor resources content is visible."""
@@ -1113,46 +1105,54 @@ class Resource(Region):
 class Partner(Region):
     """A partner resource."""
 
-    _name_locator = (By.CSS_SELECTOR, 'img')
-    _description_locator = (By.CSS_SELECTOR, '.hover-blurb')
-    _hover_top_locator = (By.CSS_SELECTOR, '.top')
+    _cost_locator = (
+        By.CSS_SELECTOR, '.info:first-child')
+    _name_locator = (
+        By.CSS_SELECTOR, '.name')
+    _partner_type_locator = (
+        By.CSS_SELECTOR, '.info:last-child')
 
     @property
-    def name(self):
-        """Return the partner's name."""
-        return (self.find_element(*self._name_locator)
-                .get_attribute('alt').strip())
+    def cost(self) -> str:
+        """Return the resource average cost range.
+
+        :return: the partner resource average cost range
+        :rtype: str
+
+        """
+        return self.find_element(*self._cost_locator).text
 
     @property
-    def to_hover(self):
-        """Return the top element."""
-        return self.find_element(*self._hover_top_locator)
+    def name(self) -> str:
+        """Return the partner's name.
+
+        :return: the partner resource name
+        :rtype: str
+
+        """
+        return self.find_element(*self._name_locator).text
 
     @property
-    def hover(self):
-        """Return the description element."""
-        return self.find_element(*self._description_locator)
+    def type(self) -> str:
+        """Return the partner resource type.
 
-    @property
-    def description(self):
-        """Return the partner's short bio."""
-        return self.hover.text
+        :return: the partner resource type
+        :rtype: str
 
-    @property
-    def url(self):
-        """Return the partner's website URL."""
-        return self.root.get_attribute('href')
+        """
+        return self.find_element(*self._partner_type_locator).text
 
-    def view_partner(self):
-        """Click on the partner resource box and return the new URL."""
-        url = self.url
-        Utility.switch_to(self.driver, element=self.root)
-        self.wait.until(
-            lambda _: bool(self.driver.find_element(By.TAG_NAME, 'body')))
-        images = self.wait.until(
-            lambda _: bool(self.driver.find_elements(By.TAG_NAME, 'img')))
-        Utility.is_image_visible(self.driver, image=images)
-        return url
+    def view_partner(self) -> WebBase:
+        """Click on the partner resource box.
+
+        :return: the partners page displaying the partner resource information
+        :rtype: :py:class:`~pages.web.partners.Partners`
+
+        """
+        Utility.click_option(self.driver, element=self.root)
+        from pages.web.partners import Partners
+        return go_to_(
+            Partners(self.driver, base_url=Utility.parent_page(self)))
 
 
 class Chapter(Region):
@@ -1461,7 +1461,7 @@ class BookOrder(Modal):
                 target = self.root
             else:
                 target = self.find_element(*self._non_root_link_locator)
-            if self.title == 'Individual':
+            if 'Individual' in self.title:
                 if url:
                     return target.get_attribute('href')
                 Utility.switch_to(self.driver, element=target)

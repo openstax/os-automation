@@ -215,7 +215,7 @@ class TutorMarketing(WebHome):
             except IndexError:
                 sleep(1.0)
                 target = self.nav[destination] if destination else element
-            Utility.safari_exception_click(self.driver, element=target)
+            Utility.click_option(self.driver, element=target)
             sleep(0.75)
             return self.page
 
@@ -250,7 +250,7 @@ class TutorMarketing(WebHome):
             webinar = (self.buttons[Web.JOIN_A_WEBINAR]
                        .button.get_attribute('href')
                        .split('/')[-1])
-            Utility.safari_exception_click(
+            Utility.click_option(
                 self.driver, element=self.buttons[Web.JOIN_A_WEBINAR])
             return go_to_(
                 Article(self.driver, self.page.base_url, article=webinar))
@@ -298,7 +298,7 @@ class TutorMarketing(WebHome):
 
         def learn_more(self):
             """Click the 'Learn More' button."""
-            Utility.safari_exception_click(
+            Utility.click_option(
                 self.driver,
                 element=self.find_element(*self._how_it_works_locator))
             sleep(0.75)
@@ -414,8 +414,7 @@ class TutorMarketing(WebHome):
                 """Select and option to view."""
                 self.scroll_to(option=option)
                 sleep(0.25)
-                Utility.safari_exception_click(self.driver,
-                                               element=self.options[option])
+                Utility.click_option(self.driver, element=self.options[option])
                 Utility.scroll_to(self.driver,
                                   element=self.viewport,
                                   shift=-80)
@@ -447,10 +446,10 @@ class TutorMarketing(WebHome):
         @property
         def features(self):
             """Return the current features."""
-            return list([feature.find_element_by_tag_name('div').text.strip()
-                        for feature
-                        in self.find_elements(*self._feature_locator)
-                        if 'false' not in feature.get_attribute('innerHTML')])
+            return list([
+                feature.get_attribute('textContent')
+                for feature
+                in self.find_elements(*self._feature_locator)])
 
         @property
         def new_features(self):
@@ -533,7 +532,7 @@ class TutorMarketing(WebHome):
             def toggle(self):
                 """Open or close the question."""
                 toggle = self.find_element(*self._toggle_locator)
-                Utility.safari_exception_click(self.driver, element=toggle)
+                Utility.click_option(self.driver, element=toggle)
                 return self.page.page
 
             @property
@@ -592,8 +591,7 @@ class TutorMarketing(WebHome):
 
             def click(self):
                 """Click on the link."""
-                Utility.safari_exception_click(self.driver,
-                                               element=self.button)
+                Utility.click_option(self.driver, element=self.button)
                 return self.page
 
             @property

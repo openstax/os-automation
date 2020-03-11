@@ -1,15 +1,10 @@
 """Tests for the OpenStax Web home page."""
 
-# from time import sleep
-
-# from selenium.common.exceptions import NoSuchElementException
-
 from pages.accounts.admin.users import Search
 from pages.accounts.home import AccountsHome
-from pages.accounts.signup import Signup
+from pages.accounts.signup import SignupOld
 from pages.web.home import WebHome as Home
-from tests.markers import accounts, expected_failure, nondestructive  # NOQA
-from tests.markers import smoke_test, test_case, web  # NOQA
+from tests.markers import accounts, expected_failure, nondestructive, smoke_test, test_case, web  # NOQA
 from utils.accounts import Accounts
 from utils.email import RestMail
 from utils.utilities import Utility
@@ -174,17 +169,15 @@ def test_mobile_menu_navigation(web_base_url, selenium):
     assert(home.web_nav.openstax.is_displayed()), \
         'What we do nav item not displayed'
     assert(home.web_nav.login.is_displayed()), \
-        'Login nav item not displayed'
+        'Log in nav item not displayed'
 
     # WHEN: they click on the "Technology" link
     home.web_nav.technology.open()
 
     # THEN: the "Technology" links are displayed
-    assert(home.web_nav.technology.technology.is_displayed()), \
-        'Technology::Technology Options nav item not displayed'
     assert(home.web_nav.technology.tutor.is_displayed()), \
         'Technology::OpenStax Tutor nav item not displayed'
-    assert(home.web_nav.technology.partners.is_displayed()), \
+    assert(home.web_nav.technology.rover.is_displayed()), \
         'Technology::Rover by OpenStax nav item not displayed'
     assert(home.web_nav.technology.partners.is_displayed()), \
         'Technology::OpenStax Partners nav item not displayed'
@@ -200,7 +193,7 @@ def test_mobile_menu_navigation(web_base_url, selenium):
     assert(home.web_nav.openstax.is_displayed()), \
         'What we do nav item not displayed'
     assert(home.web_nav.login.is_displayed()), \
-        'Login nav item not displayed'
+        'Log in nav item not displayed'
 
     # WHEN: they click on the "What we do" link
     home.web_nav.openstax.open()
@@ -228,7 +221,7 @@ def test_mobile_menu_navigation(web_base_url, selenium):
     assert(home.web_nav.openstax.is_displayed()), \
         'What we do nav item not displayed'
     assert(home.web_nav.login.is_displayed()), \
-        'Login nav item not displayed'
+        'Log in nav item not displayed'
 
     # WHEN: they click on the "X" icon
     home.web_nav.meta.toggle_menu()
@@ -354,6 +347,7 @@ def test_nav_give_loads_the_donation_page(web_base_url, selenium):
     # AND:  the screen is reduced to 960 pixels or less
     # AND:  they click on the menu toggle
     # AND:  click the "Give" link
+    home = home.close_tab()
     home.open()
 
     home.resize_window(width=Web.TABLET)
@@ -485,7 +479,7 @@ def test_web_nav_is_displayed(web_base_url, selenium):
     assert(home.web_nav.openstax.is_displayed()), \
         'What we do nav item not displayed'
     assert(home.web_nav.login.is_displayed()), \
-        'Login nav item not displayed'
+        'Log in nav item not displayed'
 
 
 @test_case('C210307')
@@ -572,6 +566,7 @@ def test_able_to_view_subjects_using_the_nav_menu(web_base_url, selenium):
                   all_subjects.humanities,
                   all_subjects.business,
                   all_subjects.essentials,
+                  all_subjects.college_success,
                   all_subjects.ap]
 
     # THEN: the subjects webpage is displayed
@@ -612,6 +607,7 @@ def test_able_to_view_subjects_using_the_nav_menu(web_base_url, selenium):
                   all_subjects.humanities,
                   all_subjects.business,
                   all_subjects.essentials,
+                  all_subjects.college_success,
                   all_subjects.ap]
 
     # THEN: the subjects webpage is displayed
@@ -655,6 +651,7 @@ def test_subject_menu_options_load_filtered_views(web_base_url, selenium):
                 home.web_nav.subjects.view_humanities,
                 home.web_nav.subjects.view_business,
                 home.web_nav.subjects.view_essentials,
+                home.web_nav.subjects.view_college_success,
                 home.web_nav.subjects.view_ap
             ]
             if device == 'mobile' and not home.web_nav.meta.is_open:
@@ -668,6 +665,7 @@ def test_subject_menu_options_load_filtered_views(web_base_url, selenium):
                 subject.humanities,
                 subject.business,
                 subject.essentials,
+                subject.college_success,
                 subject.ap
             ]
 
@@ -720,19 +718,10 @@ def test_technology_menu_options_load_the_corresponding_pages(
             assert(home.web_nav.technology.is_available(option)), \
                 f'Technology::{option} nav item not displayed'
 
-        # WHEN: the "Technology Options" menu option is clicked
+        # WHEN: the "About OpenStax Tutor" menu option is clicked
         if device == 'mobile' and not home.web_nav.meta.is_open:
             home.web_nav.meta.toggle_menu()
-        tech = home.web_nav.technology.view_technology()
-
-        # THEN: the technology webpage is displayed
-        assert(tech.is_displayed()), \
-            f'Technology page is not displayed; ended at: {tech.location}'
-
-        # WHEN: the "About OpenStax Tutor" menu option is clicked
-        if device == 'mobile' and not tech.web_nav.meta.is_open:
-            tech.web_nav.meta.toggle_menu()
-        tutor = tech.web_nav.technology.view_tutor()
+        tutor = home.web_nav.technology.view_tutor()
 
         # THEN: the OpenStax Tutor marketing webpage is displayed
         assert(tutor.is_displayed()), \
@@ -841,23 +830,24 @@ def test_able_to_log_into_the_web_site(web_base_url, selenium, student):
     # GIVEN: a student with a valid user account viewing the Web home page
     home = Home(selenium, web_base_url).open()
 
-    # WHEN: they click on the "Login" menu
+    # WHEN: they click on the "Log in" menu
     accounts = home.web_nav.login.go_to_log_in()
 
     # THEN: they are taken to Accounts
-    assert('accounts' in accounts.current_url), \
-        f'Not viewing Accounts ({accounts.current_url})'
+    assert('accounts' in accounts.location), \
+        f'Not viewing Accounts ({accounts.location})'
 
     # WHEN: they log into Accounts
-    accounts.login.service_login(*student)
+    accounts.log_in(*student, Home, web_base_url)
     # wait for the page load because we're accessing
     # Accounts directly instead of using the Web page
     # object log in routine (Safari issue)
     home.wait_for_page_to_load()
 
     # THEN: the Web home page is displayed
-    # AND:  the "Login" menu is replaced by the "Hi <first_name>" user menu
-    assert(home.web_nav.login.name != 'Login'), 'User not logged into the site'
+    # AND:  the "Log in" menu is replaced by the "Hi <first_name>" user menu
+    assert(home.web_nav.login.name != 'Log in'), \
+        'User not logged into the site'
 
     # WHEN: they open the user menu
     # AND:  click on the "Logout" menu option
@@ -865,8 +855,9 @@ def test_able_to_log_into_the_web_site(web_base_url, selenium, student):
 
     # THEN: the user is logged out of the Web page
     # AND:  the "Hi <first_name>" user menu is replaced by
-    #       the "Login" menu option
-    assert('Login' in home.web_nav.login.name), 'User still shown as logged in'
+    #       the "Log in" menu option
+    assert('Log in' in home.web_nav.login.name), \
+        'User still shown as logged in'
 
 
 @test_case('C210317', 'C210323')
@@ -882,17 +873,17 @@ def test_able_to_log_into_the_web_site_using_the_mobile_display(
     home.open()
 
     # WHEN: they click on the menu toggle
-    # AND:  click on the "Login" link
+    # AND:  click on the "Log in" link
     home.web_nav.meta.toggle_menu()
 
     accounts = home.web_nav.login.go_to_log_in()
 
     # THEN: they are taken to Accounts
-    assert('accounts' in accounts.current_url), \
-        f'Not viewing Accounts ({accounts.current_url})'
+    assert('accounts' in accounts.location), \
+        f'Not viewing Accounts ({accounts.location})'
 
     # WHEN: they log into Accounts
-    accounts.login.service_login(*student)
+    home = accounts.log_in(*student, Home, web_base_url)
     # wait for the page load because we're accessing
     # Accounts directly instead of using the Web page
     # object log in routine (Safari issue)
@@ -905,8 +896,9 @@ def test_able_to_log_into_the_web_site_using_the_mobile_display(
     # WHEN: they click on the menu toggle
     home.web_nav.meta.toggle_menu()
 
-    # THEN: the "Login" menu is replaced by the "Hi <first_name>" user menu
-    assert(home.web_nav.login.name != 'Login'), 'User not logged into the site'
+    # THEN: the "Log in" menu is replaced by the "Hi <first_name>" user menu
+    assert(home.web_nav.login.name != 'Log in'), \
+        'User not logged into the site'
 
     # WHEN: they click on the user menu
     # AND:  click on the "Logout" menu option
@@ -917,8 +909,9 @@ def test_able_to_log_into_the_web_site_using_the_mobile_display(
 
     # THEN: the user is logged out of the Web page
     # AND:  the "Hi <first_name>" user menu is replaced by
-    #       the "Login" menu option
-    assert('Login' in home.web_nav.login.name), 'User still shown as logged in'
+    #       the "Log in" menu option
+    assert('Log in' in home.web_nav.login.name), \
+        'User still shown as logged in'
 
 
 @test_case('C210318')
@@ -929,7 +922,7 @@ def test_user_menu_profile_link_loads_accounts_profile_for_the_student(
     """Test a student viewing their Accounts profile from the Web user menu."""
     # GIVEN: a user logged into the Web home page
     home = Home(selenium, web_base_url).open()
-    home = home.web_nav.login.log_in(*student)
+    home = home.web_nav.login.log_in(*student, Home, web_base_url)
 
     # WHEN: they open the user menu
     # AND:  click on the "Account Profile" menu option
@@ -937,8 +930,8 @@ def test_user_menu_profile_link_loads_accounts_profile_for_the_student(
 
     # THEN: the Accounts profile page for the user is displayed in a new tab
     assert(profile.is_displayed() and
-           'accounts' in profile.current_url), \
-        f'Not viewing the user profile: {profile.driver.current_url}'
+           'accounts' in profile.location), \
+        f'Not viewing the user profile: {profile.location}'
 
     # WHEN: they close the new tab
     # AND:  reduce the screen width to 960 pixels or fewer
@@ -955,8 +948,8 @@ def test_user_menu_profile_link_loads_accounts_profile_for_the_student(
 
     # THEN: the Accounts profile page for the user is displayed
     assert(profile.is_displayed() and
-           'accounts' in profile.current_url), \
-        f'Not viewing the user profile: {profile.driver.current_url}'
+           'accounts' in profile.location), \
+        f'Not viewing the user profile: {profile.location}'
 
 
 @test_case('C210319')
@@ -968,7 +961,7 @@ def test_go_to_the_users_openstax_tutor_dashboard(
     """Test a student going to their Tutor dashboard from the Web user menu."""
     # GIVEN: a user logged into the Web home page
     home = Home(selenium, web_base_url).open()
-    home = home.web_nav.login.log_in(*student)
+    home = home.web_nav.login.log_in(*student, Home, web_base_url)
 
     # WHEN: they open the user menu
     # AND:  click on the "OpenStax Tutor" menu option
@@ -1006,8 +999,7 @@ def test_instructor_access_application(
     """Test a teacher applying for instructor resource access."""
     # SETUP:
     name = Utility.random_name()
-    email = RestMail('{first}.{last}.{tag}'.format(
-        first=name[1], last=name[2], tag=Utility.random_hex(4)).lower())
+    email = RestMail(f'{name[1]}.{name[2]}.{Utility.random_hex(4)}'.lower())
     email.empty()
     address = email.address
     password = Utility.random_hex(15)
@@ -1015,12 +1007,14 @@ def test_instructor_access_application(
     # GIVEN: a user with rejected instructor access
     # AND:   logged into the Web home page
     accounts = AccountsHome(selenium, accounts_base_url).open()
-    profile = accounts.login.go_to_signup.account_signup(
-        name=name, email=address, password=password, _type=Signup.INSTRUCTOR,
-        provider=Signup.RESTMAIL, school='Automation', news=False,
+    sign_up = accounts.content.view_sign_up()
+    educator = sign_up.content.sign_up_as_an_educator()
+    profile = educator.account_signup(
+        name=name, email=address, password=password, _type=Accounts.INSTRUCTOR,
+        provider=Accounts.RESTMAIL, school='Automation', news=False,
         phone=Utility.random_phone(), webpage=web_base_url,
-        subjects=Signup(selenium).subject_list(2), students=10,
-        use=Signup.RECOMMENDED)
+        subjects=SignupOld(selenium).subject_list(2), students=10,
+        use=Accounts.RECOMMENDED)
     profile.log_out()
     profile = accounts.log_in(*admin)
     search = Search(selenium, accounts_base_url).open()
@@ -1055,15 +1049,16 @@ def test_instructor_access_application(
     # AND:  click on the "OK" button
     # AND:  open the Web homepage
     # AND:  open the user menu
+    form = SignupOld(selenium, accounts_base_url)
     form.instructor_access(
-        role=Signup.INSTRUCTOR,
+        role=SignupOld.INSTRUCTOR,
         school_email=address,
         phone_number=Utility.random_phone(),
         school='Automation',
         students=10,
         webpage=web_base_url,
-        using=Signup.RECOMMENDED,
-        interests=Signup(selenium).subject_list(Utility.random(2, 4)),
+        using=SignupOld.RECOMMENDED,
+        interests=SignupOld(selenium).subject_list(Utility.random(2, 4)),
         get_newsletter=False
     )
 
@@ -1079,8 +1074,7 @@ def test_instructor_access_application_on_mobile(
     """Test a teacher applying for instructor resource access."""
     # SETUP:
     name = Utility.random_name()
-    email = RestMail('{first}.{last}.{tag}'.format(
-        first=name[1], last=name[2], tag=Utility.random_hex(7)).lower())
+    email = RestMail(f'{name[1]}.{name[2]}.{Utility.random_hex(7)}'.lower())
     email.empty()
     address = email.address
     password = Utility.random_hex(17)
@@ -1089,13 +1083,15 @@ def test_instructor_access_application_on_mobile(
     # AND:   logged into the Web home page
     # AND:   the screen width is 960 pixels or less
     accounts = AccountsHome(selenium, accounts_base_url).open()
-    profile = accounts.login.go_to_signup.account_signup(
-        name=name, email=address, password=password, _type=Signup.INSTRUCTOR,
-        provider=Signup.RESTMAIL, school='Automation', news=False,
+    sign_up = accounts.content.view_sign_up()
+    educator = sign_up.content.sign_up_as_an_educator()
+    profile = educator.account_signup(
+        name=name, email=address, password=password, _type=Accounts.INSTRUCTOR,
+        provider=Accounts.RESTMAIL, school='Automation', news=False,
         phone=Utility.random_phone(), webpage=web_base_url,
-        subjects=Signup(selenium).subject_list(2), students=10,
-        use=Signup.RECOMMENDED)
-    profile.log_out()
+        subjects=SignupOld(selenium).subject_list(2), students=10,
+        use=Accounts.RECOMMENDED)
+    accounts = profile.log_out()
     profile = accounts.log_in(*admin)
     search = Search(selenium, accounts_base_url).open()
     details = Utility.switch_to(
@@ -1131,15 +1127,16 @@ def test_instructor_access_application_on_mobile(
     # AND:  click on the "OK" button
     # AND:  open the Web homepage
     # AND:  open the user menu
+    form = SignupOld(selenium, accounts_base_url)
     form.instructor_access(
-        role=Signup.INSTRUCTOR,
+        role=Accounts.INSTRUCTOR,
         school_email=address,
         phone_number=Utility.random_phone(),
         school='Automation',
         students=10,
         webpage=web_base_url,
-        using=Signup.RECOMMENDED,
-        interests=Signup(selenium).subject_list(Utility.random(2, 4)),
+        using=Accounts.RECOMMENDED,
+        interests=SignupOld(selenium).subject_list(Utility.random(2, 4)),
         get_newsletter=False
     )
     home.open()
@@ -1173,18 +1170,18 @@ def test_switch_panels_in_banner_carousel(web_base_url, selenium):
 def test_carousel_banners_link_to_other_pages(web_base_url, selenium):
     """Test clicking on each banner in the carousel."""
     # SETUP:
-    carousel = ['global-reach', 'download-openstax-se-app', 'subjects']
+    carousel = ['global-reach', 'download-openstax-se-app']
 
     # GIVEN: a user viewing the Web home page
     home = Home(selenium, web_base_url).open()
 
     # WHEN: they click on the initial banner
-    global_reach = home.carousel.banners[Web.INTERACTIVE_MAP].click()
+    global_reach = home.carousel.banners[Web.F_INTERACTIVE_MAP].click()
 
     # THEN: the interactive map page is displayed
     assert(global_reach.is_displayed()), 'Global reach page not displayed'
-    assert(global_reach.url == carousel[Web.INTERACTIVE_MAP]), (
-        f'Expected {carousel[Web.INTERACTIVE_MAP]}, '
+    assert(global_reach.url == carousel[Web.F_INTERACTIVE_MAP]), (
+        f'Expected {carousel[Web.F_INTERACTIVE_MAP]}, '
         f'ended at: {global_reach.url}')
 
     # WHEN: they return to the home page
@@ -1192,19 +1189,21 @@ def test_carousel_banners_link_to_other_pages(web_base_url, selenium):
     # AND:  click on the banner
     home.open()
 
-    home.carousel.dots[Web.NEW_APP].click()
+    home.carousel.dots[Web.F_NEW_APP].click()
 
-    new_app = home.carousel.banners[Web.NEW_APP].click()
+    new_app = home.carousel.banners[Web.F_NEW_APP].click()
 
     # THEN: the OpenStax + SE app page is displayed
     assert(new_app.is_displayed()), 'SE App page not displayed'
-    assert(new_app.url == carousel[Web.NEW_APP]), (
-        f'Expected: {carousel[Web.NEW_APP]}, '
+    assert(new_app.url == carousel[Web.F_NEW_APP]), (
+        f'Expected: {carousel[Web.F_NEW_APP]}, '
         f'ended at: {new_app.url}')
 
     # WHEN: they return to the home page
     # AND:  select the third banner
     # AND:  click on the banner
+    '''
+    # Third banner removed
     home.open()
 
     home.carousel.dots[Web.FREE_BOOKS_NO_CATCH].click()
@@ -1215,7 +1214,7 @@ def test_carousel_banners_link_to_other_pages(web_base_url, selenium):
     assert(nonprofit.is_displayed()), 'Subjects page not displayed'
     assert(nonprofit.url == carousel[Web.FREE_BOOKS_NO_CATCH]), (
         f'Expected: {carousel[Web.FREE_BOOKS_NO_CATCH]}, '
-        f'ended at: {nonprofit.url}')
+        f'ended at: {nonprofit.url}')'''
 
 
 @test_case('C210327')
@@ -1308,10 +1307,10 @@ def test_the_home_page_education_section(web_base_url, selenium):
     home.education.show()
     technology = home.education.links[Web.TECH].click()
 
-    # THEN: the technology page is displayed
-    assert(technology.is_displayed()), 'Technology page not displayed'
-    assert('technology' in technology.location), \
-        f'Not viewing the technology page: {technology.location}'
+    # THEN: the partners page is displayed
+    assert(technology.is_displayed()), 'Tech partners page not displayed'
+    assert('partners' in technology.location), \
+        f'Not viewing the tech partners page: {technology.location}'
 
 
 @test_case('C210329')

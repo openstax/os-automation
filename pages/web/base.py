@@ -28,8 +28,11 @@ class WebBase(Page):
     @property
     def loaded(self):
         """Return True when the page-loaded class is added to the body tag."""
-        return (self.web_nav.loaded and
-                not self.find_elements(*self._async_hide_locator))
+        script = (r'document.addEventListener("load", function(event) {});')
+        sleep(0.5)
+        async_hide = bool(self.find_elements(*self._async_hide_locator))
+        return (self.driver.execute_script(script) or
+                (self.web_nav.loaded and not async_hide))
 
     def open(self):
         """Open the page."""
@@ -40,6 +43,16 @@ class WebBase(Page):
                 print('Attempt: {0}'.format(attempt + 1))
                 sleep(1)
         raise WebDriverException('Website failed to open or load')
+
+    @property
+    def location(self) -> str:
+        """Return the current page URL.
+
+        :return: the current page URL
+        :rtype: str
+
+        """
+        return self.driver.current_url
 
     @property
     def sticky_note(self):
@@ -98,11 +111,6 @@ class WebBase(Page):
         """
         Utility.close_tab(self.driver)
         return self
-
-    @property
-    def location(self):
-        """Return the current URL."""
-        return self.driver.current_url
 
     @property
     def url(self):

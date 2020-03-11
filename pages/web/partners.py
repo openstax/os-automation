@@ -62,7 +62,7 @@ class Partners(WebBase):
     @property
     def loaded(self):
         """Return True if the title is set and images are visible."""
-        return ('OpenStax Partners' in self.title and
+        return ('OpenStax Tech Scout' in self.title and
                 Utility.is_image_visible(self.driver,
                                          locator=self._image_locator))
 
@@ -98,8 +98,8 @@ class Partners(WebBase):
     def filter_by(self, option):
         """Filter allies by a subject."""
         if option != self.current_filter:
-            Utility.safari_exception_click(self.driver, element=self.filter)
-            Utility.safari_exception_click(
+            Utility.click_option(self.driver, element=self.filter)
+            Utility.click_option(
                 self.driver,
                 element=self.filter_buttons[Web.PARTNER_FILTERS.get(option)])
         return self
@@ -161,7 +161,7 @@ class Partners(WebBase):
 
         def view(self):
             """Click the company logo."""
-            Utility.safari_exception_click(self.driver, element=self.link)
+            Utility.click_option(self.driver, element=self.link)
             sleep(1.5)
             return self.page
 
@@ -215,7 +215,6 @@ class Partners(WebBase):
 
         def return_to_top(self):
             """Click the 'Return to top' link."""
-            Utility.safari_exception_click(self.driver,
-                                           element=self.return_to_top_link)
+            Utility.click_option(self.driver, element=self.return_to_top_link)
             sleep(1.5)
             return self.page

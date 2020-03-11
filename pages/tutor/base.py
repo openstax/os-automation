@@ -209,7 +209,7 @@ class TutorLoginBase(TutorShared):
             :rtype: :py:class:`TutorLoginBase`
 
             """
-            Utility.safari_exception_click(self.driver, element=self.logo)
+            Utility.click_option(self.driver, element=self.logo)
             return go_to_(TutorLoginBase(self.page.driver, self.page.base_url))
 
         def view_help_articles(self) -> Salesforce:
@@ -273,7 +273,7 @@ class TutorLoginBase(TutorShared):
 
             """
             link = self.find_element(*self._terms_link_locator)
-            Utility.safari_exception_click(self.driver, element=link)
+            Utility.click_option(self.driver, element=link)
             from pages.tutor.legal import Terms
             return go_to_(Terms(self.driver, base_url=self.page.base_url))
 

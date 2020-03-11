@@ -69,10 +69,9 @@ def test_strategic_advisors_are_listed_with_their_bio(web_base_url, selenium):
     team.tabs[Web.STRATEGIC_ADVISORS].select()
 
     # THEN: the strategic advisors are listed with their
-    #       name and bio
+    #       name
     for advisor in team.advisors:
         assert(advisor.name)
-        assert(advisor.bio)
 
 
 @skip_test(reason='FAB not currently available')

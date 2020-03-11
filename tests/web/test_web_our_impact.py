@@ -6,7 +6,6 @@ from utils.utilities import Utility
 from utils.web import Web
 
 
-@skip_test(reason='Impact page replaced by Annual Report')
 @test_case('C210437', 'C210438', 'C210439')
 @nondestructive
 @web
@@ -14,28 +13,32 @@ def test_the_our_impact_banner(web_base_url, selenium):
     """Test the features of the Our Impact banner region."""
     # GIVEN: a user viewing the impact page
     home = WebHome(selenium, web_base_url).open()
-    impact = home.information.box[Web.OUR_IMPACT].click()
+    impact = home.information.box[Web.OUR_IMPACT].select()
 
     # WHEN:
 
-    # THEN: "We measure our success in access." is displayed
+    # THEN: "Improving access, learning, and our world." is displayed
     #       in the banner
-    # AND:  "OpenStax has saved students" is displayed below
+    # AND:  "As a leading research university" is displayed below
     #       the banner title
-    assert(impact.is_displayed())
-    assert('impact' in impact.location)
-    assert('We measure our success in access.' in impact.title)
-    assert('OpenStax has saved students' in impact.description)
+    assert(impact.is_displayed()), 'impact page not displayed'
+    assert('impact' in impact.location), \
+        f'not at the impact URL {impact.location}'
+    assert('Improving access, learning, and our world.' in impact.heading), \
+        'impact page heading does not match expected value'
+    assert('As a leading research university' in impact.description), \
+        'impact page description intro different'
 
-    # WHEN: the window is reduced to 760 pixels wide
-    impact.resize_window(width=Web.SMALL_TABLET)
+    # WHEN: the window is reduced to 600 pixels wide
+    impact.resize_window(width=Web.PHONE)
 
-    # THEN: "OpenStax has saved students" is not displayed
-    #       below the banner title
-    assert(not impact.subheading.is_displayed())
+    # THEN: "As a leading research university" is not displayed below the
+    #       banner title
+    assert(not impact.description), \
+        'impact page description still displayed under mobile'
 
 
-@skip_test(reason='Impact page replaced by Annual Report')
+@skip_test(reason='new impact page')
 @test_case('C210440')
 @nondestructive
 @web
@@ -57,7 +60,7 @@ def test_organizations_are_directed_to_the_contact_form_for_more_information(
     assert('Partnerships' in contact.form.topic)
 
 
-@skip_test(reason='Impact page replaced by Annual Report')
+@skip_test(reason='new impact page')
 @test_case('C210441')
 @nondestructive
 @web
@@ -75,7 +78,7 @@ def test_institutional_partner_logos_are_displayed(web_base_url, selenium):
         assert(Utility.is_image_visible(selenium, image=partner.logo))
 
 
-@skip_test(reason='Impact page replaced by Annual Report')
+@skip_test(reason='new impact page')
 @test_case('C210442')
 @nondestructive
 @web

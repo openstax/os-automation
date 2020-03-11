@@ -20,8 +20,7 @@ def web_base_url(request):
         return 'https://staging.openstax.org'
     if instance and base_url:
         segments = base_url.split(SPLIT)
-        insert = ('' if instance.startswith('prod') else
-                  'cms-{instance}.'.format(instance=instance))
+        insert = '' if instance.startswith('prod') else f'cms-{instance}.'
         return '{0}{3}{2}{1}'.format(*segments, SPLIT, insert)
     if base_url is not None:
         return base_url

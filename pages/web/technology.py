@@ -43,7 +43,7 @@ class Technology(WebBase):
 
     def learn_more(self):
         """Click the banner page link."""
-        Utility.safari_exception_click(self.driver, self._learn_more_locator)
+        Utility.click_option(self.driver, self._learn_more_locator)
         return self
 
     @property
@@ -171,7 +171,7 @@ class Technology(WebBase):
 
         def learn_more(self):
             """Click the 'Learn more' button."""
-            Utility.safari_exception_click(
+            Utility.click_option(
                 self.driver, self._how_it_works_locator)
             from pages.web.tutor import TutorMarketing
             return go_to_(TutorMarketing(self.driver, self.page.base_url))

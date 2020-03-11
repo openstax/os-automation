@@ -1,8 +1,7 @@
 """Test the OpenStax Tutor Beta marketing page."""
 
 from pages.web.home import WebHome
-from tests.markers import accounts, nondestructive, smoke_test  # NOQA
-from tests.markers import skip_test, test_case, tutor, web  # NOQA
+from tests.markers import accounts, nondestructive, skip_test, smoke_test, test_case, tutor, web  # NOQA
 from utils.utilities import Utility
 
 
@@ -17,7 +16,7 @@ def test_tutor_users_may_access_their_course_from_the_marketing_page(
     # GIVEN: a user viewing the Tutor marketing page
     # AND:  logged into the site with a current Tutor user
     home = WebHome(selenium, web_base_url).open()
-    home.web_nav.login.log_in(*teacher)
+    home = home.web_nav.login.log_in(*teacher, WebHome, web_base_url)
     tutor_marketing = home.web_nav.technology.view_tutor()
 
     # WHEN: they click on the "Access Your Course" button
@@ -196,11 +195,13 @@ def test_student_learning_research_is_discussed(web_base_url, selenium):
     tutor_marketing.sidebar.view_science()
 
     # THEN: "researchers at Rice", "cognitive science", and
-    #       "machine learning" are mentioned
-    mentions = ['researchers at Rice', 'cognitive science', 'machine learning']
+    #       "transform the way your students learn" are mentioned
+    mentions = ['researchers at Rice',
+                'cognitive science',
+                'transform the way your students learn']
     for mention in mentions:
         assert(mention in tutor_marketing.science.description), \
-            '{0} not found in the Science description'.format(mention)
+            f'{mention} not found in the Science description'
 
 
 @test_case('C210499')
@@ -213,10 +214,8 @@ def test_frequently_asked_questions_are_displayed(web_base_url, selenium):
     tutor_marketing = home.web_nav.technology.view_tutor()
     tutor_marketing.sidebar.view_faq()
 
-    print(len(tutor_marketing.faq.questions))
     for question in tutor_marketing.faq.questions:
         # WHEN: they click on a question
-        print(question.question)
         question.toggle()
 
         # THEN: the answer is displayed
@@ -262,7 +261,7 @@ def test_clicking_the_get_started_button_takes_instructors_to_their_dashboard(
     # AND:   logged in to the site with a verified
     #        instructor account
     home = WebHome(selenium, web_base_url).open()
-    home.web_nav.login.log_in(*teacher)
+    home.web_nav.login.log_in(*teacher, WebHome, web_base_url)
     tutor_marketing = home.web_nav.technology.view_tutor()
 
     # WHEN: they click the "Get started" button in the

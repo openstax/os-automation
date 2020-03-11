@@ -1,8 +1,5 @@
 """Test the books webpage."""
 
-import math
-import warnings
-
 import pytest
 import requests
 from selenium.common.exceptions import NoSuchElementException
@@ -10,7 +7,6 @@ from selenium.common.exceptions import NoSuchElementException
 from pages.accounts.admin.users import Search
 from pages.accounts.home import AccountsHome
 from pages.accounts.profile import Profile
-from pages.accounts.signup import Signup
 from pages.web.book import Book
 from pages.web.errata import ErrataForm
 from pages.web.home import WebHome
@@ -18,7 +14,7 @@ from tests.markers import (accounts, expected_failure, nondestructive,
                            skip_if_headless, smoke_test, test_case, web)
 from utils.accounts import Accounts
 from utils.email import RestMail
-from utils.utilities import Actions, Utility
+from utils.utilities import Utility
 from utils.web import Library, Web
 
 
@@ -68,7 +64,6 @@ def test_the_availability_of_the_table_of_contents(web_base_url, selenium):
     home = WebHome(selenium, web_base_url).open()
     subjects = home.web_nav.subjects.view_all()
     book = subjects.select_random_book(_from=Library.AVAILABLE)
-    book_title = book.title
 
     # WHEN: they click on the "Table of contents" link
     book.sidebar.view_table_of_contents()
@@ -76,15 +71,6 @@ def test_the_availability_of_the_table_of_contents(web_base_url, selenium):
     # THEN: the table of contents pane is displayed
     assert(book.table_of_contents.is_displayed()), \
         'The table of contents is not visible'
-
-    # WHEN: they click on the "Preface" link
-    webview = book.table_of_contents.preface
-
-    # THEN: the webview version of the book is available
-    Utility.test_url_and_warn(
-        url=webview,
-        message='Webview not available for {0}'.format(book_title),
-        driver=selenium)
 
     # WHEN: they click on the "X"
     book.table_of_contents.close()
@@ -485,7 +471,7 @@ def test_logged_in_users_may_view_the_errata_submission_form(
     # GIVEN: a user viewing a current edition book details page
     # AND:   are logged into the website
     home = WebHome(selenium, web_base_url).open()
-    home.web_nav.login.log_in(*teacher, destination=WebHome, url=web_base_url)
+    home.web_nav.login.log_in(*teacher, WebHome, web_base_url)
     subjects = home.web_nav.subjects.view_all()
     book = subjects.select_random_book(_from=Library.AVAILABLE,
                                        filter_current=True)
@@ -541,8 +527,7 @@ def test_non_logged_in_users_are_directed_to_log_in_to_view_the_errata_form(
 
     # WHEN: they log into Accounts
     errata_form = accounts.service_log_in(
-        *teacher,
-        destination=ErrataForm, url=web_base_url, book=book_errata)
+        *teacher, ErrataForm, web_base_url, book=book_errata)
 
     # THEN: the errata form is displayed
     # AND:  the subject is prefilled in
@@ -585,8 +570,7 @@ def test_non_logged_in_users_on_mobile_are_directed_to_log_in_for_errata_form(
 
     # WHEN: they log into Accounts
     errata_form = accounts.service_log_in(
-        *teacher,
-        destination=ErrataForm, url=web_base_url, book=book_errata)
+        *teacher, ErrataForm, web_base_url, book=book_errata)
 
     # THEN: the errata form is displayed
     # AND:  the subject is prefilled in
@@ -637,12 +621,15 @@ def test_pending_instructors_see_access_pending_for_locked_resources(
     address = email.address
     password = Utility.random_hex(17)
     accounts = AccountsHome(selenium, accounts_base_url).open()
-    accounts.login.go_to_signup.account_signup(
-        email=address, password=password, _type=Signup.INSTRUCTOR,
-        provider=Signup.RESTMAIL, name=name, school='Automation',
-        news=False, phone=Utility.random_phone(),
-        webpage='https://openstax.org/', subjects=subject_list(2), students=10,
-        use=Signup.ADOPTED)
+    (accounts.content
+        .view_sign_up().content
+        .sign_up_as_an_educator()
+        .account_signup(
+            email=address, password=password, _type=Accounts.INSTRUCTOR,
+            provider=Accounts.RESTMAIL, name=name, school='Automation',
+            news=False, phone=Utility.random_phone(),
+            webpage='https://openstax.org/', subjects=subject_list(2),
+            students=10, use=Accounts.ADOPTED))
     home = WebHome(selenium, web_base_url).open()
     subjects = home.web_nav.subjects.view_all()
     book = subjects.select_random_book(_from=Library.HAS_I_LOCK)
@@ -688,7 +675,7 @@ def test_verified_instructors_may_access_locked_resources(
         f'Not on an Accounts instance ({accounts.location})'
 
     # WHEN: they log into Accounts
-    accounts.service_log_in(*teacher, destination=Book, url=web_base_url)
+    accounts.service_log_in(*teacher, Book, web_base_url)
 
     # THEN: the instructor resources tab on the book details page is displayed
     # AND:  the resource is no longer locked
@@ -711,7 +698,7 @@ def test_verified_instructors_may_request_a_comped_ibook(
     home = WebHome(selenium, web_base_url).open()
     subjects = home.web_nav.subjects.view_all()
     book = subjects.select_random_book(_from=Library.COMP_COPY)
-    book.web_nav.login.log_in(*teacher, destination=Book, url=web_base_url)
+    book.web_nav.login.log_in(*teacher, Book, web_base_url)
 
     # WHEN: they click on the "Instructor resources" tab
     # AND:  click on the "iBooks Comp Copy" tile
@@ -785,7 +772,7 @@ def test_resources_have_a_title_description_and_access_type(
     # AND:  the book has instructor resources
     # AND:  the book has student resources
     home = WebHome(selenium, web_base_url).open()
-    home.web_nav.login.log_in(*teacher, destination=WebHome, url=web_base_url)
+    home.web_nav.login.log_in(*teacher, WebHome, web_base_url)
     subjects = home.web_nav.subjects.view_all()
     book = subjects.select_random_book(_from=Library.HAS_S_UNLOCK)
 
@@ -849,12 +836,16 @@ def test_unverified_users_sent_to_faculty_verification_for_locked_resources(
     # AND:  have a non-verified, non-pending account
     # AND:  are logged into the site
     accounts = AccountsHome(selenium, accounts_base_url).open()
-    profile = accounts.login.go_to_signup.account_signup(
-        name=name, email=address, password=password, _type=Signup.INSTRUCTOR,
-        provider=Signup.RESTMAIL, school='Automation', news=False,
-        phone=Utility.random_phone(), webpage=web_base_url,
-        subjects=Signup(selenium).subject_list(2), students=10,
-        use=Signup.RECOMMENDED)
+    profile = (
+        accounts.content
+        .view_sign_up().content
+        .sign_up_as_an_educator()
+        .account_signup(
+            email=address, password=password, _type=Accounts.INSTRUCTOR,
+            provider=Accounts.RESTMAIL, name=name, school='Automation',
+            news=False, phone=Utility.random_phone(),
+            webpage=web_base_url, subjects=subject_list(2),
+            students=10, use=Accounts.RECOMMENDED))
     profile.log_out()
     profile = accounts.log_in(*admin)
     search = Search(selenium, accounts_base_url).open()
@@ -891,10 +882,8 @@ def test_students_sign_up_to_access_locked_student_content(
     """Users are directed to sign up to access locked student content."""
     # SETUP:
     name = Utility.random_name()
-    email = RestMail('{first}.{last}.{tag}'.format(
-        first=name[1], last=name[2], tag=Utility.random_hex(4)).lower())
+    email = RestMail(f'{name[1]}.{name[2]}.{Utility.random_hex(4)}'.lower())
     email.empty()
-    address = email.address
     password = Utility.random_hex(20)
 
     # GIVEN: a user viewing the student resources on a book details page
@@ -903,7 +892,6 @@ def test_students_sign_up_to_access_locked_student_content(
     home = WebHome(selenium, web_base_url).open()
     subjects = home.web_nav.subjects.view_all()
     book = subjects.select_random_book(_from=Library.HAS_S_LOCK)
-    book_url = book.location.split('/')[-1]
     book.select_tab(Web.STUDENT_RESOURCES)
 
     # WHEN: they click on "Click here to unlock" link
@@ -920,24 +908,15 @@ def test_students_sign_up_to_access_locked_student_content(
         f'Not on an Accounts instance ({accounts.location})'
 
     # WHEN: they sign up
-    book = accounts.login.go_to_signup.account_signup(
-        email=address,
-        password=password,
-        _type=Accounts.STUDENT,
-        role=Accounts.STUDENT,
-        provider=Accounts.RESTMAIL,
-        name=name,
-        school='Automation',
-        news=False,
-        destination=Book(selenium, web_base_url, book_name=book_url))
+    book = accounts.student_signup(name[1], name[2], password, email,
+                                   Book, web_base_url)
 
     # THEN: the student resources on the book details page is displayed
     # AND:  the resource is available for download
     assert(book.student.is_displayed()), \
         f'Student resources not displayed ({book.location})'
     option = book.student.resource_by_name(option_title)
-    assert(not option.is_locked), \
-        '{option} is still locked'.format(option=option.title)
+    assert(not option.is_locked), f'{option.title} is still locked'
 
 
 @test_case('C210373')
@@ -972,49 +951,11 @@ def test_books_may_have_ally_tiles(web_base_url, selenium):
     book = subjects.select_random_book(_from=Library.AVAILABLE)
 
     # WHEN: they click on the "Partner resources" tab
-    book.select_tab(Web.PARTNER_RESOURCES)
+    book.select_tab(Web.INSTRUCTOR_RESOURCES)
 
     # THEN: there may be an Allies section with one or more
     #       Ally tiles with the company name on the tile
-    assert(book.partners.partners), 'No partner resources found'
-
-    # WHEN: the cursor hovers over a tile
-    random_tile = Utility.random(0, len(book.partners.partners) - 1)
-    tile = book.partners.partners[random_tile]
-    tile_name = tile.name
-    Utility.scroll_to(selenium, element=tile.root)
-    is_safari = selenium.capabilities.get('browserName').lower() == 'safari'
-    if not is_safari:
-        text_seen = (
-            Actions(selenium)
-            .move_to_element(tile.to_hover)
-            .wait(2.0)
-            .get_js_data(
-                element=tile.hover, data_type='opacity', expected='1'))
-
-        # THEN: the company name is replaced by the company
-        #       description
-        if (not text_seen[0] and
-                not math.isclose(float(text_seen[1]),
-                                 float(text_seen[2]),
-                                 rel_tol=0.125)):
-            warnings.warn(UserWarning(
-                'On hover text for the tile "{0}"'.format(tile_name) +
-                ' failed to show: {0}, {1}, {2}'.format(*text_seen)))
-
-    # WHEN: the screen is reduced to 600 pixels
-    # AND:  and the URL is tested
-    book.resize_window(width=Web.PHONE)
-    book.instructor.toggle()
-    for partner in book.instructor.partners:
-        if partner.name == tile_name:
-            tile = partner
-            break
-
-    # THEN: the company website is verified
-    assert(Utility.test_url_and_warn(url=tile.url,
-                                     message=tile.name,
-                                     driver=selenium))
+    assert(book.instructor.partners), 'No partner resources found'
 
 
 @test_case('C210375')
@@ -1042,13 +983,13 @@ def test_available_student_resources_can_be_downloaded(web_base_url, selenium):
 
 def subject_list(size=1):
     """Return a list of subjects for an elevated signup."""
-    subjects = len(Signup.SUBJECTS)
+    subjects = len(Accounts.SUBJECTS)
     if size > subjects:
         size = subjects
     book = ''
     group = []
     while len(group) < size:
-        book = (Signup.SUBJECTS[Utility.random(0, subjects - 1)])[1]
+        book = (Accounts.SUBJECTS[Utility.random(0, subjects - 1)])[1]
         if book not in group:
             group.append(book)
     return group

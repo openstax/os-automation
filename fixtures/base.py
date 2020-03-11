@@ -40,10 +40,10 @@ def chrome_options(chrome_options, pytestconfig):
     """Set Chrome options."""
     if pytestconfig.getoption('--headless'):
         chrome_options.headless = True
-    chrome75 = ('Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_5) '
-                'AppleWebKit/537.36 (KHTML, like Gecko) '
-                'Chrome/75.0.3770.100 Safari/537.36')
-    chrome_options.add_argument(f'--user-agent="{chrome75}"')
+    chrome = ('Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_3) '
+              'AppleWebKit/537.36 (KHTML, like Gecko) '
+              'Chrome/80.0.3987.100 Safari/537.36')
+    chrome_options.add_argument(f'--user-agent="{chrome}"')
 
     # Required to run in Travis containers
     if (pytestconfig.getoption('--no-sandbox') or
@@ -70,8 +70,8 @@ def firefox_options(firefox_options, pytestconfig):
     """Set Firefox options."""
     if pytestconfig.getoption('--headless'):
         firefox_options.headless = True
-    firefox68 = ('Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:68.0) '
-                 'Gecko/20100101 Firefox/68.0')
-    firefox_options.add_argument(f'--user-agent="{firefox68}"')
+    firefox = ('Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:72.0) '
+               'Gecko/20100101 Firefox/72.0')
+    firefox_options.add_argument(f'--user-agent="{firefox}"')
 
     return firefox_options

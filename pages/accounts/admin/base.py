@@ -23,7 +23,7 @@ class AccountsAdmin(Page):
 
     def is_displayed(self):
         """Return True when the console is loaded."""
-        return self.root.is_displayed()
+        return self.loaded
 
     @property
     def nav(self):

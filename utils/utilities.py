@@ -1,19 +1,30 @@
 """Helper functions for OpenStax Pages."""
 
+from collections import OrderedDict
 from http.client import responses
 from platform import system
 from random import randint, sample
 from time import sleep
+from typing import Tuple, Union
 from warnings import warn
 
 import requests
 from faker import Faker
-from selenium.common.exceptions import ElementClickInterceptedException, NoSuchElementException, StaleElementReferenceException, TimeoutException, WebDriverException  # NOQA
+from pypom import Page, Region
+from selenium.common.exceptions import (  # NOQA
+    ElementClickInterceptedException,  # NOQA
+    NoSuchElementException,  # NOQA
+    StaleElementReferenceException,  # NOQA
+    TimeoutException,  # NOQA
+    WebDriverException  # NOQA
+)  # NOQA
 from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.common.keys import Keys
+from selenium.webdriver.remote.webelement import WebElement
 from selenium.webdriver.support import expected_conditions as expect
 from selenium.webdriver.support.color import Color
 from selenium.webdriver.support.ui import Select, WebDriverWait
+from simple_salesforce import Salesforce as SF
 
 JAVASCRIPT_CLICK = 'arguments[0].click()'
 OPEN_TAB = 'window.open();'
@@ -54,8 +65,10 @@ STATE_PROV = [
     ('YT', 'Yukon Territory')
 ]
 
+Name = Tuple[str, str, str, str]
 
-class Utility(object):
+
+class Utility:
     """Helper functions for various Pages actions."""
 
     HEX_DIGITS = '0123456789ABCDEF'
@@ -91,11 +104,30 @@ class Utility(object):
             field.send_keys(clear)
 
     @classmethod
-    def click_option(cls, driver, locator=None, element=None,
-                     force_js_click=False):
-        """Another way to call the safe Safari click function."""
-        Utility.safari_exception_click(
-            driver, locator, element, force_js_click)
+    def click_option(cls, driver,
+                     locator=None, element=None, force_js_click=False):
+        """Standardize element clicks to avoid cross-browser issues."""
+        element = element if element else driver.find_element(*locator)
+        cls.scroll_to(driver=driver, element=element, shift=-80)
+        sleep(0.5)
+        try:
+            if force_js_click or \
+                    driver.capabilities.get('browserName').lower() == 'safari':
+                raise WebDriverException('Bypassing the driver-defined click')
+            element.click()
+        except WebDriverException:
+            for _ in range(10):
+                try:
+                    driver.execute_script(JAVASCRIPT_CLICK, element)
+                    break
+                except ElementClickInterceptedException:  # Firefox issues
+                    sleep(1.0)
+                except NoSuchElementException:  # Safari issues
+                    if locator:
+                        element = driver.find_element(*locator)
+                except StaleElementReferenceException:  # Chrome and Firefox
+                    if locator:
+                        element = driver.find_element(*locator)
 
     @classmethod
     def close_tab(cls, driver):
@@ -127,12 +159,8 @@ class Utility(object):
         :param _id: an ID string to append to the name
         :returns: a compound RestMail email address string
         """
-        template = ('{first}.{second}.{random}@restmail.net')
-        return template.format(
-            first=first_name,
-            second=surname,
-            random=_id if _id else Utility.random_hex(6)
-        ).lower()
+        id_string = _id if _id else cls.random_hex(cls.random(4, 7))
+        return f'{first_name}.{surname}.{id_string}@restmail.net'.lower()
 
     @classmethod
     def fast_multiselect(cls, driver, element_locator, labels):
@@ -149,7 +177,7 @@ class Utility(object):
         python-webdriver#answer-2258'
         """
         menu = driver.find_element(*element_locator)
-        Utility.scroll_to(driver, element=menu)
+        cls.scroll_to(driver, element=menu)
         select = Select(menu)
         for label in labels:
             select.select_by_visible_text(label)
@@ -184,11 +212,13 @@ class Utility(object):
         return (use_card['number'], use_card['cvv'])
 
     @classmethod
-    def has_children(cls, element):
+    def has_children(cls, element: WebElement) -> bool:
         """Return True if a specific element has one or more children.
 
-        :param element: a webelement
-        :returns: True if the element has one or more child elements
+        :param WebElement element: a webelement
+        :return: ``True`` if the element has one or more child elements
+        :rtype: bool
+
         """
         if not element:
             return False
@@ -355,6 +385,20 @@ class Utility(object):
         return driver.window_handles
 
     @classmethod
+    def parent_page(cls, region: Region) -> Page:
+        """Return the first page object found.
+
+        :param region: the current region object in a page object tree
+        :type region: :py:class:`~pypom.Region`
+        :return: the first ``Page`` object found in the current tree
+        :rtype: :py:class:`~pypom.Page`
+
+        """
+        if isinstance(region.page, Region):
+            return cls.parent_page(region.page)
+        return region.page
+
+    @classmethod
     def random(cls, start=0, end=100000):
         """Return a random integer from start to end."""
         if start >= end:
@@ -376,41 +420,51 @@ class Utility(object):
     @classmethod
     def random_hex(cls, length=20, lower=False):
         """Return a random hex number of size length."""
-        line = ''.join([Utility.HEX_DIGITS[randint(0, 0xF)]
+        line = ''.join([cls.HEX_DIGITS[randint(0, 0xF)]
                        for _ in range(length)])
         return line if not lower else line.lower()
 
     @classmethod
-    def random_name(cls, is_male=None, is_female=None):
-        """Generate a random name list for Accounts users."""
-        fake = Faker()
-        name = ['', '', '', '']
-        if is_female:
-            use_male_functions = False
-        elif is_male:
-            use_male_functions = True
-        else:
-            use_male_functions = randint(0, 2) == 0
-        has_prefix = randint(0, 10) >= 6
-        has_suffix = randint(0, 10) >= 8
+    def random_name(cls, is_male: bool = None, is_female: bool = None) \
+            -> Name:
+        """Generate a random name.
 
-        if has_prefix:
-            name[0] = fake.prefix_male() if use_male_functions else \
-                fake.prefix_female()
-        name[1] = fake.first_name_male() if use_male_functions else \
-            fake.first_name_female()
-        name[2] = fake.last_name()
-        if has_suffix:
-            name[3] = fake.suffix_male() if use_male_functions else \
-                fake.suffix_female()
-        return name
+        If neither parameter is sent, generate either a male or female name.
+
+        :param bool is_male: (optional) generate a generalized male name
+        :param bool is_female: (optional) generate a generalized female name
+        :return: the random name that may contain a title and/or a suffix
+        :rtype: tuple(str, str, str, str)
+
+        """
+        fake = Faker()
+        male = True if is_male else False if is_female else cls.random(0, 1)
+
+        title = '' if cls.random(0, 9) < 6 else \
+                fake.prefix_male() if male else fake.prefix_female()
+        first = fake.first_name_male() if male else fake.first_name_female()
+        last = fake.last_name()
+        suffix = '' if cls.random(0, 9) < 8 else \
+                 fake.suffix_male() if male else fake.suffix_female()
+
+        return (title, first, last, suffix)
 
     @classmethod
-    def random_phone(cls, area_code=713, number_only=True):
-        """Return a random phone number."""
-        template = ('{area}5550{local}' if number_only else
-                    '({area}) 555-0{local}')
-        return template.format(area=area_code, local=randint(100, 199))
+    def random_phone(cls,
+                     area_code: Union[int, str] = 713,
+                     number_only: bool = True) -> str:
+        """Return a random phone number.
+
+        :param area_code: (optional) a U.S. phone number area code
+        :type area_code: int or str
+        :param bool number_only: (optional) return a number-only phone string
+        :return: a U.S. generic telephone number
+        :rtype: str
+
+        """
+        if number_only:
+            return f'{area_code}5550{cls.random(100, 199)}'
+        return f'({area_code}) 555-0{cls.random(100, 199)}'
 
     @classmethod
     def random_set(cls, group, size=1):
@@ -421,36 +475,10 @@ class Utility(object):
             return group
         new_set = []
         while len(new_set) < size:
-            selected = group[Utility.random(0, len(group) - 1)]
+            selected = group[cls.random(0, len(group) - 1)]
             if selected not in new_set:
                 new_set.append(selected)
         return new_set
-
-    @classmethod
-    def safari_exception_click(cls, driver, locator=None, element=None,
-                               force_js_click=False):
-        """Click on elements which cause Safari 500 errors."""
-        element = element if element else driver.find_element(*locator)
-        Utility.scroll_to(driver=driver, element=element, shift=-80)
-        sleep(0.5)
-        try:
-            if force_js_click or \
-                    driver.capabilities.get('browserName').lower() == 'safari':
-                raise WebDriverException('Bypassing the driver-defined click')
-            element.click()
-        except WebDriverException:
-            for _ in range(10):
-                try:
-                    driver.execute_script(JAVASCRIPT_CLICK, element)
-                    break
-                except ElementClickInterceptedException:  # Firefox issues
-                    sleep(1.0)
-                except NoSuchElementException:  # Safari issues
-                    if locator:
-                        element = driver.find_element(*locator)
-                except StaleElementReferenceException:  # Chrome and Firefox
-                    if locator:
-                        element = driver.find_element(*locator)
 
     @classmethod
     def sample(cls, original_list: list, sample_size: int) -> list:
@@ -507,7 +535,7 @@ class Utility(object):
     @classmethod
     def select(cls, driver, element_locator, label):
         """Select an Option from a menu."""
-        return Utility.fast_multiselect(driver, element_locator, [label])
+        return cls.fast_multiselect(driver, element_locator, [label])
 
     @classmethod
     def selected_option(cls, driver, element_locator):
@@ -547,10 +575,8 @@ class Utility(object):
         current = driver.current_window_handle
         data = None
         if not action:
-            Utility.safari_exception_click(driver=driver,
-                                           locator=link_locator,
-                                           element=element,
-                                           force_js_click=force_js_click)
+            cls.click_option(driver=driver, locator=link_locator,
+                             element=element, force_js_click=force_js_click)
         else:
             data = action()
         sleep(1)
@@ -632,7 +658,7 @@ class Utility(object):
         sleep(1.0)
 
 
-class Card(object):
+class Card:
     """Fake card objects."""
 
     def __init__(self):
@@ -692,7 +718,7 @@ class Card(object):
         return cards[randint(0, len(cards) - 1)]
 
 
-class Status(object):
+class Status:
     """Card states."""
 
     STATUS = 'status'
@@ -807,3 +833,197 @@ class Actions(ActionChains):
         """Sleep for a specified number of seconds within an ActionChain."""
         self._actions.append(lambda: sleep(seconds))
         return self
+
+
+class Record:
+    """A Salesforce API result record."""
+
+    def __init__(self, record: OrderedDict, **kwargs):
+        """Initialize a Salesforce record."""
+        self.url = record['attributes']['url']
+        self.id = record['Account_ID__c']
+        super().__init__(**kwargs)
+
+
+class Salesforce:
+    """Read object for Salesforce verification."""
+
+    CONTACT = (
+        "SELECT "
+        "AccountId,Account_Email_verified__c,Address_Verified_Date__c,"
+        "All_Emails__c,Books_Adopted__c,BookURL__c,Confirmed_Emails__c,"
+        "CreatedDate,Domain__c,Donations__c,Email,Faculty_Confirmed_Date__c,"
+        "Faculty_Verified__c,FirstName,From_Lead__c,HasOptedOutOfEmail,"
+        "Has_filled_out_Adoption_Form__c,Id,Interested_in_Rover__c,"
+        "LastModifiedDate,LastName,LeadSource,Leads__c,LongID__c,"
+        "MailingAddress,MailingCity,MailingCountry,MailingCountryCode,"
+        "Manual_Check__c,Marketing_Group__c,Market_Group__c,Name,"
+        "Newsletter_Opt_Out__c,Number_of_Subjects__c,Phone,PositionT__c,"
+        "Position__c,Salutation,School_Type__c,Search_Box__c,"
+        "SendFacultyVerificationTo__c,Subject__c,SystemModstamp,Theme__c "
+        "FROM Contact "
+        "WHERE Search_Box__c = 'Automation' "
+        "ORDER BY LastName,FirstName ASC NULLS FIRST"
+    )
+    LEAD = (
+        "SELECT "
+        "Account_ID__c,Adoption_Status__c,Book__c,Company,Complete__c,"
+        "Confirmed_Date__c,Contact_ID__c,Contact_Name__c,Contact__c,"
+        "Converted_Date__c,Country,CountryCode,Course_Code__c,Course_Name__c,"
+        "CreatedDate,Dept_student_number__c,Email,Faculty_Book__c,"
+        "Faculty_Website__c,Feedback_Response_Status__c,Feedback__c,FirstName,"
+        "HasOptedOutOfEmail,How_did_you_Hear__c,Id,Institutional_Email__c,"
+        "Institution_Type__c,IsConverted,LastActivityDate,LastModifiedDate,"
+        "LastName,LeadSource,Name,Needs_Deletion__c,Needs__c,"
+        "Newsletter_Opt_In__c,Newsletter__c,Number_of_Students__c,"
+        "OS_Accounts_ID__c,Partner_Category_Interest__c,"
+        "Partner_Interest_Other__c,Partner_Interest__c,Partner_Present__c,"
+        "Phone,pi__campaign__c,pi__created_date__c,Reject_Reason__c,Role__c,"
+        "School__c,Section_Numbers__c,Status,Status__c,Student_No_Status__c,"
+        "Subject__c,SystemModstamp,TermYear__c,Term__c,test__c,Website,"
+        "What_Happened__c "
+        "FROM Lead "
+        "WHERE Company='Automation' "
+        "ORDER BY LastName,FirstName ASC NULLS FIRST"
+    )
+    ORGANIZATION = (
+        "SELECT "
+        "BillingCity,BillingCountry,BillingCountryCode,BillingPostalCode,"
+        "BillingState,BillingStateCode,BillingStreet,Continent__c,CreatedDate,"
+        "Description,Domain__c,HTML_Name__c,Id,LastModifiedDate,Name,"
+        "Number_of_Adoptions__c,Phone,SystemModstamp,Type,Website "
+        "FROM Account"
+    )
+
+    def __init__(self, username: str, password: str,
+                 domain: str = 'test', query: str = ''):
+        """Initialize the Salesforce request.
+
+        :param str username: the Salesforce username
+        :param str password: the Salesforce user password
+        :param str domain: (optional) ```'test'``` if accessing a Salesforce
+            sandbox, otherwise ```''```
+        :param str query: (optional) the SOQL request
+
+        """
+        self._sf = SF(username=username, password=password, domain=domain)
+        if query:
+            self.query(query)
+        else:
+            self._size = 0
+            self._records = []
+            self.records = []
+
+    def query(self, query: str, record_type: Record = None):
+        """Send an SOQL request to Salesforce.
+
+        :param str query: the SOQL request
+        :return: None
+
+        """
+        results = self._sf.query(query)
+        self._size = results.get('totalSize', 0)
+        self._records = results.get('records', [])
+        self.records = []
+        additional_records = results.get('nextRecordUrl', '').split('/')[-1]
+        while additional_records:
+            results = self._sf.query_more(additional_records)
+            self._records = self._records + results.get('records', [])
+            additional_records = (
+                results.get('nextRecordUrl', '').split('/')[-1])
+        if record_type:
+            for record in self._records:
+                self.records.append(record_type(record))
+
+    class Contact(Record):
+        """A Salesforce contact."""
+
+        def __init__(self, record: OrderedDict, **kwargs):
+            """Initialize a Salesforce contact record."""
+            super(Record, self).__init__(record=record, **kwargs)
+            self.email_verified = record['Account_Email_verified__c']
+            self.all_emails = record['All_Emails__c']
+            self.books_adopted = record['Books_Adopted__c']
+            self.confirmed_emails = record['Confirmed_Emails__c']
+            self.created_on = record['CreatedDate']
+            self.domain = record['Domain__c']
+            self.donations = record['Donations__c']
+            self.email = record['Email']
+            self.faculty_verified = record['Faculty_Verified__c']
+            self.first_name = record['FirstName']
+            self.from_lead = record['From_Lead__c']
+            self.opt_out = record['HasOptedOutOfEmail']
+            self.adoption_form = record['Has_filled_out_Adoption_Form__c']
+            self.contact_id = record['Id']
+            self.rover_interest = record['Interested_in_Rover__c']
+            self.last_name = record['LastName']
+            self.lead_source = record['LeadSource']
+            address = record['MailingAddress']
+            self.address = (
+                address['street'],
+                address['city'],
+                address.get('stateCode', '') or address['state'],
+                address['postalCode'],
+                address.get('countryCode', '') or address['country'])
+            self.name = record['Name']
+            self.newsletter = record['Newsletter_Opt_Out__c']
+            self.phone = record['Phone']
+            self.position = record['Position__c']
+            self.salutation = record['Salutation']
+            self.school_type = record['School_Type__c']
+            self.school = record['Search_Box__c']
+            self.subjects = record['Subject__c']
+            self.theme = record['Theme__c']
+
+    class Lead(Record):
+        """A Salesforce lead."""
+
+        def __init__(self, record: OrderedDict, **kwargs):
+            """Initialize a Salesforce lead record."""
+            super(Record, self).__init__(record=record, **kwargs)
+            self.adoption_status = record['Adoption_Status__c']
+            self.books = record['Book__c']
+            self.confirmed = bool(record['Complete__c'])
+            self.confirmed_date = record['Confirmed_Date__c']
+            self.created_on = record['CreatedDate']
+            self.email = record['Email']
+            self.faculty_website = record['Faculty_Website__c']
+            self.first_name = record['FirstName']
+            self.opt_out = record['HasOptedOutOfEmail']
+            self.how_did_you_hear = record['How_did_you_Hear__c']
+            self.lead_id = record['Id']
+            self.last_name = record['LastName']
+            self.lead_source = record['LeadSource']
+            self.name = record['Name']
+            self.newsletter = record['Newsletter_Opt_In__c']
+            self.students = int(record['Number_of_Students__c'])
+            self.partner_interest = (str(
+                record['Partner_Category_Interest__c']).split(';'))
+            self.other_partner_interest = record['Partner_Interest_Other__c']
+            self.phone = record['Phone']
+            self.reject_reason = record['Reject_Reason__c']
+            self.role = record['Role__c']
+            self.school = record['School__c']
+            self.lead_status = record['Status']
+            self.subjects = record['Subject__c']
+            self.website = record['Website']
+
+    class Organization(Record):
+        """A Salesforce organization."""
+
+        def __init__(self, record: OrderedDict, **kwargs):
+            """Initialize a Salesforce organization record."""
+            super(Record, self).__init__(record=record, **kwargs)
+            self.address = (record['BillingStreet'],
+                            record['BillingCity'],
+                            record['BillingStateCode'],
+                            record['BillingPostalCode'])
+            self.adoptions = record['Number_of_Adoptions__c']
+            self.created = record['CreatedDate']
+            self.description = record['Description']
+            self.html_name = record['HTML_Name__c']
+            self.modified = record['LastModifiedDate']
+            self.name = record['Name']
+            self.phone = record['Phone']
+            self.type = record['Type']
+            self.website = record['Website']

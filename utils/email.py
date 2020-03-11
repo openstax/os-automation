@@ -24,8 +24,8 @@ URL_MATCHER = re.compile(
     r'(https:\/\/accounts([-\w]*)?\.openstax\.org\/confirm\?code=\w{1,64})'
 )
 RESET_MATCHER = re.compile(
-    r'(https:\/\/accounts([-\w]*)?\.openstax\.org' +
-    r'\/password\/reset\?token=\w{1,64})'
+    r'(https:\/\/accounts([-\w]*)?\.openstax\.org\/i\/' +
+    r'([_\w]*)\?token=\w{1,64})'
 )
 
 
@@ -815,8 +815,7 @@ class RestMail(object):
             send = requests.get(self.confirmation_link)
             if not send.status_code == requests.codes.ok:
                 raise EmailVerificationError(
-                    'Email not confirmed. ({code})'
-                    .format(code=send.status_code))
+                    f'Email not confirmed. ({send.status_code})')
 
         @property
         def has_reset(self):
