@@ -125,3 +125,6 @@ coverage.xml
 testrail.cfg
 
 .DS_Store
+
+# secrets file for concourse
+credentials.yml

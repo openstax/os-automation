@@ -1,0 +1,21 @@
+---
+platform: linux
+image_resource:
+  type: docker-image
+  source:
+    repository: openstax/qa-utility
+    tag: latest
+inputs:
+  - name: os-automation
+  - name: listen-os-cms
+outputs:
+  - name: circleci-output
+params:
+  CIRCLE_API_TOKEN: ((os-auto-circleci-api-token))
+  CIRCLE_BRANCH: ((os-auto-circleci-branch))
+run:
+  path: bash
+  args:
+    - -exc
+    - |
+      python os-automation/.concourse/tasks/test-osweb-ui-circleci/script.py
