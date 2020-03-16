@@ -26,7 +26,6 @@ resources:
     type: git
     source:
       uri: https://github.com/openstax/os-automation
-      branch: 107-defer-to-ci
 
 jobs:
   - name: test-web
