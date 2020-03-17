@@ -5,6 +5,7 @@ from time import sleep
 from selenium.webdriver.common.by import By
 
 from pages.web.adoption import ERROR, Adoption, AdoptionConfirmation
+from pages.web.partners import Partners
 from utils.utilities import Utility, go_to_
 from utils.web import TechProviders, WebException
 
@@ -82,7 +83,7 @@ class Interest(Adoption):
         if TechProviders.OTHER in tech_providers:
             self.form.other = other_provider
         self.form.submit()
-        return go_to_(InterestConfirmation(self.driver, self.base_url))
+        return go_to_(Partners(self.driver, self.base_url))
 
     class Form(Adoption.Form):
         """The interest form."""

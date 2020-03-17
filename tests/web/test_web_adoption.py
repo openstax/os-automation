@@ -4,13 +4,13 @@ from random import choice
 
 import pytest
 
-from pages.web.adoption import Adoption, AdoptionConfirmation
+from pages.web.adoption import Adoption
 from pages.web.book import Book
 from pages.web.home import WebHome
 from tests.markers import nondestructive, skip_test, smoke_test, test_case, web
 from utils.email import RestMail
 from utils.utilities import Utility
-from utils.web import Library, TechProviders, Web
+from utils.web import Library, TechProviders, Web, WebException
 
 
 @test_case('C210385')
@@ -135,7 +135,7 @@ def test_non_student_users_submit_the_adoption_form(web_base_url, selenium):
     # AND:  click on the "Next" button
     # AND:  select a technology provider
     # AND:  click on the "Submit" button
-    confirmation = adoption.submit_adoption(
+    book = adoption.submit_adoption(
         user_type=user_type,
         first=first_name,
         last=last_name,
@@ -146,9 +146,9 @@ def test_non_student_users_submit_the_adoption_form(web_base_url, selenium):
         tech_providers=tech_providers,
         other_provider=other)
 
-    # THEN: the adoption confirmation page is displayed
-    assert(confirmation.is_displayed())
-    assert('confirmation' in confirmation.location)
+    # THEN: the book details instructor resources page is displayed
+    assert(book.is_displayed())
+    assert('details/books' in book.location)
 
 
 @test_case('C210389')
@@ -179,7 +179,7 @@ def test_a_book_is_preselected_when_a_book_details_adoption_link_is_used(
     # AND:  select a non-Student role from the drop down menu
     # AND:  fill out the contact form fields
     # AND:  click on the "Next" button
-    with pytest.raises(AssertionError) as error:
+    with pytest.raises(WebException) as error:
         adoption.submit_adoption(
             user_type=user_type,
             first=first_name,
@@ -211,7 +211,7 @@ def test_adoption_form_identity_fields_are_required(web_base_url, selenium):
 
     # WHEN: they select a non-Student role from the drop down menu
     # AND:  click on the "Next" button
-    with pytest.raises(AssertionError) as error:
+    with pytest.raises(WebException) as error:
         adoption.submit_adoption(
             user_type=user_type,
             first='',
@@ -297,7 +297,7 @@ def test_adoption_form_requires_at_least_one_book_selection(
     # AND:  fill out the contact form fields
     # AND:  click on the "Next" button
     # AND:  click on the "Next" button
-    with pytest.raises(AssertionError) as error:
+    with pytest.raises(WebException) as error:
         adoption.submit_adoption(
             user_type=user_type,
             first=first_name,
@@ -383,6 +383,7 @@ def test_all_tech_options_are_included_on_each_adoption_lead(
     # AND:  each lead contains both technology options
 
 
+@skip_test(reason='Confirmation page removed')
 @test_case('C210399')
 @nondestructive
 @web
@@ -390,13 +391,10 @@ def test_able_to_submit_a_new_adoption_from_the_adoption_confirmation(
         web_base_url, selenium):
     """A link on the confirmation screen exists to submit another adoption."""
     # GIVEN: a user viewing the adoption confirmation page
-    confirmation = AdoptionConfirmation(selenium, web_base_url).open()
 
     # WHEN: they click on the "Report another adopted textbook" button
-    adoption = confirmation.report_another()
 
     # THEN: the adoption page is displayed
-    assert(adoption.is_displayed())
 
 
 @skip_test(reason='No current survey available')
@@ -406,11 +404,8 @@ def test_able_to_submit_a_new_adoption_from_the_adoption_confirmation(
 def test_adopters_are_asked_to_take_a_marketing_survey(web_base_url, selenium):
     """Adopters are asked to take a marketing survey."""
     # GIVEN: a user viewing the adoption confirmation page
-    confirmation = AdoptionConfirmation(selenium, web_base_url).open()
 
     # IF: a survey is available
-    if not confirmation.survey_available:
-        return
 
     # WHEN: they click on the "Take the survey" button
 

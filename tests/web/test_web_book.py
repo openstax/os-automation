@@ -483,7 +483,7 @@ def test_logged_in_users_may_view_the_errata_submission_form(
     # THEN: the errata form is displayed
     # AND:  the subject is prefilled in
     assert(errata_form.is_displayed())
-    assert(errata_form.subject == book_title)
+    assert(book_title in errata_form.subject)
 
     # WHEN: they return to the book details page
     # AND:  reduce the screen to 600 pixels
@@ -497,7 +497,7 @@ def test_logged_in_users_may_view_the_errata_submission_form(
     # THEN: the errata form is displayed
     # AND:  the subject is prefilled in
     assert(errata_form.is_displayed())
-    assert(errata_form.subject == book_title)
+    assert(book_title in errata_form.subject)
 
 
 @test_case('C210365')
@@ -532,7 +532,7 @@ def test_non_logged_in_users_are_directed_to_log_in_to_view_the_errata_form(
     # THEN: the errata form is displayed
     # AND:  the subject is prefilled in
     assert(errata_form.is_displayed()), 'Errata form not displayed'
-    assert(errata_form.subject == book_title), (
+    assert(book_title in errata_form.subject), (
         f'Errata form book ({errata_form.subject}) '
         f'does not match used book ({book_title})')
 
@@ -575,7 +575,7 @@ def test_non_logged_in_users_on_mobile_are_directed_to_log_in_for_errata_form(
     # THEN: the errata form is displayed
     # AND:  the subject is prefilled in
     assert(errata_form.is_displayed())
-    assert(errata_form.subject == book_title)
+    assert(book_title in errata_form.subject)
 
 
 @test_case('C210367')
@@ -620,6 +620,7 @@ def test_pending_instructors_see_access_pending_for_locked_resources(
     email.empty()
     address = email.address
     password = Utility.random_hex(17)
+    subjects = subject_list(2)
     accounts = AccountsHome(selenium, accounts_base_url).open()
     (accounts.content
         .view_sign_up().content
@@ -628,7 +629,7 @@ def test_pending_instructors_see_access_pending_for_locked_resources(
             email=address, password=password, _type=Accounts.INSTRUCTOR,
             provider=Accounts.RESTMAIL, name=name, school='Automation',
             news=False, phone=Utility.random_phone(),
-            webpage='https://openstax.org/', subjects=subject_list(2),
+            webpage='https://openstax.org/', subjects=subjects,
             students=10, use=Accounts.ADOPTED))
     home = WebHome(selenium, web_base_url).open()
     subjects = home.web_nav.subjects.view_all()

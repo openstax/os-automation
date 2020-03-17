@@ -25,7 +25,8 @@ def test_create_and_clone_a_course(tutor_base_url, selenium, teacher):
     """Test creating and cloning courses."""
     # SETUP:
     book = Tutor.BOOKS[Utility.random(0, len(Tutor.BOOKS) - 1)]
-    term = Tutor.TERMS[Utility.random(0, len(Tutor.TERMS) - 1)]
+    # term = Tutor.TERMS[Utility.random(0, len(Tutor.TERMS) - 1)]
+    term = Tutor.TERMS[Utility.random(0, 1)]
     today = datetime.now()
     course_name = (f"{book} Auto-{today.year}{today.month:02}{today.day:02}"
                    f" ({Utility.random_hex(6)})")
@@ -1095,7 +1096,9 @@ def test_student_task_homework_assignment(tutor_base_url, selenium, store):
     selenium.get(enrollment_url)
     enrollment = Enrollment(selenium, tutor_base_url)
     signup = enrollment.get_started()
-    privacy = signup.account_signup(
+    sign_up = signup.content.view_sign_up()
+    student = sign_up.content.sign_up_as_a_student()
+    privacy = student.account_signup(
         destination=tutor_base_url,
         email=email.address,
         name=['', first_name, last_name, suffix],

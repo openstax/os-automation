@@ -103,8 +103,8 @@ class Adoption(WebBase):
         self.form.next()
         sleep(1.0)
         user_errors = self.form.get_user_errors
-        assert(not user_errors), \
-            'User errors: {issues}'.format(issues=user_errors)
+        if user_errors:
+            raise WebException(f'User errors: {user_errors}')
         self.wait.until(
             lambda _:
                 Utility.is_image_visible(self.driver,
@@ -119,17 +119,18 @@ class Adoption(WebBase):
         self.form.next()
         sleep(1.0)
         book_error = self.form.get_book_error
-        assert(not book_error), \
-            'Book error - {book}'.format(book=book_error)
+        if book_error:
+            raise WebException(f'Book error: {book_error}')
         using_errors = self.form.get_using_errors
-        assert(not using_errors), \
-            'Using error - {using}'.format(using=using_errors)
+        if using_errors:
+            raise WebException(f'Using error: {using_errors}')
         self.form.select_tech(tech_providers)
         if tech_providers and TechProviders.OTHER in tech_providers:
             self.form.other = other_provider
         self.form.submit()
         sleep(1.0)
-        return go_to_(AdoptionConfirmation(self.driver, self.base_url))
+        from pages.web.book import Book
+        return go_to_(Book(self.driver, self.base_url))
 
     @property
     def form(self):
