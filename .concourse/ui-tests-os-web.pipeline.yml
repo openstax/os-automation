@@ -39,5 +39,5 @@ jobs:
         file: os-automation/.concourse/tasks/version-message/task.yml
       - put: notify
         params:
-          text: ((message-output/out.txt))
+          text: '{{ message-output/out.txt }}'
           channel: qa-stream
