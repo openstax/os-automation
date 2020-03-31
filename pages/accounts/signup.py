@@ -316,6 +316,38 @@ class StudentSignup(AccountsBase):
 
     URL_TEMPLATE = '/i/signup/student'
 
+    def sign_up(self,
+                first: str, last: str, email: RestMail, password: str,
+                page: Page = None, base_url: str = None) \
+            -> Page:
+        """Register a new student account.
+
+        :param str first: the student's first name
+        :param str last: the student's last name
+        :param RestMail email: the student's accessible email address
+        :param str password: the new account password
+        :param Page page: (optional) the expected destination page
+        :param str base_url: (optional) the destination page base URL address
+        :return: the new account profile if a destination page isn't provided
+            or the destination page
+        :rtype: :py:class:`~pypom.Page`
+
+        """
+        form = self.content
+        form.first_name = first
+        form.last_name = last
+        form.email = email.address
+        form.password = password
+        form.i_agree()
+        confirm_email = form._continue().content
+        pin = email.wait_for_mail()[-1].pin
+        confirm_email.pin = pin
+        complete_sign_up = confirm_email.confirm_my_account().content
+        complete_sign_up.finish()
+        if page:
+            return go_to_(page(self.driver, base_url=base_url))
+        return go_to_(Profile(self.driver, base_url=self.base_url))
+
     class Content(AccountsBase.Content,
                   Email, FirstName, LastName, Password, SocialLogins):
         """The sign up pane."""

@@ -1440,7 +1440,7 @@ class BookOrder(Modal):
         @property
         def title(self):
             """Return the intended user type."""
-            return self.find_element(*self._title_locator).text.strip()
+            return self.find_element(*self._title_locator).text
 
         @property
         def description(self):
@@ -1467,10 +1467,11 @@ class BookOrder(Modal):
                 Utility.switch_to(self.driver, element=target)
                 from pages.amazon.home import Amazon
                 return go_to_(Amazon(self.driver))
-            elif self.title == 'Bookstore':
+            elif 'Bookstore' in self.title:
                 Utility.switch_to(self.driver, element=target)
                 from pages.web.bookstore_suppliers import Bookstore
                 return go_to_(Bookstore(self.driver))
+            raise WebException(f'unknown print copy provider {self.title}')
 
 
 class CompCopyRequest(Modal):

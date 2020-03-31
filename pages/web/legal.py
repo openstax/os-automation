@@ -12,8 +12,8 @@ from utils.utilities import Utility, go_to_
 class LegalBase(WebBase):
     """The base page for the legal document pages."""
 
-    _heading_locator = (By.CSS_SELECTOR, '#main h1')
-    _content_locator = (By.CSS_SELECTOR, '#main [data-html*=content]')
+    _heading_locator = (By.CSS_SELECTOR, 'h1')
+    _content_locator = (By.CSS_SELECTOR, '#maincontent')
     _text_locator = (By.CSS_SELECTOR, 'p')
 
     @property

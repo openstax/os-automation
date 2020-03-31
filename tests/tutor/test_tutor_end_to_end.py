@@ -9,7 +9,7 @@ from typing import Union
 
 from autochomsky import chomsky
 
-from pages.tutor.enrollment import Enrollment
+from pages.tutor.enrollment import Enrollment, Terms
 from pages.tutor.home import TutorHome
 from pages.tutor.task import Homework
 from tests.markers import nondestructive, test_case, tutor
@@ -345,7 +345,6 @@ def test_course_registration_and_initial_assignment_creation_timing(
         f"{first_name}.{last_name}.{Utility.random_hex(4)}".lower())
     email.empty()
     password = Utility.random_hex(8)
-    school = 'Automation'
     student_id = Utility.random(100000000, 999999999)
     home_address = Utility.random_address()
     max_time_to_wait = 10  # minutes
@@ -370,15 +369,15 @@ def test_course_registration_and_initial_assignment_creation_timing(
     selenium.get(enrollment_url)
     enrollment = Enrollment(selenium, tutor_base_url)
 
-    signup = enrollment.get_started()
+    sign_up = enrollment.get_started()
 
-    privacy = signup.account_signup(
-        destination=tutor_base_url,
-        email=email.address,
-        name=['', first_name, last_name, suffix],
+    privacy = sign_up.sign_up(
+        first=first_name,
+        last=last_name,
+        email=email,
         password=password,
-        school=school,
-        tutor=True)
+        page=Terms,
+        base_url=tutor_base_url)
 
     identification = privacy.i_agree()
     identification.student_id = student_id
@@ -850,7 +849,6 @@ def test_student_task_reading_assignment(tutor_base_url, selenium, store):
         f"{first_name}.{last_name}.{Utility.random_hex(3)}".lower())
     email.empty()
     password = Utility.random_hex(8)
-    school = 'Automation'
     student_id = Utility.random(100000000, 999999999)
     assignment_name = test_data.get('assignment_name')
     highlight_length = Utility.random(-20, 20) * 5 + 5
@@ -869,14 +867,14 @@ def test_student_task_reading_assignment(tutor_base_url, selenium, store):
     # GIVEN: a Tutor student enrolled in a course with a reading assignment
     selenium.get(enrollment_url)
     enrollment = Enrollment(selenium, tutor_base_url)
-    signup = enrollment.get_started()
-    privacy = signup.account_signup(
-        destination=tutor_base_url,
-        email=email.address,
-        name=['', first_name, last_name, suffix],
+    sign_up = enrollment.get_started()
+    privacy = sign_up.sign_up(
+        first=first_name,
+        last=last_name,
+        email=email,
         password=password,
-        school=school,
-        tutor=True)
+        page=Terms,
+        base_url=tutor_base_url)
     identification = privacy.i_agree()
     identification.student_id = student_id
     course_page = identification._continue()
@@ -943,7 +941,7 @@ def test_student_task_reading_assignment(tutor_base_url, selenium, store):
         (Actions(selenium)
             .move_by_offset(0, 100)
             .click_and_hold()
-            .move_by_offset(0, 30)
+            .move_by_offset(45, 10)
             .release()
             .perform())
 
@@ -1087,7 +1085,6 @@ def test_student_task_homework_assignment(tutor_base_url, selenium, store):
         f"{first_name}.{last_name}.{Utility.random_hex(5)}".lower())
     email.empty()
     password = Utility.random_hex(8)
-    school = 'Automation'
     student_id = Utility.random(100000000, 999999999)
     assignment_name = test_data.get('assignment_name')
     book = bookterm.CollegePhysics()
@@ -1095,16 +1092,14 @@ def test_student_task_homework_assignment(tutor_base_url, selenium, store):
     # GIVEN: a Tutor student enrolled in a course with a homework assignment
     selenium.get(enrollment_url)
     enrollment = Enrollment(selenium, tutor_base_url)
-    signup = enrollment.get_started()
-    sign_up = signup.content.view_sign_up()
-    student = sign_up.content.sign_up_as_a_student()
-    privacy = student.account_signup(
-        destination=tutor_base_url,
-        email=email.address,
-        name=['', first_name, last_name, suffix],
+    sign_up = enrollment.get_started()
+    privacy = sign_up.sign_up(
+        first=first_name,
+        last=last_name,
+        email=email,
         password=password,
-        school=school,
-        tutor=True)
+        page=Terms,
+        base_url=tutor_base_url)
     identification = privacy.i_agree()
     identification.student_id = student_id
     course_page = identification._continue()
