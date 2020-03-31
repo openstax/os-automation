@@ -79,7 +79,7 @@ class ResourceTab(Region):
 class Accordion(Region):
     """A base region for phone-view expandable menus."""
 
-    _toggle_locator = (By.CSS_SELECTOR, '.control-bar')
+    _toggle_locator = (By.CSS_SELECTOR, '.accordion-button , .control-bar')
     _is_open_locator = (By.CSS_SELECTOR, '.content-pane')
 
     def toggle(self):

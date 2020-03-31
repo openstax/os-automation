@@ -173,7 +173,7 @@ class PrivacyPolicy(Modal):
         Utility.click_option(self.driver, element=button)
         sleep(1.25)
         course = StudentCourse(self.driver, base_url=self.page.base_url)
-        dialog_root = self.driver.execute_script(GET_ROOT.format('dialog'))
+        dialog_root = self.driver.execute_script(GET_ROOT.format('document'))
         if (dialog_root and
                 'pay-now-or-later' in dialog_root.get_attribute('class')):
             return BuyAccess(course, dialog_root)

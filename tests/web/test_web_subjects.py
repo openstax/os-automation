@@ -39,7 +39,7 @@ def test_able_to_filter_books_by_category(web_base_url, selenium):
         subjects.business,
         subjects.essentials,
         subjects.college_success,
-        subjects.ap
+        subjects.high_school
     ]
     subject_list_text = [
         'Math',
@@ -51,7 +51,7 @@ def test_able_to_filter_books_by_category(web_base_url, selenium):
         'Business',
         'Essentials',
         'College Success',
-        'AP'
+        'High School'
     ]
 
     for index in range(len(subject_list)):
@@ -101,7 +101,7 @@ def test_able_to_filter_books_by_category_using_the_drop_down_menu(
         subjects.business,
         subjects.essentials,
         subjects.college_success,
-        subjects.ap
+        subjects.high_school
     ]
     subject_list_text = [
         'Math',
@@ -111,7 +111,7 @@ def test_able_to_filter_books_by_category_using_the_drop_down_menu(
         'Business',
         'Essentials',
         'College Success',
-        'AP'
+        'High School'
     ]
 
     for index in range(len(subject_list)):
