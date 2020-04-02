@@ -91,6 +91,8 @@ class Accordion(Region):
     @property
     def is_open(self):
         """Return True if the menu is open."""
+        print(self)
+        print(self.root.get_attribute('outerHTML'))
         return not self.driver.execute_script(
             'return arguments[0].hidden;',
             self.find_element(*self._is_open_locator))
@@ -631,13 +633,13 @@ class Book(WebBase):
             By.CSS_SELECTOR, '.accordion-item:first-child')
         _toc_locator = (
             By.XPATH, ('//div[text()="Table of contents"]'
-                       '/ancestor::node()[2]'))
+                       '/ancestor::node()[3]'))
         _instructor_locator = (
             By.XPATH, ('//div[text()="Instructor resources"]'
-                       '/ancestor::node()[2]'))
+                       '/ancestor::node()[3]'))
         _student_locator = (
             By.XPATH, ('//div[text()="Student resources"]'
-                       '/ancestor::node()[2]'))
+                       '/ancestor::node()[3]'))
         _errata_locator = (
             By.CSS_SELECTOR, '.accordion-item:last-child')
 
