@@ -937,7 +937,7 @@ def test_users_may_see_the_upcoming_webinar_schedule(web_base_url, selenium):
 
     # THEN: the webinars blog post is displayed
     assert(webinar.is_displayed())
-    assert('webinars hosted by OpenStax' in selenium.page_source)
+    assert('Webinars' in selenium.page_source)
 
 
 @test_case('C210374')

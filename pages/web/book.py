@@ -564,14 +564,9 @@ class Book(WebBase):
         def view_webinars(self):
             """Click on the 'Find a webinar' link."""
             webinar = self.find_element(*self._webinar_link_locator)
-            article_href = webinar.get_attribute('href')
-            if not bool(article_href):
-                raise WebException(
-                    f'{self.page.title} is missing its webinar link')
-            article_url = article_href.split('/')[-1]
             Utility.click_option(self.driver, element=webinar)
-            from pages.web.blog import Article
-            return go_to_(Article(self.driver, article=article_url))
+            from pages.web.webinars import Webinars
+            return go_to_(Webinars(self.driver, base_url=self.page.base_url))
 
         @property
         def tech_options(self):
@@ -1043,7 +1038,7 @@ class Resource(Region):
     """A resource box."""
 
     _title_locator = (By.CSS_SELECTOR, 'h3')
-    _description_locator = (By.CSS_SELECTOR, '[data-html=description]')
+    _description_locator = (By.CSS_SELECTOR, '.description')
     _status_message_locator = (By.CSS_SELECTOR, '.bottom .left')
     _is_locked_locator = (By.CSS_SELECTOR, '.fa-lock')
     _can_download_locator = (By.CSS_SELECTOR, '.fa-download')
@@ -1061,7 +1056,8 @@ class Resource(Region):
     @property
     def description(self):
         """Return the resource description."""
-        return self.find_element(*self._description_locator).text.strip()
+        return (self.find_element(*self._description_locator)
+                .get_attribute('textContent').strip())
 
     def select(self):
         """Click on the resource box."""
