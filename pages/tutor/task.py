@@ -21,6 +21,7 @@ from pages.tutor.course import StudentCourse
 from pages.tutor.performance import PerformanceForecast
 from pages.tutor.reference import ReferenceBook
 from regions.tutor.assessment import FreeResponse, MultipleChoice
+from regions.tutor.my_highlights import MyHighlights
 from regions.tutor.print_preview import PrintPreview
 from regions.tutor.tooltip import Float
 from utils.tutor import Tutor, TutorException
@@ -704,7 +705,7 @@ class Reading(Assignment):
     """A collection of book sections selected by the course instructor."""
 
     _overlay_page_locator = (
-        By.CSS_SELECTOR, '.overlay')
+        By.CSS_SELECTOR, '[role=dialog]')
     _annotation_slide_out_box_locator = (
         By.CSS_SELECTOR, '.slide-out-edit-box')
     _highlight_segment_locator = (
@@ -714,13 +715,13 @@ class Reading(Assignment):
 
     _main_content_selector = '.obscured-page .page'
 
-    _highlighting_summary_toggle_selector = '.note-summary-toggle'
-    _milestone_chart_toggle_selector = '.icons > button'
+    _highlighting_summary_toggle_selector = '.summary-toggle'
+    _milestone_chart_toggle_selector = '.milestones-toggle'
     _highlight_button_selector = 'button.highlight'
     _annotation_button_selector = 'button.annotate'
 
     def highlights(self, milestones=False) \
-            -> Union[Reading, Reading.Highlights, Reading.Milestones]:
+            -> Union[Reading, MyHighlights, Reading.Milestones]:
         """Toggle the highlighting or milestone summary page.
 
         .. Possible outcomes:
@@ -738,7 +739,7 @@ class Reading(Assignment):
             of the highlighting selector, returning the milestone chart
         :return: the reading, the highlighting summary, or the milestone chart
         :rtype: :py:class:`~pages.tutor.task.Reading` or
-            :py:class:`~pages.tutor.task.Reading.Highlights` or
+            :py:class:`~regions.tutor.my_highlights.MyHighlights` or
             :py:class:`~pages.tutor.task.Reading.Milestones`
 
         """
@@ -751,16 +752,16 @@ class Reading(Assignment):
             f'return document.querySelector("{toggle_selector}");')
 
         # locate the overlay element for the highlight and summary pages
-        overlay_root = self.find_element(*self._overlay_page_locator)
+        overlay_root = self.driver.execute_script(
+            'return document.querySelector("'
+            f'{self._overlay_page_locator[1]}");')
 
         # find the current state of the overlay to figure out what page or
         # region to return
-        overlay_open = self.driver.execute_script(
-            'return window.getComputedStyle(arguments[0]).display != "none";',
-            overlay_root)
+        overlay_open = bool(overlay_root)
         highlights_active = (
-            overlay_open and
-            'notes-summary' in overlay_root.get_attribute('class'))
+            overlay_open and 'My Highlights and Notes' in
+            overlay_root.get_attribute('outerHTML'))
 
         toggle.send_keys(Keys.RETURN)
         sleep(0.75)
@@ -769,7 +770,7 @@ class Reading(Assignment):
                 (overlay_open and not highlights_active and not milestones):
             # the reading is displayed and the user clicked on highlighting OR
             # milestones are displayed and the user clicked on highlighting
-            return self.Highlights(self, overlay_root)
+            return MyHighlights(self, overlay_root)
         elif (not overlay_open and milestones) or \
                 (overlay_open and highlights_active and milestones):
             # the reading is displayed and the user clicked on milestones OR
@@ -874,7 +875,7 @@ class Reading(Assignment):
         """
         group = {}
         for segment in self.find_elements(*self._highlight_segment_locator):
-            highlight_id = segment.get_attribute('data-id')
+            highlight_id = segment.get_attribute('data-highlight-id')
             if highlight_id not in group:
                 group[highlight_id] = [segment]
             else:
@@ -998,11 +999,11 @@ class Reading(Assignment):
             sleep(1)
             return self
 
-        def see_all(self) -> Reading.Highlights:
+        def see_all(self) -> MyHighlights:
             """Click the 'See all' annotations button.
 
             :return: the highlighting summary page
-            :rtype: :py:class:`~pages.tutor.task.Reading.Highlights`
+            :rtype: :py:class:`~regions.tutor.my_highlights.MyHighlights`
 
             """
             see_all = self.find_element(
@@ -1012,7 +1013,7 @@ class Reading(Assignment):
             overlay_root = self.driver.execute_script(
                 'return document.querySelector("{0}");'
                 .format(self.page._overlay_page_locator[1]))
-            return self.page.Highlights(self, overlay_root)
+            return MyHighlights(self, overlay_root)
 
     class Content(Assignment.Content):
         """The reading assignment body."""

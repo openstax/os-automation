@@ -253,9 +253,9 @@ class Signup(AccountsBase):
         DESCRIPTION = ' ~ div'
 
         _educator_signup_button_locator = (
-            By.CSS_SELECTOR, '[href^="/signup"]')
+            By.CSS_SELECTOR, '[href$=educator]')
         _student_signup_button_locator = (
-            By.CSS_SELECTOR, '[href*=student]')
+            By.CSS_SELECTOR, '[href$=student]')
 
         _educator_descrition_locator = (
             By.CSS_SELECTOR, _educator_signup_button_locator[1] + DESCRIPTION)

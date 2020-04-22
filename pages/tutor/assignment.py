@@ -1791,8 +1791,7 @@ class Assignment(TutorBase):
             raise TutorException(f'Assignment error(s): {self.errors}')
         calendar = go_to_(Calendar(self.driver, self.base_url))
         calendar.wait.until(
-            lambda _: not self.driver.find_elements(
-                *calendar._is_publishing_locator))
+            lambda _: not self.find_elements(*calendar._is_publishing_locator))
         return calendar
 
     save = publish

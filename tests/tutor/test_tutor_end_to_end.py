@@ -952,8 +952,10 @@ def test_student_task_reading_assignment(tutor_base_url, selenium, store):
 
     # THEN:  a text highlight is included
     # AND:   a speech bubble icon is displayed to the right of the highlight
-    assert(len(reading.content_highlights) == 2), (
-        f'{len(reading.content_highlights)} highlight(s) found on the page')
+    from time import sleep
+    sleep(5)
+    options = reading.content_highlights
+    assert(len(options) == 2), f'{len(options)} highlight(s) found on the page'
 
     assert(reading.sidebar_buttons), \
         f'No annotation text bubbles found in the sidebar'

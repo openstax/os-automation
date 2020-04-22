@@ -4,7 +4,7 @@ from pages.accounts.admin.users import Search
 from pages.accounts.home import AccountsHome
 from pages.accounts.signup import SignupOld
 from pages.web.home import WebHome as Home
-from tests.markers import accounts, expected_failure, nondestructive, smoke_test, test_case, web  # NOQA
+from tests.markers import accounts, expected_failure, nondestructive, skip_test, smoke_test, test_case, web  # NOQA
 from utils.accounts import Accounts
 from utils.email import RestMail
 from utils.utilities import Utility
@@ -29,7 +29,7 @@ def test_the_website_loads(web_base_url, selenium):
 
 
 @test_case('C210297')
-@expected_failure(reason='Sticky note may or may not be active')
+@skip_test(reason='Sticky note may or may not be active')
 @web
 def test_the_donation_banner_is_displayed(web_base_url, selenium):
     """Test if the donation banner is shown to new visitors."""

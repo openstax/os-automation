@@ -1,12 +1,13 @@
 """The Tutor reference view of the textbook."""
 
-from time import sleep
+# from time import sleep
 
 from pypom import Page, Region
 from selenium.webdriver.common.by import By
 
-from regions.tutor.print_preview import PrintPreview
-from utils.utilities import Utility, go_to_
+from regions.tutor.my_highlights import MyHighlights
+# from regions.tutor.print_preview import PrintPreview
+from utils.utilities import Utility  # , go_to_
 
 
 class ReferenceBook(Page):
@@ -58,8 +59,9 @@ class ReferenceBook(Page):
         :rtype: :py:class:`~ReferenceBook.Highlights`
 
         """
-        annotation_root = self.find_element(*self._highlights_summary_locator)
-        return self.Highlights(self, annotation_root)
+        '''annotation_root = self.find_element(*self._highlights_summary_locator)  # NOQA
+        return self.Highlights(self, annotation_root)'''
+        return MyHighlights(self)
 
     class Nav(Region):
         """The reference book navigation controls."""
@@ -383,6 +385,7 @@ class ReferenceBook(Page):
             """
             return self.find_element(*self._page_data_locator).text
 
+    '''
     class Highlights(Region):
         """The highlighting summary page overlay."""
 
@@ -618,3 +621,4 @@ class ReferenceBook(Page):
                 Utility.click_option(self.driver, element=confirm)
                 sleep(0.25)
                 return self.page.page
+    '''

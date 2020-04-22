@@ -10,8 +10,7 @@ from pages.accounts.profile import Profile
 from pages.web.book import Book
 from pages.web.errata import ErrataForm
 from pages.web.home import WebHome
-from tests.markers import (accounts, expected_failure, nondestructive,
-                           skip_if_headless, smoke_test, test_case, web)
+from tests.markers import accounts, nondestructive, skip_if_headless, skip_test, smoke_test, test_case, web  # NOQA
 from utils.accounts import Accounts
 from utils.email import RestMail
 from utils.utilities import Utility
@@ -407,7 +406,7 @@ def test_current_book_editions_have_an_errata_section(web_base_url, selenium):
 
 @test_case('C210362')
 @nondestructive
-@expected_failure(reason='No old editions currently available')
+@skip_test(reason='No old editions currently available')
 @web
 def test_an_old_version_does_not_have_errata(web_base_url, selenium):
     """Test that the current edition of a book has an errata section."""
