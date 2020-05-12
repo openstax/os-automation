@@ -13,7 +13,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 
 from pages.accounts.base import AccountsBase
 from pages.accounts.profile import Profile
-from regions.accounts.fields import Email, FirstName, LastName, Password, Pin
+from regions.accounts.fields import Email, FirstName, LastName, Password, Phone, Pin  # NOQA
 from regions.accounts.social import SocialLogins
 from utils.accounts import AccountsException
 from utils.email import GmailReader, GuerrillaMail, RestMail
@@ -195,13 +195,16 @@ class ConfirmEmail(AccountsBase):
             Utility.clear_field(self.driver, field=field)
             field.send_keys(pin)
 
-        def confirm_my_account(self) -> Union[ConfirmEmail, CompleteSignup]:
+        def confirm_my_account(self) \
+                -> Union[CompleteSignup, VerifyInstructor]:
             """Click the Continue button.
 
             :return: the email confirmation (second step) if there are errors
                 or the completion page (third step)
-            :rtype: :py:class:`~pages.accounts.signup.ConfirmEmail` or
-                :py:class:`~pages.accounts.signup.CompleteSignup`
+            :rtype: :py:class:`~pages.accounts.signup.CompleteSignup`
+                or :py:class:`~pages.accounts.signup.VerifyInstructor`
+            :raises :py:class:`~utils.accounts.AccountsException`: if an error
+                in the form entries is found
 
             """
             current_page = self.page.location
@@ -214,6 +217,8 @@ class ConfirmEmail(AccountsBase):
                     self.driver.execute_script(
                         'return document.querySelector(".invalid-message")'
                         '.textContent;'))
+            if 'sheerid.com' in self.driver.current_url:
+                return go_to_(VerifyInstructor(self.driver))
             return go_to_(
                 CompleteSignup(self.driver, base_url=self.page.base_url))
 
@@ -240,6 +245,173 @@ class ConfirmEmail(AccountsBase):
             Utility.click_option(self.driver, element=link)
             return go_to_(
                 ChangeYourEmail(self.driver, base_url=self.page.base_url))
+
+
+class EducatorSignup(AccountsBase):
+    """The educator sign up process."""
+
+    URL_TEMPLATE = '/i/signup/educator'
+
+    def sign_up(self,
+                first: str, last: str, email: RestMail, password: str,
+                phone: str, school: str,
+                page: Page = None, base_url: str = None) \
+            -> Page:
+        """Register a new educator account.
+
+        :param str first: the instructor's first name
+        :param str last: the instructor's last name
+        :param RestMail email: the instructor's accessible email address
+        :param str password: the new account password
+        :param str phone: the instructor's telephone number
+        :param Page page: (optional) the expected destination page
+        :param str base_url: (optional) the destination page base URL address
+        :return: the new account profile if a destination page isn't provided
+            or the destination page
+        :rtype: :py:class:`~pypom.Page`
+
+        """
+        form = self.content
+        form.first_name = first
+        form.last_name = last
+        form.phone = phone
+        form.email = email.address
+        form.password = password
+        form.i_agree()
+        if not email.address.endswith('.edu'):
+            form._continue()
+        confirm_email = form._continue().content
+
+        pin = email.wait_for_mail()[-1].pin
+        confirm_email.pin = pin
+        instructor_access = confirm_email.confirm_my_account()
+
+        if not instructor_access.location.endswith('/i/done'):
+            instructor_access.school_name = school
+            validated = instructor_access.verify_my_instructor_status()
+            your_done = validated._continue().content
+        else:
+            your_done = instructor_access.content
+        your_done.finish()
+
+        if page:
+            return go_to_(page(self.driver, base_url=base_url))
+        return go_to_(Profile(self.driver, base_url=self.base_url))
+
+        def get_errors(self) -> List[str]:
+            """Return a list of error messages found on the page.
+
+            :return: the list of error messages found on the current page
+            :rtype: list(str)
+
+            """
+            errors = []
+            if self.first_name_has_error:
+                errors.append(f'First Name: {self.first_name_error}')
+            if self.last_name_has_error:
+                errors.append(f'Last Name: {self.last_name_error}')
+            if self.email_has_error:
+                errors.append(f'Email: {self.email_error}')
+            if self.password_has_error:
+                errors.append(f'Password: {self.password_error}')
+            return errors
+
+    class Content(AccountsBase.Content,
+                  Email, FirstName, LastName, Password, Phone):
+        """The sign up pane."""
+
+        _continue_button_locator = (
+            By.CSS_SELECTOR, '[type=submit]')
+        _email_locator = (
+            By.CSS_SELECTOR, '#signup_email')
+        _first_name_locator = (
+            By.CSS_SELECTOR, '#signup_first_name')
+        _last_name_locator = (
+            By.CSS_SELECTOR, '#signup_last_name')
+        _newsletter_signup_locator = (
+            By.CSS_SELECTOR, '#signup_newsletter')
+        _password_locator = (
+            By.CSS_SELECTOR, '#signup_password')
+        _phone_locator = (
+            By.CSS_SELECTOR, '#signup_phone_number')
+        _policy_agreement_locator = (
+            By.CSS_SELECTOR, '#signup_terms_accepted')
+        _privacy_policy_link_locator = (
+            By.CSS_SELECTOR, '.terms [href*=terms]:last-child')
+        _show_password_toggle_locator = (
+            By.CSS_SELECTOR, '#show-hide-button')
+        _terms_of_use_link_locator = (
+            By.CSS_SELECTOR, '.terms [href*=terms]:first-child')
+
+        _email_error_message_locator = (
+            By.CSS_SELECTOR, _email_locator[1] + ERROR_SELECTOR)
+        _first_name_error_message_locator = (
+            By.CSS_SELECTOR, _first_name_locator[1] + ERROR_SELECTOR)
+        _last_name_error_message_locator = (
+            By.CSS_SELECTOR, _last_name_locator[1] + ERROR_SELECTOR)
+        _password_error_message_locator = (
+            By.CSS_SELECTOR, _password_locator[1] + ERROR_SELECTOR)
+        _phone_error_message_locator = (
+            By.CSS_SELECTOR, _phone_locator[1] + ERROR_SELECTOR)
+
+        def i_agree(self) -> StudentSignup:
+            """Click the I agree checkbox.
+
+            :return: the Accounts student sign up page
+            :rtype: :py:class:`~pages.accounts.signup.StudentSignup`
+
+            """
+            checkbox = self.find_element(*self._policy_agreement_locator)
+            Utility.click_option(self.driver, element=checkbox)
+            return self.page
+
+        def toggle_newsletter(self) -> StudentSignup:
+            """Click the OpenStax newsletter checkbox.
+
+            :return: the Accounts student sign up page
+            :rtype: :py:class:`~pages.accounts.signup.StudentSignup`
+
+            """
+            checkbox = self.find_element(*self._newsletter_signup_locator)
+            Utility.click_option(self.driver, element=checkbox)
+            return self.page
+
+        def toggle_password_display(self) -> StudentSignup:
+            """Toggle the password field to show or hide the value.
+
+            :return: the Accounts student sign up page
+            :rtype: :py:class:`~pages.accounts.signup.StudentSignup`
+
+            """
+            toggle = self.find_element(*self._show_password_toggle_locator)
+            Utility.click_option(self.driver, element=toggle)
+            sleep(0.1)
+            return self.page
+
+        def _continue(self) -> Union[StudentSignup, ConfirmEmail]:
+            """Click the Continue button.
+
+            :param Page previous: (optional) the Page object for the initial
+                page that sent the log in request
+            :param str base_url: (optional) the base URL for the previous Page
+            :param kwargs: (optional) additional keyword arguments for the Page
+            :return: the student sign up (first step) if there are errors or
+                the email confirmation (second step)
+            :rtype: :py:class:`~pages.accounts.signup.StudentSignup` or
+                :py:class:`~pages.accounts.signup.ConfirmEmail`
+
+            """
+            current_page = self.page.location
+            button = self.find_element(*self._continue_button_locator)
+            Utility.click_option(self.driver, element=button)
+            sleep(0.5)
+            if self.driver.current_url == current_page:
+                error = self.driver.execute_script(
+                    'return document.querySelector(".invalid-message");')
+                if error:
+                    raise AccountsException(error.get_attribute('textContent'))
+            return go_to_(
+                ConfirmEmail(self.driver, base_url=self.page.base_url))
 
 
 class Signup(AccountsBase):
@@ -458,6 +630,72 @@ class StudentSignup(AccountsBase):
                         '.textContent;'))
             return go_to_(
                 ConfirmEmail(self.driver, base_url=self.page.base_url))
+
+
+class SuccessfulVerification(Page):
+    """The successful verification page."""
+
+    _continue_button_locator = (
+        By.CSS_SELECTOR, '.sid-btn')
+
+    def _continue(self) -> CompleteSignup:
+        """Click the Continue button.
+
+        :return: the account creation completion page
+        :rtype: :py:class:`~pages.accounts.signup.CompleteSignup`
+
+        """
+        button = self.find_element(*self._continue_button_locator)
+        Utility.click_option(self.driver, element=button)
+        return go_to_(CompleteSignup(self.driver))
+
+
+class VerifyInstructor(Page):
+    """The SheerID instructor verification form."""
+
+    _country_selection_locator = (
+        By.CSS_SELECTOR, '#sid-country')
+    _email_locator = (
+        By.CSS_SELECTOR, '#sid-email')
+    _first_name_locator = (
+        By.CSS_SELECTOR, '#sid-first-name')
+    _last_name_locator = (
+        By.CSS_SELECTOR, '#sid-last-name')
+    _school_name_locator = (
+        By.CSS_SELECTOR, '#sid-teacher-school')
+    _verify_my_instructor_status_button_locator = (
+        By.CSS_SELECTOR, '[type=submit]')
+
+    @property
+    def email(self) -> str:
+        """Return the sign up email address.
+
+        :return: the email used during sign up
+        :rtype: str
+
+        """
+        return self.find_element(*self._email_locator).text
+
+    @property
+    def country(self) -> str:
+        """Return the currently selected country.
+
+        :return: the currently selected country
+        :rtype: str
+
+        """
+        return (self.find_element(*self._country_selection_locator)
+                .get_attribute('value'))
+
+    @country.setter
+    def country(self, country: str = 'United States'):
+        """Set the user's country.
+
+        :param str country: the country name
+        :return: None
+
+        """
+        self.find_element(*self._country_selection_locator).send_keys(country)
 
 
 """ *********************************************************************** """
@@ -1255,7 +1493,3 @@ class SignupOld(AccountsBase):
             confirm = self.find_element(*self._get_email_confirmation_locator)
             Utility.click_option(self.driver, element=confirm)
             return self
-
-
-class EducatorSignup(SignupOld):
-    """The educator sign up process."""

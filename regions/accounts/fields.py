@@ -1,7 +1,11 @@
 """Shared Account sign up form fields."""
 
+from typing import Union
+
 from pypom import Region
 from selenium.webdriver.remote.webelement import WebElement
+
+from utils.utilities import Utility
 
 ERROR_SELECTOR = ' ~ .errors .invalid-message'
 
@@ -257,6 +261,70 @@ class Password(Region):
         return 'has-error' in self.password_field.get_attribute('class')
 
 
+class Phone(Region):
+    """A telephone form field.
+
+    .. note::
+       Must define ``_phone_locator`` and ``_phone_error_message_locator``
+
+    """
+
+    @property
+    def phone(self) -> str:
+        """Return the current value for the telephone field.
+
+        :return: the phone field content
+        :rtype: str
+
+        """
+        return self.phone_field.get_attribute('value')
+
+    @phone.setter
+    def phone(self, number: Union[int, str]):
+        """Set the pin field.
+
+        :param number: the user's telephone number
+        :type number: int or str
+        :return: None
+
+        """
+        Utility.click_option(self.driver, element=self.phone_field)
+        self.phone_field.send_keys(str(number))
+
+    @property
+    def phone_error(self) -> str:
+        """Return the error message for the telephone number field.
+
+        :return: the error message content for the telephone field, if found
+        :rtype: str
+
+        """
+        if self.phone_has_error:
+            return self.find_element(
+                *self._phone_error_message_locator).text
+        return ''
+
+    @property
+    def phone_field(self) -> WebElement:
+        """Return the telephone number field.
+
+        :return: the telephone number field
+        :rtype: :py:class:`~selenium.webdriver.remote.webelement.WebElement`
+
+        """
+        return self.find_element(*self._phone_locator)
+
+    @property
+    def phone_has_error(self) -> bool:
+        """Return True if there is an error on the telephone number field.
+
+        :return: ``True`` if an error exists under the telephone number field
+        :rtype: bool
+
+        """
+        return 'has-error' in self.phone_field.get_attribute('class')
+
+
 class Pin(Region):
     """A PIN form field.
 
@@ -313,7 +381,7 @@ class Pin(Region):
     def pin_has_error(self) -> bool:
         """Return True if there is an error on the pin field.
 
-        :return: ``True`` if an error exists under the first name field
+        :return: ``True`` if an error exists under the verification pin field
         :rtype: bool
 
         """
