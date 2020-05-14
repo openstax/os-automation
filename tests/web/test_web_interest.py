@@ -4,7 +4,7 @@ import pytest
 
 from pages.web.book import Book
 from pages.web.home import WebHome
-from pages.web.interest import Interest, InterestConfirmation
+from pages.web.interest import Interest
 from tests.markers import nondestructive, skip_test, smoke_test, test_case, web
 from utils.email import RestMail
 from utils.utilities import Utility
@@ -132,7 +132,7 @@ def test_non_students_may_fill_out_the_form(web_base_url, selenium):
     # AND:  click on the "Next" button
     # AND:  select zero or more technology options
     # AND:  click on the "Submit" button
-    confirmation = interest.submit_interest(
+    partners = interest.submit_interest(
         user_type=user_type,
         first=first_name,
         last=last_name,
@@ -146,11 +146,11 @@ def test_non_students_may_fill_out_the_form(web_base_url, selenium):
         tech_providers=tech_providers,
         other_provider=other)
 
-    # THEN: the interest confirmation page is displayed
-    assert(confirmation.is_displayed()), \
-        'Book interest confirmation page not displayed'
-    assert('confirmation' in confirmation.location), \
-        f'Not at the interest confirmation page ({confirmation.location})'
+    # THEN: the partners page is displayed
+    assert(partners.is_displayed()), \
+        'Partners page not displayed'
+    assert('partners' in partners.location), \
+        f'Not at the interest confirmation page ({partners.location})'
 
 
 @test_case('C210512')
@@ -365,17 +365,13 @@ def test_multiple_book_selection_generates_one_lead(web_base_url, selenium):
     # THEN: one interest lead is sent to Salesforce
 
 
+@skip_test(reason='Confirmation removed')
 @test_case('C210519')
 @web
 def test_post_form_submission_text_and_link(web_base_url, selenium):
     """Test the interest form confirmation page."""
     # GIVEN: a user viewing the interest confirmation page
-    confirmation = InterestConfirmation(selenium, web_base_url).open()
 
     # WHEN: they click on the "Back to the books" button
-    subjects = confirmation.back_to_books()
 
     # THEN: the subjects page is displayed
-    assert(subjects.is_displayed()), 'Subjects page not displayed'
-    assert('subjects' in subjects.location), \
-        f'Not at the subjects page ({subjects.location})'

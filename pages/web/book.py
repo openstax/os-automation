@@ -79,7 +79,7 @@ class ResourceTab(Region):
 class Accordion(Region):
     """A base region for phone-view expandable menus."""
 
-    _toggle_locator = (By.CSS_SELECTOR, '.control-bar')
+    _toggle_locator = (By.CSS_SELECTOR, '.accordion-button , .control-bar')
     _is_open_locator = (By.CSS_SELECTOR, '.content-pane')
 
     def toggle(self):
@@ -91,6 +91,8 @@ class Accordion(Region):
     @property
     def is_open(self):
         """Return True if the menu is open."""
+        print(self)
+        print(self.root.get_attribute('outerHTML'))
         return not self.driver.execute_script(
             'return arguments[0].hidden;',
             self.find_element(*self._is_open_locator))
@@ -562,14 +564,9 @@ class Book(WebBase):
         def view_webinars(self):
             """Click on the 'Find a webinar' link."""
             webinar = self.find_element(*self._webinar_link_locator)
-            article_href = webinar.get_attribute('href')
-            if not bool(article_href):
-                raise WebException(
-                    f'{self.page.title} is missing its webinar link')
-            article_url = article_href.split('/')[-1]
             Utility.click_option(self.driver, element=webinar)
-            from pages.web.blog import Article
-            return go_to_(Article(self.driver, article=article_url))
+            from pages.web.webinars import Webinars
+            return go_to_(Webinars(self.driver, base_url=self.page.base_url))
 
         @property
         def tech_options(self):
@@ -631,13 +628,13 @@ class Book(WebBase):
             By.CSS_SELECTOR, '.accordion-item:first-child')
         _toc_locator = (
             By.XPATH, ('//div[text()="Table of contents"]'
-                       '/ancestor::node()[2]'))
+                       '/ancestor::node()[3]'))
         _instructor_locator = (
             By.XPATH, ('//div[text()="Instructor resources"]'
-                       '/ancestor::node()[2]'))
+                       '/ancestor::node()[3]'))
         _student_locator = (
             By.XPATH, ('//div[text()="Student resources"]'
-                       '/ancestor::node()[2]'))
+                       '/ancestor::node()[3]'))
         _errata_locator = (
             By.CSS_SELECTOR, '.accordion-item:last-child')
 
@@ -1041,7 +1038,7 @@ class Resource(Region):
     """A resource box."""
 
     _title_locator = (By.CSS_SELECTOR, 'h3')
-    _description_locator = (By.CSS_SELECTOR, '[data-html=description]')
+    _description_locator = (By.CSS_SELECTOR, '.description')
     _status_message_locator = (By.CSS_SELECTOR, '.bottom .left')
     _is_locked_locator = (By.CSS_SELECTOR, '.fa-lock')
     _can_download_locator = (By.CSS_SELECTOR, '.fa-download')
@@ -1059,7 +1056,8 @@ class Resource(Region):
     @property
     def description(self):
         """Return the resource description."""
-        return self.find_element(*self._description_locator).text.strip()
+        return (self.find_element(*self._description_locator)
+                .get_attribute('textContent').strip())
 
     def select(self):
         """Click on the resource box."""
@@ -1440,7 +1438,7 @@ class BookOrder(Modal):
         @property
         def title(self):
             """Return the intended user type."""
-            return self.find_element(*self._title_locator).text.strip()
+            return self.find_element(*self._title_locator).text
 
         @property
         def description(self):
@@ -1467,10 +1465,11 @@ class BookOrder(Modal):
                 Utility.switch_to(self.driver, element=target)
                 from pages.amazon.home import Amazon
                 return go_to_(Amazon(self.driver))
-            elif self.title == 'Bookstore':
+            elif 'Bookstore' in self.title:
                 Utility.switch_to(self.driver, element=target)
                 from pages.web.bookstore_suppliers import Bookstore
                 return go_to_(Bookstore(self.driver))
+            raise WebException(f'unknown print copy provider {self.title}')
 
 
 class CompCopyRequest(Modal):

@@ -10,7 +10,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.remote.webelement import WebElement
 from selenium.webdriver.support import expected_conditions as expect
 
-from pages.accounts.signup import Signup as AccountSignup
+from pages.accounts.signup import StudentSignup as Signup
 from pages.tutor.base import TutorBase
 from pages.tutor.course import StudentCourse
 from utils.tutor import Tutor, TutorException
@@ -116,9 +116,10 @@ class PrivacyPolicy(Modal):
         :rtype: bool
 
         """
-        return ('Terms of Service'
-                in (self.find_element(*self._modal_content_locator)
-                    .get_attribute('textContent')))
+        content = (self.root.get_attribute('textContent'))
+        return ('Terms of Service' in content or
+                'Privacy Policy' in content or
+                'Terms of Use' in content)
 
     @property
     def heading(self) -> str:
@@ -172,7 +173,7 @@ class PrivacyPolicy(Modal):
         Utility.click_option(self.driver, element=button)
         sleep(1.25)
         course = StudentCourse(self.driver, base_url=self.page.base_url)
-        dialog_root = self.driver.execute_script(GET_ROOT.format('dialog'))
+        dialog_root = self.driver.execute_script(GET_ROOT.format('document'))
         if (dialog_root and
                 'pay-now-or-later' in dialog_root.get_attribute('class')):
             return BuyAccess(course, dialog_root)
@@ -789,7 +790,7 @@ class Enrollment(Page):
         return (self.find_element(*self._splash_content_locator)
                 .get_attribute('textContent'))
 
-    def get_started(self) -> Union[AccountSignup, Enrollment.StudentID]:
+    def get_started(self) -> Union[Signup, Enrollment.StudentID]:
         """Click on the 'Get Started' button to begin enrollment.
 
         :return: the account signup flow for new users or the student ID
@@ -802,7 +803,7 @@ class Enrollment(Page):
         Utility.click_option(self.driver, element=button)
         sleep(1)
         if 'accounts' in self.driver.current_url:
-            return AccountSignup(self.driver)
+            return Signup(self.driver)
         return StudentID(self.driver, base_url=self.base_url)
 
 
@@ -925,8 +926,8 @@ class Terms(TutorBase):
         :rtype: bool
 
         """
-        content = self.modal.heading.lower()
-        return 'terms' in content and 'privacy' in content
+        content = self.driver.page_source.lower()
+        return 'terms of use' in content and 'privacy' in content
 
     @property
     def modal(self) -> PrivacyPolicy:

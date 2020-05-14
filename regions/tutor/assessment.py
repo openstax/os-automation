@@ -556,11 +556,15 @@ class QuestionBase(Region):
         """Return the book chapter and section number for the associated step.
 
         :return: the book chapter and section number containing the question
-            explanation
+            explanation or default to chapter 1, section 1 if a number isn't
+            found
         :rtype: str
 
         """
-        return self.find_element(*self._book_section_number_locator).text
+        try:
+            return self.find_element(*self._book_section_number_locator).text
+        except NoSuchElementException:
+            return '1.1'
 
     @property
     def section_title(self) -> str:

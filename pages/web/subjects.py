@@ -49,8 +49,8 @@ class Subjects(WebBase):
         By.XPATH, category_xpath.format(subject=Web.VIEW_ESSENTIALS))
     _college_success_category_locator = (
         By.XPATH, category_xpath.format(subject=Web.VIEW_COLLEGE_SUCCESS))
-    _ap_category_locator = (
-        By.XPATH, category_xpath.format(subject=Web.VIEW_AP.replace('®', '')))
+    _high_school_category_locator = (
+        By.XPATH, category_xpath.format(subject=Web.VIEW_HIGH_SCHOOL))
     _book_locator = (By.CSS_SELECTOR, 'div.book-category:not(.hidden) .cover')
     _image_locators = (By.CSS_SELECTOR, _book_locator[1] + ' img')
 
@@ -158,10 +158,11 @@ class Subjects(WebBase):
         return self.Category(self, success_root)
 
     @property
-    def ap(self):
-        """Return the subjects filtered by the AP titles."""
-        ap_root = self.find_element(*self._ap_category_locator)
-        return self.Category(self, ap_root)
+    def high_school(self):
+        """Return the subjects filtered by high school course titles."""
+        high_school_root = self.find_element(
+            *self._high_school_category_locator)
+        return self.Category(self, high_school_root)
 
     @property
     def _active_books(self):
@@ -305,6 +306,7 @@ class Subjects(WebBase):
             Library.HAS_I_UNLOCK: self.unlocked_instructor,
             Library.HAS_S_LOCK: self.locked_student,
             Library.HAS_S_UNLOCK: self.unlocked_student,
+            Library.HIGH_SCHOOL: self.high_school,
             Library.HUMANITIES: self.humanities_books,
             Library.ITUNES: self.itunes_books,
             Library.KINDLE: self.kindle_books,

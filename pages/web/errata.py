@@ -131,7 +131,6 @@ class Errata(WebBase):
 
     def view_correction_schedule(self):
         """Mouse over the schedule and check that it shows."""
-        print('View correction schedule tooltip')
         result = (
             Actions(self.driver)
             .move_to_element(self.tooltip)
@@ -336,19 +335,11 @@ class ErrataForm(WebBase):
     URL_TEMPLATE = '/errata/form?book={book}'
 
     _form_locator = (By.CSS_SELECTOR, '.body-block')
-    _subject_locator = (By.CSS_SELECTOR, '.item')
+    _subject_locator = (By.CSS_SELECTOR, '.hero h1')
 
     @property
     def loaded(self):
         """Return True when an errata form and book title are found."""
-        sup = super().loaded
-        form = self.find_elements(*self._form_locator)
-        sub = self.find_elements(*self._subject_locator)
-        loc = 'errata/form' in self.location
-        print(f'Super: {sup} '
-              f'Form: {bool(form)} '
-              f'Subject: {bool(sub)} '
-              f'Location: {loc}')
         return (super().loaded and
                 bool(self.find_elements(*self._form_locator)) and
                 bool(self.find_elements(*self._subject_locator)) and

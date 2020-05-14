@@ -659,7 +659,7 @@ class Profile(AccountsBase):
             By.CSS_SELECTOR, '.title')
 
         _email_section_locator = (
-            By.XPATH, '//div[div[contains(text(),"Email addresses")]]')
+            By.XPATH, '//div[div[contains(text(),"Emails")]]')
         _enabled_providers_section_locator = (
             By.CSS_SELECTOR, '.row.enabled-providers')
         _name_section_locator = (

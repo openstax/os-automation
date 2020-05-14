@@ -10,8 +10,7 @@ from pages.accounts.profile import Profile
 from pages.web.book import Book
 from pages.web.errata import ErrataForm
 from pages.web.home import WebHome
-from tests.markers import (accounts, expected_failure, nondestructive,
-                           skip_if_headless, smoke_test, test_case, web)
+from tests.markers import accounts, nondestructive, skip_if_headless, skip_test, smoke_test, test_case, web  # NOQA
 from utils.accounts import Accounts
 from utils.email import RestMail
 from utils.utilities import Utility
@@ -407,7 +406,7 @@ def test_current_book_editions_have_an_errata_section(web_base_url, selenium):
 
 @test_case('C210362')
 @nondestructive
-@expected_failure(reason='No old editions currently available')
+@skip_test(reason='No old editions currently available')
 @web
 def test_an_old_version_does_not_have_errata(web_base_url, selenium):
     """Test that the current edition of a book has an errata section."""
@@ -483,7 +482,7 @@ def test_logged_in_users_may_view_the_errata_submission_form(
     # THEN: the errata form is displayed
     # AND:  the subject is prefilled in
     assert(errata_form.is_displayed())
-    assert(errata_form.subject == book_title)
+    assert(book_title in errata_form.subject)
 
     # WHEN: they return to the book details page
     # AND:  reduce the screen to 600 pixels
@@ -497,7 +496,7 @@ def test_logged_in_users_may_view_the_errata_submission_form(
     # THEN: the errata form is displayed
     # AND:  the subject is prefilled in
     assert(errata_form.is_displayed())
-    assert(errata_form.subject == book_title)
+    assert(book_title in errata_form.subject)
 
 
 @test_case('C210365')
@@ -532,7 +531,7 @@ def test_non_logged_in_users_are_directed_to_log_in_to_view_the_errata_form(
     # THEN: the errata form is displayed
     # AND:  the subject is prefilled in
     assert(errata_form.is_displayed()), 'Errata form not displayed'
-    assert(errata_form.subject == book_title), (
+    assert(book_title in errata_form.subject), (
         f'Errata form book ({errata_form.subject}) '
         f'does not match used book ({book_title})')
 
@@ -575,7 +574,7 @@ def test_non_logged_in_users_on_mobile_are_directed_to_log_in_for_errata_form(
     # THEN: the errata form is displayed
     # AND:  the subject is prefilled in
     assert(errata_form.is_displayed())
-    assert(errata_form.subject == book_title)
+    assert(book_title in errata_form.subject)
 
 
 @test_case('C210367')
@@ -620,15 +619,16 @@ def test_pending_instructors_see_access_pending_for_locked_resources(
     email.empty()
     address = email.address
     password = Utility.random_hex(17)
+    subjects = subject_list(2)
     accounts = AccountsHome(selenium, accounts_base_url).open()
     (accounts.content
         .view_sign_up().content
         .sign_up_as_an_educator()
-        .account_signup(
+        .account_sign_up(
             email=address, password=password, _type=Accounts.INSTRUCTOR,
             provider=Accounts.RESTMAIL, name=name, school='Automation',
             news=False, phone=Utility.random_phone(),
-            webpage='https://openstax.org/', subjects=subject_list(2),
+            webpage='https://openstax.org/', subjects=subjects,
             students=10, use=Accounts.ADOPTED))
     home = WebHome(selenium, web_base_url).open()
     subjects = home.web_nav.subjects.view_all()
@@ -840,7 +840,7 @@ def test_unverified_users_sent_to_faculty_verification_for_locked_resources(
         accounts.content
         .view_sign_up().content
         .sign_up_as_an_educator()
-        .account_signup(
+        .account_sign_up(
             email=address, password=password, _type=Accounts.INSTRUCTOR,
             provider=Accounts.RESTMAIL, name=name, school='Automation',
             news=False, phone=Utility.random_phone(),
@@ -908,8 +908,8 @@ def test_students_sign_up_to_access_locked_student_content(
         f'Not on an Accounts instance ({accounts.location})'
 
     # WHEN: they sign up
-    book = accounts.student_signup(name[1], name[2], password, email,
-                                   Book, web_base_url)
+    book = accounts.student_sign_up(name[1], name[2], password, email,
+                                    Book, web_base_url)
 
     # THEN: the student resources on the book details page is displayed
     # AND:  the resource is available for download
@@ -936,7 +936,7 @@ def test_users_may_see_the_upcoming_webinar_schedule(web_base_url, selenium):
 
     # THEN: the webinars blog post is displayed
     assert(webinar.is_displayed())
-    assert('webinars hosted by OpenStax' in selenium.page_source)
+    assert('Webinars' in selenium.page_source)
 
 
 @test_case('C210374')

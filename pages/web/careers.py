@@ -18,11 +18,9 @@ class Careers(WebBase):
 
     _banner_locator = (By.CSS_SELECTOR, 'h1')
     _careers_content_locator = (
-        By.CSS_SELECTOR, '#main [data-html=content] p:first-child')
-    _job_list_locator = (By.XPATH, '//div[@data-html="content"]/p[a]')
+        By.CSS_SELECTOR, '#maincontent')
+    _job_list_locator = (By.XPATH, '//*[@id="maincontent"]/div/p[a]')
     _job_title_locator = (By.CSS_SELECTOR, 'a')
-    _subheading_locator = (
-        By.CSS_SELECTOR, '[data-html=content] p:first-child')
 
     @property
     def loaded(self) -> bool:

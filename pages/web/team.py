@@ -151,8 +151,8 @@ class Team(WebBase):
         """A group bar for a phone view accordion menu."""
 
         _name_locator = (By.CSS_SELECTOR, '.label')
-        _toggle_locator = (By.CSS_SELECTOR, '.control-bar')
-        _open_status_locator = (By.CSS_SELECTOR, '.control-bar .chevron')
+        _toggle_locator = (By.CSS_SELECTOR, '.accordion-button , .control-bar')
+        _open_status_locator = (By.CSS_SELECTOR, '.chevron')
 
         @property
         def name(self):

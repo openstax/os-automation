@@ -14,12 +14,12 @@ from utils.utilities import Status, Utility
 def test_menu_select(accounts_base_url, selenium):
     """Basic start test."""
     page = Home(selenium, accounts_base_url).open()
-    selenium.get('https://accounts-qa.openstax.org/signup')
+    selenium.get(f'{accounts_base_url}/signup?bpff=9')
     assert(page)
-    select = Utility.select(selenium, (By.ID, 'signup_role'), 'Student')
-    assert(select.first_selected_option.text == 'Student')
+    select = Utility.select(selenium, (By.ID, 'signup_role'), 'Instructor')
+    assert(select.first_selected_option.text == 'Instructor')
     assert(Utility.selected_option(selenium, (By.ID, 'signup_role')) ==
-           'Student')
+           'Instructor')
 
 
 @test_case('C195540')

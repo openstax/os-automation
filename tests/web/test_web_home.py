@@ -4,7 +4,7 @@ from pages.accounts.admin.users import Search
 from pages.accounts.home import AccountsHome
 from pages.accounts.signup import SignupOld
 from pages.web.home import WebHome as Home
-from tests.markers import accounts, expected_failure, nondestructive, smoke_test, test_case, web  # NOQA
+from tests.markers import accounts, expected_failure, nondestructive, skip_test, smoke_test, test_case, web  # NOQA
 from utils.accounts import Accounts
 from utils.email import RestMail
 from utils.utilities import Utility
@@ -29,7 +29,7 @@ def test_the_website_loads(web_base_url, selenium):
 
 
 @test_case('C210297')
-@expected_failure(reason='Sticky note may or may not be active')
+@skip_test(reason='Sticky note may or may not be active')
 @web
 def test_the_donation_banner_is_displayed(web_base_url, selenium):
     """Test if the donation banner is shown to new visitors."""
@@ -155,8 +155,6 @@ def test_mobile_menu_navigation(web_base_url, selenium):
         'Subjests::Business not displayed'
     assert(home.web_nav.subjects.essentials.is_displayed()), \
         'Subjests::Essentials not displayed'
-    assert(home.web_nav.subjects.ap.is_displayed()), \
-        'Subjests::AP® not displayed'
 
     # WHEN: they click on the "Back" link
     home.web_nav.back()
@@ -567,12 +565,13 @@ def test_able_to_view_subjects_using_the_nav_menu(web_base_url, selenium):
                   all_subjects.business,
                   all_subjects.essentials,
                   all_subjects.college_success,
-                  all_subjects.ap]
+                  all_subjects.high_school]
 
     # THEN: the subjects webpage is displayed
     # AND:  the "View All" filter button is grayed (active)
     # AND:  all subject areas are displayed ("Math", "Science", "Social
-    #       Sciences", "Humanities", "Business", and "AP®")
+    #       Sciences", "Humanities", "Business", "Essentials", "College
+    #       Success", and "High School")
     assert(all_subjects.is_displayed()), \
         f'Subjects page not displayed; ended at: {all_subjects.location}'
 
@@ -608,12 +607,13 @@ def test_able_to_view_subjects_using_the_nav_menu(web_base_url, selenium):
                   all_subjects.business,
                   all_subjects.essentials,
                   all_subjects.college_success,
-                  all_subjects.ap]
+                  all_subjects.high_school]
 
     # THEN: the subjects webpage is displayed
     # AND:  the "View All" filter button is grayed (active)
     # AND:  all subject areas are displayed ("Math", "Science", "Social
-    #       Sciences", "Humanities", "Business", and "AP®")
+    #       Sciences", "Humanities", "Business", and "Essentials", "College
+    #       Success", and "High School")
     assert(all_subjects.is_displayed()), \
         f'Subjects page not displayed; ended at: {all_subjects.location}'
 
@@ -652,7 +652,7 @@ def test_subject_menu_options_load_filtered_views(web_base_url, selenium):
                 home.web_nav.subjects.view_business,
                 home.web_nav.subjects.view_essentials,
                 home.web_nav.subjects.view_college_success,
-                home.web_nav.subjects.view_ap
+                home.web_nav.subjects.view_high_school
             ]
             if device == 'mobile' and not home.web_nav.meta.is_open:
                 home.web_nav.meta.toggle_menu()
@@ -666,7 +666,7 @@ def test_subject_menu_options_load_filtered_views(web_base_url, selenium):
                 subject.business,
                 subject.essentials,
                 subject.college_success,
-                subject.ap
+                subject.high_school
             ]
 
             # THEN: the subject's webpage is displayed

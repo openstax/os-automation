@@ -57,7 +57,7 @@ class Menu(Region):
 class TutorNav(Region):
     """Tutor nav bar region for logged in users."""
 
-    _root_locator = (By.CSS_SELECTOR, '.tutor-top-navbar')
+    _root_locator = (By.CSS_SELECTOR, '.tutor-navbar')
 
     # Main buttons on the nav
     _openstax_logo_locator = (By.CSS_SELECTOR, '.ui-brand-logo')

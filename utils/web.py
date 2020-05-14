@@ -227,10 +227,10 @@ class Web(object):
 
     # Menus
     VIEW_ALL = 'All'
-    VIEW_AP = 'AP®'
     VIEW_BUSINESS = 'Business'
     VIEW_COLLEGE_SUCCESS = 'College Success'
     VIEW_ESSENTIALS = 'Essentials'
+    VIEW_HIGH_SCHOOL = 'High School'
     VIEW_HUMANITIES = 'Humanities'
     VIEW_MATH = 'Math'
     VIEW_SCIENCE = 'Science'
@@ -359,7 +359,7 @@ class Web(object):
         'business',
         'essentials',
         'college-success',
-        'ap'
+        'high-school'
     ]
     FILTERS = [
         VIEW_MATH,
@@ -369,7 +369,7 @@ class Web(object):
         VIEW_BUSINESS,
         VIEW_ESSENTIALS,
         VIEW_COLLEGE_SUCCESS,
-        VIEW_AP
+        VIEW_HIGH_SCHOOL
     ]
     MENU_SUBJECTS = [
         VIEW_ALL,
@@ -541,12 +541,6 @@ class TechProviders():
 class Library():
     """OpenStax book library."""
 
-    # AP®
-    # AP_BIO (Science)
-    # AP_PHYS (Science)
-    # AP_MACRO (Social Sciences)
-    # AP_MICRO (Social Sciences)
-
     # Business
     ACCOUNTING_1 = 'Principles of Accounting, Volume 1: Financial Accounting'
     ACCOUNTING_1_ALT = 'Financial Accounting'
@@ -567,6 +561,14 @@ class Library():
     # Essentials
     # BUS_LAW_1 (Business)
 
+    # High School
+    # AP_BIO (Science)
+    # AP_PHYS (Science)
+    # AP_MACRO (Social Sciences)
+    # AP_MICRO (Social Sciences)
+    HS_STATISTICS = 'Statistics High School'
+    HS_PHYS = 'Physics'
+
     # Humanities
     US_HISTORY = 'U.S. History'
 
@@ -578,6 +580,7 @@ class Library():
     CALCULUS_2 = 'Calculus Volume 2'
     CALCULUS_3 = 'Calculus Volume 3'
     ELEM_ALGEBRA = 'Elementary Algebra'
+    # HS_STATISTICS (High School)
     INTER_ALGEBRA = 'Intermediate Algebra'
     INTRO_STATS = 'Introductory Statistics'
     PREALGEBRA = 'Prealgebra'
@@ -600,6 +603,7 @@ class Library():
     FIZYKA_1 = 'Fizyka dla szkół wyższych. Tom 1'
     FIZYKA_2 = 'Fizyka dla szkół wyższych. Tom 2'
     FIZYKA_3 = 'Fizyka dla szkół wyższych. Tom 3'
+    # HS_PHYS (High School)
     MICROBIOLOGY = 'Microbiology'
     PHYSICS = 'College Physics'
     U_PHYS_1 = 'University Physics Volume 1'
@@ -634,6 +638,7 @@ class Library():
     HAS_S_UNLOCK = 'student_unlocked'
     INTEREST = ADOPTION
     IS_AP = 'is_ap?'
+    IS_HIGH_SCHOOL = 'is_high_school?'
     ITUNES = 'itunes'
     KINDLE = 'kindle'
     LANGUAGE = 'language'
@@ -651,6 +656,7 @@ class Library():
     BUSINESS = 'Business'
     COLLEGE_SUCESS = 'College Success'
     ESSENTIALS = 'Essentials'
+    HIGH_SCHOOL = 'High School'
     HUMANITIES = 'Humanities'
     MATH = 'Math'
     SCIENCE = 'Science'
@@ -858,6 +864,46 @@ class Library():
 
             # Essentials
             #     currently, only Busness Law I is in Essentials
+
+            # High School
+            self.HS_PHYS: {
+                self.BOOKSHARE: False,
+                self.CATEGORY: [self.ALL],
+                self.CHEGG: False,
+                self.COMP_COPY: False,
+                self.DETAILS: 'physics',
+                self.HAS_I_LOCK: False,
+                self.HAS_I_UNLOCK: False,
+                self.HAS_S_LOCK: False,
+                self.HAS_S_UNLOCK: False,
+                self.INTEREST: 'HS%20Physics',
+                self.IS_AP: False,
+                self.ITUNES: False,
+                self.KINDLE: False,
+                self.LANGUAGE: self.ENGLISH,
+                self.PRE_RELEASE: False,
+                self.PRINT_COPY: False,
+                self.SHORT_NAME: 'Physics',
+                self.VIDEOS: False, },
+            self.HS_STATISTICS: {
+                self.BOOKSHARE: False,
+                self.CATEGORY: [self.ALL],
+                self.CHEGG: False,
+                self.COMP_COPY: False,
+                self.DETAILS: 'statistics',
+                self.HAS_I_LOCK: False,
+                self.HAS_I_UNLOCK: False,
+                self.HAS_S_LOCK: False,
+                self.HAS_S_UNLOCK: False,
+                self.INTEREST: 'HS%20Statistics',
+                self.IS_AP: False,
+                self.ITUNES: False,
+                self.KINDLE: False,
+                self.LANGUAGE: self.ENGLISH,
+                self.PRE_RELEASE: False,
+                self.PRINT_COPY: False,
+                self.SHORT_NAME: 'HS Statistics',
+                self.VIDEOS: False, },
 
             # Humanities
             self.US_HISTORY: {

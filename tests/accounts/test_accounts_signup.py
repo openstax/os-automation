@@ -67,6 +67,7 @@ def test_sign_up_as_a_student_user(accounts_base_url, selenium):
 def test_sign_up_as_an_instructor(accounts_base_url, selenium):
     """Test non-student user signup."""
     # SETUP:
+    from pages.accounts.profile import Profile as profile
     name = Utility.random_name()
     email = RestMail((f'{name[Accounts.FIRST]}.{name[Accounts.LAST]}.'
                       f'{Utility.random_hex(4)}').lower())
@@ -96,21 +97,15 @@ def test_sign_up_as_an_instructor(accounts_base_url, selenium):
 
     educator = sign_up.content.sign_up_as_an_educator()
 
-    profile = educator.account_signup(
-        email=address,
+    profile = educator.sign_up(
+        first=name[1],
+        last=name[2],
+        email=email,
         password=password,
-        _type=Accounts.INSTRUCTOR,
-        role=Accounts.INSTRUCTOR,
-        provider=Accounts.RESTMAIL,
-        name=name,
-        school='Automation',
-        news=False,
         phone=Utility.random_phone(),
-        webpage='https://openstax.org/',
-        subjects=subject_list(2),
-        students=10,
-        use=Accounts.ADOPTED,
-        access_notice=True)
+        school='Automation',
+        page=profile,
+        base_url=accounts_base_url)
 
     # THEN: their new account profile is displayed
     full_name = profile.content.name.full_name
@@ -130,6 +125,7 @@ def test_sign_up_as_an_instructor(accounts_base_url, selenium):
 def test_sign_up_as_a_nonstudent_user(accounts_base_url, selenium):
     """Test non-student user signup."""
     # SETUP:
+    from pages.accounts.profile import Profile as profile
     name = Utility.random_name()
     email = RestMail((f'{name[Accounts.FIRST]}.{name[Accounts.LAST]}.'
                       f'{Utility.random_hex(5)}').lower())
@@ -159,19 +155,15 @@ def test_sign_up_as_a_nonstudent_user(accounts_base_url, selenium):
 
     educator = sign_up.content.sign_up_as_an_educator()
 
-    profile = educator.account_signup(
-        email=address,
+    profile = educator.sign_up(
+        first=name[1],
+        last=name[2],
+        email=email,
         password=password,
-        _type=Accounts.OTHER,
-        role=Accounts.OTHER,
-        provider=Accounts.RESTMAIL,
-        name=name,
-        school='Automation',
-        news=False,
         phone=Utility.random_phone(),
-        webpage='https://openstax.org/',
-        subjects=subject_list(3),
-        access_notice=False)
+        school='Automation',
+        page=profile,
+        base_url=accounts_base_url)
 
     # THEN: their new account profile is displayed
     full_name = profile.content.name.full_name

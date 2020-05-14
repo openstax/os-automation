@@ -25,7 +25,7 @@ def test_open_the_accounts_home_page(accounts_base_url, selenium):
     assert(home.menu.root.is_displayed()), 'Accounts header is not shown'
     assert(home.footer.root.is_displayed()), 'Accounts footer is not shown'
 
-    # WHEN: they click the OpenStax log
+    # WHEN: they click the OpenStax logo
     web = home.menu.go_home()
 
     # THEN: the OpenStax.org web page is loaded

@@ -138,8 +138,8 @@ class Research(WebBase):
         """A group bar for a phone view accordion menu."""
 
         _name_locator = (By.CSS_SELECTOR, '.label')
-        _toggle_locator = (By.CSS_SELECTOR, '.control-bar')
-        _open_status_locator = (By.CSS_SELECTOR, '.control-bar .chevron')
+        _toggle_locator = (By.CSS_SELECTOR, '.accordion-button')
+        _open_status_locator = (By.CSS_SELECTOR, '.accordion-button .chevron')
 
         @property
         def name(self):

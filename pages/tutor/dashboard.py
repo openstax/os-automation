@@ -29,6 +29,18 @@ class Dashboard(TutorBase):
     _tooltip_locator = (By.CSS_SELECTOR, '.joyride-tooltip')
 
     @property
+    def loaded(self) -> bool:
+        """Return True when the Tutor app root element is found.
+
+        :return: ``True`` when the application root is found
+        :rtype: bool
+
+        """
+        script = (r'document.addEventListener("load", function(event) {});')
+        return (self.driver.execute_script(script) or
+                bool(self.find_element(*self._root_locator)))
+
+    @property
     def nav(self):
         """Access the nav region.
 

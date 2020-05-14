@@ -1,7 +1,5 @@
 """Tutor Home page objects."""
 
-from time import sleep
-
 from selenium.common.exceptions import NoSuchElementException
 from selenium.webdriver.common.by import By
 
@@ -89,13 +87,9 @@ class TutorHome(TutorLoginBase):
         :rtype: :py:class:`~pages.tutor.dashboard.Dashboard`
 
         """
-        accounts = self.go_to_log_in()
-        accounts.service_log_in(username, password)
-        self.wait.until(lambda _: self.logged_in)
-        if Utility.is_browser(self.driver, 'safari'):
-            sleep(2.0)
         from pages.tutor.dashboard import Dashboard
-        return go_to_(Dashboard(self.driver, self.base_url))
+        accounts = self.go_to_log_in()
+        return accounts.log_in(username, password, Dashboard, self.base_url)
 
     @property
     def logged_in(self):

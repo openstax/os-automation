@@ -217,6 +217,8 @@ class WebNav(Region):
             By.CSS_SELECTOR, '[href$=college-success]')
         _essentials_option_locator = (
             By.CSS_SELECTOR, '[href$=essentials]')
+        _high_school_option_locator = (
+            By.CSS_SELECTOR, '[href$=high-school]')
         _humanities_option_locator = (
             By.CSS_SELECTOR, '[href$=humanities]')
         _math_option_locator = (
@@ -235,10 +237,10 @@ class WebNav(Region):
             sleep(0.5)
             subjects = {
                 Web.VIEW_ALL: self._all_option_locator[1],
-                Web.VIEW_AP: self._ap_option_locator[1],
                 Web.VIEW_BUSINESS: self._business_option_locator[1],
                 Web.VIEW_COLLEGE_SUCCESS: self._college_success_option_locator[1],  # NOQA
                 Web.VIEW_ESSENTIALS: self._essentials_option_locator[1],
+                Web.VIEW_HIGH_SCHOOL: self._high_school_option_locator[1],
                 Web.VIEW_HUMANITIES: self._humanities_option_locator[1],
                 Web.VIEW_MATH: self._math_option_locator[1],
                 Web.VIEW_SCIENCE: self._science_option_locator[1],
@@ -347,15 +349,15 @@ class WebNav(Region):
                 Subjects)
 
         @property
-        def ap(self):
-            """Return the AP subjects link."""
+        def high_school(self):
+            """Return the high school subjects link."""
             return self.find_element(*self._ap_option_locator)
 
-        def view_ap(self):
-            """View all AP books."""
+        def view_high_school(self):
+            """View all high school books."""
             from pages.web.subjects import Subjects
             return self.open()._selection_helper(
-                self._ap_option_locator,
+                self._high_school_option_locator,
                 Subjects)
 
     class Technology(WebNavMenu):
