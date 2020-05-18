@@ -66,7 +66,7 @@ jobs:
           name: run tests for accounts
           command: |
             . .venv/bin/activate
-            pytest -vvv --driver chrome --systems accounts --instance unique --strip-flake --skip-social --reruns 1 --circleci-parallelize --html report.html --self-contained-html --junitxml=/tmp/test-reports/junit.xml
+            pytest -vvv --driver chrome --systems accounts --strip-flake --skip-social --reruns 1 --circleci-parallelize --html report.html --self-contained-html --junitxml=/tmp/test-reports/junit.xml
       - store_artifacts:
           path: /tmp/test-reports/junit.xml
           destination: test-reports
