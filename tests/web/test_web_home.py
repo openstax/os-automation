@@ -1290,27 +1290,15 @@ def test_the_home_page_education_section(web_base_url, selenium):
     home = Home(selenium, web_base_url).open()
 
     # WHEN: they scroll to the education section
-    # AND:  click the "Books" pane
+    # AND:  click the "See our books" button
     home.education.show()
 
-    subjects = home.education.links[Web.BOOKS].click()
+    subjects = home.education.see_our_books()
 
     # THEN: the book subjects page is displayed
     assert(subjects.is_displayed()), 'Subjects page not displayed'
     assert('subjects' in subjects.location), \
         f'Not viewing the subjects page: {subjects.location}'
-
-    # WHEN: the user opens the Web home page
-    # AND:  click the "Technology" pane
-    home.open()
-
-    home.education.show()
-    technology = home.education.links[Web.TECH].click()
-
-    # THEN: the partners page is displayed
-    assert(technology.is_displayed()), 'Tech partners page not displayed'
-    assert('partners' in technology.location), \
-        f'Not viewing the tech partners page: {technology.location}'
 
 
 @test_case('C210329')

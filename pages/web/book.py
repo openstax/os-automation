@@ -1459,6 +1459,7 @@ class BookOrder(Modal):
                 target = self.root
             else:
                 target = self.find_element(*self._non_root_link_locator)
+            print(f'"{self.title}"')
             if 'Individual' in self.title:
                 if url:
                     return target.get_attribute('href')
