@@ -16,8 +16,7 @@ from selenium.common.exceptions import (  # NOQA
     NoSuchElementException,  # NOQA
     StaleElementReferenceException,  # NOQA
     TimeoutException,  # NOQA
-    WebDriverException  # NOQA
-)  # NOQA
+    WebDriverException)  # NOQA
 from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.remote.webelement import WebElement
@@ -62,8 +61,7 @@ STATE_PROV = [
     ('NF', 'Newfoundland'), ('NT', 'Northwest Territories'),
     ('NS', 'Nova Scotia'), ('ON', 'Ontario'), ('PE', 'Prince Edward Island'),
     ('PQ', 'Province du Quebec'), ('SK', 'Saskatchewan'),
-    ('YT', 'Yukon Territory')
-]
+    ('YT', 'Yukon Territory')]
 
 Name = Tuple[str, str, str, str]
 

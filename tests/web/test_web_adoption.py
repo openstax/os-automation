@@ -146,9 +146,9 @@ def test_non_student_users_submit_the_adoption_form(web_base_url, selenium):
         tech_providers=tech_providers,
         other_provider=other)
 
-    # THEN: the book details instructor resources page is displayed
+    # THEN: the book's instructor resources page is displayed
     assert(book.is_displayed())
-    assert('details/books' in book.location)
+    assert('books' in book.location)
 
 
 @test_case('C210389')

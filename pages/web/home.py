@@ -199,6 +199,9 @@ class WebHome(WebBase):
                     from pages.web.se_app import StudyEdge as Destination
                 elif destination.endswith(Web.GLOBAL_REACH):
                     from pages.web.reach import GlobalReach as Destination
+                elif destination.endswith(Web.ONLINE_RESOURCES):
+                    from pages.web.online_resources \
+                        import OnlineResources as Destination
                 else:
                     raise WebException(
                         'Unknown destination: {0}'

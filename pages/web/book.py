@@ -266,8 +266,8 @@ class Book(WebBase):
             By.CSS_SELECTOR, '[href*=amazon] , [href*="/a.co/"]')
         _chegg_view_locator = (By.CSS_SELECTOR, '[href*=chegg]')
         _view_more_options_locator = (By.CSS_SELECTOR, '.sidebar [href="."]')
-        _interest_locator = (By.CSS_SELECTOR, '[href*=interest]')
-        _adoption_locator = (By.CSS_SELECTOR, '[href*=adoption]')
+        _interest_locator = (By.CSS_SELECTOR, '[href*="/interest"]')
+        _adoption_locator = (By.CSS_SELECTOR, '[href*="/adoption"]')
 
         @property
         def options(self):
