@@ -1170,18 +1170,51 @@ def test_switch_panels_in_banner_carousel(web_base_url, selenium):
 def test_carousel_banners_link_to_other_pages(web_base_url, selenium):
     """Test clicking on each banner in the carousel."""
     # SETUP:
-    carousel = ['global-reach', 'download-openstax-se-app']
+    carousel = ['subjects',
+                'online-resources',
+                'global-reach',
+                'download-openstax-se-app']
 
     # GIVEN: a user viewing the Web home page
     home = Home(selenium, web_base_url).open()
 
     # WHEN: they click on the initial banner
-    global_reach = home.carousel.banners[Web.F_INTERACTIVE_MAP].click()
+    subjects = home.carousel.banners[0].click()
+
+    # THEN: the subjects page is displayed
+    assert(subjects.is_displayed()), 'Subjects page not displayed'
+    assert(subjects.url == carousel[0]), (
+        f'Expected {carousel[0]}, '
+        f'ended at: {subjects.url}')
+
+    # WHEN: they return to the home page
+    # AND:  select the second banner
+    # AND:  click on the banner
+    home.open()
+
+    home.carousel.dots[1].click()
+
+    resources = home.carousel.banners[1].click()
+
+    # THEN: the OpenStax Covid-19 resources page is displayed
+    assert(resources.is_displayed()), 'Resources page not displayed'
+    assert(resources.url == carousel[1]), (
+        f'Expected: {carousel[1]}, '
+        f'ended at: {resources.url}')
+
+    # WHEN: they return to the home page
+    # AND:  select the second banner
+    # AND:  click on the banner
+    home.open()
+
+    home.carousel.dots[2].click()
+
+    global_reach = home.carousel.banners[2].click()
 
     # THEN: the interactive map page is displayed
     assert(global_reach.is_displayed()), 'Global reach page not displayed'
-    assert(global_reach.url == carousel[Web.F_INTERACTIVE_MAP]), (
-        f'Expected {carousel[Web.F_INTERACTIVE_MAP]}, '
+    assert(global_reach.url == carousel[2]), (
+        f'Expected {carousel[2]}, '
         f'ended at: {global_reach.url}')
 
     # WHEN: they return to the home page
@@ -1198,23 +1231,6 @@ def test_carousel_banners_link_to_other_pages(web_base_url, selenium):
     assert(new_app.url == carousel[Web.F_NEW_APP]), (
         f'Expected: {carousel[Web.F_NEW_APP]}, '
         f'ended at: {new_app.url}')
-
-    # WHEN: they return to the home page
-    # AND:  select the third banner
-    # AND:  click on the banner
-    '''
-    # Third banner removed
-    home.open()
-
-    home.carousel.dots[Web.FREE_BOOKS_NO_CATCH].click()
-
-    nonprofit = home.carousel.banners[Web.FREE_BOOKS_NO_CATCH].click()
-
-    # THEN: the subjects page is displayed
-    assert(nonprofit.is_displayed()), 'Subjects page not displayed'
-    assert(nonprofit.url == carousel[Web.FREE_BOOKS_NO_CATCH]), (
-        f'Expected: {carousel[Web.FREE_BOOKS_NO_CATCH]}, '
-        f'ended at: {nonprofit.url}')'''
 
 
 @test_case('C210327')
@@ -1290,27 +1306,15 @@ def test_the_home_page_education_section(web_base_url, selenium):
     home = Home(selenium, web_base_url).open()
 
     # WHEN: they scroll to the education section
-    # AND:  click the "Books" pane
+    # AND:  click the "See our books" button
     home.education.show()
 
-    subjects = home.education.links[Web.BOOKS].click()
+    subjects = home.education.see_our_books()
 
     # THEN: the book subjects page is displayed
     assert(subjects.is_displayed()), 'Subjects page not displayed'
     assert('subjects' in subjects.location), \
         f'Not viewing the subjects page: {subjects.location}'
-
-    # WHEN: the user opens the Web home page
-    # AND:  click the "Technology" pane
-    home.open()
-
-    home.education.show()
-    technology = home.education.links[Web.TECH].click()
-
-    # THEN: the partners page is displayed
-    assert(technology.is_displayed()), 'Tech partners page not displayed'
-    assert('partners' in technology.location), \
-        f'Not viewing the tech partners page: {technology.location}'
 
 
 @test_case('C210329')

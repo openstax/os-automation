@@ -187,7 +187,7 @@ def test_mobile_links_to_purchase_a_print_copy(web_base_url, selenium):
     # WHEN: they click on the "Order a print copy" link
     # AND:  click on the "Order on Amazon" button
     book_order = book.phone.view_book_order_options()
-    amazon = book_order.boxes[Web.INDIVIDUAL].select(True)
+    amazon = book_order.boxes[Web.INDIVIDUAL].select()
 
     # THEN: the book order page on Amazon is verified
     assert(Utility.test_url_and_warn(
@@ -908,8 +908,8 @@ def test_students_sign_up_to_access_locked_student_content(
         f'Not on an Accounts instance ({accounts.location})'
 
     # WHEN: they sign up
-    book = accounts.student_sign_up(name[1], name[2], password, email,
-                                    Book, web_base_url)
+    book = accounts.student_signup(name[1], name[2], password, email,
+                                   Book, web_base_url)
 
     # THEN: the student resources on the book details page is displayed
     # AND:  the resource is available for download

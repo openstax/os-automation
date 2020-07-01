@@ -199,6 +199,9 @@ class WebHome(WebBase):
                     from pages.web.se_app import StudyEdge as Destination
                 elif destination.endswith(Web.GLOBAL_REACH):
                     from pages.web.reach import GlobalReach as Destination
+                elif destination.endswith(Web.ONLINE_RESOURCES):
+                    from pages.web.online_resources \
+                        import OnlineResources as Destination
                 else:
                     raise WebException(
                         'Unknown destination: {0}'
@@ -376,7 +379,7 @@ class WebHome(WebBase):
         _square_two_locator = (By.CLASS_NAME, 'square-2')
         _quote_locator = (By.CLASS_NAME, 'quote')
         _student_locator = (By.CLASS_NAME, 'student')
-        _link_locator = (By.CSS_SELECTOR, '.links li')
+        _link_locator = (By.CSS_SELECTOR, '.quote a')
 
         @property
         def box_one(self):
@@ -398,11 +401,12 @@ class WebHome(WebBase):
             """Return the student image element."""
             return self.find_element(*self._student_locator)
 
-        @property
-        def links(self):
-            """Access the educational links."""
-            return [Link(self, el)
-                    for el in self.find_elements(*self._link_locator)]
+        def see_our_books(self):
+            """Access the educational books button."""
+            button = self.find_element(*self._link_locator)
+            Utility.click_option(self.driver, element=button)
+            from pages.web.subjects import Subjects
+            return go_to_(Subjects(self.driver, base_url=self.page.base_url))
 
         def show(self):
             """Scroll the section into view."""

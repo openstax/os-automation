@@ -285,7 +285,9 @@ class Subjects(WebBase):
         :rtype: :py:class:`~pages.web.book.Book`
 
         """
-        append = Library().get(book_title, field=Library.DETAILS)
+        field = Library.SHORT_NAME if 'calculus' in book_title \
+            else Library.DETAILS
+        append = Library().get(book_title, field=field)
         selector = '[href$="{book_details}"]'.format(book_details=append)
         book = self.find_element(By.CSS_SELECTOR, selector)
         Utility.click_option(self.driver, element=book)
