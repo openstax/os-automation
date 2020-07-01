@@ -187,9 +187,6 @@ def test_mobile_links_to_purchase_a_print_copy(web_base_url, selenium):
     # WHEN: they click on the "Order a print copy" link
     # AND:  click on the "Order on Amazon" button
     book_order = book.phone.view_book_order_options()
-    print(f'{len(book_order.boxes)}')
-    for box in book_order.boxes:
-        print(box.title)
     amazon = book_order.boxes[Web.INDIVIDUAL].select()
 
     # THEN: the book order page on Amazon is verified
