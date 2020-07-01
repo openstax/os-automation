@@ -12,13 +12,14 @@ from autochomsky import chomsky
 from pages.tutor.enrollment import Enrollment, Terms
 from pages.tutor.home import TutorHome
 from pages.tutor.task import Homework
-from tests.markers import nondestructive, test_case, tutor
+from tests.markers import nondestructive, skip_test, test_case, tutor
 from utils import bookterm
 from utils.email import RestMail
 from utils.tutor import States, Tutor
 from utils.utilities import Actions, Card, Utility
 
 
+@skip_test(reason='WRM')
 @test_case('C485035')
 @tutor
 def test_create_and_clone_a_course(tutor_base_url, selenium, teacher):
@@ -124,6 +125,7 @@ def test_create_and_clone_a_course(tutor_base_url, selenium, teacher):
                           in calendar.sidebar.copied_assignments])
 
 
+@skip_test(reason='WRM')
 @test_case('C485036')
 @tutor
 def test_edit_course_settings_and_manage_course_students(
@@ -318,6 +320,7 @@ def test_edit_course_settings_and_manage_course_students(
         f"{student_name} ({student_id}) not found in the active students list"
 
 
+@skip_test(reason='WRM')
 @test_case('C485037')
 @tutor
 def test_course_registration_and_initial_assignment_creation_timing(
@@ -429,6 +432,7 @@ def test_course_registration_and_initial_assignment_creation_timing(
         f'Not all assignments found: {new_assignments}'
 
 
+@skip_test(reason='WRM')
 @test_case('C485038')
 @tutor
 def test_assignment_creation_readings(tutor_base_url, selenium, store):
@@ -544,6 +548,7 @@ def test_assignment_creation_readings(tutor_base_url, selenium, store):
         f'({tomorrow.strftime("%m/%d/%Y")})')
 
 
+@skip_test(reason='WRM')
 @test_case('C485049')
 @tutor
 def test_assignment_creation_homework(tutor_base_url, selenium, store):
@@ -660,6 +665,7 @@ def test_assignment_creation_homework(tutor_base_url, selenium, store):
         f'"{assignment_name}" is still a draft assignment'
 
 
+@skip_test(reason='WRM')
 @test_case('C485050')
 @tutor
 def test_assignment_creation_external(tutor_base_url, selenium, store):
@@ -757,6 +763,7 @@ def test_assignment_creation_external(tutor_base_url, selenium, store):
         f'"{assignment_name}" still on the calendar'
 
 
+@skip_test(reason='WRM')
 @test_case('C485051')
 @tutor
 def test_assignment_creation_event(tutor_base_url, selenium, store):
@@ -823,6 +830,7 @@ def test_assignment_creation_event(tutor_base_url, selenium, store):
         f'({two_days_from_today.strftime("%m/%d/%Y")})')
 
 
+@skip_test(reason='WRM')
 @test_case('C485039')
 @tutor
 def test_student_task_reading_assignment(tutor_base_url, selenium, store):
@@ -1056,6 +1064,7 @@ def test_student_task_reading_assignment(tutor_base_url, selenium, store):
         f'"{finished_assignment.progress}"')
 
 
+@skip_test(reason='WRM')
 @test_case('C485040')
 @tutor
 def test_student_task_homework_assignment(tutor_base_url, selenium, store):
@@ -1192,6 +1201,7 @@ def test_student_task_homework_assignment(tutor_base_url, selenium, store):
         f'"{progress}"')
 
 
+@skip_test(reason='WRM')
 @test_case('C485041')
 @tutor
 def test_student_task_practice(tutor_base_url, selenium, store):
@@ -1317,6 +1327,7 @@ def valid_score(score: Union[str, int]) -> bool:
             (isinstance(score, int) and score >= 0 and score <= 100))
 
 
+@skip_test(reason='WRM')
 @test_case('C485042')
 @tutor
 def test_teacher_viewing_student_scores(tutor_base_url, selenium, store):
@@ -1489,6 +1500,7 @@ def test_teacher_viewing_student_scores(tutor_base_url, selenium, store):
     assert(scores.toast_seen), 'Export toast message not seen'
 
 
+@skip_test(reason='WRM')
 @test_case('C485043')
 @nondestructive
 @tutor
@@ -1556,6 +1568,7 @@ def test_student_viewing_student_scores(tutor_base_url, selenium, store):
     assert(not weights.is_displayed()), 'Weights are still visible'
 
 
+@skip_test(reason='WRM')
 @test_case('C485044')
 @nondestructive
 @tutor
@@ -1617,6 +1630,7 @@ def test_teacher_viewing_the_course_performance_forecast(
             assert(section.count)
 
 
+@skip_test(reason='WRM')
 @test_case('C485045')
 @tutor
 def test_student_viewing_their_performance_forecast(

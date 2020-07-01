@@ -301,25 +301,14 @@ def pytest_collection_modifyitems(config, items):
                 deselected.append(item)
                 continue
         if run_systems:
-            if 'accounts' not in run_systems and 'accounts' in item.keywords:
-                deselected.append(item)
-                continue
-            if 'biglearn' not in run_systems and 'biglearn' in item.keywords:
-                deselected.append(item)
-                continue
-            if 'exercises' not in run_systems and 'exercises' in item.keywords:
-                deselected.append(item)
-                continue
-            if 'payments' not in run_systems and 'payments' in item.keywords:
-                deselected.append(item)
-                continue
-            if 'tutor' not in run_systems and 'tutor' in item.keywords:
-                deselected.append(item)
-                continue
-            if 'support' not in run_systems and 'support' in item.keywords:
-                deselected.append(item)
-                continue
-            if 'web' not in run_systems and 'web' in item.keywords:
+            keys = item.keywords
+            if ('accounts' not in run_systems and 'accounts' in keys or
+                    'biglearn' not in run_systems and 'biglearn' in keys or
+                    'exercises' not in run_systems and 'exercises' in keys or
+                    'payments' not in run_systems and 'payments' in keys or
+                    'tutor' not in run_systems and 'tutor' in keys or
+                    'support' not in run_systems and 'support' in keys or
+                    'web' not in run_systems and 'web' in keys):
                 deselected.append(item)
                 continue
         if headless_mode and 'skip_if_headless' in item.keywords:

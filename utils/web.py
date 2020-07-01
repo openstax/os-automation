@@ -1043,11 +1043,11 @@ class Library():
                 self.SHORT_NAME: 'Elementary Algebra',
                 self.VIDEOS: False, },
             self.INTER_ALGEBRA: {
-                self.BOOKSHARE: True,
+                self.BOOKSHARE: False,
                 self.CATEGORY: [self.ALL, self.MATH],
                 self.CHEGG: False,
                 self.COMP_COPY: False,
-                self.DETAILS: 'intermediate-algebra',
+                self.DETAILS: 'intermediate-algebra-2e',
                 self.HAS_I_LOCK: True,
                 self.HAS_I_UNLOCK: True,
                 self.HAS_S_LOCK: True,
@@ -1055,10 +1055,10 @@ class Library():
                 self.INTEREST: 'Intermediate%20Algebra',
                 self.IS_AP: False,
                 self.ITUNES: False,
-                self.KINDLE: True,
+                self.KINDLE: False,
                 self.LANGUAGE: self.ENGLISH,
                 self.PRE_RELEASE: False,
-                self.PRINT_COPY: True,
+                self.PRINT_COPY: False,
                 self.SHORT_NAME: 'Intermediate Algebra',
                 self.VIDEOS: False, },
             self.INTRO_STATS: {
@@ -1080,25 +1080,6 @@ class Library():
                 self.PRINT_COPY: True,
                 self.SHORT_NAME: 'Introductory Statistics',
                 self.VIDEOS: False, },
-            # self.PREALGEBRA: {
-            #    self.BOOKSHARE: False,
-            #    self.CATEGORY: [self.ALL, self.MATH],
-            #    self.CHEGG: False,
-            #    self.COMP_COPY: False,
-            #    self.DETAILS: 'prealgebra',
-            #    self.HAS_I_LOCK: True,
-            #    self.HAS_I_UNLOCK: True,
-            #    self.HAS_S_LOCK: True,
-            #    self.HAS_S_UNLOCK: True,
-            #    self.INTEREST: 'Prealgebra',
-            #    self.IS_AP: False,
-            #    self.ITUNES: False,
-            #    self.KINDLE: True,
-            #    self.LANGUAGE: self.ENGLISH,
-            #    self.PRE_RELEASE: False,
-            #    self.PRINT_COPY: True,
-            #    self.SHORT_NAME: 'Prealgebra',
-            #    self.VIDEOS: False, },
             self.PREALGEBRA_2E: {
                 self.BOOKSHARE: False,
                 self.CATEGORY: [self.ALL, self.MATH],
@@ -1564,20 +1545,20 @@ class Library():
             self.PSYCHOLOGY: {
                 self.BOOKSHARE: False,
                 self.CATEGORY: [self.ALL, self.SOCIAL],
-                self.CHEGG: True,
+                self.CHEGG: False,
                 self.COMP_COPY: False,
-                self.DETAILS: 'psychology',
-                self.HAS_I_LOCK: True,
+                self.DETAILS: 'psychology-2e',
+                self.HAS_I_LOCK: False,
                 self.HAS_I_UNLOCK: True,
-                self.HAS_S_LOCK: True,
+                self.HAS_S_LOCK: False,
                 self.HAS_S_UNLOCK: True,
                 self.INTEREST: 'Psychology',
                 self.IS_AP: False,
-                self.ITUNES: True,
-                self.KINDLE: True,
+                self.ITUNES: False,
+                self.KINDLE: False,
                 self.LANGUAGE: self.ENGLISH,
                 self.PRE_RELEASE: False,
-                self.PRINT_COPY: True,
+                self.PRINT_COPY: False,
                 self.SHORT_NAME: 'Psychology',
                 self.VIDEOS: False, },
             self.SOCIOLOGY: {
@@ -1777,6 +1758,8 @@ class Library():
             return_book = self.books.get(book)
         if return_book is None:  # Retrieval failed; is it a second edition?
             return_book = self.books.get(book + ' 2e')
+        if return_book is None:  # Drop the registered trademark?
+            return_book = self.books.get(book.replace('®', ''))
         if return_book is None:  # Retrieval failed; not a second edition...
             raise WebException(f'{book} not found in the library')
 
