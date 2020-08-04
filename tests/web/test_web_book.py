@@ -624,7 +624,7 @@ def test_pending_instructors_see_access_pending_for_locked_resources(
     (accounts.content
         .view_sign_up().content
         .sign_up_as_an_educator()
-        .account_sign_up(
+        .sign_up(
             email=address, password=password, _type=Accounts.INSTRUCTOR,
             provider=Accounts.RESTMAIL, name=name, school='Automation',
             news=False, phone=Utility.random_phone(),
@@ -840,7 +840,7 @@ def test_unverified_users_sent_to_faculty_verification_for_locked_resources(
         accounts.content
         .view_sign_up().content
         .sign_up_as_an_educator()
-        .account_sign_up(
+        .sign_up(
             email=address, password=password, _type=Accounts.INSTRUCTOR,
             provider=Accounts.RESTMAIL, name=name, school='Automation',
             news=False, phone=Utility.random_phone(),
@@ -908,8 +908,8 @@ def test_students_sign_up_to_access_locked_student_content(
         f'Not on an Accounts instance ({accounts.location})'
 
     # WHEN: they sign up
-    book = accounts.student_signup(name[1], name[2], password, email,
-                                   Book, web_base_url)
+    book = accounts.sign_up(name[1], name[2], password, email,
+                            Book, web_base_url)
 
     # THEN: the student resources on the book details page is displayed
     # AND:  the resource is available for download

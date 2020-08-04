@@ -217,7 +217,7 @@ class ConfirmEmail(AccountsBase):
                     self.driver.execute_script(
                         'return document.querySelector(".invalid-message")'
                         '.textContent;'))
-            if 'sheerid.com' in self.driver.current_url:
+            if '/educator/apply' in self.driver.current_url:
                 return go_to_(VerifyInstructor(self.driver))
             return go_to_(
                 CompleteSignup(self.driver, base_url=self.page.base_url))
@@ -286,7 +286,8 @@ class EducatorSignup(AccountsBase):
         confirm_email.pin = pin
         instructor_access = confirm_email.confirm_my_account()
 
-        if not instructor_access.location.endswith('/i/done'):
+        if not instructor_access.driver.current_url.endswith('/i/done'):
+            instructor_access.access_sheerid_form()
             instructor_access.school_name = school
             validated = instructor_access.verify_my_instructor_status()
             your_done = validated._continue().content
@@ -696,6 +697,15 @@ class VerifyInstructor(Page):
 
         """
         self.find_element(*self._country_selection_locator).send_keys(country)
+
+    def access_sheerid_form(self):
+        """Switch to the SheerID iframe."""
+        form = self.find_element(*self._sheer_id_iframe_locator)
+        self.driver.switch_to.iframe(form)
+
+    def access_accounts_page(self):
+        """Switch back to the default page."""
+        self.driver.switch_to.default_content()
 
 
 """ *********************************************************************** """

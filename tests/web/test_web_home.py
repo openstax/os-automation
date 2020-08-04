@@ -1009,7 +1009,7 @@ def test_instructor_access_application(
     accounts = AccountsHome(selenium, accounts_base_url).open()
     sign_up = accounts.content.view_sign_up()
     educator = sign_up.content.sign_up_as_an_educator()
-    profile = educator.account_signup(
+    profile = educator.sign_up(
         name=name, email=address, password=password, _type=Accounts.INSTRUCTOR,
         provider=Accounts.RESTMAIL, school='Automation', news=False,
         phone=Utility.random_phone(), webpage=web_base_url,
@@ -1085,7 +1085,7 @@ def test_instructor_access_application_on_mobile(
     accounts = AccountsHome(selenium, accounts_base_url).open()
     sign_up = accounts.content.view_sign_up()
     educator = sign_up.content.sign_up_as_an_educator()
-    profile = educator.account_signup(
+    profile = educator.sign_up(
         name=name, email=address, password=password, _type=Accounts.INSTRUCTOR,
         provider=Accounts.RESTMAIL, school='Automation', news=False,
         phone=Utility.random_phone(), webpage=web_base_url,
