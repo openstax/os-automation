@@ -65,7 +65,7 @@ class QuickLook(QuickLookBase):
     _view_scores_locator = (
         By.CSS_SELECTOR, '.modal-footer [href*=scores]')
     _view_assignment_locator = (
-        By.CSS_SELECTOR, f'.modal-footer [href*=assign]')
+        By.CSS_SELECTOR, '.modal-footer [href*=assign]')
     _assignment_link_locator = (
         By.CSS_SELECTOR, '.modal-footer button')
 
