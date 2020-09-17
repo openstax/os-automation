@@ -641,8 +641,7 @@ class CourseRoster(TutorBase):
                 maximum = len(self.sections)
                 if position < 1 or position > maximum:
                     raise TutorException(
-                        "position {pos} is not between 1 and {max}"
-                        .format(position, maximum))
+                        f'position {position} is not between 1 and {maximum}')
                 self.sections[position - 1].select()
             sleep(0.5)
             return self.page

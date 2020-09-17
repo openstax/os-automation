@@ -212,7 +212,7 @@ class GmailReader(object):
 
         """
         if exception:
-            print('{id} blew up! {ex}'.format(request_id, exception))
+            print(f'{request_id} blew up! {exception}')
             raise exception
         else:
             self._inbox.append(self.Email(response))
@@ -552,8 +552,7 @@ class GuerrillaMail(Page):
 
         def __unicode__(self):
             """Print out an email."""
-            return ('Subject: {subject}\nExcerpt: {excerpt}'
-                    ).format(self.subject, self.excerpt)
+            return (f'Subject: {self.subject}\nExcerpt: {self.excerpt}')
 
     class OpenedMail(Region):
         """The email page after it's opened."""
