@@ -320,6 +320,76 @@ class Web(object):
         BY_PARTNER
     ]
 
+    # Accounts Educator sign up
+    ROLE_INSTRUCTOR = 'instructor'
+    ROLE_ADMINISTRATOR = 'administrator'
+    ROLE_OTHER_EDUCATIONAL_STAFF = 'other'
+
+    TEXTBOOK_BY_INSTRUCTOR = 'instructor'
+    TEXTBOOK_BY_COMMITTEE = 'committee'
+    TEXTBOOK_BY_COORDINATOR = 'coordinator'
+
+    USING_AS_PRIMARY = 'as_primary'
+    USING_AS_RECOMMENDED = 'as_recommending'
+    USING_IN_FUTURE = 'as_future'
+
+    TEXTBOOK_CHOICE_OPTIONS = [
+        TEXTBOOK_BY_INSTRUCTOR,
+        TEXTBOOK_BY_COMMITTEE,
+        TEXTBOOK_BY_COORDINATOR
+    ]
+    USING_OPTIONS = [
+        USING_AS_PRIMARY,
+        USING_AS_RECOMMENDED,
+        USING_IN_FUTURE
+    ]
+    BOOK_SELECTION = [
+        'Algebra and Trigonometry',
+        'American Government 2e',
+        'Anatomy and Physiology',
+        'Astronomy',
+        'Biology 2e',
+        'Biology for AP® Courses',
+        'Business Ethics',
+        'Business Law I Essentials',
+        'Calculus Volume 1',
+        'Chemistry 2e',
+        'Chemistry: Atoms First 2e',
+        'College Algebra with Corequisite Support',
+        'College Algebra',
+        'College Physics',
+        'College Success',
+        'Concepts of Biology',
+        'Elementary Algebra 2e',
+        'Entrepreneurship',
+        'Intermediate Algebra 2e',
+        'Introduction to Business',
+        'Introduction to Sociology 2e',
+        'Introductory Business Statistics',
+        'Introductory Statistics',
+        'Life, Liberty, and the Pursuit of Happiness',
+        'Microbiology',
+        'Organizational Behavior',
+        'Physics',
+        'Prealgebra 2e',
+        'Precalculus',
+        'Principles of Accounting, Volume 1: Financial Accounting',
+        'Principles of Accounting, Volume 2: Managerial Accounting',
+        'Principles of Economics 2e',
+        'Principles of Macroeconomics 2e',
+        'Principles of Macroeconomics for AP® Courses 2e',
+        'Principles of Macroeconomics for AP® Courses',
+        'Principles of Management',
+        'Principles of Microeconomics 2e',
+        'Principles of Microeconomics for AP® Courses 2e',
+        'Principles of Microeconomics for AP® Courses',
+        'Psychology',
+        'Statistics',
+        'The AP Physics Collection',
+        'U.S. History',
+        'University Physics Volume 1'
+    ]
+
     @classmethod
     def resources(cls, options=1, randomize=True, get_partner_resources=True):
         """Return a list of additional resource options."""
