@@ -2,7 +2,7 @@ version: 2
 jobs:
   test-web:
     docker:
-      - image: openstax/selenium-chrome-debug:3.141.59
+      - image: openstax/selenium-chrome-debug:20201020.185705
     parallelism: 2
     steps:
       - checkout
@@ -40,7 +40,7 @@ jobs:
           test-webview:
   test-accounts:
     docker:
-      - image: openstax/selenium-chrome-debug:3.141.59
+      - image: openstax/selenium-chrome-debug::20201020.185705
     parallelism: 2
     steps:
       - checkout
