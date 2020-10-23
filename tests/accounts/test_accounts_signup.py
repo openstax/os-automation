@@ -77,6 +77,7 @@ def test_sign_up_as_an_instructor(accounts_base_url, selenium):
     email.empty()
     address = email.address
     password = Utility.random_hex(20)
+    school = 'Rice University (Houston, TX)'
 
     # GIVEN: a user with a valid email address viewing the home page
     home = Home(selenium, accounts_base_url).open()
@@ -106,7 +107,7 @@ def test_sign_up_as_an_instructor(accounts_base_url, selenium):
         email=email,
         password=password,
         phone=Utility.random_phone(),
-        school='Rice University (Houston, TX)',
+        school=school,
         role=Web.ROLE_INSTRUCTOR,
         choice_by=sample(Web.TEXTBOOK_CHOICE_OPTIONS, 1)[0],
         using=sample(Web.USING_OPTIONS, 1)[0],
@@ -128,7 +129,6 @@ def test_sign_up_as_an_instructor(accounts_base_url, selenium):
         'sign up email not found'
 
 
-@skip_test(reason='Not used in the new Accounts flows')
 @test_case('C195550')
 @accounts
 def test_sign_up_as_a_nonstudent_user(accounts_base_url, selenium):
@@ -141,6 +141,10 @@ def test_sign_up_as_a_nonstudent_user(accounts_base_url, selenium):
     email.empty()
     address = email.address
     password = Utility.random_hex(20)
+    school = 'Rice University (Houston, TX)'
+    roles = [Web.ROLE_ADMINISTRATOR, Web.ROLE_OTHER_EDUCATIONAL_STAFF]
+    role = roles[Utility.random(0, 1)]
+    other = 'Other role' if role == Web.ROLE_OTHER_EDUCATIONAL_STAFF else None
 
     # GIVEN: a user with a valid email address viewing the home page
     home = Home(selenium, accounts_base_url).open()
@@ -170,7 +174,13 @@ def test_sign_up_as_a_nonstudent_user(accounts_base_url, selenium):
         email=email,
         password=password,
         phone=Utility.random_phone(),
-        school='Rice University (Houston, TX)',
+        school=school,
+        role=role,
+        other=other,
+        choice_by=sample(Web.TEXTBOOK_CHOICE_OPTIONS, 1)[0],
+        using=sample(Web.USING_OPTIONS, 1)[0],
+        students=Utility.random(1, 200),
+        books=sample(Web.BOOK_SELECTION, Utility.random(1, 4)),
         page=profile,
         base_url=accounts_base_url)
 
