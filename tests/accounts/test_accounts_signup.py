@@ -1,10 +1,13 @@
 """Test the Accounts signup process."""
 
+from random import sample
+
 from pages.accounts.home import AccountsHome as Home
 from tests.markers import accounts, skip_test, smoke_test, social, test_case
 from utils.accounts import Accounts
 from utils.email import RestMail
 from utils.utilities import Utility
+from utils.web import Web
 
 
 @test_case('C195549')
@@ -103,7 +106,12 @@ def test_sign_up_as_an_instructor(accounts_base_url, selenium):
         email=email,
         password=password,
         phone=Utility.random_phone(),
-        school='Automation',
+        school='Rice University (Houston, TX)',
+        role=Web.ROLE_INSTRUCTOR,
+        choice_by=sample(Web.TEXTBOOK_CHOICE_OPTIONS, 1)[0],
+        using=sample(Web.USING_OPTIONS, 1)[0],
+        students=Utility.random(1, 200),
+        books=sample(Web.BOOK_SELECTION, Utility.random(1, 4)),
         page=profile,
         base_url=accounts_base_url)
 
@@ -120,6 +128,7 @@ def test_sign_up_as_an_instructor(accounts_base_url, selenium):
         'sign up email not found'
 
 
+@skip_test(reason='Not used in the new Accounts flows')
 @test_case('C195550')
 @accounts
 def test_sign_up_as_a_nonstudent_user(accounts_base_url, selenium):
@@ -161,7 +170,7 @@ def test_sign_up_as_a_nonstudent_user(accounts_base_url, selenium):
         email=email,
         password=password,
         phone=Utility.random_phone(),
-        school='Automation',
+        school='Rice University (Houston, TX)',
         page=profile,
         base_url=accounts_base_url)
 

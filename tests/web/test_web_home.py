@@ -2,7 +2,7 @@
 
 from pages.accounts.admin.users import Search
 from pages.accounts.home import AccountsHome
-from pages.accounts.signup import SignupOld
+# from pages.accounts.signup import Signup
 from pages.web.home import WebHome as Home
 from tests.markers import accounts, expected_failure, nondestructive, skip_test, smoke_test, test_case, web  # NOQA
 from utils.accounts import Accounts
@@ -1013,7 +1013,7 @@ def test_instructor_access_application(
         name=name, email=address, password=password, _type=Accounts.INSTRUCTOR,
         provider=Accounts.RESTMAIL, school='Automation', news=False,
         phone=Utility.random_phone(), webpage=web_base_url,
-        subjects=SignupOld(selenium).subject_list(2), students=10,
+        students=10,
         use=Accounts.RECOMMENDED)
     profile.log_out()
     profile = accounts.log_in(*admin)
@@ -1049,18 +1049,7 @@ def test_instructor_access_application(
     # AND:  click on the "OK" button
     # AND:  open the Web homepage
     # AND:  open the user menu
-    form = SignupOld(selenium, accounts_base_url)
-    form.instructor_access(
-        role=SignupOld.INSTRUCTOR,
-        school_email=address,
-        phone_number=Utility.random_phone(),
-        school='Automation',
-        students=10,
-        webpage=web_base_url,
-        using=SignupOld.RECOMMENDED,
-        interests=SignupOld(selenium).subject_list(Utility.random(2, 4)),
-        get_newsletter=False
-    )
+    assert(False), 'Replace with new instructor flow'
 
     # THEN: the application process is complete
     # No final verification
@@ -1089,7 +1078,7 @@ def test_instructor_access_application_on_mobile(
         name=name, email=address, password=password, _type=Accounts.INSTRUCTOR,
         provider=Accounts.RESTMAIL, school='Automation', news=False,
         phone=Utility.random_phone(), webpage=web_base_url,
-        subjects=SignupOld(selenium).subject_list(2), students=10,
+        students=10,
         use=Accounts.RECOMMENDED)
     accounts = profile.log_out()
     profile = accounts.log_in(*admin)
@@ -1127,18 +1116,7 @@ def test_instructor_access_application_on_mobile(
     # AND:  click on the "OK" button
     # AND:  open the Web homepage
     # AND:  open the user menu
-    form = SignupOld(selenium, accounts_base_url)
-    form.instructor_access(
-        role=Accounts.INSTRUCTOR,
-        school_email=address,
-        phone_number=Utility.random_phone(),
-        school='Automation',
-        students=10,
-        webpage=web_base_url,
-        using=Accounts.RECOMMENDED,
-        interests=SignupOld(selenium).subject_list(Utility.random(2, 4)),
-        get_newsletter=False
-    )
+    assert(False), 'Replace with new instructor flow'
     home.open()
     home.web_nav.meta.toggle_menu()
     home.web_nav.login.open()
