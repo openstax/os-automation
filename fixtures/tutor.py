@@ -19,6 +19,6 @@ def tutor_base_url(request):
     if instance and base_url:
         segments = base_url.split(SPLIT)
         insert = '' if instance.startswith('prod') else f'{instance}.'
-        return '{3}{0}{2}{1}'.format(*segments, SPLIT, insert)
+        return '{0}{3}{2}{1}'.format(*segments, SPLIT, insert)
     if base_url is not None:
         return base_url
