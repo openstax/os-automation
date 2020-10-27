@@ -146,7 +146,15 @@ class AboutUs(WebBase):
                 elif Web.PARTNERS in href:
                     from pages.web.partners import Partners as Destination
                 elif Web.ROVER in href:
-                    from pages.web.rover import Rover as Destination
+                    from pages.web.rover import Rover
+                    current = self.driver.current_window_handle
+                    new_handle = 1 \
+                        if current == self.driver.window_handles[0] \
+                        else 0
+                    if len(self.driver.window_handles) > 1:
+                        self.driver.switch_to.window(
+                            self.driver.window_handles[new_handle])
+                    return go_to_(Rover(self.driver))
                 else:
                     raise PageNotFound(f'{append} is not a known destination')
                 sleep(1.0)

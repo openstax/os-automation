@@ -23,7 +23,7 @@ class Subjects(WebBase):
 
     category_xpath = '//div[h2[text()="{subject}"]]'
 
-    _loader_locator = (By.CSS_SELECTOR, '.subjects-page.loaded')
+    _loader_locator = (By.CSS_SELECTOR, '.loaded')
     _banner_locator = (By.CSS_SELECTOR, '.hero')
     _slogan_locator = (By.CSS_SELECTOR, '.hero h2')
     _blurb_locator = (By.CSS_SELECTOR, '.hero p')
