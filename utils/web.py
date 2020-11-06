@@ -220,7 +220,6 @@ class Web(object):
     ONLINE_RESOURCES = 'online-resources'
     PARTNERS = 'partners'
     RESEARCH = 'research'
-    ROVER = 'rover-by-openstax'
     SE_APP = 'download-openstax-se-app'
     SUBJECTS = 'subjects'
     TECHNOLOGY = 'technology'
