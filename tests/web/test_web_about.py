@@ -4,8 +4,8 @@ from pages.web.about import AboutUs
 from tests.markers import nondestructive, test_case, web
 from utils.utilities import Utility
 
-CARDS = 6
-FIRST, SECOND, THIRD, FOURTH, FIFTH, SIXTH = range(CARDS)
+CARDS = 5
+FIRST, SECOND, THIRD, FOURTH, FIFTH = range(CARDS)
 
 
 @test_case('C210378')
