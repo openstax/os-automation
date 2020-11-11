@@ -175,8 +175,6 @@ def test_mobile_menu_navigation(web_base_url, selenium):
     # THEN: the "Technology" links are displayed
     assert(home.web_nav.technology.tutor.is_displayed()), \
         'Technology::OpenStax Tutor nav item not displayed'
-    assert(home.web_nav.technology.rover.is_displayed()), \
-        'Technology::Rover by OpenStax nav item not displayed'
     assert(home.web_nav.technology.partners.is_displayed()), \
         'Technology::OpenStax Partners nav item not displayed'
 
@@ -496,23 +494,6 @@ def test_openstax_logo_loads_the_home_page(web_base_url, selenium):
     assert(home.is_displayed()), \
         f'Home page not displayed; ended at: {home.location}'
 
-    # WHEN: they go to the supporters webpage
-    # AND:  the screen is reduced to 960 pixels or less
-    # AND:  they click on the menu toggle
-    # AND:  click the OpenStax logo
-    home.open()
-    supporters = home.openstax_nav.view_supporters()
-
-    supporters.resize_window(width=Web.TABLET)
-
-    supporters.web_nav.meta.toggle_menu()
-
-    home = supporters.web_nav.go_home()
-
-    # THEN: the Web home page is displayed
-    assert(home.is_displayed()), \
-        f'Home page not displayed; ended at: {home.location}'
-
 
 @test_case('C210308')
 @nondestructive
@@ -727,19 +708,10 @@ def test_technology_menu_options_load_the_corresponding_pages(
         assert(tutor.is_displayed()), \
             f'Tutor marketing page not displayed; ended at: {tutor.location}'
 
-        # WHEN: the "Rover by OpenStax" menu option is clicked
+        # WHEN: the "OpenStax Partners" menu option is clicked
         if device == 'mobile' and not tutor.web_nav.meta.is_open:
             tutor.web_nav.meta.toggle_menu()
-        rover = tutor.web_nav.technology.view_rover()
-
-        # THEN: the Rover by OpenStax marketing webpage is displayed
-        assert(rover.is_displayed()), \
-            f'Rover page not displayed; ended at: {rover.location}'
-
-        # WHEN: the "OpenStax Partners" menu option is clicked
-        if device == 'mobile' and not rover.web_nav.meta.is_open:
-            rover.web_nav.meta.toggle_menu()
-        partners = rover.web_nav.technology.view_partners()
+        partners = tutor.web_nav.technology.view_partners()
 
         # THEN: the OpenStax parners webpage is displayed
         assert(partners.is_displayed()), \

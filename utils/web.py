@@ -237,7 +237,6 @@ class Web(object):
     VIEW_SOCIAL_SCIENCES = 'Social Sciences'
 
     VIEW_PARTNERS = 'OpenStax Tech Scout'
-    VIEW_ROVER = 'Rover by OpenStax'
     VIEW_TUTOR = 'OpenStax Tutor'
 
     VIEW_ABOUT_US = 'About Us'
@@ -447,7 +446,6 @@ class Web(object):
     ]
     MENU_TECHNOLOGY = [
         VIEW_TUTOR,
-        VIEW_ROVER,
         VIEW_PARTNERS
     ]
     MENU_WHAT_WE_DO = [

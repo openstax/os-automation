@@ -27,8 +27,7 @@ class AboutUs(WebBase):
         """Wait until the three panels are displayed."""
         status = (super().loaded and
                   self.who_we_are.is_displayed() and
-                  self.what_we_do.is_displayed() and
-                  self.where_were_going.is_displayed())
+                  self.what_we_do.is_displayed())
         return status
 
     def is_displayed(self):
@@ -159,9 +158,10 @@ class AboutUs(WebBase):
     class WhereWereGoing(Region):
         """The Where we're going panel."""
 
-        _tutor_marketing_link_locator = (By.LINK_TEXT,
-                                         'improving student learning')
-        _research_link_locator = (By.CSS_SELECTOR, '[href$=research]')
+        _research_link_locator = (
+            By.CSS_SELECTOR, '[href$=research]')
+        _tutor_marketing_link_locator = (
+            By.LINK_TEXT, 'improving student learning')
 
         def is_displayed(self):
             """Return True if the panel is displayed."""
