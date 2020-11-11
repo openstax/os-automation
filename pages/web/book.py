@@ -150,8 +150,7 @@ class Book(WebBase):
         except WebDriverException:
             return False
         return (
-            not self.find_elements(*self._async_hide_locator)
-            and Utility.is_image_visible(
+            Utility.is_image_visible(
                 self.driver, image=self.find_element(*self._banner_locator))
             and Utility.has_children(details)
             and (Utility.has_children(instructor)

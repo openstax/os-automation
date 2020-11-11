@@ -23,7 +23,7 @@ class Adoption(WebBase):
 
     _banner_locator = (By.CSS_SELECTOR, '.subhead h1')
     _description_locator = (By.CSS_SELECTOR, '.subhead p:first-child')
-    _drop_down_menu_locator = (By.CSS_SELECTOR, '.proxy-select')
+    _drop_down_menu_locator = (By.CSS_SELECTOR, '[name=subject]')
     _interest_form_link_locator = (By.CSS_SELECTOR, '[href$=interest]')
     _form_root_locator = (By.CSS_SELECTOR, '.role-selector')
     _book_selection_locator = (By.CSS_SELECTOR, '.book-checkbox')
@@ -117,7 +117,7 @@ class Adoption(WebBase):
         self.form.set_using(books)
         sleep(0.5)
         self.form.next()
-        sleep(1.0)
+        sleep(2.0)
         book_error = self.form.get_book_error
         if book_error:
             raise WebException(f'Book error: {book_error}')
@@ -129,8 +129,8 @@ class Adoption(WebBase):
             self.form.other = other_provider
         self.form.submit()
         sleep(1.0)
-        from pages.web.book import Book
-        return go_to_(Book(self.driver, self.base_url))
+        from pages.web.partners import Partners
+        return go_to_(Partners(self.driver, self.base_url))
 
     @property
     def form(self):
@@ -142,15 +142,13 @@ class Adoption(WebBase):
         """The adoption form."""
 
         # User role selection
-        _user_select_locator = (By.CSS_SELECTOR, '.proxy-select')
+        _user_select_locator = (By.CSS_SELECTOR, '.select')
         _user_select_option_locator = (By.CSS_SELECTOR, '.options .option')
         _user_selected_role_locator = (By.CSS_SELECTOR, 'span.item')
 
-        _user_role_selector = '.options [data-value="{user}"]'
-
         # Student-specific locators
         _student_message_locator = (By.CSS_SELECTOR,
-                                    '.student-form .text-content')
+                                    '.student-form.text-content')
         _go_back_button_locator = (By.CSS_SELECTOR, '.student-form button')
 
         # User information
@@ -171,7 +169,6 @@ class Adoption(WebBase):
             By.CSS_SELECTOR, _school_locator[1] + ERROR)
 
         # Book information
-        _books_locator = (By.CSS_SELECTOR, '[data-book-checkbox]')
         _book_selector_error = (
             By.CSS_SELECTOR, '.book-selector .invalid-message')
         _book_checkbox_locator = (
@@ -203,35 +200,14 @@ class Adoption(WebBase):
         def select(self, user_type, retry=0):
             """Select a user type from the user drop down menu."""
             sleep(0.33)
-            for step in range(10):
-                user = self.find_element(*self._user_select_locator)
-                Utility.click_option(self.driver, element=user)
-                sleep(0.5)
-                is_open = 'open' in (
-                    self.find_element(*self._user_select_locator)
-                    .get_attribute('class'))
-                if is_open:
-                    break
-                if step == 9:
-                    raise WebException('User select menu not open')
-            for step in range(10):
-                user = self.find_element(
-                    By.CSS_SELECTOR,
-                    self._user_role_selector.format(
-                        user=Web.USER_CONVERSION[user_type]))
-                Utility.click_option(self.driver, element=user)
-                sleep(0.5)
-                is_closed = 'open' not in (
-                    self.find_element(
-                        By.CSS_SELECTOR,
-                        self._user_role_selector.format(
-                            user=Web.USER_CONVERSION[user_type]))
-                    .get_attribute('class'))
-                if is_closed:
-                    break
-                if step == 9:
-                    raise WebException('User select menu still open')
-            sleep(0.5)
+            user = self.find_element(*self._user_select_locator)
+            Utility.click_option(self.driver, element=user)
+            sleep(0.25)
+            user = [group for group in self.options if group.text == user_type]
+            if not user:
+                raise WebException(f'User type `{user_type}` not available')
+            Utility.click_option(self.driver, element=user[0])
+            sleep(0.25)
             selected = (self.find_element(*self._user_selected_role_locator)
                         .get_attribute('textContent'))
             if selected == Web.NO_USER_TYPE and retry <= 2:
@@ -371,7 +347,7 @@ class Adoption(WebBase):
         def books(self):
             """Access the book selector checkboxes."""
             return [self.Book(self, el)
-                    for el in self.find_elements(*self._books_locator)]
+                    for el in self.find_elements(*self._book_checkbox_locator)]
 
         def select_books(self, book_list):
             """Select the checkboxes for submitted book list."""
@@ -497,7 +473,6 @@ class Adoption(WebBase):
         class Book(Region):
             """A book checkbox option."""
 
-            _status_indicator_locator = (By.CSS_SELECTOR, '.book-checkbox')
             _image_locator = (By.CSS_SELECTOR, 'img')
             _title_locator = (By.CSS_SELECTOR, 'label')
             _checkbox_locator = (By.CSS_SELECTOR, '[role=checkbox]')
@@ -541,9 +516,7 @@ class Adoption(WebBase):
             @property
             def checked(self):
                 """Return True if the book option is checked."""
-                return ('checked' in
-                        self.find_element(*self._status_indicator_locator)
-                        .get_attribute('class'))
+                return 'checked' in self.root.get_attribute('class')
 
         class Using(Region):
             """Additional information concerning each book adoption."""
