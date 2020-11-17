@@ -39,7 +39,6 @@ class WebBase(Page):
             try:
                 return super(WebBase, self).open()
             except TimeoutException:
-                print('Attempt: {0}'.format(attempt + 1))
                 sleep(1)
         raise WebDriverException('Website failed to open or load')
 
