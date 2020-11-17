@@ -36,9 +36,9 @@ class Web(object):
     M_FREE_BOOKS_NO_CATCH = 2
 
     # Quotes
-    SUBSCRIBE = 0
-    BOOK_QUALITY_RIGGS = 1
-    BOOKSTORE_SUPPLIERS = 2
+    Q_OPENSTAX_TUTOR = 0
+    Q_SUBSCRIBE = 1
+    Q_WEBINARS = 2
 
     # Home page boxes
     BOOKS = 0
@@ -224,6 +224,7 @@ class Web(object):
     SUBJECTS = 'subjects'
     TECHNOLOGY = 'technology'
     TUTOR = 'openstax-tutor'
+    WEBINAR = 'webinars'
 
     # Menus
     VIEW_ALL = 'All'

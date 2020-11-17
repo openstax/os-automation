@@ -1,8 +1,10 @@
 """Tests for the OpenStax Web home page."""
 
+from random import sample
+
 from pages.accounts.admin.users import Search
 from pages.accounts.home import AccountsHome
-# from pages.accounts.signup import Signup
+from pages.accounts.profile import Profile
 from pages.web.home import WebHome as Home
 from tests.markers import accounts, expected_failure, nondestructive, skip_test, smoke_test, test_case, web  # NOQA
 from utils.accounts import Accounts
@@ -975,18 +977,21 @@ def test_instructor_access_application(
     email.empty()
     address = email.address
     password = Utility.random_hex(15)
+    school = 'Rice University (Houston, TX)'
 
     # GIVEN: a user with rejected instructor access
     # AND:   logged into the Web home page
     accounts = AccountsHome(selenium, accounts_base_url).open()
     sign_up = accounts.content.view_sign_up()
     educator = sign_up.content.sign_up_as_an_educator()
-    profile = educator.account_signup(
-        name=name, email=address, password=password, _type=Accounts.INSTRUCTOR,
-        provider=Accounts.RESTMAIL, school='Automation', news=False,
-        phone=Utility.random_phone(), webpage=web_base_url,
-        students=10,
-        use=Accounts.RECOMMENDED)
+    profile = educator.sign_up(
+        first=name[1], last=name[2], email=email, password=password,
+        phone=Utility.random_phone(), school=school,
+        role=Web.ROLE_INSTRUCTOR,
+        choice_by=sample(Web.TEXTBOOK_CHOICE_OPTIONS, 1)[0],
+        using=sample(Web.USING_OPTIONS, 1)[0], students=Utility.random(1, 200),
+        books=sample(Web.BOOK_SELECTION, 1), page=Profile,
+        base_url=accounts_base_url)
     profile.log_out()
     profile = accounts.log_in(*admin)
     search = Search(selenium, accounts_base_url).open()
@@ -1039,6 +1044,7 @@ def test_instructor_access_application_on_mobile(
     email.empty()
     address = email.address
     password = Utility.random_hex(17)
+    school = 'Rice University (Houston, TX)'
 
     # GIVEN: a user with rejected instructor access
     # AND:   logged into the Web home page
@@ -1046,12 +1052,14 @@ def test_instructor_access_application_on_mobile(
     accounts = AccountsHome(selenium, accounts_base_url).open()
     sign_up = accounts.content.view_sign_up()
     educator = sign_up.content.sign_up_as_an_educator()
-    profile = educator.account_signup(
-        name=name, email=address, password=password, _type=Accounts.INSTRUCTOR,
-        provider=Accounts.RESTMAIL, school='Automation', news=False,
-        phone=Utility.random_phone(), webpage=web_base_url,
-        students=10,
-        use=Accounts.RECOMMENDED)
+    profile = educator.sign_up(
+        first=name[1], last=name[2], email=email, password=password,
+        phone=Utility.random_phone(), school=school,
+        role=Web.ROLE_INSTRUCTOR,
+        choice_by=sample(Web.TEXTBOOK_CHOICE_OPTIONS, 1)[0],
+        using=sample(Web.USING_OPTIONS, 1)[0], students=Utility.random(1, 200),
+        books=sample(Web.BOOK_SELECTION, 1), page=Profile,
+        base_url=accounts_base_url)
     accounts = profile.log_out()
     profile = accounts.log_in(*admin)
     search = Search(selenium, accounts_base_url).open()
@@ -1120,10 +1128,10 @@ def test_switch_panels_in_banner_carousel(web_base_url, selenium):
 def test_carousel_banners_link_to_other_pages(web_base_url, selenium):
     """Test clicking on each banner in the carousel."""
     # SETUP:
-    carousel = ['subjects',
-                'online-resources',
-                'global-reach',
-                'download-openstax-se-app']
+    carousel = ['blog',
+                'subjects',
+                'partners',
+                'subjects']
 
     # GIVEN: a user viewing the Web home page
     home = Home(selenium, web_base_url).open()
@@ -1195,26 +1203,49 @@ def test_home_page_quote_boxes(web_base_url, selenium):
     home = Home(selenium, web_base_url).open()
 
     # WHEN: they scroll to the quotes
-    home.quotes.quotes[Web.SUBSCRIBE].show()
+    home.quotes.quotes[Web.Q_OPENSTAX_TUTOR].show()
 
     # THEN: they are presented 3 quote boxes
-    # AND:  the first box discusses information updates with a mail list
+    # AND:  the first box discusses OpenStax Tutor
     assert(len(home.quotes.quotes) == quote_boxes), \
         f'Expected {quote_boxes} boxes; found {len(home.quotes.quotes)}'
     for index, quote in enumerate(home.quotes.quotes):
         assert(quote.is_displayed()), \
             f'Quote box {index + 1} not displayed'
 
-    assert(home.quotes.quotes[Web.SUBSCRIBE].has_image), \
+    assert(home.quotes.quotes[Web.Q_OPENSTAX_TUTOR].has_image), \
+        'Tutor box image not found'
+    assert(
+        'OpenStax Tutor' in home.quotes.quotes[Web.Q_OPENSTAX_TUTOR].text), \
+        'Tutor box text does not match'
+    assert(home.quotes.quotes[Web.Q_OPENSTAX_TUTOR].has_button), \
+        'Tutor box button not found'
+
+    # WHEN: they click on the "Learn more" link
+    tutor = home.quotes.quotes[Web.Q_OPENSTAX_TUTOR].click()
+
+    # THEN: they are taken to the Tutor page
+    assert(tutor.is_displayed()), (
+        'OpenStax Tutor marketing page not displayed; '
+        f'ended at: {tutor.location}')
+
+    # WEHN: they return to the home page
+    # AND:  scroll to the quotes
+    home = tutor.web_nav.go_home()
+
+    home.quotes.quotes[Web.Q_OPENSTAX_TUTOR].show()
+
+    # THEN: the second box discusses information updates with a mail list
+    assert(home.quotes.quotes[Web.Q_SUBSCRIBE].has_image), \
         'Subscribe box image not found'
-    assert('OpenStax updates' in home.quotes.quotes[Web.SUBSCRIBE].text), \
+    assert('Get updates' in home.quotes.quotes[Web.Q_SUBSCRIBE].text), \
         'Subscribe box text does not match'
-    assert(home.quotes.quotes[Web.SUBSCRIBE].has_button), \
+    assert(home.quotes.quotes[Web.Q_SUBSCRIBE].has_button), \
         'Subscribe box button not found'
 
     # WHEN: the user clicks the "Subscribe" link
     subscribe = Utility.switch_to(
-        selenium, action=home.quotes.quotes[Web.SUBSCRIBE].click)
+        selenium, action=home.quotes.quotes[Web.Q_SUBSCRIBE].click)
 
     # THEN: they are taken to the subscription form in a new tab
     assert(subscribe.is_displayed()), \
@@ -1225,21 +1256,15 @@ def test_home_page_quote_boxes(web_base_url, selenium):
     # WHEN: they close the new tab
     subscribe.close_tab()
 
-    # THEN: the second box displays a quote
-    # AND:  the third box discusses information for book stores
-    assert('OpenStax is amazing. Access to these high-quality textbooks '
-           'is game-changing for our students.'
-           in home.quotes.quotes[Web.BOOK_QUALITY_RIGGS].text), \
-        'Riggs quote box text does not match'
-
-    assert('a campus bookstore or school and looking for print copies'
-           in home.quotes.quotes[Web.BOOKSTORE_SUPPLIERS].text), \
+    # THEN: the third box discusses OpenStax webinars
+    assert('host free webinars to support your use'
+           in home.quotes.quotes[Web.Q_WEBINARS].text), \
         'Bookstore suppliers box text does not match'
-    assert(home.quotes.quotes[Web.BOOKSTORE_SUPPLIERS].has_button), \
+    assert(home.quotes.quotes[Web.Q_WEBINARS].has_button), \
         'Bookstore suppliers box button not found'
 
     # WHEN: the user clicks the "Learn more" link
-    bookstore = home.quotes.quotes[Web.BOOKSTORE_SUPPLIERS].click()
+    bookstore = home.quotes.quotes[Web.Q_WEBINARS].click()
 
     # THEN: they are taken to the bookstore suppliers page
     assert(bookstore.is_displayed()), (

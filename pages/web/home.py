@@ -367,6 +367,14 @@ class WebHome(WebBase):
                     Utility.switch_to(self.driver, element=self.button)
                     from pages.web.bookstore_suppliers \
                         import Bookstore as Destination
+                elif Web.TUTOR in destination:
+                    Utility.click_option(self.driver, element=self.button)
+                    from pages.web.tutor \
+                        import TutorMarketing as Destination
+                elif Web.WEBINAR in destination:
+                    Utility.click_option(self.driver, element=self.button)
+                    from pages.web.webinars \
+                        import Webinars as Destination
                 else:
                     raise ValueError('Unknown destination: %s' % destination)
                 sleep(1.0)
