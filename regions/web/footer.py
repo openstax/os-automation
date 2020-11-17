@@ -157,15 +157,15 @@ class Footer(Region):
         _faq_locator = (
             By.CSS_SELECTOR, '[href$=faq]')
         _give_locator = (
-            By.CSS_SELECTOR, '[href$=give]')
+            By.CSS_SELECTOR, '[href*="rice.edu/donation"]')
         _heading_locator = (
             By.CSS_SELECTOR, 'h2')
         _license_locator = (
             By.CSS_SELECTOR, '[href$=license]')
-        _mission_statement_locator = (
-            By.CSS_SELECTOR, '.mission')
         _newsletter_locator = (
             By.CSS_SELECTOR, '[href*="www2.openstax.org"]')
+        _org_info_locator = (
+            By.CSS_SELECTOR, 'h2 ~ p')
         _press_locator = (
             By.CSS_SELECTOR, '[href$=press]')
         _privacy_policy_locator = (
@@ -183,7 +183,7 @@ class Footer(Region):
             :rtype: str
 
             """
-            return self.find_element(*self._heading_locator).text
+            return self.find_element(*self._org_info_locator).text
 
         @property
         def our_mission(self) -> str:
@@ -193,7 +193,7 @@ class Footer(Region):
             :rtype: str
 
             """
-            return self.find_element(*self._mission_statement_locator).text
+            return self.find_element(*self._heading_locator).text
 
         def donate(self) -> Page:
             """Click on the 'donating' link.
@@ -350,9 +350,9 @@ class Footer(Region):
         """Trademarks and OpenStax social program Links."""
 
         _ap_statement_locator = (
-            By.CSS_SELECTOR, '[data-html=apStatement]')
+            By.CSS_SELECTOR, 'ap-html')
         _copyright_statement_locator = (
-            By.CSS_SELECTOR, '[data-html=copyright]')
+            By.CSS_SELECTOR, 'div')
         _facebook_locator = (
             By.CSS_SELECTOR, '.facebook')
         _instagram_locator = (

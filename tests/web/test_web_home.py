@@ -1390,8 +1390,8 @@ def test_footer_static_text(web_base_url, selenium):
         'Footer non-profit organization type not listed'
 
     assert(mission), 'Footer OpenStax mission statement missing'
-    assert("It's our mission to give every student the tools they need to be" +
-           " successful in the classroom." in mission), \
+    assert('Our mission is to improve educational access and '
+           'learning for everyone.' in mission), \
         'Footer mission statement text is incorrect'
 
     assert(copyright), 'Footer copyright missing'
