@@ -56,12 +56,16 @@ class Link(Region):
             from pages.web.impact import Impact as Destination
         elif destination.endswith(Web.ANNUAL_REPORT):
             from pages.web.annual import AnnualReport as Destination
+        elif destination.endswith(Web.INSTITUTION):
+            from pages.web.partners import Institutional as Destination
         elif destination.endswith(Web.PARTNERS):
             from pages.web.partners import Partners as Destination
-        elif destination.endswith(Web.SUBJECTS):
+        elif Web.SUBJECTS in destination:
             from pages.web.subjects import Subjects as Destination
         elif destination.endswith(Web.TECHNOLOGY):
             from pages.web.technology import Technology as Destination
+        else:
+            raise WebException(f'Unknown destination page: {destination}')
         return go_to_(Destination(self.driver, base_url=base_url))
 
 

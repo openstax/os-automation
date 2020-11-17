@@ -40,12 +40,9 @@ class Web(object):
     Q_SUBSCRIBE = 1
     Q_WEBINARS = 2
 
-    # Home page boxes
-    BOOKS = 0
-    TECH = 1
-    OUR_IMPACT = 0
-    REPORT = 0
-    OPENSTAX_PARTNERS = 1
+    # Home page boxes (inverse order)
+    BOX_HIGH_SCHOOL = 1
+    BOX_INSTITUTIONAL_PARTNER = 0
 
     # *** BOOK DETAILS ***
 

@@ -1307,26 +1307,25 @@ def test_the_home_page_information_bars(web_base_url, selenium):
     home.information.show()
 
     # THEN: they are presented 2 boxes
-    # AND:  the first discusses the OpenStax impact
+    # AND:  the first discusses the OpenStax high school books
     assert(len(home.information.box) == information_bars), (
         f'{len(home.information.box)} bar(s) shown; '
         f'expected {information_bars}')
 
-    assert(home.information.box[Web.OUR_IMPACT].is_displayed()), \
-        'Our Impact info box not displayed'
-    assert('Wolchonok has saved students' in
-           home.information.box[Web.OUR_IMPACT].text), \
-        'Our Impact info box text changed'
-    assert(home.information.box[Web.OUR_IMPACT].has_image), \
-        'Our Impact info box image missing'
+    assert(home.information.box[Web.BOX_HIGH_SCHOOL].is_displayed()), \
+        'High school info box not displayed'
+    assert('support high school classes' in
+           home.information.box[Web.BOX_HIGH_SCHOOL].text), \
+        'High school info box text changed'
 
-    # WHEN: the user clicks the "See our impact" button
-    impact = home.information.box[Web.OUR_IMPACT].click()
+    # WHEN: the user clicks the "Explore the books" link
+    subjects = home.information.box[Web.BOX_HIGH_SCHOOL].click()
 
-    # THEN: the impact page is displayed
-    assert(impact.is_displayed()), 'Our Impact page not displayed'
-    assert('impact' in impact.location), \
-        f'Not viewing the Our Impact page; ended at: {impact.location}'
+    # THEN: the subjects page is displayed filtering for high school books
+    assert(subjects.is_displayed()), 'Subjects page not displayed'
+    assert('high-school' in subjects.location), (
+        'Not viewing the high school subjects page; ended at: '
+        f'{subjects.location}')
 
     # WHEN: the user opens the Web home page
     # AND:  scroll to the information bars
@@ -1334,20 +1333,22 @@ def test_the_home_page_information_bars(web_base_url, selenium):
 
     home.information.show()
 
-    # THEN: the second box discusses OpenStax partners
-    assert(home.information.box[Web.OPENSTAX_PARTNERS].is_displayed()), \
-        'Partners info box not displayed'
-    assert('OpenStax partners have united with us' in
-           home.information.box[Web.OPENSTAX_PARTNERS].text), \
-        'Partners info box text changed'
+    # THEN: the second box discusses the institutional partner program
+    assert(
+        home.information.box[Web.BOX_INSTITUTIONAL_PARTNER].is_displayed()), \
+        'Partner program info box not displayed'
+    assert('even more support and resources to our partner schools' in
+           home.information.box[Web.BOX_INSTITUTIONAL_PARTNER].text), \
+        'Partner program info box text changed'
 
-    # WHEN: the user clicks the "View Partners" button
-    partners = home.information.box[Web.OPENSTAX_PARTNERS].click()
+    # WHEN: the user clicks the "Learn more and apply" link
+    partners = home.information.box[Web.BOX_INSTITUTIONAL_PARTNER].click()
 
-    # THEN: the partners page is displayed
-    assert(partners.is_displayed()), 'Partners page not displayed'
-    assert('partners' in partners.location), \
-        f'Not viewing the Partners page; ended at: {partners.location}'
+    # THEN: the institutional partner program page is displayed
+    assert(partners.is_displayed()), 'Institutional partner page not displayed'
+    assert('institutional' in partners.location), (
+        'Not viewing the Institutional Partner Program page;'
+        f' ended at: {partners.location}')
 
 
 @test_case('C210330')
