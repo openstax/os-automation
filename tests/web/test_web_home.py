@@ -1281,15 +1281,15 @@ def test_the_home_page_education_section(web_base_url, selenium):
     home = Home(selenium, web_base_url).open()
 
     # WHEN: they scroll to the education section
-    # AND:  click the "See our books" button
+    # AND:  click the "Explore OpenStax Tech Scout" link
     home.education.show()
 
-    subjects = home.education.see_our_books()
+    partners = home.education.explore_openstax_tech_scout()
 
-    # THEN: the book subjects page is displayed
-    assert(subjects.is_displayed()), 'Subjects page not displayed'
-    assert('subjects' in subjects.location), \
-        f'Not viewing the subjects page: {subjects.location}'
+    # THEN: the book partners page is displayed
+    assert(partners.is_displayed()), 'Subjects page not displayed'
+    assert('partners' in partners.location), \
+        f'Not viewing the partners page: {partners.location}'
 
 
 @test_case('C210329')

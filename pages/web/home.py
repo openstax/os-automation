@@ -409,12 +409,12 @@ class WebHome(WebBase):
             """Return the student image element."""
             return self.find_element(*self._student_locator)
 
-        def see_our_books(self):
-            """Access the educational books button."""
-            button = self.find_element(*self._link_locator)
-            Utility.click_option(self.driver, element=button)
-            from pages.web.subjects import Subjects
-            return go_to_(Subjects(self.driver, base_url=self.page.base_url))
+        def explore_openstax_tech_scout(self):
+            """Access the educational partners link."""
+            link = self.find_element(*self._link_locator)
+            Utility.click_option(self.driver, element=link)
+            from pages.web.partners import Partners
+            return go_to_(Partners(self.driver, base_url=self.page.base_url))
 
         def show(self):
             """Scroll the section into view."""
