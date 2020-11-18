@@ -195,8 +195,10 @@ class WebHome(WebBase):
                 while not isinstance(parent, Page):
                     parent = parent.page
                 base_url = parent.base_url
-                if destination.endswith(Web.SUBJECTS):
+                if Web.SUBJECTS in destination:
                     from pages.web.subjects import Subjects as Destination
+                elif Web.BLOG in destination:
+                    from pages.web.blog import Blog as Destination
                 elif destination.endswith(Web.ABOUT):
                     from pages.web.about import AboutUs as Destination
                 elif destination.endswith(Web.SE_APP):
@@ -206,6 +208,8 @@ class WebHome(WebBase):
                 elif destination.endswith(Web.ONLINE_RESOURCES):
                     from pages.web.online_resources \
                         import OnlineResources as Destination
+                elif destination.endswith(Web.PARTNERS):
+                    from pages.web.partners import Partners as Destination
                 else:
                     raise WebException(
                         'Unknown destination: {0}'

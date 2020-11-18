@@ -207,6 +207,7 @@ class Web(object):
     # Matching strings
     ABOUT = 'about'
     ANNUAL_REPORT = 'annual-report'
+    BLOG = 'blog'
     BOOKSTORE = 'bookstore-suppliers'
     GIVE = 'give'
     GLOBAL_REACH = 'global-reach'
