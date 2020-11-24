@@ -3,7 +3,6 @@
 from pages.web.home import WebHome
 from tests.markers import nondestructive, test_case, web
 from utils.utilities import Utility
-from utils.web import Web
 
 
 @test_case('C210466')
@@ -13,7 +12,7 @@ def test_users_are_directed_to_the_subjects_page(web_base_url, selenium):
     """Instructors and students are directed to the Subjects page."""
     # GIVEN: a user viewing the bookstore page
     home = WebHome(selenium, web_base_url).open()
-    suppliers = home.quotes.get(Web.BOOKSTORE_SUPPLIERS).click()
+    suppliers = home.openstax_nav.view_bookstores()
 
     # WHEN: they click on the "Subjects page" link
     subjects = suppliers.subjects_page()
@@ -32,7 +31,7 @@ def test_book_suppliers_has_a_pdf_of_openstax_isbn_numbers(
     """A PDF of OpenStax ISBNs is available."""
     # GIVEN: a user viewing the bookstore page
     home = WebHome(selenium, web_base_url).open()
-    suppliers = home.quotes.get(Web.BOOKSTORE_SUPPLIERS).click()
+    suppliers = home.openstax_nav.view_bookstores()
 
     for price_list in suppliers.price_lists:
         # WHEN: they click on the "View" button for each price list
@@ -54,7 +53,7 @@ def test_there_is_one_preferred_book_fulfillment_company(
     """One book fulfillment company is listed as preferred."""
     # GIVEN: a user viewing the bookstore page
     home = WebHome(selenium, web_base_url).open()
-    suppliers = home.quotes.get(Web.BOOKSTORE_SUPPLIERS).click()
+    suppliers = home.openstax_nav.view_bookstores()
 
     # WHEN:
 
@@ -80,7 +79,7 @@ def test_there_are_four_additional_provider_options(web_base_url, selenium):
     """Four additional companies are available for bookstore orders."""
     # GIVEN: a user viewing the bookstore page
     home = WebHome(selenium, web_base_url).open()
-    suppliers = home.quotes.get(Web.BOOKSTORE_SUPPLIERS).click()
+    suppliers = home.openstax_nav.view_bookstores()
 
     # WHEN:
 
