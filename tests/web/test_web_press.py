@@ -120,16 +120,9 @@ def test_the_openstax_mission_statement_is_outlined(web_base_url, selenium):
 
     # WHEN:
 
-    # THEN: the mission goals are presented ("increase
-    #       access to education", "partner with educators",
-    #       and "leverage our freedom")
-    goals = [
-        'increase access to education',
-        'partner with educators',
-        'leverage our freedom'
-    ]
-    for goal in goals:
-        assert(goal in '\n'.join(press.mission_statements))
+    # THEN: the mission goal is presented
+    assert('To improve educational access and learning for everyone' in
+           press.mission_statement)
 
 
 @test_case('C210473')
@@ -184,7 +177,7 @@ def test_expert_speaker_availability(web_base_url, selenium):
 
     # THEN: three speakers are shown with a portrait, name,
     #       title, and bio
-    assert(len(press.experts) == 3)
+    assert(len(press.experts) == 2)
     for expert in press.experts:
         assert(expert.has_portrait)
         assert(expert.name)
@@ -236,7 +229,7 @@ def test_mobile_users_are_presented_a_drop_down_menu(web_base_url, selenium):
     press.select(Web.BOOKING)
 
     # THEN: expert speakers are displayed
-    assert(len(press.experts) == 3)
+    assert(len(press.experts) == 2)
     assert(press.experts[0].is_displayed())
 
 
