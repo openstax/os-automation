@@ -170,7 +170,7 @@ class Web(object):
     STRATEGIC_ADVISORS = 1
 
     TEAM_GROUPS = [
-        'OpenStax Team',
+        'OpenStax Leadership',
         'Strategic Advisors'
     ]
 
