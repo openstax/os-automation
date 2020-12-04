@@ -125,7 +125,6 @@ class Partners(WebBase):
 
     def return_to_your_book(self):
         """Click the 'your book' link."""
-        print(self.find_element('css selector', '#main').get_attribute('outerHTML'))
         link = self.find_element(*self._return_to_your_book_link_locator)
         Utility.click_option(self.driver, element=link)
         from pages.web.book import Book
