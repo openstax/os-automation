@@ -30,17 +30,9 @@ class WebBase(Page):
         """Return True when the page-loaded class is added to the body tag."""
         script = (r'document.addEventListener("load", function(event) {});')
         self.driver.execute_script(script)
+        web_nav = self.web_nav.loaded
         async_hide = bool(self.find_elements(*self._async_hide_locator))
-        return self.web_nav.loaded and not async_hide
-
-    def open(self):
-        """Open the page."""
-        for attempt in range(3):
-            try:
-                return super(WebBase, self).open()
-            except TimeoutException:
-                sleep(1)
-        raise WebDriverException('Website failed to open or load')
+        return web_nav and not async_hide
 
     @property
     def location(self) -> str:
