@@ -13,7 +13,7 @@ def test_the_our_impact_banner(web_base_url, selenium):
     """Test the features of the Our Impact banner region."""
     # GIVEN: a user viewing the impact page
     home = WebHome(selenium, web_base_url).open()
-    impact = home.information.box[Web.OUR_IMPACT].select()
+    impact = home.openstax_nav.view_our_impact()
 
     # WHEN:
 
