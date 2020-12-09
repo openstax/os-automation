@@ -55,11 +55,12 @@ class TutorMarketing(WebHome):
     @property
     def loaded(self):
         """Override the base loader."""
-        sleep(1.0)
+        script = (r'document.addEventListener("load", function(event) {});')
+        self.driver.execute_script(script)
         visible = Utility.is_image_visible(
             self.driver,
             locator=self._image_locators)
-        return visible and self.find_element(*self._new_frontier_locator)
+        return visible
 
     def is_displayed(self):
         """Return True if the marketing page is displayed."""
