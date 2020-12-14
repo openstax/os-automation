@@ -3,19 +3,19 @@
 from time import sleep
 
 from pypom import Region
-from selenium.common.exceptions import NoSuchElementException
-from selenium.common.exceptions import WebDriverException  # NOQA
+from selenium.common.exceptions import NoSuchElementException, WebDriverException  # NOQA
 from selenium.webdriver.common.by import By
 
-from utils.web import Web as Support
+from utils.utilities import Utility
+from utils.web import Web as Support, WebException
 
 
 class StickyNote(Region):
     """OpenStax Web's sticky note region."""
 
-    _root_locator = (By.TAG_NAME, 'sticky-note')
-    _close_button_locator = (By.TAG_NAME, 'button')
-    _link_destination_locator = (By.TAG_NAME, 'a')
+    _root_locator = (By.CSS_SELECTOR, '#lower-sticky-note')
+    _close_button_locator = (By.CSS_SELECTOR, '.put-away')
+    _link_destination_locator = (By.CSS_SELECTOR, 'a')
     _mobile_link_locator = (By.CSS_SELECTOR, 'img.mobile')
     _desktop_link_locator = (By.CSS_SELECTOR, 'img.desktop')
 
@@ -43,7 +43,7 @@ class StickyNote(Region):
         try:
             return self.find_element(*locator)
         except NoSuchElementException:
-            assert(False), 'The sticky note button wasn\'t found.'
+            raise WebException('The sticky note button was not found.')
 
     def go(self):
         """Follow the sticky note link.
@@ -53,12 +53,11 @@ class StickyNote(Region):
         """
         destination = (self.find_element(*self._link_destination_locator)
                        .get_attribute('href'))
-        for _ in range(10):
-            try:
-                self.button.click()
-                break
-            except WebDriverException:
-                sleep(1.0)
+        try:
+            self.button.click()
+        except WebDriverException:
+            sleep(1.0)
+            Utility.click_option(self.driver, element=self.button)
         sleep(1.0)
         if Support.GIVE in destination:
             from pages.web.donation import Give as Destination
