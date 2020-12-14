@@ -87,6 +87,21 @@ class WebBase(Page):
         root = self.driver.execute_script(script, self._microsurvey_selector)
         return MicroSurvey(self, root)
 
+    def clear_notices(self):
+        """Clear pop up and dialog notices.
+
+        :return: None
+
+        """
+        if self.sticky_note.is_displayed():
+            self.sticky_note.close()
+        if self.privacy_notice.is_displayed():
+            self.privacy_notice.got_it()
+        if self.survey.is_displayed():
+            self.survey.close()
+        if self.microsurvey.is_displayed():
+            self.microsurvey.close()
+
     def reload(self):
         """Reload the current page.
 
