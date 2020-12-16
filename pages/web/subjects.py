@@ -28,7 +28,8 @@ class Subjects(WebBase):
     _content_loader_locator = (By.CSS_SELECTOR, '.content.loading')
     _slogan_locator = (By.CSS_SELECTOR, '.hero h2')
     _blurb_locator = (By.CSS_SELECTOR, '.hero p')
-    _filter_toggle_locator = (By.CSS_SELECTOR, '.filter-buttons')
+    _filter_toggle_locator = (
+        By.CSS_SELECTOR, '.filter-button[aria-pressed=true]')
     _filter_button_locator = (By.CSS_SELECTOR, '.filter-button')
     _filter_by_locator = (By.CSS_SELECTOR,
                           '.filter-buttons [aria-pressed=true]')
@@ -112,6 +113,7 @@ class Subjects(WebBase):
         """Click on the filter menu to show the filter options."""
         toggle = self.find_element(*self._filter_toggle_locator)
         Utility.click_option(self.driver, element=toggle)
+        sleep(0.5)
         return self
 
     @property
