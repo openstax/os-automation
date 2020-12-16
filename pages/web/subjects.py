@@ -4,7 +4,7 @@ from time import sleep
 
 from pypom import Region
 from pypom.exception import UsageError
-from selenium.common.exceptions import WebDriverException
+from selenium.common.exceptions import TimeoutException, WebDriverException
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 
@@ -25,10 +25,11 @@ class Subjects(WebBase):
 
     _loader_locator = (By.CSS_SELECTOR, '.loaded')
     _banner_locator = (By.CSS_SELECTOR, '.hero')
+    _content_loader_locator = (By.CSS_SELECTOR, '.content.loading')
     _slogan_locator = (By.CSS_SELECTOR, '.hero h2')
     _blurb_locator = (By.CSS_SELECTOR, '.hero p')
     _filter_toggle_locator = (By.CSS_SELECTOR, '.filter-buttons')
-    _filter_button_locator = (By.CLASS_NAME, 'filter-button')
+    _filter_button_locator = (By.CSS_SELECTOR, '.filter-button')
     _filter_by_locator = (By.CSS_SELECTOR,
                           '.filter-buttons [aria-pressed=true]')
     _about_our_textbooks_locator = (By.CSS_SELECTOR, '.text-content')
@@ -50,7 +51,7 @@ class Subjects(WebBase):
     _college_success_category_locator = (
         By.XPATH, category_xpath.format(subject=Web.VIEW_COLLEGE_SUCCESS))
     _high_school_category_locator = (
-        By.XPATH, category_xpath.format(subject=Web.VIEW_HIGH_SCHOOL))
+        By.XPATH, '//div[h2[contains(text(),"chool")]]')
     _book_locator = (By.CSS_SELECTOR, 'div.book-category:not(.hidden) .cover')
     _image_locators = (By.CSS_SELECTOR, _book_locator[1] + ' img')
 
@@ -69,6 +70,16 @@ class Subjects(WebBase):
             lambda _: self.loaded)
         self.pm.hook.pypom_after_wait_for_page_to_load(page=self)
         return self
+
+    def wait_for_content(self):
+        """Wait until content is done loading."""
+        if bool(self.find_elements(*self._content_loader_locator)):
+            try:
+                self.wait.until(
+                    lambda _: not bool(self.find_elements(
+                        *self._content_loader_locator)))
+            except TimeoutException:
+                raise WebException('Book library content not loaded')
 
     def open(self):
         """Open the page."""
@@ -94,7 +105,8 @@ class Subjects(WebBase):
     def filters(self):
         """Return the available filters."""
         return [self.Filter(self, button)
-                for button in self.find_elements(*self._filter_button_locator)]
+                for button
+                in self.find_elements(*self._filter_button_locator)]
 
     def filter_toggle(self):
         """Click on the filter menu to show the filter options."""
@@ -113,53 +125,53 @@ class Subjects(WebBase):
                 in self.find_element(*self._filter_by_locator)
                 .get_attribute('textContent'))
 
-    @property
     def math(self):
         """Return the subjects filtered by math titles."""
+        self.wait_for_content()
         math_root = self.find_element(*self._math_category_locator)
         return self.Category(self, math_root)
 
-    @property
     def science(self):
         """Return the subjects filtered by the science titles."""
+        self.wait_for_content()
         science_root = self.find_element(*self._science_category_locator)
         return self.Category(self, science_root)
 
-    @property
     def social_sciences(self):
         """Return the subjects filtered by the social sciences titles."""
+        self.wait_for_content()
         social_root = self.find_element(
             *self._social_sciences_category_locator)
         return self.Category(self, social_root)
 
-    @property
     def humanities(self):
         """Return the subjects filtered by the humanities titles."""
+        self.wait_for_content()
         humanities_root = self.find_element(*self._humanities_category_locator)
         return self.Category(self, humanities_root)
 
-    @property
     def business(self):
         """Return the subjects filtered by the business titles."""
+        self.wait_for_content()
         business_root = self.find_element(*self._business_category_locator)
         return self.Category(self, business_root)
 
-    @property
     def essentials(self):
         """Return the subjects filtered by the essentials titles."""
+        self.wait_for_content()
         essentials_root = self.find_element(*self._essentials_category_locator)
         return self.Category(self, essentials_root)
 
-    @property
     def college_success(self):
         """Return the subjects filtered by the College Success titles."""
+        self.wait_for_content()
         success_root = self.find_element(
             *self._college_success_category_locator)
         return self.Category(self, success_root)
 
-    @property
     def high_school(self):
         """Return the subjects filtered by high school course titles."""
+        self.wait_for_content()
         high_school_root = self.find_element(
             *self._high_school_category_locator)
         return self.Category(self, high_school_root)
@@ -286,11 +298,6 @@ class Subjects(WebBase):
 
         """
         book = book_title.lower()
-        '''if 'calculus' in book and 'precalc' not in book:
-            field = Library.SHORT_NAME
-        else:
-            field = Library.DETAILS'''
-        # append = Library().get(book_title, field=field)
         append = Library().get(book_title, field=Library.DETAILS)
         selector = f'[href$="{append}"]'
         book = self.find_element(By.CSS_SELECTOR, selector)
