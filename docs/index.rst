@@ -28,5 +28,4 @@ Contents
    local_dev
    run_tests
    cheatsheet
-   ci
    pages/pages
