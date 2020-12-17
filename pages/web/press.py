@@ -430,7 +430,7 @@ class Press(WebBase):
 
         def check_media_link(self):
             """Request the HEAD of the media page."""
-            if self.url_name == Web.INSTAGRAM:
+            if self.url_name in [Web.INSTAGRAM, Web.TWITTER]:
                 return get(self.url)
             return head(self.url)
 

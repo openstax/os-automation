@@ -146,9 +146,13 @@ def test_press_inquiry_options(web_base_url, selenium):
         social_page = social.check_media_link()
 
         # THEN: the OpenStax social page is displayed in a
-        #       new tab
-        if not social_page.ok:
+        #       new tab (skip if a 429 from Instagram or
+        #       400 from Twitter due to rate limiting)
+        if (not social_page.ok
+                and social_page.status_code != 429
+                and social_page.status_code != 400):
             Utility.test_url_and_warn(code=social_page.status_code,
+                                      url=social.url,
                                       message=social.name,
                                       driver=selenium)
 
