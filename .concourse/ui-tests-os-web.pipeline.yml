@@ -4,7 +4,7 @@ resource_types:
   - name: slack
     type: docker-image
     source:
-      repository: karenc/concourse-slack-resource
+      repository: openstax/concourse-slack-resource
 
 resources:
   - name: listen-os-cms
