@@ -567,7 +567,7 @@ def test_able_to_view_subjects_using_the_nav_menu(web_base_url, selenium):
         f'Available filters ({filters}) should equal the '
         f'subjects plus "View All" ({len(visibility)})')
     for index, topic in enumerate(Web.FILTERS):
-        assert(visibility[index].is_visible), \
+        assert(visibility[index]().is_visible), \
             f'{topic} is not visible when it should be shown'
 
     # WHEN: the user returns to the home page
@@ -609,7 +609,7 @@ def test_able_to_view_subjects_using_the_nav_menu(web_base_url, selenium):
         f'Available filters ({filters}) should equal the '
         f'subjects plus "View All" ({len(visibility)})')
     for index, topic in enumerate(Web.FILTERS):
-        assert(visibility[index].is_visible), \
+        assert(visibility[index]().is_visible), \
             f'{topic} is not visible when it should be shown'
 
 
@@ -669,11 +669,11 @@ def test_subject_menu_options_load_filtered_views(web_base_url, selenium):
 
             for topic, category in enumerate(visibility):
                 if topic == index:
-                    assert(category.is_visible), (
+                    assert(category().is_visible), (
                         f'{Web.FILTERS[topic]} is not visible '
                         'when it should be shown')
                 else:
-                    assert(not category.is_visible), (
+                    assert(not category().is_visible), (
                         f'{Web.FILTERS[topic]} is visible '
                         'when it should be hidden')
 
