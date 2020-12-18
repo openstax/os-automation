@@ -875,6 +875,7 @@ def test_unverified_users_sent_to_faculty_verification_for_locked_resources(
 
 
 @test_case('C210372')
+@skip_test(reason='No locked student resources')
 @nondestructive
 @web
 def test_students_sign_up_to_access_locked_student_content(
