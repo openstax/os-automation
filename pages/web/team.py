@@ -52,7 +52,7 @@ class Team(WebBase):
     _advisor_locator_full = (
         By.CSS_SELECTOR, 'tab-content .people-tab:last-child .card')
     _advisor_locator_phone = (
-        By.CSS_SELECTOR, 'accordion-region .accordion-item:last-child .card')
+        By.CSS_SELECTOR, '.accordion-item:last-child .card')
     _bar_locator = (
         By.CSS_SELECTOR, '.accordion-item')
     _blurb_locator = (
@@ -62,7 +62,7 @@ class Team(WebBase):
     _people_locator_full = (
         By.CSS_SELECTOR, 'tab-content .people-tab:first-child .card')
     _people_locator_phone = (
-        By.CSS_SELECTOR, 'accordion-region .accordion-item:first-child .card')
+        By.CSS_SELECTOR, '.accordion-item:first-child .card')
     _tab_locator = (
         By.CSS_SELECTOR, '.tab-group h3')
     _title_locator = (
