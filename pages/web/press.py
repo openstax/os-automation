@@ -1,7 +1,6 @@
 """The press and marketing page."""
 
 from datetime import datetime
-from re import sub as substitute
 
 from pypom import Region
 from requests import get, head
@@ -54,11 +53,11 @@ class Release(Region):
 
     @property
     def continue_reading(self):
-        """Return the 'Continue reading' link."""
-        try:
-            return self.find_element(*self._continue_reading_locator)
-        except WebDriverException:
+        """Return the 'Continue reading' link if the excerpt is visible."""
+        link = self.find_elements(*self._continue_reading_locator)
+        if not link or not self.excerpt:
             return None
+        return link[0]
 
     def select(self):
         """Select a press release to view the entire text."""
@@ -75,88 +74,95 @@ class Press(WebBase):
 
     URL_TEMPLATE = '/press'
 
-    HEADLINE = ' .headline-container:not([hidden]) .press-excerpt'
-    MAIN = '.main-body '
-    MOBILE = '.mobile-view '
-    FIRST = ' .nav-buttons div:first-child'
-    LAST = ' .nav-buttons div:last-child'
-
-    _hero_quote_selector = '.hero h1'
+    _hero_banner_selector = '.hero h1'
     _press_releases_selector = '.press-releases'
     _sidebar_selector = '.sidebar'
     _news_mentions_selector = '.news-mentions'
-    _image_locator = (By.CSS_SELECTOR, 'img')
 
-    _title_locator = (By.CSS_SELECTOR, _hero_quote_selector)
-    _see_toggle_locator = (By.CSS_SELECTOR, '.see')
-    _menu_select_locator = (By.CSS_SELECTOR, '.selector-button')
-    _menu_item_locator = (By.CSS_SELECTOR, '.mobile-selector [role=menuitem]')
-    _current_menuitem_locator = (By.CSS_SELECTOR, '.mobile-selector span')
+    _title_locator = (
+        By.CSS_SELECTOR, '.hero h1')
+    _see_toggle_locator = (
+        By.CSS_SELECTOR, '.more-fewer > [role=button]')
+    _image_locator = (
+        By.CSS_SELECTOR, 'img')
+    _menu_select_locator = (
+        By.CSS_SELECTOR, '.selector-button')
+    _menu_item_locator = (
+        By.CSS_SELECTOR, '.mobile-selector [role=menuitem]')
+    _current_menuitem_locator = (
+        By.CSS_SELECTOR, '.mobile-selector span')
     _mission_statement_locator = (
-        By.CSS_SELECTOR, '[data-html^=missionStatement]')
+        By.CSS_SELECTOR, '.our-mission div')
 
-    _viewing_fewer_locator = (By.CSS_SELECTOR, '.fewer:not([hidden])')
+    _viewing_fewer_locator = (
+        By.CSS_SELECTOR, '.fewer:not([hidden])')
     _releases_full_excerpt_locator = (
         By.CSS_SELECTOR, '.press-releases .fewer .press-excerpt')
     _releases_full_locator = (
-        By.CSS_SELECTOR, '.press-releases .more' + HEADLINE)
+        By.CSS_SELECTOR, '.hidden-on-mobile:not(.active):not(.news-mentions) .press-excerpt')  # NOQA
     _releases_mobile_locator = (
-        By.CSS_SELECTOR, '.press-mobile .releases' + HEADLINE)
-    _newer_releases_full_locator = (By.CSS_SELECTOR, MAIN + '.more' + FIRST)
+        By.CSS_SELECTOR, '.press-releases.active .mobile-only .press-excerpt')
+    _newer_releases_full_locator = (
+        By.CSS_SELECTOR, '.more-fewer .nav-buttons > div:first-child')
     _newer_releases_mobile_locator = (
-                                    By.CSS_SELECTOR, MOBILE + '.more' + FIRST)
-    _older_releases_full_locator = (By.CSS_SELECTOR, MAIN + '.more' + LAST)
-    _older_releases_mobile_locator = (By.CSS_SELECTOR, MOBILE + 'more' + LAST)
+        By.CSS_SELECTOR, '.mobile-only .nav-buttons > div:first-child')
+    _older_releases_full_locator = (
+        By.CSS_SELECTOR, '.more-fewer .nav-buttons > div:nth-child(2)')
+    _older_releases_mobile_locator = (
+        By.CSS_SELECTOR, '.mobile-only .nav-buttons > div:nth-child(2)')
 
     _mentions_full_locator = (
-        By.CSS_SELECTOR, MAIN + _news_mentions_selector + HEADLINE)
-    _mentions_mobile_locator = (
-        By.CSS_SELECTOR, MOBILE + '.mentions' + HEADLINE)
+        By.CSS_SELECTOR, '.news-mentions .press-excerpt')
     _newer_mentions_full_locator = (
-        By.CSS_SELECTOR, MAIN + _news_mentions_selector + FIRST)
-    _newer_mentions_mobile_locator = (
-        By.CSS_SELECTOR, MOBILE + '.mentions' + FIRST)
+        By.CSS_SELECTOR, '.news-mentions .nav-buttons > div:first-child')  # NOQA
     _older_mentions_full_locator = (
-        By.CSS_SELECTOR, MAIN + _news_mentions_selector + LAST)
-    _older_mentions_mobile_locator = (
-        By.CSS_SELECTOR, MOBILE + '.mentions' + LAST)
+        By.CSS_SELECTOR, '.news-mentions .nav-buttons > div:nth-child(2)')  # NOQA
+    _mentions_mobile_locator = (
+        By.CSS_SELECTOR, '.news-mentions .press-excerpt')
+    _newer_mentions_mobile_locator = _newer_mentions_full_locator
+    _older_mentions_mobile_locator = _older_mentions_full_locator
 
-    _contact_full_locator = (By.CSS_SELECTOR, MAIN + '.contact')
-    _contact_mobile_locator = (By.CSS_SELECTOR, MOBILE + '.contact')
+    _contact_full_locator = (
+        By.CSS_SELECTOR, '.contact')
+    _contact_mobile_locator = _contact_full_locator
 
-    _social_full_locator = (By.CSS_SELECTOR, MAIN + '.find-us a')
-    _social_mobile_locator = (By.CSS_SELECTOR, MOBILE + '.find-us a')
+    _social_full_locator = (
+        By.CSS_SELECTOR, '.find-us a')
+    _social_mobile_locator = _social_full_locator
 
-    _press_kit_full_locator = (By.CSS_SELECTOR, MAIN + '[href*=press_kit]')
-    _press_kit_mobile_locator = (By.CSS_SELECTOR, MOBILE + '[href*=press_kit]')
+    _press_kit_full_locator = (
+        By.CSS_SELECTOR, '[href*=press_kit]')
+    _press_kit_mobile_locator = _press_kit_full_locator
 
-    _experts_full_locator = (By.CSS_SELECTOR, MAIN + '.booking')
-    _experts_mobile_locator = (By.CSS_SELECTOR, MOBILE + '.booking')
+    _experts_full_locator = (
+        By.CSS_SELECTOR, '.booking')
+    _experts_mobile_locator = _experts_full_locator
 
     @property
     def loaded(self):
         """Return True when the four root elements are found."""
         locator = (
             By.CSS_SELECTOR,
-            '{hero} , {press} , {sidebar} , {news}'
-            .format(hero=self._hero_quote_selector,
+            '{banner} , {press} , {sidebar} , {news}'
+            .format(banner=self._hero_banner_selector,
                     press=self._press_releases_selector,
                     sidebar=self._sidebar_selector,
                     news=self._news_mentions_selector))
+        merged = self.find_elements(*locator)
+        sections_found = len(merged) == 4
+        images_visible = Utility.is_image_visible(
+            self.driver, locator=self._image_locator)
         try:
-            merged = self.find_elements(*locator)
-            sections_found = len(merged) == 4
-            images_visible = Utility.is_image_visible(
-                self.driver, locator=self._image_locator)
-            contact_found = (self.contact.name
-                             if not isinstance(self.contact, list)
-                             else self.contact[0].name)
-            return (super().loaded and
-                    sections_found and
-                    images_visible and
-                    (contact_found or self.is_phone))
+            contact_found = (
+                self.contact.name
+                if not isinstance(self.contact, list)
+                else self.contact[0].name)
         except Exception:
-            return False
+            contact_found = ''
+        return (super().loaded and
+                sections_found and
+                images_visible and
+                (contact_found or self.is_phone))
 
     def is_displayed(self):
         """Return True if the heading is displayed."""
@@ -237,7 +243,8 @@ class Press(WebBase):
         else:
             locator = self._mentions_full_locator
         return [self.Mention(self, article)
-                for article in self.find_elements(*locator)]
+                for article
+                in self.find_elements(*locator)]
 
     def view_older_mentions(self):
         """View older news articles mentioning OpenStax."""
@@ -252,11 +259,9 @@ class Press(WebBase):
             self._newer_mentions_full_locator)
 
     @property
-    def mission_statements(self):
-        """Return the list of mission statements."""
-        return [substitute(r'<\/?b>', '', statement.get_attribute('innerHTML'))
-                for statement
-                in self.find_elements(*self._mission_statement_locator)]
+    def mission_statement(self):
+        """Return the OpenStax mission statement."""
+        return self.find_element(*self._mission_statement_locator).text
 
     @property
     def mission_displayed(self):
@@ -328,7 +333,7 @@ class Press(WebBase):
 
         _logo_locator = (By.CSS_SELECTOR, 'img')
         _source_locator = (By.CSS_SELECTOR, '.source')
-        _byline_locator = (By.CSS_SELECTOR, '.byline .date')
+        _byline_date_locator = (By.CSS_SELECTOR, '.byline .date')
         _headline_locator = (By.CSS_SELECTOR, '.headline a')
 
         @property
@@ -345,7 +350,7 @@ class Press(WebBase):
         def date(self):
             """Return a timezone-aware date of publication."""
             return datetime.strptime(
-                self.find_element(*self._byline_locator).text
+                self.find_element(*self._byline_date_locator).text
                 .split('-', 1)[-1].strip() + ' +0000',
                 '%b %d, %Y %z')
 
@@ -377,8 +382,8 @@ class Press(WebBase):
         """An OpenStax MarComm point of contact."""
 
         _name_locator = (By.CSS_SELECTOR, 'div:first-child')
-        _phone_locator = (By.CSS_SELECTOR, 'div:nth-child(2)')
-        _email_locator = (By.CSS_SELECTOR, 'div:last-child')
+        _phone_locator = (By.CSS_SELECTOR, 'div:nth-child(2) a')
+        _email_locator = (By.CSS_SELECTOR, 'div:last-child a')
 
         @property
         def name(self):
@@ -425,7 +430,7 @@ class Press(WebBase):
 
         def check_media_link(self):
             """Request the HEAD of the media page."""
-            if self.url_name == Web.INSTAGRAM:
+            if self.url_name in [Web.INSTAGRAM, Web.TWITTER]:
                 return get(self.url)
             return head(self.url)
 
@@ -436,7 +441,7 @@ class Press(WebBase):
         _portrait_locator = (By.CSS_SELECTOR, 'img')
         _name_locator = (By.CSS_SELECTOR, '.name')
         _role_locator = (By.CSS_SELECTOR, _name_locator[1] + ' ~ div')
-        _bio_locator = (By.CSS_SELECTOR, '[data-html=bio]')
+        _bio_locator = (By.CSS_SELECTOR, '.span-2')
 
         def is_displayed(self):
             """Return True if the portrait is loaded and in the frame."""

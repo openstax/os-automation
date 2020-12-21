@@ -1,10 +1,13 @@
 """Tests for the OpenStax Web home page."""
 
+from random import sample
+
 from pages.accounts.admin.users import Search
 from pages.accounts.home import AccountsHome
-# from pages.accounts.signup import Signup
+from pages.accounts.profile import Profile
 from pages.web.home import WebHome as Home
-from tests.markers import accounts, expected_failure, nondestructive, skip_test, smoke_test, test_case, web  # NOQA
+from tests.markers import (  # NOQA
+    accounts, nondestructive, skip_test, smoke_test, test_case, web)  # NOQA
 from utils.accounts import Accounts
 from utils.email import RestMail
 from utils.utilities import Utility
@@ -64,7 +67,7 @@ def test_the_donation_banner_is_displayed(web_base_url, selenium):
 
 
 @test_case('C214019')
-@expected_failure(reason='Sticky note may or may not be active')
+@skip_test(reason='Sticky note rarely active')
 @web
 def test_the_donation_banner_is_not_displayed_after_repeat_reloads(
         web_base_url, selenium):
@@ -175,8 +178,6 @@ def test_mobile_menu_navigation(web_base_url, selenium):
     # THEN: the "Technology" links are displayed
     assert(home.web_nav.technology.tutor.is_displayed()), \
         'Technology::OpenStax Tutor nav item not displayed'
-    assert(home.web_nav.technology.rover.is_displayed()), \
-        'Technology::Rover by OpenStax nav item not displayed'
     assert(home.web_nav.technology.partners.is_displayed()), \
         'Technology::OpenStax Partners nav item not displayed'
 
@@ -496,23 +497,6 @@ def test_openstax_logo_loads_the_home_page(web_base_url, selenium):
     assert(home.is_displayed()), \
         f'Home page not displayed; ended at: {home.location}'
 
-    # WHEN: they go to the supporters webpage
-    # AND:  the screen is reduced to 960 pixels or less
-    # AND:  they click on the menu toggle
-    # AND:  click the OpenStax logo
-    home.open()
-    supporters = home.openstax_nav.view_supporters()
-
-    supporters.resize_window(width=Web.TABLET)
-
-    supporters.web_nav.meta.toggle_menu()
-
-    home = supporters.web_nav.go_home()
-
-    # THEN: the Web home page is displayed
-    assert(home.is_displayed()), \
-        f'Home page not displayed; ended at: {home.location}'
-
 
 @test_case('C210308')
 @nondestructive
@@ -583,7 +567,7 @@ def test_able_to_view_subjects_using_the_nav_menu(web_base_url, selenium):
         f'Available filters ({filters}) should equal the '
         f'subjects plus "View All" ({len(visibility)})')
     for index, topic in enumerate(Web.FILTERS):
-        assert(visibility[index].is_visible), \
+        assert(visibility[index]().is_visible), \
             f'{topic} is not visible when it should be shown'
 
     # WHEN: the user returns to the home page
@@ -625,7 +609,7 @@ def test_able_to_view_subjects_using_the_nav_menu(web_base_url, selenium):
         f'Available filters ({filters}) should equal the '
         f'subjects plus "View All" ({len(visibility)})')
     for index, topic in enumerate(Web.FILTERS):
-        assert(visibility[index].is_visible), \
+        assert(visibility[index]().is_visible), \
             f'{topic} is not visible when it should be shown'
 
 
@@ -685,11 +669,11 @@ def test_subject_menu_options_load_filtered_views(web_base_url, selenium):
 
             for topic, category in enumerate(visibility):
                 if topic == index:
-                    assert(category.is_visible), (
+                    assert(category().is_visible), (
                         f'{Web.FILTERS[topic]} is not visible '
                         'when it should be shown')
                 else:
-                    assert(not category.is_visible), (
+                    assert(not category().is_visible), (
                         f'{Web.FILTERS[topic]} is visible '
                         'when it should be hidden')
 
@@ -727,19 +711,10 @@ def test_technology_menu_options_load_the_corresponding_pages(
         assert(tutor.is_displayed()), \
             f'Tutor marketing page not displayed; ended at: {tutor.location}'
 
-        # WHEN: the "Rover by OpenStax" menu option is clicked
+        # WHEN: the "OpenStax Partners" menu option is clicked
         if device == 'mobile' and not tutor.web_nav.meta.is_open:
             tutor.web_nav.meta.toggle_menu()
-        rover = tutor.web_nav.technology.view_rover()
-
-        # THEN: the Rover by OpenStax marketing webpage is displayed
-        assert(rover.is_displayed()), \
-            f'Rover page not displayed; ended at: {rover.location}'
-
-        # WHEN: the "OpenStax Partners" menu option is clicked
-        if device == 'mobile' and not rover.web_nav.meta.is_open:
-            rover.web_nav.meta.toggle_menu()
-        partners = rover.web_nav.technology.view_partners()
+        partners = tutor.web_nav.technology.view_partners()
 
         # THEN: the OpenStax parners webpage is displayed
         assert(partners.is_displayed()), \
@@ -1003,18 +978,21 @@ def test_instructor_access_application(
     email.empty()
     address = email.address
     password = Utility.random_hex(15)
+    school = 'Rice University (Houston, TX)'
 
     # GIVEN: a user with rejected instructor access
     # AND:   logged into the Web home page
     accounts = AccountsHome(selenium, accounts_base_url).open()
     sign_up = accounts.content.view_sign_up()
     educator = sign_up.content.sign_up_as_an_educator()
-    profile = educator.account_signup(
-        name=name, email=address, password=password, _type=Accounts.INSTRUCTOR,
-        provider=Accounts.RESTMAIL, school='Automation', news=False,
-        phone=Utility.random_phone(), webpage=web_base_url,
-        students=10,
-        use=Accounts.RECOMMENDED)
+    profile = educator.sign_up(
+        first=name[1], last=name[2], email=email, password=password,
+        phone=Utility.random_phone(), school=school,
+        role=Web.ROLE_INSTRUCTOR,
+        choice_by=sample(Web.TEXTBOOK_CHOICE_OPTIONS, 1)[0],
+        using=sample(Web.USING_OPTIONS, 1)[0], students=Utility.random(1, 200),
+        books=sample(Web.BOOK_SELECTION, 1), page=Profile,
+        base_url=accounts_base_url)
     profile.log_out()
     profile = accounts.log_in(*admin)
     search = Search(selenium, accounts_base_url).open()
@@ -1067,6 +1045,7 @@ def test_instructor_access_application_on_mobile(
     email.empty()
     address = email.address
     password = Utility.random_hex(17)
+    school = 'Rice University (Houston, TX)'
 
     # GIVEN: a user with rejected instructor access
     # AND:   logged into the Web home page
@@ -1074,12 +1053,14 @@ def test_instructor_access_application_on_mobile(
     accounts = AccountsHome(selenium, accounts_base_url).open()
     sign_up = accounts.content.view_sign_up()
     educator = sign_up.content.sign_up_as_an_educator()
-    profile = educator.account_signup(
-        name=name, email=address, password=password, _type=Accounts.INSTRUCTOR,
-        provider=Accounts.RESTMAIL, school='Automation', news=False,
-        phone=Utility.random_phone(), webpage=web_base_url,
-        students=10,
-        use=Accounts.RECOMMENDED)
+    profile = educator.sign_up(
+        first=name[1], last=name[2], email=email, password=password,
+        phone=Utility.random_phone(), school=school,
+        role=Web.ROLE_INSTRUCTOR,
+        choice_by=sample(Web.TEXTBOOK_CHOICE_OPTIONS, 1)[0],
+        using=sample(Web.USING_OPTIONS, 1)[0], students=Utility.random(1, 200),
+        books=sample(Web.BOOK_SELECTION, 1), page=Profile,
+        base_url=accounts_base_url)
     accounts = profile.log_out()
     profile = accounts.log_in(*admin)
     search = Search(selenium, accounts_base_url).open()
@@ -1148,10 +1129,10 @@ def test_switch_panels_in_banner_carousel(web_base_url, selenium):
 def test_carousel_banners_link_to_other_pages(web_base_url, selenium):
     """Test clicking on each banner in the carousel."""
     # SETUP:
-    carousel = ['subjects',
-                'online-resources',
-                'global-reach',
-                'download-openstax-se-app']
+    carousel = ['blog',
+                'subjects',
+                'partners',
+                'subjects']
 
     # GIVEN: a user viewing the Web home page
     home = Home(selenium, web_base_url).open()
@@ -1223,26 +1204,49 @@ def test_home_page_quote_boxes(web_base_url, selenium):
     home = Home(selenium, web_base_url).open()
 
     # WHEN: they scroll to the quotes
-    home.quotes.quotes[Web.SUBSCRIBE].show()
+    home.quotes.quotes[Web.Q_OPENSTAX_TUTOR].show()
 
     # THEN: they are presented 3 quote boxes
-    # AND:  the first box discusses information updates with a mail list
+    # AND:  the first box discusses OpenStax Tutor
     assert(len(home.quotes.quotes) == quote_boxes), \
         f'Expected {quote_boxes} boxes; found {len(home.quotes.quotes)}'
     for index, quote in enumerate(home.quotes.quotes):
         assert(quote.is_displayed()), \
             f'Quote box {index + 1} not displayed'
 
-    assert(home.quotes.quotes[Web.SUBSCRIBE].has_image), \
+    assert(home.quotes.quotes[Web.Q_OPENSTAX_TUTOR].has_image), \
+        'Tutor box image not found'
+    assert(
+        'OpenStax Tutor' in home.quotes.quotes[Web.Q_OPENSTAX_TUTOR].text), \
+        'Tutor box text does not match'
+    assert(home.quotes.quotes[Web.Q_OPENSTAX_TUTOR].has_button), \
+        'Tutor box button not found'
+
+    # WHEN: they click on the "Learn more" link
+    tutor = home.quotes.quotes[Web.Q_OPENSTAX_TUTOR].click()
+
+    # THEN: they are taken to the Tutor page
+    assert(tutor.is_displayed()), (
+        'OpenStax Tutor marketing page not displayed; '
+        f'ended at: {tutor.location}')
+
+    # WEHN: they return to the home page
+    # AND:  scroll to the quotes
+    home = tutor.web_nav.go_home()
+
+    home.quotes.quotes[Web.Q_OPENSTAX_TUTOR].show()
+
+    # THEN: the second box discusses information updates with a mail list
+    assert(home.quotes.quotes[Web.Q_SUBSCRIBE].has_image), \
         'Subscribe box image not found'
-    assert('OpenStax updates' in home.quotes.quotes[Web.SUBSCRIBE].text), \
+    assert('Get updates' in home.quotes.quotes[Web.Q_SUBSCRIBE].text), \
         'Subscribe box text does not match'
-    assert(home.quotes.quotes[Web.SUBSCRIBE].has_button), \
+    assert(home.quotes.quotes[Web.Q_SUBSCRIBE].has_button), \
         'Subscribe box button not found'
 
     # WHEN: the user clicks the "Subscribe" link
     subscribe = Utility.switch_to(
-        selenium, action=home.quotes.quotes[Web.SUBSCRIBE].click)
+        selenium, action=home.quotes.quotes[Web.Q_SUBSCRIBE].click)
 
     # THEN: they are taken to the subscription form in a new tab
     assert(subscribe.is_displayed()), \
@@ -1253,21 +1257,15 @@ def test_home_page_quote_boxes(web_base_url, selenium):
     # WHEN: they close the new tab
     subscribe.close_tab()
 
-    # THEN: the second box displays a quote
-    # AND:  the third box discusses information for book stores
-    assert('OpenStax is amazing. Access to these high-quality textbooks '
-           'is game-changing for our students.'
-           in home.quotes.quotes[Web.BOOK_QUALITY_RIGGS].text), \
-        'Riggs quote box text does not match'
-
-    assert('a campus bookstore or school and looking for print copies'
-           in home.quotes.quotes[Web.BOOKSTORE_SUPPLIERS].text), \
+    # THEN: the third box discusses OpenStax webinars
+    assert('host free webinars to support your use'
+           in home.quotes.quotes[Web.Q_WEBINARS].text), \
         'Bookstore suppliers box text does not match'
-    assert(home.quotes.quotes[Web.BOOKSTORE_SUPPLIERS].has_button), \
+    assert(home.quotes.quotes[Web.Q_WEBINARS].has_button), \
         'Bookstore suppliers box button not found'
 
     # WHEN: the user clicks the "Learn more" link
-    bookstore = home.quotes.quotes[Web.BOOKSTORE_SUPPLIERS].click()
+    bookstore = home.quotes.quotes[Web.Q_WEBINARS].click()
 
     # THEN: they are taken to the bookstore suppliers page
     assert(bookstore.is_displayed()), (
@@ -1284,15 +1282,15 @@ def test_the_home_page_education_section(web_base_url, selenium):
     home = Home(selenium, web_base_url).open()
 
     # WHEN: they scroll to the education section
-    # AND:  click the "See our books" button
+    # AND:  click the "Explore OpenStax Tech Scout" link
     home.education.show()
 
-    subjects = home.education.see_our_books()
+    partners = home.education.explore_openstax_tech_scout()
 
-    # THEN: the book subjects page is displayed
-    assert(subjects.is_displayed()), 'Subjects page not displayed'
-    assert('subjects' in subjects.location), \
-        f'Not viewing the subjects page: {subjects.location}'
+    # THEN: the book partners page is displayed
+    assert(partners.is_displayed()), 'Subjects page not displayed'
+    assert('partners' in partners.location), \
+        f'Not viewing the partners page: {partners.location}'
 
 
 @test_case('C210329')
@@ -1310,26 +1308,25 @@ def test_the_home_page_information_bars(web_base_url, selenium):
     home.information.show()
 
     # THEN: they are presented 2 boxes
-    # AND:  the first discusses the OpenStax impact
+    # AND:  the first discusses the OpenStax high school books
     assert(len(home.information.box) == information_bars), (
         f'{len(home.information.box)} bar(s) shown; '
         f'expected {information_bars}')
 
-    assert(home.information.box[Web.OUR_IMPACT].is_displayed()), \
-        'Our Impact info box not displayed'
-    assert('Wolchonok has saved students' in
-           home.information.box[Web.OUR_IMPACT].text), \
-        'Our Impact info box text changed'
-    assert(home.information.box[Web.OUR_IMPACT].has_image), \
-        'Our Impact info box image missing'
+    assert(home.information.box[Web.BOX_HIGH_SCHOOL].is_displayed()), \
+        'High school info box not displayed'
+    assert('support high school classes' in
+           home.information.box[Web.BOX_HIGH_SCHOOL].text), \
+        'High school info box text changed'
 
-    # WHEN: the user clicks the "See our impact" button
-    impact = home.information.box[Web.OUR_IMPACT].click()
+    # WHEN: the user clicks the "Explore the books" link
+    subjects = home.information.box[Web.BOX_HIGH_SCHOOL].click()
 
-    # THEN: the impact page is displayed
-    assert(impact.is_displayed()), 'Our Impact page not displayed'
-    assert('impact' in impact.location), \
-        f'Not viewing the Our Impact page; ended at: {impact.location}'
+    # THEN: the subjects page is displayed filtering for high school books
+    assert(subjects.is_displayed()), 'Subjects page not displayed'
+    assert('high-school' in subjects.location), (
+        'Not viewing the high school subjects page; ended at: '
+        f'{subjects.location}')
 
     # WHEN: the user opens the Web home page
     # AND:  scroll to the information bars
@@ -1337,20 +1334,22 @@ def test_the_home_page_information_bars(web_base_url, selenium):
 
     home.information.show()
 
-    # THEN: the second box discusses OpenStax partners
-    assert(home.information.box[Web.OPENSTAX_PARTNERS].is_displayed()), \
-        'Partners info box not displayed'
-    assert('OpenStax partners have united with us' in
-           home.information.box[Web.OPENSTAX_PARTNERS].text), \
-        'Partners info box text changed'
+    # THEN: the second box discusses the institutional partner program
+    assert(
+        home.information.box[Web.BOX_INSTITUTIONAL_PARTNER].is_displayed()), \
+        'Partner program info box not displayed'
+    assert('even more support and resources to our partner schools' in
+           home.information.box[Web.BOX_INSTITUTIONAL_PARTNER].text), \
+        'Partner program info box text changed'
 
-    # WHEN: the user clicks the "View Partners" button
-    partners = home.information.box[Web.OPENSTAX_PARTNERS].click()
+    # WHEN: the user clicks the "Learn more and apply" link
+    partners = home.information.box[Web.BOX_INSTITUTIONAL_PARTNER].click()
 
-    # THEN: the partners page is displayed
-    assert(partners.is_displayed()), 'Partners page not displayed'
-    assert('partners' in partners.location), \
-        f'Not viewing the Partners page; ended at: {partners.location}'
+    # THEN: the institutional partner program page is displayed
+    assert(partners.is_displayed()), 'Institutional partner page not displayed'
+    assert('institutional' in partners.location), (
+        'Not viewing the Institutional Partner Program page;'
+        f' ended at: {partners.location}')
 
 
 @test_case('C210330')
@@ -1392,8 +1391,8 @@ def test_footer_static_text(web_base_url, selenium):
         'Footer non-profit organization type not listed'
 
     assert(mission), 'Footer OpenStax mission statement missing'
-    assert("It's our mission to give every student the tools they need to be" +
-           " successful in the classroom." in mission), \
+    assert('Our mission is to improve educational access and '
+           'learning for everyone.' in mission), \
         'Footer mission statement text is incorrect'
 
     assert(copyright), 'Footer copyright missing'

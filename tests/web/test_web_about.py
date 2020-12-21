@@ -4,8 +4,8 @@ from pages.web.about import AboutUs
 from tests.markers import nondestructive, test_case, web
 from utils.utilities import Utility
 
-CARDS = 6
-FIRST, SECOND, THIRD, FOURTH, FIFTH, SIXTH = range(CARDS)
+CARDS = 5
+FIRST, SECOND, THIRD, FOURTH, FIFTH = range(CARDS)
 
 
 @test_case('C210378')
@@ -153,16 +153,6 @@ def test_what_we_do_information_cards(web_base_url, selenium):
     # THEN: the Tutor marketing page is displayed
     assert(tutor_marketing.is_displayed()), \
         f'{selenium.current_url} is not the Tutor marketing page'
-
-    # WHEN: they return to the about page
-    # AND:  click on the sixth card
-    about.open()
-
-    rover = about.what_we_do.cards[SIXTH].click()
-
-    # THEN: the Rover marketing page is displayed
-    assert(rover.is_displayed()), \
-        f'{selenium.current_url} is not the Rover marketing page'
 
 
 @test_case('C210382')

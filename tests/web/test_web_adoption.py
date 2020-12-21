@@ -10,7 +10,7 @@ from pages.web.home import WebHome
 from tests.markers import nondestructive, skip_test, smoke_test, test_case, web
 from utils.email import RestMail
 from utils.utilities import Utility
-from utils.web import Library, TechProviders, Web, WebException
+from utils.web import Library, Web, WebException
 
 
 @test_case('C210385')
@@ -104,7 +104,7 @@ def test_non_student_users_submit_the_adoption_form(web_base_url, selenium):
         .format(first=first_name, last=last_name, rand=Utility.random_hex(3))
         .lower())
     phone = Utility.random_phone(713, False)
-    school = 'Automation'
+    school = 'Rice University'
     book_list = Library().random_book()
     books = {}
     for book in book_list:
@@ -113,11 +113,6 @@ def test_non_student_users_submit_the_adoption_form(web_base_url, selenium):
                 Utility.random(0, len(Web.USING_STATUS) - 1)],
             'students': Utility.random(Web.STUDENT_MIN, Web.STUDENT_MAX)
         }
-    tech_providers = TechProviders.get_tech(Utility.random(0, 3))
-    if TechProviders.OTHER in tech_providers:
-        other = 'Another product provider'
-    else:
-        other = None
 
     # GIVEN: a user viewing the adoption page
     home = WebHome(selenium, web_base_url).open()
@@ -135,20 +130,18 @@ def test_non_student_users_submit_the_adoption_form(web_base_url, selenium):
     # AND:  click on the "Next" button
     # AND:  select a technology provider
     # AND:  click on the "Submit" button
-    book = adoption.submit_adoption(
+    partners = adoption.submit_adoption(
         user_type=user_type,
         first=first_name,
         last=last_name,
         email=email.address,
         phone=phone,
         school=school,
-        books=books,
-        tech_providers=tech_providers,
-        other_provider=other)
+        books=books)
 
-    # THEN: the book's instructor resources page is displayed
-    assert(book.is_displayed())
-    assert('books' in book.location)
+    # THEN: the Tech Scout page (Partners) is displayed
+    assert(partners.is_displayed())
+    assert('partners' in partners.location)
 
 
 @test_case('C210389')
@@ -165,7 +158,7 @@ def test_a_book_is_preselected_when_a_book_details_adoption_link_is_used(
         .format(first=first_name, last=last_name, rand=Utility.random_hex(4))
         .lower())
     phone = Utility.random_phone(713, False)
-    school = 'Automation'
+    school = 'Rice University'
     book, short, full, detail_append = Library().get_name_set()
     books = {short: {'status': '', 'students': '', }}
 
@@ -191,6 +184,7 @@ def test_a_book_is_preselected_when_a_book_details_adoption_link_is_used(
 
     # THEN: the book is selected
     # AND:  the using questions for the book are displayed
+    print(f'{Utility.get_error_information(error)}')
     assert(short in Utility.get_error_information(error)), \
         '{book} ({short}) not preselected'.format(book=full, short=short)
 
@@ -288,7 +282,7 @@ def test_adoption_form_requires_at_least_one_book_selection(
         .format(first=first_name, last=last_name, rand=Utility.random_hex(5))
         .lower())
     phone = Utility.random_phone(713, False)
-    school = 'Automation'
+    school = 'Rice University'
 
     # GIVEN: a user viewing the adoption page
     adoption = Adoption(selenium, web_base_url).open()

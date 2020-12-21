@@ -56,12 +56,16 @@ class Link(Region):
             from pages.web.impact import Impact as Destination
         elif destination.endswith(Web.ANNUAL_REPORT):
             from pages.web.annual import AnnualReport as Destination
+        elif destination.endswith(Web.INSTITUTION):
+            from pages.web.partners import Institutional as Destination
         elif destination.endswith(Web.PARTNERS):
             from pages.web.partners import Partners as Destination
-        elif destination.endswith(Web.SUBJECTS):
+        elif Web.SUBJECTS in destination:
             from pages.web.subjects import Subjects as Destination
         elif destination.endswith(Web.TECHNOLOGY):
             from pages.web.technology import Technology as Destination
+        else:
+            raise WebException(f'Unknown destination page: {destination}')
         return go_to_(Destination(self.driver, base_url=base_url))
 
 
@@ -191,8 +195,10 @@ class WebHome(WebBase):
                 while not isinstance(parent, Page):
                     parent = parent.page
                 base_url = parent.base_url
-                if destination.endswith(Web.SUBJECTS):
+                if Web.SUBJECTS in destination:
                     from pages.web.subjects import Subjects as Destination
+                elif Web.BLOG in destination:
+                    from pages.web.blog import Blog as Destination
                 elif destination.endswith(Web.ABOUT):
                     from pages.web.about import AboutUs as Destination
                 elif destination.endswith(Web.SE_APP):
@@ -202,6 +208,8 @@ class WebHome(WebBase):
                 elif destination.endswith(Web.ONLINE_RESOURCES):
                     from pages.web.online_resources \
                         import OnlineResources as Destination
+                elif destination.endswith(Web.PARTNERS):
+                    from pages.web.partners import Partners as Destination
                 else:
                     raise WebException(
                         'Unknown destination: {0}'
@@ -367,6 +375,14 @@ class WebHome(WebBase):
                     Utility.switch_to(self.driver, element=self.button)
                     from pages.web.bookstore_suppliers \
                         import Bookstore as Destination
+                elif Web.TUTOR in destination:
+                    Utility.click_option(self.driver, element=self.button)
+                    from pages.web.tutor \
+                        import TutorMarketing as Destination
+                elif Web.WEBINAR in destination:
+                    Utility.click_option(self.driver, element=self.button)
+                    from pages.web.webinars \
+                        import Webinars as Destination
                 else:
                     raise ValueError('Unknown destination: %s' % destination)
                 sleep(1.0)
@@ -401,12 +417,12 @@ class WebHome(WebBase):
             """Return the student image element."""
             return self.find_element(*self._student_locator)
 
-        def see_our_books(self):
-            """Access the educational books button."""
-            button = self.find_element(*self._link_locator)
-            Utility.click_option(self.driver, element=button)
-            from pages.web.subjects import Subjects
-            return go_to_(Subjects(self.driver, base_url=self.page.base_url))
+        def explore_openstax_tech_scout(self):
+            """Access the educational partners link."""
+            link = self.find_element(*self._link_locator)
+            Utility.click_option(self.driver, element=link)
+            from pages.web.partners import Partners
+            return go_to_(Partners(self.driver, base_url=self.page.base_url))
 
         def show(self):
             """Scroll the section into view."""

@@ -593,18 +593,18 @@ class Utility:
         agent = {
             'chrome': {
                 'User-Agent': (
-                    'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6)'
-                    ' AppleWebKit/537.36 (KHTML, like Gecko)'
-                    ' Chrome/77.0.3865.90 Safari/537.36'), },
+                    'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) '
+                    'AppleWebKit/537.36 (KHTML, like Gecko) '
+                    'Chrome/87.0.4280.88 Safari/537.36'), },
             'firefox': {
                 'User-Agent': (
-                    'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14;'
-                    ' rv:69.0) Gecko/20100101 Firefox/69.0'), },
+                    'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; '
+                    'rv:83.0) Gecko/20100101 Firefox/83.0'), },
             'safari': {
                 'User-Agent': (
-                    'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6)'
-                    ' AppleWebKit/605.1.15 (KHTML, like Gecko)'
-                    ' Version/13.0.1 Safari/605.1.15'), },
+                    'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) '
+                    'AppleWebKit/605.1.15 (KHTML, like Gecko) '
+                    'Version/14.0.1 Safari/605.1.15'), },
             '': {},
         }
         if link:

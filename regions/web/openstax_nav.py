@@ -13,6 +13,7 @@ class OpenStaxNav(Region):
     """OpenStax's website shared navigational control."""
 
     _root_locator = (By.CSS_SELECTOR, 'nav.meta-nav')
+    _bookstore_suppliers_locator = (By.CSS_SELECTOR, '[href$=suppliers]')
     _our_impact_locator = (By.CSS_SELECTOR, '[href$=impact]')
     _supporters_locator = (By.CSS_SELECTOR, '[href$=foundation]')
     _blog_locator = (By.CSS_SELECTOR, '[href$=blog]')
@@ -23,6 +24,13 @@ class OpenStaxNav(Region):
     def is_displayed(self):
         """Return True if the nav bar is displayed."""
         return self.root.is_displayed()
+
+    def view_bookstores(self):
+        """Go to the bookstore suppliers page."""
+        self._click(self._bookstore_suppliers_locator)
+        sleep(1.0)
+        from pages.web.bookstore_suppliers import Bookstore
+        return go_to_(Bookstore(self.driver, base_url=self.page.base_url))
 
     def view_our_impact(self):
         """Go to the impact or annual report page."""

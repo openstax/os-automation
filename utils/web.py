@@ -36,16 +36,13 @@ class Web(object):
     M_FREE_BOOKS_NO_CATCH = 2
 
     # Quotes
-    SUBSCRIBE = 0
-    BOOK_QUALITY_RIGGS = 1
-    BOOKSTORE_SUPPLIERS = 2
+    Q_OPENSTAX_TUTOR = 0
+    Q_SUBSCRIBE = 1
+    Q_WEBINARS = 2
 
-    # Home page boxes
-    BOOKS = 0
-    TECH = 1
-    OUR_IMPACT = 0
-    REPORT = 0
-    OPENSTAX_PARTNERS = 1
+    # Home page boxes (inverse order)
+    BOX_HIGH_SCHOOL = 1
+    BOX_INSTITUTIONAL_PARTNER = 0
 
     # *** BOOK DETAILS ***
 
@@ -173,7 +170,7 @@ class Web(object):
     STRATEGIC_ADVISORS = 1
 
     TEAM_GROUPS = [
-        'OpenStax Team',
+        'OpenStax Leadership',
         'Strategic Advisors'
     ]
 
@@ -210,6 +207,7 @@ class Web(object):
     # Matching strings
     ABOUT = 'about'
     ANNUAL_REPORT = 'annual-report'
+    BLOG = 'blog'
     BOOKSTORE = 'bookstore-suppliers'
     GIVE = 'give'
     GLOBAL_REACH = 'global-reach'
@@ -220,11 +218,11 @@ class Web(object):
     ONLINE_RESOURCES = 'online-resources'
     PARTNERS = 'partners'
     RESEARCH = 'research'
-    ROVER = 'rover-by-openstax'
     SE_APP = 'download-openstax-se-app'
     SUBJECTS = 'subjects'
     TECHNOLOGY = 'technology'
     TUTOR = 'openstax-tutor'
+    WEBINAR = 'webinars'
 
     # Menus
     VIEW_ALL = 'All'
@@ -238,7 +236,6 @@ class Web(object):
     VIEW_SOCIAL_SCIENCES = 'Social Sciences'
 
     VIEW_PARTNERS = 'OpenStax Tech Scout'
-    VIEW_ROVER = 'Rover by OpenStax'
     VIEW_TUTOR = 'OpenStax Tutor'
 
     VIEW_ABOUT_US = 'About Us'
@@ -448,7 +445,6 @@ class Web(object):
     ]
     MENU_TECHNOLOGY = [
         VIEW_TUTOR,
-        VIEW_ROVER,
         VIEW_PARTNERS
     ]
     MENU_WHAT_WE_DO = [
@@ -637,31 +633,34 @@ class Library():
     # AP_PHYS (Science)
     # AP_MACRO (Social Sciences)
     # AP_MICRO (Social Sciences)
-    HS_STATISTICS = 'Statistics High School'
     HS_PHYS = 'Physics'
+    HS_PHYS_ALT = 'HS Physics'
+    HS_STATISTICS = 'Statistics High School'
+    LLPH = 'Life Liberty and the Pursuit of Happiness'
 
     # Humanities
+    # LLPH (High School)
     US_HISTORY = 'U.S. History'
 
     # Math
     ALGEBRA = 'College Algebra'
+    ALGEBRA_COREQ = 'College Algebra with Corequisite Support'
     ALGEBRA_TRIG = 'Algebra and Trigonometry'
     # BUSINESS_STATS (Business)
     CALCULUS_1 = 'Calculus Volume 1'
     CALCULUS_2 = 'Calculus Volume 2'
     CALCULUS_3 = 'Calculus Volume 3'
-    ELEM_ALGEBRA = 'Elementary Algebra 2e'
+    ELEM_ALGEBRA_2E = 'Elementary Algebra 2e'
     # HS_STATISTICS (High School)
-    INTER_ALGEBRA = 'Intermediate Algebra 2e'
+    INTER_ALGEBRA_2E = 'Intermediate Algebra 2e'
     INTRO_STATS = 'Introductory Statistics'
-    PREALGEBRA = 'Prealgebra'
     PREALGEBRA_2E = 'Prealgebra 2e'
     PRECALCULUS = 'Precalculus'
 
     # Science
     ANATOMY_PHYS = 'Anatomy and Physiology'
     ANATOMY_PHYS_ALT = 'Anatomy & Physiology'
-    AP_BIO = 'Biology for AP® Courses'  # book title
+    AP_BIO = 'Biology for AP Courses'  # book title
     AP_BIO_ALT = 'AP Biology'  # shortened list title
     AP_PHYS = 'College Physics for AP® Courses'  # book title
     AP_PHYS_ALT = 'The AP Physics Collection'  # alternate title
@@ -683,18 +682,21 @@ class Library():
     U_PHYS_ALT = 'University Physics'
 
     # Social Sciences
-    AP_MACRO = 'Principles of Macroeconomics for AP® Courses 2e'
-    AP_MICRO = 'Principles of Microeconomics for AP® Courses 2e'
+    AP_MACRO_2E = 'Principles of Macroeconomics for AP Courses 2e'
+    AP_MICRO_2E = 'Principles of Microeconomics for AP Courses 2e'
     GOVERNMENT_2E = 'American Government 2e'
-    PRINCIPLES_ECON = 'Principles of Economics 2e'
-    PRINCIPLES_MACRO = 'Principles of Macroeconomics 2e'
-    PRINCIPLES_MICRO = 'Principles of Microeconomics 2e'
-    PSYCHOLOGY = 'Psychology 2e'
-    SOCIOLOGY = 'Introduction to Sociology 2e'
+    PRINCIPLES_ECON_2E = 'Principles of Economics 2e'
+    PRINCIPLES_MACRO_2E = 'Principles of Macroeconomics 2e'
+    PRINCIPLES_MICRO_2E = 'Principles of Microeconomics 2e'
+    PSYCHOLOGY = 'Psychology'
+    PSYCHOLOGY_2E = 'Psychology 2e'
+    PSYCHOLGIA = 'Psychologia'
+    SOCIOLOGY_2E = 'Introduction to Sociology 2e'
 
     # Fields and limiters
     ADOPTION = 'interest'
     ALL_BOOKS = 'all'
+    AP = 'ap'
     AVAILABLE = 'available'
     BOOKSHARE = 'bookshare'
     CATEGORY = 'subject'
@@ -718,14 +720,14 @@ class Library():
     PRE_RELEASE = 'Coming Soon'
     PRINT_COPY = 'print'
     SHORT_NAME = 'short_name'
+    SPANISH = 'Spanish'
     SUPERSEDED = 'not_current'
     VIDEOS = 'videos'
 
     # Subjects
     ALL = 'View All'
-    AP = 'AP®'
     BUSINESS = 'Business'
-    COLLEGE_SUCESS = 'College Success'
+    COLLEGE_SUCCESS = 'College Success'
     ESSENTIALS = 'Essentials'
     HIGH_SCHOOL = 'High School'
     HUMANITIES = 'Humanities'
@@ -733,7 +735,9 @@ class Library():
     SCIENCE = 'Science'
     SOCIAL = 'Social Sciences'
 
-    OLD_EDITIONS = []
+    OLD_EDITIONS = [
+        PSYCHOLOGY
+    ]
 
     def __init__(self):
         """Initialize the library."""
@@ -750,7 +754,7 @@ class Library():
                 self.HAS_I_UNLOCK: True,
                 self.HAS_S_LOCK: False,
                 self.HAS_S_UNLOCK: True,
-                self.INTEREST: 'Financial%20Accounting',
+                self.INTEREST: r'Financial%20Accounting',
                 self.IS_AP: False,
                 self.ITUNES: False,
                 self.KINDLE: True,
@@ -769,7 +773,7 @@ class Library():
                 self.HAS_I_UNLOCK: True,
                 self.HAS_S_LOCK: False,
                 self.HAS_S_UNLOCK: True,
-                self.INTEREST: 'Managerial%20Accounting',
+                self.INTEREST: r'Managerial%20Accounting',
                 self.IS_AP: False,
                 self.ITUNES: False,
                 self.KINDLE: True,
@@ -781,14 +785,14 @@ class Library():
             self.BUSINESS_STATS: {
                 self.BOOKSHARE: False,
                 self.CATEGORY: [self.ALL, self.BUSINESS, self.MATH],
-                self.CHEGG: True,
+                self.CHEGG: False,
                 self.COMP_COPY: False,
                 self.DETAILS: 'introductory-business-statistics',
                 self.HAS_I_LOCK: True,
                 self.HAS_I_UNLOCK: True,
                 self.HAS_S_LOCK: False,
                 self.HAS_S_UNLOCK: True,
-                self.INTEREST: 'Business%20Statistics',
+                self.INTEREST: r'Business%20Statistics',
                 self.IS_AP: False,
                 self.ITUNES: False,
                 self.KINDLE: True,
@@ -803,7 +807,7 @@ class Library():
                 self.CHEGG: False,
                 self.COMP_COPY: False,
                 self.DETAILS: 'business-law-i-essentials',
-                self.HAS_I_LOCK: False,
+                self.HAS_I_LOCK: True,
                 self.HAS_I_UNLOCK: True,
                 self.HAS_S_LOCK: False,
                 self.HAS_S_UNLOCK: True,
@@ -813,7 +817,7 @@ class Library():
                 self.KINDLE: False,
                 self.LANGUAGE: self.ENGLISH,
                 self.PRE_RELEASE: False,
-                self.PRINT_COPY: False,
+                self.PRINT_COPY: True,
                 self.SHORT_NAME: 'Business Law I Essentials',
                 self.VIDEOS: False, },
             self.ENTREPRENEUR: {
@@ -838,7 +842,7 @@ class Library():
             self.ETHICS: {
                 self.BOOKSHARE: False,
                 self.CATEGORY: [self.ALL, self.BUSINESS],
-                self.CHEGG: True,
+                self.CHEGG: False,
                 self.COMP_COPY: False,
                 self.DETAILS: 'business-ethics',
                 self.HAS_I_LOCK: True,
@@ -902,35 +906,35 @@ class Library():
                 self.HAS_I_UNLOCK: True,
                 self.HAS_S_LOCK: False,
                 self.HAS_S_UNLOCK: True,
-                self.INTEREST: 'Organizational%20Behavior',
+                self.INTEREST: r'Organizational%20Behavior',
                 self.IS_AP: False,
                 self.ITUNES: False,
                 self.KINDLE: False,
                 self.LANGUAGE: self.ENGLISH,
                 self.PRE_RELEASE: False,
-                self.PRINT_COPY: True,
+                self.PRINT_COPY: False,
                 self.SHORT_NAME: 'Organizational Behavior',
                 self.VIDEOS: True, },
 
             # College Success
             self.COLL_SUCCESS: {
                 self.BOOKSHARE: False,
-                self.CATEGORY: [self.ALL, self.COLLEGE_SUCESS],
-                self.CHEGG: False,
+                self.CATEGORY: [self.ALL, self.COLLEGE_SUCCESS],
+                self.CHEGG: True,
                 self.COMP_COPY: False,
                 self.DETAILS: 'college-success',
-                self.HAS_I_LOCK: False,
+                self.HAS_I_LOCK: True,
                 self.HAS_I_UNLOCK: True,
                 self.HAS_S_LOCK: False,
                 self.HAS_S_UNLOCK: True,
-                self.INTEREST: 'College%20Success',
+                self.INTEREST: r'College%20Success',
                 self.IS_AP: False,
                 self.ITUNES: False,
                 self.KINDLE: False,
                 self.LANGUAGE: self.ENGLISH,
-                self.PRE_RELEASE: True,
-                self.PRINT_COPY: False,
-                self.SHORT_NAME: '',
+                self.PRE_RELEASE: False,
+                self.PRINT_COPY: True,
+                self.SHORT_NAME: 'College Success',
                 self.VIDEOS: False, },
 
             # Essentials
@@ -939,55 +943,75 @@ class Library():
             # High School
             self.HS_PHYS: {
                 self.BOOKSHARE: False,
-                self.CATEGORY: [self.ALL],
+                self.CATEGORY: [self.ALL, self.HIGH_SCHOOL, self.SCIENCE],
                 self.CHEGG: False,
                 self.COMP_COPY: False,
                 self.DETAILS: 'physics',
-                self.HAS_I_LOCK: False,
-                self.HAS_I_UNLOCK: False,
+                self.HAS_I_LOCK: True,
+                self.HAS_I_UNLOCK: True,
                 self.HAS_S_LOCK: False,
-                self.HAS_S_UNLOCK: False,
-                self.INTEREST: 'HS%20Physics',
+                self.HAS_S_UNLOCK: True,
+                self.INTEREST: r'HS%20Physics',
                 self.IS_AP: False,
                 self.ITUNES: False,
                 self.KINDLE: False,
                 self.LANGUAGE: self.ENGLISH,
                 self.PRE_RELEASE: False,
-                self.PRINT_COPY: False,
-                self.SHORT_NAME: 'Physics',
+                self.PRINT_COPY: True,
+                self.SHORT_NAME: 'HS Physics',
                 self.VIDEOS: False, },
             self.HS_STATISTICS: {
                 self.BOOKSHARE: False,
-                self.CATEGORY: [self.ALL],
+                self.CATEGORY: [self.ALL, self.HIGH_SCHOOL, self.MATH],
                 self.CHEGG: False,
                 self.COMP_COPY: False,
                 self.DETAILS: 'statistics',
-                self.HAS_I_LOCK: False,
-                self.HAS_I_UNLOCK: False,
+                self.HAS_I_LOCK: True,
+                self.HAS_I_UNLOCK: True,
                 self.HAS_S_LOCK: False,
-                self.HAS_S_UNLOCK: False,
-                self.INTEREST: 'HS%20Statistics',
+                self.HAS_S_UNLOCK: True,
+                self.INTEREST: r'HS%20Statistics',
                 self.IS_AP: False,
                 self.ITUNES: False,
                 self.KINDLE: False,
                 self.LANGUAGE: self.ENGLISH,
                 self.PRE_RELEASE: False,
-                self.PRINT_COPY: False,
+                self.PRINT_COPY: True,
                 self.SHORT_NAME: 'HS Statistics',
+                self.VIDEOS: False, },
+            self.LLPH: {
+                self.BOOKSHARE: False,
+                self.CATEGORY: [self.ALL, self.HIGH_SCHOOL, self.HUMANITIES],
+                self.CHEGG: False,
+                self.COMP_COPY: False,
+                self.DETAILS: 'life-liberty-and-pursuit-happiness',
+                self.HAS_I_LOCK: True,
+                self.HAS_I_UNLOCK: True,
+                self.HAS_S_LOCK: False,
+                self.HAS_S_UNLOCK: True,
+                self.INTEREST: (r'Life%2C%20Liberty%2C%20and%20the%20'
+                                r'Pursuit%20of%20Happiness'),
+                self.IS_AP: False,
+                self.ITUNES: False,
+                self.KINDLE: False,
+                self.LANGUAGE: self.ENGLISH,
+                self.PRE_RELEASE: False,
+                self.PRINT_COPY: True,
+                self.SHORT_NAME: 'Life, Liberty, and the Pursuit of Happiness',
                 self.VIDEOS: False, },
 
             # Humanities
             self.US_HISTORY: {
                 self.BOOKSHARE: True,
                 self.CATEGORY: [self.ALL, self.HUMANITIES],
-                self.CHEGG: True,
+                self.CHEGG: False,
                 self.COMP_COPY: True,
                 self.DETAILS: 'us-history',
                 self.HAS_I_LOCK: True,
                 self.HAS_I_UNLOCK: True,
                 self.HAS_S_LOCK: False,
                 self.HAS_S_UNLOCK: True,
-                self.INTEREST: 'US%20History',
+                self.INTEREST: r'US%20History',
                 self.IS_AP: False,
                 self.ITUNES: True,
                 self.KINDLE: True,
@@ -1008,7 +1032,7 @@ class Library():
                 self.HAS_I_UNLOCK: True,
                 self.HAS_S_LOCK: False,
                 self.HAS_S_UNLOCK: True,
-                self.INTEREST: 'College%20Algebra',
+                self.INTEREST: r'College%20Algebra',
                 self.IS_AP: False,
                 self.ITUNES: False,
                 self.KINDLE: True,
@@ -1016,6 +1040,26 @@ class Library():
                 self.PRE_RELEASE: False,
                 self.PRINT_COPY: True,
                 self.SHORT_NAME: 'College Algebra',
+                self.VIDEOS: False, },
+            self.ALGEBRA_COREQ: {
+                self.BOOKSHARE: False,
+                self.CATEGORY: [self.ALL, self.MATH],
+                self.CHEGG: False,
+                self.COMP_COPY: False,
+                self.DETAILS: 'college-algebra-corequisite-support',
+                self.HAS_I_LOCK: True,
+                self.HAS_I_UNLOCK: True,
+                self.HAS_S_LOCK: False,
+                self.HAS_S_UNLOCK: True,
+                self.INTEREST: (r'College%20Algebra%20with%20'
+                                r'Corequisite%20Support'),
+                self.IS_AP: False,
+                self.ITUNES: False,
+                self.KINDLE: False,
+                self.LANGUAGE: self.ENGLISH,
+                self.PRE_RELEASE: False,
+                self.PRINT_COPY: True,
+                self.SHORT_NAME: 'College Algebra with Corequisite Support',
                 self.VIDEOS: False, },
             self.ALGEBRA_TRIG: {
                 self.BOOKSHARE: False,
@@ -1093,17 +1137,17 @@ class Library():
                 self.PRINT_COPY: True,
                 self.SHORT_NAME: 'Calculus',
                 self.VIDEOS: False, },
-            self.ELEM_ALGEBRA: {
+            self.ELEM_ALGEBRA_2E: {
                 self.BOOKSHARE: False,
                 self.CATEGORY: [self.ALL, self.MATH],
-                self.CHEGG: True,
+                self.CHEGG: False,
                 self.COMP_COPY: False,
-                self.DETAILS: 'elementary-algebra',
+                self.DETAILS: 'elementary-algebra-2e',
                 self.HAS_I_LOCK: True,
                 self.HAS_I_UNLOCK: True,
-                self.HAS_S_LOCK: True,
+                self.HAS_S_LOCK: False,
                 self.HAS_S_UNLOCK: True,
-                self.INTEREST: 'Elementary%20Algebra',
+                self.INTEREST: r'Elementary%20Algebra',
                 self.IS_AP: False,
                 self.ITUNES: False,
                 self.KINDLE: True,
@@ -1112,7 +1156,7 @@ class Library():
                 self.PRINT_COPY: True,
                 self.SHORT_NAME: 'Elementary Algebra',
                 self.VIDEOS: False, },
-            self.INTER_ALGEBRA: {
+            self.INTER_ALGEBRA_2E: {
                 self.BOOKSHARE: False,
                 self.CATEGORY: [self.ALL, self.MATH],
                 self.CHEGG: False,
@@ -1122,13 +1166,13 @@ class Library():
                 self.HAS_I_UNLOCK: True,
                 self.HAS_S_LOCK: True,
                 self.HAS_S_UNLOCK: True,
-                self.INTEREST: 'Intermediate%20Algebra',
+                self.INTEREST: r'Intermediate%20Algebra',
                 self.IS_AP: False,
                 self.ITUNES: False,
                 self.KINDLE: False,
                 self.LANGUAGE: self.ENGLISH,
                 self.PRE_RELEASE: False,
-                self.PRINT_COPY: False,
+                self.PRINT_COPY: True,
                 self.SHORT_NAME: 'Intermediate Algebra',
                 self.VIDEOS: False, },
             self.INTRO_STATS: {
@@ -1141,7 +1185,7 @@ class Library():
                 self.HAS_I_UNLOCK: True,
                 self.HAS_S_LOCK: False,
                 self.HAS_S_UNLOCK: True,
-                self.INTEREST: 'Introductory%20Statistics',
+                self.INTEREST: r'Introductory%20Statistics',
                 self.IS_AP: False,
                 self.ITUNES: True,
                 self.KINDLE: True,
@@ -1156,7 +1200,7 @@ class Library():
                 self.CHEGG: False,
                 self.COMP_COPY: False,
                 self.DETAILS: 'prealgebra-2e',
-                self.HAS_I_LOCK: False,
+                self.HAS_I_LOCK: True,
                 self.HAS_I_UNLOCK: True,
                 self.HAS_S_LOCK: False,
                 self.HAS_S_UNLOCK: True,
@@ -1165,8 +1209,8 @@ class Library():
                 self.ITUNES: False,
                 self.KINDLE: False,
                 self.LANGUAGE: self.ENGLISH,
-                self.PRE_RELEASE: True,
-                self.PRINT_COPY: False,
+                self.PRE_RELEASE: False,
+                self.PRINT_COPY: True,
                 self.SHORT_NAME: 'Prealgebra',
                 self.VIDEOS: False, },
             self.PRECALCULUS: {
@@ -1193,12 +1237,12 @@ class Library():
             self.ANATOMY_PHYS: {
                 self.BOOKSHARE: True,
                 self.CATEGORY: [self.ALL, self.SCIENCE],
-                self.CHEGG: True,
+                self.CHEGG: False,
                 self.COMP_COPY: False,
                 self.DETAILS: 'anatomy-and-physiology',
                 self.HAS_I_LOCK: True,
                 self.HAS_I_UNLOCK: True,
-                self.HAS_S_LOCK: True,
+                self.HAS_S_LOCK: False,
                 self.HAS_S_UNLOCK: True,
                 self.INTEREST: r'Anatomy%20%26%20Physiology',
                 self.IS_AP: False,
@@ -1211,15 +1255,15 @@ class Library():
                 self.VIDEOS: False, },
             self.AP_BIO: {
                 self.BOOKSHARE: False,
-                self.CATEGORY: [self.ALL, self.AP, self.SCIENCE],
-                self.CHEGG: True,
+                self.CATEGORY: [self.ALL, self.HIGH_SCHOOL, self.SCIENCE],
+                self.CHEGG: False,
                 self.COMP_COPY: False,
                 self.DETAILS: 'biology-ap-courses',
                 self.HAS_I_LOCK: True,
                 self.HAS_I_UNLOCK: True,
-                self.HAS_S_LOCK: True,
+                self.HAS_S_LOCK: False,
                 self.HAS_S_UNLOCK: True,
-                self.INTEREST: 'AP%20Bio',
+                self.INTEREST: r'AP%20Bio',
                 self.IS_AP: True,
                 self.ITUNES: False,
                 self.KINDLE: True,
@@ -1230,15 +1274,15 @@ class Library():
                 self.VIDEOS: False, },
             self.AP_PHYS: {
                 self.BOOKSHARE: False,
-                self.CATEGORY: [self.ALL, self.AP, self.SCIENCE],
+                self.CATEGORY: [self.ALL, self.HIGH_SCHOOL, self.SCIENCE],
                 self.CHEGG: False,
                 self.COMP_COPY: False,
                 self.DETAILS: 'college-physics-ap-courses',
                 self.HAS_I_LOCK: True,
                 self.HAS_I_UNLOCK: True,
-                self.HAS_S_LOCK: True,
+                self.HAS_S_LOCK: False,
                 self.HAS_S_UNLOCK: True,
-                self.INTEREST: 'AP%20Physics',
+                self.INTEREST: r'AP%20Physics',
                 self.IS_AP: True,
                 self.ITUNES: True,
                 self.KINDLE: True,
@@ -1250,8 +1294,8 @@ class Library():
             self.ASTRONOMY: {
                 self.BOOKSHARE: False,
                 self.CATEGORY: [self.ALL, self.SCIENCE],
-                self.CHEGG: True,
-                self.COMP_COPY: True,
+                self.CHEGG: False,
+                self.COMP_COPY: False,
                 self.DETAILS: 'astronomy',
                 self.HAS_I_LOCK: True,
                 self.HAS_I_UNLOCK: True,
@@ -1269,17 +1313,17 @@ class Library():
             self.BIOLOGY_2E: {
                 self.BOOKSHARE: False,
                 self.CATEGORY: [self.ALL, self.SCIENCE],
-                self.CHEGG: True,
+                self.CHEGG: False,
                 self.COMP_COPY: True,
                 self.DETAILS: 'biology-2e',
                 self.HAS_I_LOCK: True,
                 self.HAS_I_UNLOCK: True,
-                self.HAS_S_LOCK: True,
+                self.HAS_S_LOCK: False,
                 self.HAS_S_UNLOCK: True,
                 self.INTEREST: 'Biology',
                 self.IS_AP: False,
                 self.ITUNES: True,
-                self.KINDLE: True,
+                self.KINDLE: False,
                 self.LANGUAGE: self.ENGLISH,
                 self.PRE_RELEASE: False,
                 self.PRINT_COPY: True,
@@ -1288,12 +1332,12 @@ class Library():
             self.BIO_CONCEPTS: {
                 self.BOOKSHARE: True,
                 self.CATEGORY: [self.ALL, self.SCIENCE],
-                self.CHEGG: True,
+                self.CHEGG: False,
                 self.COMP_COPY: False,
                 self.DETAILS: 'concepts-biology',
                 self.HAS_I_LOCK: True,
                 self.HAS_I_UNLOCK: True,
-                self.HAS_S_LOCK: True,
+                self.HAS_S_LOCK: False,
                 self.HAS_S_UNLOCK: True,
                 self.INTEREST: r'Concepts%20of%20Bio%20(non-majors)',
                 self.IS_AP: False,
@@ -1312,7 +1356,7 @@ class Library():
                 self.DETAILS: 'chemistry-2e',
                 self.HAS_I_LOCK: True,
                 self.HAS_I_UNLOCK: True,
-                self.HAS_S_LOCK: True,
+                self.HAS_S_LOCK: False,
                 self.HAS_S_UNLOCK: True,
                 self.INTEREST: 'Chemistry',
                 self.IS_AP: False,
@@ -1331,7 +1375,7 @@ class Library():
                 self.DETAILS: 'chemistry-atoms-first-2e',
                 self.HAS_I_LOCK: True,
                 self.HAS_I_UNLOCK: True,
-                self.HAS_S_LOCK: True,
+                self.HAS_S_LOCK: False,
                 self.HAS_S_UNLOCK: True,
                 self.INTEREST: r'Chem%3A%20Atoms%20First',
                 self.IS_AP: False,
@@ -1402,8 +1446,8 @@ class Library():
             self.MICROBIOLOGY: {
                 self.BOOKSHARE: False,
                 self.CATEGORY: [self.ALL, self.SCIENCE],
-                self.CHEGG: True,
-                self.COMP_COPY: True,
+                self.CHEGG: False,
+                self.COMP_COPY: False,
                 self.DETAILS: 'microbiology',
                 self.HAS_I_LOCK: True,
                 self.HAS_I_UNLOCK: True,
@@ -1426,12 +1470,12 @@ class Library():
                 self.DETAILS: 'college-physics',
                 self.HAS_I_LOCK: True,
                 self.HAS_I_UNLOCK: True,
-                self.HAS_S_LOCK: True,
+                self.HAS_S_LOCK: False,
                 self.HAS_S_UNLOCK: True,
-                self.INTEREST: 'College%20Physics%20(Algebra)',
+                self.INTEREST: r'College%20Physics%20(Algebra)',
                 self.IS_AP: False,
                 self.ITUNES: True,
-                self.KINDLE: True,
+                self.KINDLE: False,
                 self.LANGUAGE: self.ENGLISH,
                 self.PRE_RELEASE: False,
                 self.PRINT_COPY: True,
@@ -1445,9 +1489,9 @@ class Library():
                 self.DETAILS: 'university-physics-volume-1',
                 self.HAS_I_LOCK: True,
                 self.HAS_I_UNLOCK: True,
-                self.HAS_S_LOCK: True,
+                self.HAS_S_LOCK: False,
                 self.HAS_S_UNLOCK: True,
-                self.INTEREST: 'University%20Physics%20(Calc)',
+                self.INTEREST: r'University%20Physics%20(Calc)',
                 self.IS_AP: False,
                 self.ITUNES: True,
                 self.KINDLE: True,
@@ -1464,9 +1508,9 @@ class Library():
                 self.DETAILS: 'university-physics-volume-2',
                 self.HAS_I_LOCK: True,
                 self.HAS_I_UNLOCK: True,
-                self.HAS_S_LOCK: True,
+                self.HAS_S_LOCK: False,
                 self.HAS_S_UNLOCK: True,
-                self.INTEREST: 'University%20Physics%20(Calc)',
+                self.INTEREST: r'University%20Physics%20(Calc)',
                 self.IS_AP: False,
                 self.ITUNES: True,
                 self.KINDLE: True,
@@ -1483,9 +1527,9 @@ class Library():
                 self.DETAILS: 'university-physics-volume-3',
                 self.HAS_I_LOCK: True,
                 self.HAS_I_UNLOCK: True,
-                self.HAS_S_LOCK: True,
+                self.HAS_S_LOCK: False,
                 self.HAS_S_UNLOCK: True,
-                self.INTEREST: 'University%20Physics%20(Calc)',
+                self.INTEREST: r'University%20Physics%20(Calc)',
                 self.IS_AP: False,
                 self.ITUNES: True,
                 self.KINDLE: True,
@@ -1496,9 +1540,9 @@ class Library():
                 self.VIDEOS: False, },
 
             # Social Sciences
-            self.AP_MACRO: {
+            self.AP_MACRO_2E: {
                 self.BOOKSHARE: False,
-                self.CATEGORY: [self.ALL, self.AP, self.SOCIAL],
+                self.CATEGORY: [self.ALL, self.HIGH_SCHOOL, self.SOCIAL],
                 self.CHEGG: False,
                 self.COMP_COPY: False,
                 self.DETAILS: 'principles-macroeconomics-ap-courses-2e',
@@ -1512,13 +1556,13 @@ class Library():
                 self.KINDLE: True,
                 self.LANGUAGE: self.ENGLISH,
                 self.PRE_RELEASE: False,
-                self.PRINT_COPY: False,
+                self.PRINT_COPY: True,
                 self.SHORT_NAME: ('Principles of Macroeconomics '
                                   'for AP Courses 2e'),
                 self.VIDEOS: False, },
-            self.AP_MICRO: {
+            self.AP_MICRO_2E: {
                 self.BOOKSHARE: False,
-                self.CATEGORY: [self.ALL, self.AP, self.SOCIAL],
+                self.CATEGORY: [self.ALL, self.HIGH_SCHOOL, self.SOCIAL],
                 self.CHEGG: False,
                 self.COMP_COPY: False,
                 self.DETAILS: 'principles-microeconomics-ap-courses-2e',
@@ -1532,7 +1576,7 @@ class Library():
                 self.KINDLE: True,
                 self.LANGUAGE: self.ENGLISH,
                 self.PRE_RELEASE: False,
-                self.PRINT_COPY: False,
+                self.PRINT_COPY: True,
                 self.SHORT_NAME: ('Principles of Microeconomics '
                                   'for AP Courses 2e'),
                 self.VIDEOS: False, },
@@ -1555,7 +1599,7 @@ class Library():
                 self.PRINT_COPY: True,
                 self.SHORT_NAME: 'American Government 2e',
                 self.VIDEOS: False, },
-            self.PRINCIPLES_ECON: {
+            self.PRINCIPLES_ECON_2E: {
                 self.BOOKSHARE: False,
                 self.CATEGORY: [self.ALL, self.SOCIAL],
                 self.CHEGG: False,
@@ -1574,7 +1618,7 @@ class Library():
                 self.PRINT_COPY: True,
                 self.SHORT_NAME: 'Principles of Economics 2e',
                 self.VIDEOS: False, },
-            self.PRINCIPLES_MACRO: {
+            self.PRINCIPLES_MACRO_2E: {
                 self.BOOKSHARE: False,
                 self.CATEGORY: [self.ALL, self.SOCIAL],
                 self.CHEGG: False,
@@ -1593,7 +1637,7 @@ class Library():
                 self.PRINT_COPY: True,
                 self.SHORT_NAME: 'Principles of Macroeconomics 2e',
                 self.VIDEOS: False, },
-            self.PRINCIPLES_MICRO: {
+            self.PRINCIPLES_MICRO_2E: {
                 self.BOOKSHARE: False,
                 self.CATEGORY: [self.ALL, self.SOCIAL],
                 self.CHEGG: False,
@@ -1612,13 +1656,51 @@ class Library():
                 self.PRINT_COPY: True,
                 self.SHORT_NAME: 'Principles of Microeconomics 2e',
                 self.VIDEOS: False, },
+            self.PSYCHOLGIA: {
+                self.BOOKSHARE: False,
+                self.CATEGORY: [self.ALL, self.SOCIAL],
+                self.CHEGG: False,
+                self.COMP_COPY: False,
+                self.DETAILS: 'psychologia-polska',
+                self.HAS_I_LOCK: False,
+                self.HAS_I_UNLOCK: False,
+                self.HAS_S_LOCK: False,
+                self.HAS_S_UNLOCK: False,
+                self.INTEREST: '',
+                self.IS_AP: False,
+                self.ITUNES: False,
+                self.KINDLE: False,
+                self.LANGUAGE: self.POLISH,
+                self.PRE_RELEASE: True,
+                self.PRINT_COPY: False,
+                self.SHORT_NAME: '',
+                self.VIDEOS: False, },
             self.PSYCHOLOGY: {
                 self.BOOKSHARE: False,
                 self.CATEGORY: [self.ALL, self.SOCIAL],
                 self.CHEGG: False,
                 self.COMP_COPY: False,
+                self.DETAILS: 'psychology',
+                self.HAS_I_LOCK: True,
+                self.HAS_I_UNLOCK: True,
+                self.HAS_S_LOCK: False,
+                self.HAS_S_UNLOCK: True,
+                self.INTEREST: 'Psychology',
+                self.IS_AP: False,
+                self.ITUNES: True,
+                self.KINDLE: True,
+                self.LANGUAGE: self.ENGLISH,
+                self.PRE_RELEASE: False,
+                self.PRINT_COPY: True,
+                self.SHORT_NAME: 'Psychology',
+                self.VIDEOS: False, },
+            self.PSYCHOLOGY_2E: {
+                self.BOOKSHARE: False,
+                self.CATEGORY: [self.ALL, self.SOCIAL],
+                self.CHEGG: False,
+                self.COMP_COPY: False,
                 self.DETAILS: 'psychology-2e',
-                self.HAS_I_LOCK: False,
+                self.HAS_I_LOCK: True,
                 self.HAS_I_UNLOCK: True,
                 self.HAS_S_LOCK: False,
                 self.HAS_S_UNLOCK: True,
@@ -1628,18 +1710,18 @@ class Library():
                 self.KINDLE: False,
                 self.LANGUAGE: self.ENGLISH,
                 self.PRE_RELEASE: False,
-                self.PRINT_COPY: False,
+                self.PRINT_COPY: True,
                 self.SHORT_NAME: 'Psychology',
                 self.VIDEOS: False, },
-            self.SOCIOLOGY: {
+            self.SOCIOLOGY_2E: {
                 self.BOOKSHARE: False,
                 self.CATEGORY: [self.ALL, self.SOCIAL],
-                self.CHEGG: True,
+                self.CHEGG: False,
                 self.COMP_COPY: False,
                 self.DETAILS: 'introduction-sociology-2e',
                 self.HAS_I_LOCK: True,
                 self.HAS_I_UNLOCK: True,
-                self.HAS_S_LOCK: True,
+                self.HAS_S_LOCK: False,
                 self.HAS_S_UNLOCK: True,
                 self.INTEREST: 'Introduction%20to%20Sociology',
                 self.IS_AP: False,
@@ -1696,7 +1778,7 @@ class Library():
     @property
     def college_success(self):
         """Return the College Success books."""
-        return self.get_by_category(self.COLLEGE_SUCESS)
+        return self.get_by_category(self.COLLEGE_SUCCESS)
 
     @property
     def coming_soon(self):
@@ -1819,6 +1901,7 @@ class Library():
                 self.AP_BIO_ALT: self.AP_BIO,
                 self.ACCOUNTING_1_ALT: self.ACCOUNTING_1,
                 self.ACCOUNTING_2_ALT: self.ACCOUNTING_2,
+                self.HS_PHYS_ALT: self.HS_PHYS,
                 self.MANAGEMENT_ALT: self.MANAGEMENT,
                 self.U_PHYS_ALT: self.U_PHYS_1, }
 

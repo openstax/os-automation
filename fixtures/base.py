@@ -40,9 +40,9 @@ def chrome_options(chrome_options, pytestconfig):
     """Set Chrome options."""
     if pytestconfig.getoption('--headless'):
         chrome_options.headless = True
-    chrome = ('Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_3) '
+    chrome = ('Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) '
               'AppleWebKit/537.36 (KHTML, like Gecko) '
-              'Chrome/80.0.3987.100 Safari/537.36')
+              'Chrome/87.0.4280.67 Safari/537.36')
     chrome_options.add_argument(f'--user-agent="{chrome}"')
 
     # Required to run in Travis containers
@@ -58,6 +58,7 @@ def chrome_options(chrome_options, pytestconfig):
     chrome_options.add_experimental_option(
         'prefs', {
             'profile.default_content_setting_values.notifications': 2, })
+    chrome_options.add_experimental_option('w3c', False)
 
     # Open developer tools for each tab
     # chrome_options.add_argument('--auto-open-devtools-for-tabs')
@@ -70,8 +71,8 @@ def firefox_options(firefox_options, pytestconfig):
     """Set Firefox options."""
     if pytestconfig.getoption('--headless'):
         firefox_options.headless = True
-    firefox = ('Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:72.0) '
-               'Gecko/20100101 Firefox/72.0')
+    firefox = ('Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:83.0) '
+               'Gecko/20100101 Firefox/83.0')
     firefox_options.add_argument(f'--user-agent="{firefox}"')
 
     return firefox_options

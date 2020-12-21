@@ -2,15 +2,14 @@
 
 from time import sleep
 
-from pypom import Page
-from selenium.common.exceptions import (StaleElementReferenceException,  # NOQA
-                                        TimeoutException,  # NOQA
-                                        WebDriverException)  # NOQA
+from pypom import Page, Region
+from selenium.common.exceptions import StaleElementReferenceException
 from selenium.webdriver.common.by import By
 
 from regions.web.footer import Dialog, Footer, Survey
 from regions.web.openstax_nav import OpenStaxNav
 from regions.web.sticky_note import StickyNote
+from regions.web.survey import MicroSurvey
 from regions.web.web_nav import WebNav
 from utils.utilities import Utility
 from utils.web import Web
@@ -21,6 +20,8 @@ class WebBase(Page):
 
     _async_hide_locator = (By.CSS_SELECTOR, '.async-hide')
 
+    _microsurvey_selector = '#microsurvey'
+
     def __init__(self, driver, base_url=None, timeout=60, **url_kwargs):
         """Override the initialization to hold onto the Web timeout."""
         super(WebBase, self).__init__(driver, base_url, timeout, **url_kwargs)
@@ -30,18 +31,9 @@ class WebBase(Page):
         """Return True when the page-loaded class is added to the body tag."""
         script = (r'document.addEventListener("load", function(event) {});')
         self.driver.execute_script(script)
+        web_nav = self.web_nav.loaded
         async_hide = bool(self.find_elements(*self._async_hide_locator))
-        return self.web_nav.loaded and not async_hide
-
-    def open(self):
-        """Open the page."""
-        for attempt in range(3):
-            try:
-                return super(WebBase, self).open()
-            except TimeoutException:
-                print('Attempt: {0}'.format(attempt + 1))
-                sleep(1)
-        raise WebDriverException('Website failed to open or load')
+        return web_nav and not async_hide
 
     @property
     def location(self) -> str:
@@ -82,6 +74,33 @@ class WebBase(Page):
     def survey(self):
         """Access the Pulse Insights pop up survey."""
         return Survey(self)
+
+    @property
+    def microsurvey(self) -> Region:
+        """Access the microsurvey.
+
+        :return: the microsurvey
+        :rtype: :py:class:`~regions.web.survey.MicroSurvey`
+
+        """
+        script = 'return document.querySelector(arguments[0]);'
+        root = self.driver.execute_script(script, self._microsurvey_selector)
+        return MicroSurvey(self, root)
+
+    def clear_notices(self):
+        """Clear pop up and dialog notices.
+
+        :return: None
+
+        """
+        if self.sticky_note.is_displayed():
+            self.sticky_note.close()
+        if self.privacy_notice.is_displayed():
+            self.privacy_notice.got_it()
+        if self.survey.is_displayed():
+            self.survey.close()
+        if self.microsurvey.is_displayed():
+            self.microsurvey.close()
 
     def reload(self):
         """Reload the current page.

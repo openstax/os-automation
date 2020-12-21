@@ -29,6 +29,20 @@ RESET_MATCHER = re.compile(
 )
 
 
+class Mailer:
+    """Use GILC email sender."""
+
+    def send(self, recipient: str, sender: str, subject: str, message: str):
+        smtp = smtplib.SMTP('restmail.net', 25)
+        msg = MIMEText(message)
+        msg['From'] = format_address(sender)
+        msg['To'] = format_address(recipient)
+        msg['Subject'] = subject
+        smtp.sendmail(
+            from_addr=sender[1], to_addrs=recipient[1], msg=msg.as_string())
+        smtp.quit()
+
+
 class GoogleBase(Page):
     """Use Gmail."""
 

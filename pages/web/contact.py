@@ -17,15 +17,16 @@ class Contact(WebBase):
     _form_locator = (By.CSS_SELECTOR, '.form')
     _topic_locator = (By.CSS_SELECTOR, '.select')
     _header_locator = (By.CSS_SELECTOR, '.hero h1')
-    _address_locator = (By.CSS_SELECTOR, '[data-html=mailing_address] p')
+    _address_locator = (By.CSS_SELECTOR, '.col address')
     _support_locator = (By.CSS_SELECTOR, '#main [href*=force]')
 
     @property
     def loaded(self):
         """Return True when the form and sidebar text are found."""
-        return (self.find_element(*self._form_locator) and
-                self.find_element(*self._topic_locator) and
-                self.find_element(*self._address_locator))
+        form = bool(self.find_elements(*self._form_locator))
+        topic = bool(self.find_elements(*self._topic_locator))
+        address = bool(self.find_elements(*self._address_locator))
+        return form and topic and address
 
     def is_displayed(self):
         """Return True if the heading is displayed."""

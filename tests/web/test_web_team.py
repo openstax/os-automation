@@ -9,7 +9,7 @@ from utils.web import Web
 @test_case('C210455')
 @nondestructive
 @web
-def test_the_openstax_team_is_split_into_three_groups(web_base_url, selenium):
+def test_the_openstax_team_is_split_into_two_groups(web_base_url, selenium):
     """The three group tabs are available.
 
     Note: FAB is currently missing and will be readded when
@@ -30,6 +30,7 @@ def test_the_openstax_team_is_split_into_three_groups(web_base_url, selenium):
             '"{0}" not in the expected group list'.format(tab.name)
 
 
+@skip_test(reason='Bio displayed for all leadership and advisor panels')
 @test_case('C210456')
 @nondestructive
 @web
@@ -110,7 +111,6 @@ def test_mobile_users_are_presented_bars(web_base_url, selenium):
     team = home.web_nav.openstax.view_team()
 
     for position, group in enumerate(team.bars):
-        print(position, group.name)
         # WHEN: they click on the group bar
         group.toggle()
 

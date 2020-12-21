@@ -9,8 +9,8 @@ from selenium.webdriver.support import expected_conditions as expect
 from selenium.webdriver.support.ui import WebDriverWait
 
 from tests.markers import nondestructive, skip_test, social, support, test_case
-from utils.email import EmailVerificationError, GoogleBase  # NOQA
-from utils.email import GuerrillaMail, RestMail, SendMail  # NOQA
+from utils.email import (  # NOQA
+    EmailVerificationError, GoogleBase, GuerrillaMail, Mailer, RestMail)  # NOQA
 
 TEST_EMAIL_SUBJECT = (
     '[OpenStax] Use PIN 999999 to confirm your email address'
@@ -101,17 +101,17 @@ def test_guerrilla_mail_received_pin_email(selenium):
 
 @test_case('C210268')
 @support
-def test_restmail_received_pin_email(google_signup):
+def test_restmail_received_pin_email():
     """Test a RestMail JSON email."""
     # GIVEN: A RestMail address with a verification PIN email
     username = 'openstax'
     email = RestMail(username)
     email.empty()  # clear the message inbox
 
-    send = SendMail(*google_signup, *GOOGLE)
+    send = Mailer()
     sender = ('OpenStax QA', 'noreply@openstax.org')
     recipient = ('OpenStax Automation', 'openstax@restmail.net')
-    send.send_mail(recipient, sender, TEST_EMAIL_SUBJECT, TEST_EMAIL_BODY)
+    send.send(recipient, sender, TEST_EMAIL_SUBJECT, TEST_EMAIL_BODY)
 
     # WHEN: Access the rest API
     box = email.get_mail()

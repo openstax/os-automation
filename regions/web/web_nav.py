@@ -69,7 +69,7 @@ class WebNavMenu(Region):
             Utility.click_option(driver=self.driver,
                                  locator=target,
                                  force_js_click=True)
-        sleep(0.25)
+        sleep(0.75)
         return self
 
     def _selection_helper(self, locator, destination, new_tab=False):
@@ -191,7 +191,7 @@ class WebNav(Region):
         def is_open(self):
             """Return True if the meta menu for mobile displays is open."""
             status = self.driver.execute_script(
-                'return document.querySelector("body.no-scroll");')
+                'return document.querySelector("html.no-scroll");')
             return bool(status)
 
         def toggle_menu(self):
@@ -366,14 +366,12 @@ class WebNav(Region):
         _menu_expand_locator = (By.CSS_SELECTOR, 'nav.dropdown-menu')
         _open_menu_locator = (By.CSS_SELECTOR, '[href="."]')
         _partners_option_locator = (By.CSS_SELECTOR, '[href$=partners]')
-        _rover_option_locator = (By.CSS_SELECTOR, '[href*=rover]')
         _tutor_option_locator = (By.CSS_SELECTOR, '[href$=openstax-tutor]')
 
         def is_available(self, label):
             """Return True if the menu option is available."""
             topics = {
                 Web.VIEW_TUTOR: self._tutor_option_locator[1],
-                Web.VIEW_ROVER: self._rover_option_locator[1],
                 Web.VIEW_PARTNERS: self._partners_option_locator[1],
             }
             return self._is_available(label, 'technology', topics)
@@ -389,18 +387,6 @@ class WebNav(Region):
             return self.open()._selection_helper(
                 self._tutor_option_locator,
                 TutorMarketing)
-
-        @property
-        def rover(self):
-            """Return the Rover by OpenStax link."""
-            return self.find_element(*self._rover_option_locator)
-
-        def view_rover(self):
-            """View the Rover by OpenStax marketing page."""
-            from pages.web.rover import Rover
-            return self.open()._selection_helper(
-                self._rover_option_locator,
-                Rover)
 
         @property
         def partners(self):
